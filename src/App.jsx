@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { supabase } from './supabase'
 import { useTheme } from './theme'
 import Auth from './components/Auth'
@@ -342,6 +343,7 @@ export default function App() {
           {toast.type === 'err' ? '✕ ' : '✓ '}{toast.msg}
         </div>
       )}
+      <Analytics />
     </div>
   )
 }
