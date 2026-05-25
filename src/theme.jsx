@@ -26,30 +26,34 @@ export const THEMES = {
     inputBg:   '#0b0f1a',
     logoBg:    '#ffffff',
     shadow:    '0 8px 32px #00000066',
+    toastOk:   '#0f2b1a',
+    toastErr:  '#3b0f0f',
   },
   light: {
-    bg:        '#f4f1ea',
-    bgDeep:    '#ebe7dd',
-    surface:   '#ffffff',
-    raised:    '#f9f7f3',
-    border:    '#ddd6c8',
+    bg:        '#f0ece2',
+    bgDeep:    '#e8e3d8',
+    surface:   '#faf8f4',
+    raised:    '#ffffff',
+    border:    '#d6cfc0',
     borderGold:'#c9a45244',
     gold:      '#8a6634',
     goldDark:  '#6b4f26',
-    cream:     '#4a3728',
+    cream:     '#3a2e22',
     muted:     '#7a6a58',
     text:      '#1a1410',
-    textSub:   '#4a3f35',
+    textSub:   '#3a3028',
     civel:     '#1d4ed8',
-    penal:     '#dc2626',
-    info:      '#059669',
-    doutrina:  '#7c3aed',
-    error:     '#dc2626',
-    success:   '#059669',
+    penal:     '#b91c1c',
+    info:      '#047857',
+    doutrina:  '#6d28d9',
+    error:     '#b91c1c',
+    success:   '#047857',
     cardBg:    '#ffffff',
-    inputBg:   '#faf8f5',
+    inputBg:   '#faf8f4',
     logoBg:    '#ffffff',
-    shadow:    '0 4px 16px #00000018',
+    shadow:    '0 4px 20px #00000014',
+    toastOk:   '#f0fdf4',
+    toastErr:  '#fef2f2',
   }
 }
 
@@ -63,7 +67,6 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('rj_theme', next)
   }
 
-  // Aplicar no body
   useEffect(() => {
     document.body.style.background = theme.bg
     document.body.style.color = theme.text
