@@ -1,9 +1,50 @@
 import { useState } from 'react'
 import { AREAS, Badge } from '../shared'
+import { useTheme } from '../theme'
 
-export default function EntradaDetail({ entry, onClose, onDelete, onEdit }) {
+function gerarCitacaoABNT(entry) {
+  const { area, tema, tipo, fonte, referencia, url, teses } = entry
+  const ano = new Date(entry.criado_em).getFullYear()
+
+  // Extrair dados do campo referencia
+  const fonteUpper = (fonte || '').toUpperCase()
+
+  if (tipo === 'doutrina') {
+    // SOBRENOME, Nome. Título. Edição. Local: Editora, Ano.
+    const partes = (fonte || '').split(/[\s,]+/)
+    const sobrenome = partes[0]?.toUpperCase() || fonteUpper
+    return `${sobrenome}. ${tema}. In: ${referencia || fonte}. Disponível em: ${url || 'acervo do escritório'}. Acesso em: ${new Date().toLocaleDateString('pt-BR')}.`
+  }
+
+  if (tipo === 'súmula') {
+    return `${fonteUpper}. ${referencia || tema}. ${url ? `Disponível em: ${url}.` : ''} Acesso em: ${new Date().toLocaleDateString('pt-BR')}.`
+  }
+
+  if (tipo === 'lei') {
+    return `BRASIL. ${referencia || tema}. ${url ? `Disponível em: ${url}.` : 'Disponível em: planalto.gov.br.'} Acesso em: ${new Date().toLocaleDateString('pt-BR')}.`
+  }
+
+  // Jurisprudência (padrão)
+  // TRIBUNAL. Tema. Tipo de recurso nº X. Relator: Min. Nome. Data.
+  const numProcesso = referencia?.match(/[\d.]+[\/\-]\w+/)?.[0] || referencia || ''
+  const relator = referencia?.match(/[Rr]el\.\s*([^,]+)/)?.[1]?.trim() || ''
+  const data = referencia?.match(/j\.\s*([\d\/]+)/)?.[1] || ''
+
+  let citacao = `${fonteUpper}. ${tema}.`
+  if (numProcesso) citacao += ` ${numProcesso}.`
+  if (relator) citacao += ` Relator: ${relator}.`
+  if (data) citacao += ` Julgado em: ${data}.`
+  if (url) citacao += ` Disponível em: ${url}.`
+  citacao += ` Acesso em: ${new Date().toLocaleDateString('pt-BR')}.`
+
+  return citacao
+}
+
+export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOnly }) {
+  const { theme, mode } = useTheme()
   const [copied, setCopied] = useState(false)
-  const am = AREAS[entry.area] || { color: '#6b7fa3' }
+  const [copiedAbnt, setCopiedAbnt] = useState(false)
+  const am = AREAS[entry.area] || { color: theme.muted }
 
   function copyFichamento() {
     const lines = [
@@ -17,8 +58,8 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit }) {
         `## Tese ${i + 1}: ${t.tese_assunto}`,
         `**Fundamentação:** ${t.fundamentacao_legal}`,
         `**Precedente:** ${t.precedente_sumula}`,
-        `**Ratio:** ${t.ratio_decidendi}`,
-        `**Aplicação:** ${t.aplicacao_pratica}`,
+        `**Ratio Decidendi:** ${t.ratio_decidendi}`,
+        `**Aplicação Prática:** ${t.aplicacao_pratica}`,
         '',
       ]),
     ].join('\n')
@@ -27,28 +68,40 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  function copyABNT() {
+    const citacao = gerarCitacaoABNT(entry)
+    navigator.clipboard.writeText(citacao)
+    setCopiedAbnt(true)
+    setTimeout(() => setCopiedAbnt(false), 2000)
+  }
+
+  const btnBase = {
+    border: `1px solid ${theme.border}`,
+    borderRadius: 8, padding: '8px 12px',
+    fontSize: 12, cursor: 'pointer',
+    fontFamily: 'IBM Plex Mono, monospace',
+    display: 'flex', alignItems: 'center', gap: 6,
+  }
+
   return (
     <div style={{ paddingBottom: 40 }}>
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
           <Badge label={entry.area} color={am.color} />
-          <Badge label={entry.tipo} color="#6b7fa3" />
+          <Badge label={entry.tipo} color={theme.muted} />
         </div>
         <div style={{
-          fontSize: 18,
-          fontWeight: 700,
-          color: '#e8dfc8',
+          fontSize: 18, fontWeight: 700, color: theme.cream,
           fontFamily: 'Playfair Display, serif',
-          lineHeight: 1.3,
-          marginBottom: 6,
+          lineHeight: 1.3, marginBottom: 6,
         }}>{entry.tema}</div>
-        <div style={{ fontSize: 11, color: '#6b7fa3' }}>
+        <div style={{ fontSize: 11, color: theme.muted }}>
           {entry.fonte}{entry.referencia ? ` · ${entry.referencia}` : ''}
         </div>
         {entry.url && (
           <a href={entry.url} target="_blank" rel="noreferrer"
-            style={{ fontSize: 11, color: '#c9a452', wordBreak: 'break-all', display: 'block', marginTop: 4 }}>
+            style={{ fontSize: 11, color: theme.gold, wordBreak: 'break-all', display: 'block', marginTop: 4 }}>
             {entry.url}
           </a>
         )}
@@ -56,36 +109,53 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit }) {
 
       {/* Ações */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {/* Copiar fichamento */}
         <button onClick={copyFichamento} style={{
-          flex: 1,
-          background: copied ? '#0f2b1a' : '#1a2236',
-          border: `1px solid ${copied ? '#10b981' : '#1e2d45'}`,
-          color: copied ? '#10b981' : '#6b7fa3',
-          borderRadius: 8, padding: '8px 12px',
-          fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+          ...btnBase,
+          background: copied ? theme.toastOk : theme.raised,
+          color: copied ? theme.success : theme.muted,
+          borderColor: copied ? theme.success : theme.border,
         }}>
-          {copied ? '✓ Copiado' : '⎘ Copiar fichamento'}
+          {copied ? '✓' : '⎘'} {copied ? 'Copiado' : 'Copiar fichamento'}
         </button>
-        <button onClick={onEdit} style={{
-          flex: 1,
-          background: '#1a2236', border: '1px solid #1e2d45',
-          color: '#6b7fa3', borderRadius: 8, padding: '8px 12px',
-          fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
-        }}>✎ Editar</button>
-        <button onClick={onDelete} style={{
-          background: '#2a0f0f', border: '1px solid #5a1f1f',
-          color: '#f87171', borderRadius: 8, padding: '8px 12px',
-          fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
-        }}>✕</button>
+
+        {/* Copiar ABNT */}
+        <button onClick={copyABNT} style={{
+          ...btnBase,
+          background: copiedAbnt ? theme.toastOk : theme.raised,
+          color: copiedAbnt ? theme.success : theme.gold,
+          borderColor: copiedAbnt ? theme.success : theme.borderGold,
+        }}>
+          {copiedAbnt ? '✓' : '§'} {copiedAbnt ? 'Copiado' : 'Citação ABNT'}
+        </button>
+
+        {/* Editar e Excluir — só para usuários logados */}
+        {!readOnly && (
+          <>
+            <button onClick={onEdit} style={{
+              ...btnBase,
+              background: theme.raised,
+              color: theme.muted,
+              marginLeft: 'auto',
+            }}>✎ Editar</button>
+            <button onClick={onDelete} style={{
+              ...btnBase,
+              background: mode === 'dark' ? '#2a0f0f' : '#fef2f2',
+              color: theme.error,
+              border: `1px solid ${mode === 'dark' ? '#5a1f1f' : '#fca5a5'}`,
+            }}>✕ Excluir</button>
+          </>
+        )}
       </div>
 
       {/* Teses */}
       {(entry.teses || []).map((t, i) => (
         <div key={i} style={{
-          background: '#1a2236', border: '1px solid #1e2d45',
+          background: theme.cardBg,
+          border: `1px solid ${theme.border}`,
           borderRadius: 12, padding: 16, marginBottom: 12,
         }}>
-          <div style={{ fontSize: 11, color: '#c9a452', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>
+          <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>
             Tese {i + 1}
           </div>
           {[
@@ -96,10 +166,10 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit }) {
             ['Aplicação Prática', t.aplicacao_pratica],
           ].map(([label, val]) => val ? (
             <div key={label} style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 10, color: '#6b7fa3', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>
+              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>
                 {label}
               </div>
-              <div style={{ fontSize: 13, color: '#e8dfc8', lineHeight: 1.6 }}>{val}</div>
+              <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7 }}>{val}</div>
             </div>
           ) : null)}
         </div>
