@@ -8,7 +8,7 @@ import EntradaForm from './components/EntradaForm'
 import BuscaPeca from './components/BuscaPeca'
 import { AREAS } from './shared'
 
-const VIEWS = { HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail', BUSCA: 'busca' }
+const VIEWS = { HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail', BUSCA: 'busca', LOGIN: 'login' }
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(window.innerWidth < 768)
@@ -23,7 +23,7 @@ function useIsMobile() {
 export default function App() {
   const { theme, mode, toggle } = useTheme()
   const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [authLoading, setAuthLoading] = useState(true)
   const [entradas, setEntradas] = useState([])
   const [view, setView] = useState(VIEWS.HOME)
   const [areaFilter, setAreaFilter] = useState('all')
@@ -31,16 +31,24 @@ export default function App() {
   const [selected, setSelected] = useState(null)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState(null)
+  const [showLogin, setShowLogin] = useState(false)
   const isMobile = useIsMobile()
 
+  const isLoggedIn = !!session
+
+  // Auth
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session); setLoading(false)
+      setSession(session); setAuthLoading(false)
     })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setSession(s))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => {
+      setSession(s)
+      if (s) setShowLogin(false)
+    })
     return () => subscription.unsubscribe()
   }, [])
 
+  // Carregar entradas (público — sem restrição de autenticação)
   const loadEntradas = useCallback(async () => {
     const { data, error } = await supabase
       .from('entradas').select('*').order('criado_em', { ascending: false })
@@ -48,13 +56,12 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!session) return
-    loadEntradas()
+    if (!authLoading) loadEntradas()
     const channel = supabase.channel('entradas-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'entradas' }, loadEntradas)
       .subscribe()
     return () => supabase.removeChannel(channel)
-  }, [session, loadEntradas])
+  }, [authLoading, loadEntradas])
 
   function notify(msg, type = 'ok') {
     setToast({ msg, type })
@@ -73,6 +80,13 @@ export default function App() {
       e.teses?.some(t => t.tese_assunto?.toLowerCase().includes(q))
     )
   })
+
+  // Ações que requerem login
+  function requireLogin(action) {
+    if (!isLoggedIn) { setShowLogin(true); return false }
+    action()
+    return true
+  }
 
   async function handleSave(entry) {
     setSaving(true)
@@ -100,19 +114,34 @@ export default function App() {
     else { notify('Entrada removida.'); setSelected(null); setView(VIEWS.HOME) }
   }
 
-  if (loading) return (
+  if (authLoading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
       Carregando...
     </div>
   )
 
-  if (!session) return <Auth />
+  // Tela de login sobreposta
+  if (showLogin) return (
+    <div>
+      <button onClick={() => setShowLogin(false)} style={{
+        position: 'fixed', top: 16, left: 16, zIndex: 200,
+        background: theme.raised, border: `1px solid ${theme.border}`,
+        borderRadius: 8, padding: '8px 14px', color: theme.muted,
+        fontSize: 13, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+      }}>← Voltar</button>
+      <Auth />
+    </div>
+  )
 
   const sidebarItems = [
     { id: 'all', label: 'Todas as Áreas', count: entradas.length, color: theme.gold },
-    ...Object.entries(AREAS).map(([k, v]) => ({ id: k, label: k, color: v.color, icon: v.icon, count: entradas.filter(e => e.area === k).length }))
+    ...Object.entries(AREAS).map(([k, v]) => ({
+      id: k, label: k, color: v.color, icon: v.icon,
+      count: entradas.filter(e => e.area === k).length
+    }))
   ]
 
+  // ── Sidebar desktop ────────────────────────────────────────────────────
   const Sidebar = () => (
     <div style={{
       width: 240, background: theme.surface,
@@ -121,21 +150,18 @@ export default function App() {
     }}>
       {/* Logo */}
       <div style={{
-        padding: '20px 16px 16px',
-        borderBottom: `1px solid ${theme.borderGold}`,
+        padding: '16px', borderBottom: `1px solid ${theme.borderGold}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         <div style={{
           background: theme.logoBg, borderRadius: 8,
-          padding: '8px 12px 6px',
-          boxShadow: theme.shadow,
+          padding: '8px 12px 6px', boxShadow: theme.shadow,
           border: mode === 'light' ? `1px solid ${theme.border}` : 'none',
         }}>
           <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 52, width: 'auto', display: 'block' }}/>
         </div>
       </div>
 
-      {/* Nav */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
         <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Áreas</div>
         {sidebarItems.map(n => {
@@ -161,79 +187,80 @@ export default function App() {
         <div style={{ margin: '12px 0', borderTop: `1px solid ${theme.border}` }}/>
         <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Ferramentas</div>
 
-        {[{ id: VIEWS.ADD, label: '+ Nova Entrada' }, { id: VIEWS.BUSCA, label: '✦ Busca para Peça' }].map(n => {
-          const active = view === n.id
-          return (
-            <button key={n.id} onClick={() => setView(n.id)}
-              style={{
-                width: '100%', background: active ? theme.gold + '11' : 'none',
-                border: 'none', borderLeft: `2px solid ${active ? theme.gold : 'transparent'}`,
-                padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
-                color: active ? theme.gold : theme.muted, fontSize: 12,
-                fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
-              }}>{n.label}</button>
-          )
-        })}
+        {/* Busca para Peça — público */}
+        <button onClick={() => setView(VIEWS.BUSCA)}
+          style={{
+            width: '100%', background: view === VIEWS.BUSCA ? theme.gold + '11' : 'none',
+            border: 'none', borderLeft: `2px solid ${view === VIEWS.BUSCA ? theme.gold : 'transparent'}`,
+            padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
+            color: view === VIEWS.BUSCA ? theme.gold : theme.muted, fontSize: 12,
+            fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
+          }}>✦ Busca para Peça</button>
+
+        {/* Nova Entrada — só logados */}
+        {isLoggedIn && (
+          <button onClick={() => setView(VIEWS.ADD)}
+            style={{
+              width: '100%', background: view === VIEWS.ADD ? theme.gold + '11' : 'none',
+              border: 'none', borderLeft: `2px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
+              padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
+              color: view === VIEWS.ADD ? theme.gold : theme.muted, fontSize: 12,
+              fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
+            }}>+ Nova Entrada</button>
+        )}
       </div>
 
       {/* Footer */}
       <div style={{ padding: '12px 16px', borderTop: `1px solid ${theme.borderGold}` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div style={{ fontSize: 10, color: theme.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-            {session.user.email}
+            {isLoggedIn ? session.user.email : 'Acesso público'}
           </div>
-          {/* Theme toggle */}
-          <button onClick={toggle} style={{
-            background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '0 0 0 8px',
-          }} title={mode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+          <button onClick={toggle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '0 0 0 8px' }}>
             {mode === 'dark' ? '☀️' : '🌙'}
           </button>
         </div>
-        <button onClick={() => supabase.auth.signOut()} style={{
-          width: '100%', background: theme.raised,
-          border: `1px solid ${theme.border}`,
-          borderRadius: 6, padding: '7px', color: theme.muted,
-          fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
-        }}>Sair</button>
+        {isLoggedIn
+          ? <button onClick={() => supabase.auth.signOut()} style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '7px', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
+          : <button onClick={() => setShowLogin(true)} style={{ width: '100%', background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: '7px', color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Acesso Interno</button>
+        }
       </div>
     </div>
   )
 
+  // ── Mobile header ─────────────────────────────────────────────────────
   const MobileHeader = () => (
     <div style={{
-      background: theme.surface,
-      borderBottom: `1px solid ${theme.borderGold}`,
-      padding: '10px 16px',
-      paddingTop: 'calc(10px + env(safe-area-inset-top))',
+      background: theme.surface, borderBottom: `1px solid ${theme.borderGold}`,
+      padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     }}>
-      <div style={{
-        background: theme.logoBg, borderRadius: 6,
-        padding: '4px 8px 3px',
-        border: mode === 'light' ? `1px solid ${theme.border}` : 'none',
-      }}>
+      <div style={{ background: theme.logoBg, borderRadius: 6, padding: '4px 8px 3px', border: mode === 'light' ? `1px solid ${theme.border}` : 'none' }}>
         <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 32, width: 'auto', display: 'block' }}/>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <button onClick={toggle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}>
           {mode === 'dark' ? '☀️' : '🌙'}
         </button>
-        <span style={{ fontSize: 10, color: theme.muted }}>{entradas.length} entradas</span>
+        {isLoggedIn
+          ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
+          : <button onClick={() => setShowLogin(true)} style={{ background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: '5px 10px', color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Login</button>
+        }
       </div>
     </div>
   )
 
+  // ── Mobile bottom nav ─────────────────────────────────────────────────
   const MobileNav = () => (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0,
       background: theme.surface, borderTop: `1px solid ${theme.borderGold}`,
-      display: 'flex', zIndex: 50,
-      paddingBottom: 'env(safe-area-inset-bottom)',
+      display: 'flex', zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
       {[
         { v: VIEWS.HOME, label: 'Início', icon: '🏠' },
         { v: VIEWS.BUSCA, label: 'Busca IA', icon: '✦' },
-        { v: VIEWS.ADD, label: 'Adicionar', icon: '+' },
+        ...(isLoggedIn ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
       ].map(item => (
         <button key={item.v} onClick={() => setView(item.v)}
           style={{
@@ -250,9 +277,11 @@ export default function App() {
     </div>
   )
 
+  // ── Conteúdo principal ────────────────────────────────────────────────
   function renderContent() {
     switch (view) {
       case VIEWS.ADD:
+        if (!isLoggedIn) { setShowLogin(true); return null }
         return (
           <div className="fade-up">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -263,6 +292,7 @@ export default function App() {
           </div>
         )
       case VIEWS.EDIT:
+        if (!isLoggedIn) return null
         return (
           <div className="fade-up">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -278,7 +308,13 @@ export default function App() {
             <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: 'IBM Plex Mono, monospace' }}>
               ← Voltar à lista
             </button>
-            <EntradaDetail entry={selected} onClose={() => setView(VIEWS.HOME)} onDelete={handleDelete} onEdit={() => setView(VIEWS.EDIT)}/>
+            <EntradaDetail
+              entry={selected}
+              onClose={() => setView(VIEWS.HOME)}
+              onDelete={handleDelete}
+              onEdit={() => requireLogin(() => setView(VIEWS.EDIT))}
+              readOnly={!isLoggedIn}
+            />
           </div>
         ) : null
       case VIEWS.BUSCA:
@@ -286,6 +322,7 @@ export default function App() {
       default:
         return (
           <div>
+            {/* Search */}
             <div style={{ position: 'relative', marginBottom: 16 }}>
               <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }}>🔍</span>
               <input value={search} onChange={e => setSearch(e.target.value)}
@@ -294,6 +331,7 @@ export default function App() {
               />
             </div>
 
+            {/* Filtros de área */}
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
               {[{ id: 'all', label: 'Todas', color: theme.gold }, ...Object.entries(AREAS).map(([k, v]) => ({ id: k, label: k, color: v.color, icon: v.icon }))].map(a => (
                 <button key={a.id} onClick={() => setAreaFilter(a.id)}
@@ -305,8 +343,8 @@ export default function App() {
                     borderRadius: 20, padding: '5px 12px', fontSize: 12, cursor: 'pointer',
                     fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap', transition: 'all .15s',
                   }}>
-                  {a.icon ? `${a.icon} ` : ''}{a.label}
-                  {' '}<span style={{ opacity: 0.6, fontSize: 10 }}>
+                  {a.icon ? `${a.icon} ` : ''}{a.label}{' '}
+                  <span style={{ opacity: 0.6, fontSize: 10 }}>
                     {a.id === 'all' ? entradas.length : entradas.filter(e => e.area === a.id).length}
                   </span>
                 </button>
@@ -314,7 +352,7 @@ export default function App() {
             </div>
 
             <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>{filtered.length} entrada(s)</div>
-            <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }} search=""/>
+            <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}/>
           </div>
         )
     }
@@ -334,8 +372,8 @@ export default function App() {
       {toast && (
         <div style={{
           position: 'fixed', bottom: isMobile ? 80 : 24, right: 16,
-          background: toast.type === 'err' ? '#3b0f0f' : (mode === 'dark' ? '#0f2b1a' : '#f0fdf4'),
-          border: `1px solid ${toast.type === 'err' ? '#f87171' : theme.success}`,
+          background: toast.type === 'err' ? theme.toastErr : theme.toastOk,
+          border: `1px solid ${toast.type === 'err' ? theme.error : theme.success}`,
           borderRadius: 8, padding: '10px 16px', color: theme.text,
           fontSize: 13, boxShadow: theme.shadow, zIndex: 100, maxWidth: 320,
         }}>
