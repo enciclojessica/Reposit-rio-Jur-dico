@@ -1,35 +1,29 @@
 import { useState } from 'react'
-import { BtnGold } from '../shared'
+import { supabase } from '../supabase'
+import { useTheme } from '../theme'
 
 export default function BuscaPeca({ entradas }) {
+  const { theme } = useTheme()
   const [query, setQuery] = useState('')
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
 
   async function buscar() {
     if (!query.trim() || loading) return
     setLoading(true)
     setResult('')
+    setError('')
     try {
-      const ctx = JSON.stringify(entradas.map(e => ({
-        area: e.area, tema: e.tema, tipo: e.tipo,
-        fonte: e.fonte, referencia: e.referencia, teses: e.teses,
-      })))
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1500,
-          system: 'Você é um assistente de prática jurídica. Dado um repositório de teses em JSON, selecione as mais relevantes para a peça indicada. Para cada tese selecionada, indique: (1) tese/assunto, (2) fundamentação legal, (3) precedente, (4) como aplicar especificamente na peça. Seja técnico e objetivo. Formate em markdown com seções claras. Se faltar cobertura no repositório para algum ponto da peça, aponte a lacuna.',
-          messages: [{ role: 'user', content: `Repositório:\n${ctx}\n\nPeça: ${query}` }],
-        }),
+      const { data, error: fnError } = await supabase.functions.invoke('busca-peca', {
+        body: { query, entradas },
       })
-      const json = await res.json()
-      setResult(json.content?.[0]?.text || 'Sem resposta.')
-    } catch {
-      setResult('Erro ao consultar a IA. Verifique a conexão.')
+      if (fnError) throw new Error(fnError.message)
+      if (data?.error) throw new Error(data.error)
+      setResult(data?.result || 'Sem resposta.')
+    } catch (err) {
+      setError('Erro ao consultar: ' + err.message + '. Verifique se a Edge Function está ativa.')
     }
     setLoading(false)
   }
@@ -43,43 +37,66 @@ export default function BuscaPeca({ entradas }) {
   return (
     <div style={{ paddingBottom: 40 }}>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#c9a452', fontFamily: 'Playfair Display, serif', marginBottom: 6 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 6 }}>
           Busca para Peça
         </div>
-        <div style={{ fontSize: 13, color: '#6b7fa3' }}>
+        <div style={{ fontSize: 13, color: theme.muted }}>
           Descreva a peça e a IA seleciona as teses relevantes do repositório.
         </div>
       </div>
 
-      <div style={{ background: '#1a2236', border: '1px solid #1e2d45', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+      <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
         <textarea
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Ex: Petição inicial de ação indenizatória por acidente de trânsito com colisão traseira, pedido de danos morais e materiais, réu é empresa locadora, Comarca de Santos/SP..."
           rows={5}
-          style={{ marginBottom: 12 }}
           onKeyDown={e => e.key === 'Enter' && e.ctrlKey && buscar()}
+          style={{
+            background: theme.inputBg,
+            border: `1px solid ${theme.border}`,
+            color: theme.text,
+            marginBottom: 12,
+          }}
         />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: '#6b7fa3' }}>
-            {entradas.length} entradas no repositório
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <span style={{ fontSize: 11, color: theme.muted }}>
+            Ctrl+Enter para buscar · {entradas.length} entradas no repositório
           </span>
-          <BtnGold onClick={buscar} disabled={loading || !query.trim()}>
-            {loading ? '✦ Buscando...' : '✦ Buscar Teses'}
-          </BtnGold>
+          <button onClick={buscar} disabled={loading || !query.trim()} style={{
+            background: loading || !query.trim()
+              ? theme.raised
+              : `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`,
+            color: loading || !query.trim() ? theme.muted : '#0b0f1a',
+            border: 'none', borderRadius: 8, padding: '10px 20px',
+            fontSize: 13, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace',
+            cursor: loading || !query.trim() ? 'not-allowed' : 'pointer',
+            boxShadow: loading || !query.trim() ? 'none' : `0 4px 12px ${theme.gold}44`,
+          }}>
+            {loading ? '⟳ Buscando...' : '✦ Buscar Teses'}
+          </button>
         </div>
       </div>
 
+      {error && (
+        <div style={{
+          background: '#3b0f0f', border: '1px solid #f87171',
+          borderRadius: 10, padding: 16, color: '#f87171', fontSize: 13, marginBottom: 16,
+        }}>
+          ✕ {error}
+        </div>
+      )}
+
       {result && (
-        <div style={{ background: '#1a2236', border: '1px solid #1e2d45', borderRadius: 12, padding: 16 }}>
+        <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: '#c9a452', textTransform: 'uppercase', letterSpacing: 2 }}>
+            <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2 }}>
               Teses Selecionadas
             </div>
             <button onClick={copyResult} style={{
-              background: copied ? '#0f2b1a' : '#0b0f1a',
-              border: `1px solid ${copied ? '#10b981' : '#1e2d45'}`,
-              color: copied ? '#10b981' : '#6b7fa3',
+              background: copied ? (theme === 'dark' ? '#0f2b1a' : '#f0fdf4') : theme.raised,
+              border: `1px solid ${copied ? theme.success : theme.border}`,
+              color: copied ? theme.success : theme.muted,
               borderRadius: 6, padding: '6px 12px',
               fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
             }}>
@@ -87,7 +104,7 @@ export default function BuscaPeca({ entradas }) {
             </button>
           </div>
           <div style={{
-            fontSize: 13, color: '#e8dfc8', lineHeight: 1.8,
+            fontSize: 13, color: theme.text, lineHeight: 1.8,
             whiteSpace: 'pre-wrap', fontFamily: 'monospace',
           }}>{result}</div>
         </div>
