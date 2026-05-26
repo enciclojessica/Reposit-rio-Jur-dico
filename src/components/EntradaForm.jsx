@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted } from '../shared'
+import TagInput from './TagInput'
 import { useTheme } from '../theme'
 
 const MAX_PDF_MB = 10
@@ -180,6 +181,12 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
         {inp(entry.fonte, v => setF('fonte', v), 'Ex: STJ, TJSP, Caio Mário da Silva Pereira')}
         <FieldLabel>Referência</FieldLabel>
         {inp(entry.referencia, v => setF('referencia', v), 'Ex: REsp 1.234.567/SP, Súmula 479 STJ, Art. 186 CC')}
+        <FieldLabel>Tags</FieldLabel>
+        <TagInput
+          tags={entry.tags || []}
+          onChange={v => setF('tags', v)}
+          todasAsTags={[]}
+        />
         <FieldLabel>URL (opcional)</FieldLabel>
         {inp(entry.url, v => setF('url', v), 'https://')}
       </div>

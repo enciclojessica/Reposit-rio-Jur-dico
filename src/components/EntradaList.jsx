@@ -1,4 +1,5 @@
 import { AREAS } from '../shared'
+import { TagPill } from './TagInput'
 import { useTheme } from '../theme'
 
 export default function EntradaList({ entradas, onSelect }) {
@@ -56,6 +57,11 @@ export default function EntradaList({ entradas, onSelect }) {
               fontFamily: 'Playfair Display, serif',
               fontWeight: 600, lineHeight: 1.3, marginBottom: 4,
             }}>{e.tema}</div>
+            {(e.tags || []).length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                {(e.tags || []).map(t => <TagPill key={t} tag={t} pequena />)}
+              </div>
+            )}
             {e.fonte && (
               <div style={{ fontSize: 11, color: theme.muted }}>{e.fonte}</div>
             )}

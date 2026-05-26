@@ -114,3 +114,10 @@ ALTER TABLE alertas ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "alertas_own" ON alertas FOR ALL
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Tags personalizadas nas entradas
+-- ═══════════════════════════════════════════════════════════
+
+ALTER TABLE entradas ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';

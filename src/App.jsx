@@ -12,6 +12,7 @@ import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import { AREAS } from './shared'
+import { TagPill } from './components/TagInput'
 
 const VIEWS = {
   ALERTAS: 'alertas',
@@ -40,6 +41,7 @@ export default function App() {
   const [entradas, setEntradas]     = useState([])
   const [view, setView]             = useState(VIEWS.HOME)
   const [areaFilter, setAreaFilter] = useState('all')
+  const [tagFilter, setTagFilter]   = useState(null)
   const [search, setSearch]         = useState('')
   const [selected, setSelected]     = useState(null)
   const [saving, setSaving]         = useState(false)
@@ -148,6 +150,8 @@ export default function App() {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3500)
   }
+
+  const todasAsTags = [...new Set(entradas.flatMap(e => e.tags || []))].sort()
 
   const filtered = entradas.filter(e => {
     const areaOk = areaFilter === 'all' || e.area === areaFilter
@@ -469,7 +473,23 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>{filtered.length} entrada(s)</div>
+
+            {/* Filtro por tag */}
+            {todasAsTags.length > 0 && (
+              <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4, flexWrap: 'wrap' }}>
+                <button onClick={() => setTagFilter(null)}
+                  style={{ flexShrink: 0, background: !tagFilter ? theme.gold + '22' : theme.raised, color: !tagFilter ? theme.gold : theme.muted, border: `1px solid ${!tagFilter ? theme.gold + '66' : theme.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                  todas as tags
+                </button>
+                {todasAsTags.map(t => (
+                  <button key={t} onClick={() => setTagFilter(tagFilter === t ? null : t)}
+                    style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                    <TagPill tag={t} pequena style={{ opacity: tagFilter && tagFilter !== t ? 0.45 : 1 }} />
+                  </button>
+                ))}
+              </div>
+            )}
+            <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>{filtered.length} entrada(s){tagFilter ? ` com tag #${tagFilter}` : ''}</div>
             <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}/>
           </div>
         )
