@@ -15,6 +15,7 @@ import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
+import Informativos from './components/Informativos'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -23,7 +24,8 @@ const VIEWS = {
   EDITOR:     'editor',
   DASHBOARD: 'dashboard',
   IMPORTAR:   'importar',
-  FLASHCARDS: 'flashcards',
+  FLASHCARDS:   'flashcards',
+  INFORMATIVOS: 'informativos',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -433,7 +435,8 @@ export default function App() {
         { v: VIEWS.HOME,     label: 'Início',    icon: '🏠' },
         { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
-        { v: VIEWS.DASHBOARD, label: 'Dashboard', icon: '◈' },
+        { v: VIEWS.DASHBOARD,    label: 'Dashboard',    icon: '◈' },
+        { v: VIEWS.INFORMATIVOS, label: 'Informativos', icon: '📋' },
         ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
         { v: VIEWS.ALERTAS,     label: 'Alertas',   icon: '🔔' },
         { v: VIEWS.FLASHCARDS, label: 'Flashcards', icon: '🃏' },
@@ -460,6 +463,16 @@ export default function App() {
 
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
+
+      case VIEWS.INFORMATIVOS:
+        return (
+          <div className="fade-up">
+            <Informativos
+              onImportar={entry => { setPrefillEntry(entry); setView(VIEWS.ADD) }}
+              isEditor={isEditor}
+            />
+          </div>
+        )
 
       case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
