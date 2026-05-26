@@ -13,6 +13,7 @@ import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
+import InstalarApp from './components/InstalarApp'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -598,6 +599,8 @@ export default function App() {
         </div>
         {isMobile && <MobileNav/>}
       </div>
+
+      <InstalarApp />
 
       {toast && (
         <div style={{ position: 'fixed', bottom: isMobile ? 80 : 24, right: 16, background: toast.type === 'err' ? theme.toastErr : theme.toastOk, border: `1px solid ${toast.type === 'err' ? theme.error : theme.success}`, borderRadius: 8, padding: '10px 16px', color: theme.text, fontSize: 13, boxShadow: theme.shadow, zIndex: 100, maxWidth: 320 }}>
