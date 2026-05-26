@@ -10,11 +10,13 @@ import PesquisaJuri from './components/PesquisaJuri'
 import Membros from './components/Membros'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
+import Dashboard from './components/Dashboard'
 import { AREAS } from './shared'
 
 const VIEWS = {
   ALERTAS: 'alertas',
-  EDITOR:  'editor',
+  EDITOR:     'editor',
+  DASHBOARD: 'dashboard',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -274,7 +276,8 @@ export default function App() {
         <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Ferramentas</div>
 
         {[
-          { v: VIEWS.PESQUISA, label: '⌕ Pesquisar Jurisprudência' },
+          { v: VIEWS.DASHBOARD, label: '◈ Dashboard' },
+        { v: VIEWS.PESQUISA, label: '⌕ Pesquisar Jurisprudência' },
           { v: VIEWS.BUSCA,    label: '✦ Busca para Peça' },
         { v: VIEWS.EDITOR,   label: '✎ Editor de Peças' },
         { v: VIEWS.ALERTAS,  label: '🔔 Alertas' },
@@ -366,6 +369,7 @@ export default function App() {
         { v: VIEWS.HOME,     label: 'Início',    icon: '🏠' },
         { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
+        { v: VIEWS.DASHBOARD, label: 'Dashboard', icon: '◈' },
         { v: VIEWS.ALERTAS,  label: 'Alertas',   icon: '🔔' },
         { v: VIEWS.EDITOR,   label: 'Editor',    icon: '✎' },
         ...(isEditor ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
@@ -390,6 +394,9 @@ export default function App() {
 
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
+
+      case VIEWS.DASHBOARD:
+        return <div className="fade-up"><Dashboard entradas={entradas}/></div>
 
       case VIEWS.EDITOR:
         return (
