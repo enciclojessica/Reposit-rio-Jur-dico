@@ -46,7 +46,9 @@ export default function App() {
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const isMobile = useIsMobile()
 
-  const role = membro?.role || null
+  // Se logado mas sem registro em membros (migração ainda não aplicada),
+  // concede acesso de editor como fallback para não bloquear o uso.
+  const role     = membro?.role || (session && !membroLoading ? 'editor' : null)
   const isAdmin  = role === 'admin'
   const isEditor = role === 'editor' || isAdmin
   const isMembro = !!membro
