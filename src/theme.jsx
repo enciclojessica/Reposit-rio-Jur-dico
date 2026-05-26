@@ -28,6 +28,7 @@ export const THEMES = {
     shadow:    '0 8px 32px #00000066',
     toastOk:   '#0f2b1a',
     toastErr:  '#3b0f0f',
+    btnMutedBg:'#1a2236',
   },
   light: {
     bg:        '#f0ece2',
@@ -54,6 +55,7 @@ export const THEMES = {
     shadow:    '0 4px 20px #00000014',
     toastOk:   '#f0fdf4',
     toastErr:  '#fef2f2',
+    btnMutedBg:'#f0ece2',
   }
 }
 
@@ -68,9 +70,19 @@ export function ThemeProvider({ children }) {
   }
 
   useEffect(() => {
-    document.body.style.background = theme.bg
-    document.body.style.color = theme.text
-  }, [theme])
+    const t = THEMES[mode]
+    document.body.style.background = t.bg
+    document.body.style.color = t.text
+
+    // Atualiza variáveis CSS globais (inputs, scrollbar)
+    const root = document.documentElement
+    root.style.setProperty('--input-bg',           t.inputBg)
+    root.style.setProperty('--input-border',       t.border)
+    root.style.setProperty('--input-color',        t.text)
+    root.style.setProperty('--input-focus-border', t.gold)
+    root.style.setProperty('--scrollbar-track',    t.surface)
+    root.style.setProperty('--scrollbar-thumb',    t.border)
+  }, [mode])
 
   return (
     <ThemeContext.Provider value={{ theme, mode, toggle }}>

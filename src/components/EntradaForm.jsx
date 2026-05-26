@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted } from '../shared'
+import { useTheme } from '../theme'
 
 export default function EntradaForm({ initial, onSave, onCancel, loading }) {
+  const { theme } = useTheme()
   const [entry, setEntry] = useState(initial || emptyEntry())
 
   function setF(field, val) { setEntry(e => ({ ...e, [field]: val })) }
@@ -29,10 +31,18 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
     ? <textarea value={val} onChange={ev => fn(ev.target.value)} placeholder={placeholder} rows={3} />
     : <input value={val} onChange={ev => fn(ev.target.value)} placeholder={placeholder} />
 
+  const cardStyle = {
+    background: theme.cardBg,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  }
+
   return (
     <div style={{ paddingBottom: 40 }}>
       {/* Identificação */}
-      <div style={{ background: '#1a2236', border: '1px solid #1e2d45', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+      <div style={cardStyle}>
         <SectionLabel>Identificação</SectionLabel>
         <FieldLabel>Área</FieldLabel>
         <select value={entry.area} onChange={e => setF('area', e.target.value)}>
@@ -54,11 +64,11 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
 
       {/* Teses */}
       {entry.teses.map((t, i) => (
-        <div key={i} style={{ background: '#1a2236', border: '1px solid #1e2d45', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+        <div key={i} style={cardStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <SectionLabel>Tese {i + 1}</SectionLabel>
             {entry.teses.length > 1 && (
-              <button onClick={() => removeTese(i)} style={{ background: 'none', border: 'none', color: '#6b7fa3', cursor: 'pointer', fontSize: 18 }}>✕</button>
+              <button onClick={() => removeTese(i)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 18 }}>✕</button>
             )}
           </div>
           <FieldLabel>Tese / Assunto</FieldLabel>

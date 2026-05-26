@@ -3,6 +3,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS variables controladas pelo ThemeProvider */
+:root {
+  --input-bg:           #0b0f1a;
+  --input-border:       #1e2d45;
+  --input-color:        #f0f4ff;
+  --input-focus-border: #c9a452;
+  --scrollbar-track:    #111827;
+  --scrollbar-thumb:    #1e2d45;
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -14,15 +24,15 @@ body {
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: #111827; }
-::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 4px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
 
 input, select, textarea {
-  background: #0b0f1a;
-  border: 1px solid #1e2d45;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   padding: 10px 12px;
-  color: #f0f4ff;
+  color: var(--input-color);
   font-size: 14px;
   font-family: 'IBM Plex Mono', monospace;
   width: 100%;
@@ -30,7 +40,7 @@ input, select, textarea {
   transition: border-color 0.15s;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: #c9a452;
+  border-color: var(--input-focus-border);
 }
 textarea { resize: vertical; }
 

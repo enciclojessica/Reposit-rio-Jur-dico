@@ -1,3 +1,5 @@
+import { useTheme } from './theme'
+
 export const AREAS = {
   'Cível':       { color: '#3b82f6', icon: '⚖️' },
   'Penal':       { color: '#ef4444', icon: '🔒' },
@@ -42,10 +44,11 @@ export function Badge({ label, color, small }) {
 }
 
 export function FieldLabel({ children }) {
+  const { theme } = useTheme()
   return (
     <div style={{
       fontSize: 10,
-      color: '#6b7fa3',
+      color: theme.muted,
       textTransform: 'uppercase',
       letterSpacing: 1.5,
       marginBottom: 6,
@@ -55,10 +58,11 @@ export function FieldLabel({ children }) {
 }
 
 export function SectionLabel({ children }) {
+  const { theme } = useTheme()
   return (
     <div style={{
       fontSize: 11,
-      color: '#c9a452',
+      color: theme.gold,
       textTransform: 'uppercase',
       letterSpacing: 2,
       marginBottom: 14,
@@ -68,13 +72,14 @@ export function SectionLabel({ children }) {
 }
 
 export function BtnGold({ onClick, children, disabled, style = {} }) {
+  const { theme } = useTheme()
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       style={{
-        background: disabled ? '#1e2d45' : '#c9a452',
-        color: disabled ? '#6b7fa3' : '#0b0f1a',
+        background: disabled ? theme.border : theme.gold,
+        color: disabled ? theme.muted : '#0b0f1a',
         border: 'none',
         borderRadius: 8,
         padding: '10px 20px',
@@ -89,13 +94,14 @@ export function BtnGold({ onClick, children, disabled, style = {} }) {
 }
 
 export function BtnMuted({ onClick, children, style = {} }) {
+  const { theme } = useTheme()
   return (
     <button
       onClick={onClick}
       style={{
-        background: '#1a2236',
-        color: '#6b7fa3',
-        border: '1px solid #1e2d45',
+        background: theme.btnMutedBg,
+        color: theme.muted,
+        border: `1px solid ${theme.border}`,
         borderRadius: 8,
         padding: '10px 16px',
         fontSize: 13,
