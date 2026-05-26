@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AREAS } from '../shared'
+import { exportarDocx } from '../utils/exportarDocx'
 
 // ── Formatar citação inline e ABNT ────────────────────────────────────────
 function citacaoInline(entry, tese) {
@@ -237,7 +238,8 @@ export default function EditorPecas({ entradas }) {
   const { theme, mode } = useTheme()
   const [conteudo, setConteudo] = useState('')
   const [titulo, setTitulo]     = useState('')
-  const [copiado, setCopiado]   = useState(false)
+  const [copiado, setCopiado]     = useState(false)
+  const [exportando, setExportando] = useState(false)
   const [painelAberto, setPainelAberto] = useState(true)
   const editorRef = useRef()
 
@@ -265,6 +267,17 @@ export default function EditorPecas({ entradas }) {
     navigator.clipboard.writeText(texto)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
+  }
+
+  async function baixarDocx() {
+    if (!conteudo.trim() || exportando) return
+    setExportando(true)
+    try {
+      await exportarDocx({ titulo, conteudo, entradas })
+    } catch (e) {
+      console.error('Erro ao exportar .docx', e)
+    }
+    setExportando(false)
   }
 
   function baixarTxt() {
@@ -308,6 +321,10 @@ export default function EditorPecas({ entradas }) {
           <button onClick={copiarTudo} disabled={!conteudo.trim()}
             style={{ background: copiado ? theme.success + '22' : theme.raised, color: copiado ? theme.success : theme.muted, border: `1px solid ${copiado ? theme.success + '44' : theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
             {copiado ? '✓ Copiado' : '⎘ Copiar'}
+          </button>
+          <button onClick={baixarDocx} disabled={!conteudo.trim() || exportando}
+            style={{ background: exportando ? theme.border : theme.raised, color: exportando ? theme.muted : theme.gold, border: `1px solid ${exportando ? theme.border : theme.gold + '55'}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: !conteudo.trim() || exportando ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600 }}>
+            {exportando ? '⟳ Gerando...' : '↓ .docx'}
           </button>
           <button onClick={baixarTxt} disabled={!conteudo.trim()}
             style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
