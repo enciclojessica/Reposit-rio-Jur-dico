@@ -233,34 +233,133 @@ function PainelCitacoes({ entradas, onInserir, editorRef, conteudo, setConteudo 
   )
 }
 
+// ── Gerenciador de rascunhos (localStorage) ───────────────────────────────
+const DRAFTS_KEY = 'rj_drafts_v2'
+
+function carregarRascunhos() {
+  try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) || '[]') } catch { return [] }
+}
+function salvarRascunhos(lista) {
+  localStorage.setItem(DRAFTS_KEY, JSON.stringify(lista))
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }
+
+// ── Painel de histórico de rascunhos ─────────────────────────────────────
+function PainelRascunhos({ rascunhos, rascunhoAtualId, onCarregar, onNovo, onExcluir, onFechar }) {
+  const { theme, mode } = useTheme()
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 200,
+      background: '#00000066', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }} onClick={onFechar}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: theme.surface, border: `1px solid ${theme.borderGold}`,
+        borderRadius: 16, width: '100%', maxWidth: 540,
+        maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+        boxShadow: theme.shadow, margin: 16,
+      }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: `1px solid ${theme.border}` }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
+            Rascunhos salvos
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={onNovo} style={{
+              background: theme.gold, color: '#0b0f1a', border: 'none',
+              borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+            }}>+ Novo rascunho</button>
+            <button onClick={onFechar} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>×</button>
+          </div>
+        </div>
+
+        {/* Lista */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: 12 }}>
+          {rascunhos.length === 0 ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: theme.muted, fontSize: 13 }}>
+              <div style={{ fontSize: 32, marginBottom: 10, opacity: 0.3 }}>📝</div>
+              Nenhum rascunho salvo ainda.
+            </div>
+          ) : rascunhos.map(r => {
+            const ativo = r.id === rascunhoAtualId
+            const palavras = r.conteudo?.trim() ? r.conteudo.trim().split(/\s+/).length : 0
+            const data = new Date(r.atualizado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+            return (
+              <div key={r.id} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '12px 14px', borderRadius: 10, marginBottom: 6,
+                background: ativo ? theme.gold + '11' : theme.cardBg,
+                border: `1px solid ${ativo ? theme.gold + '44' : theme.border}`,
+                cursor: 'pointer', transition: 'all .15s',
+              }} onClick={() => onCarregar(r)}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, color: theme.text, fontWeight: ativo ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>
+                    {r.titulo || 'Sem título'}
+                    {ativo && <span style={{ marginLeft: 8, fontSize: 9, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1 }}>atual</span>}
+                  </div>
+                  <div style={{ fontSize: 11, color: theme.muted, display: 'flex', gap: 10 }}>
+                    <span>{palavras} palavra{palavras !== 1 ? 's' : ''}</span>
+                    <span>·</span>
+                    <span>{data}</span>
+                  </div>
+                  {r.conteudo?.trim() && (
+                    <div style={{ fontSize: 11, color: theme.muted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: 0.7 }}>
+                      {r.conteudo.trim().slice(0, 80)}...
+                    </div>
+                  )}
+                </div>
+                <button onClick={e => { e.stopPropagation(); onExcluir(r.id) }}
+                  style={{ background: 'none', border: 'none', color: theme.error, cursor: 'pointer', fontSize: 16, padding: '4px', flexShrink: 0 }}
+                  title="Excluir rascunho">✕</button>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Editor principal ──────────────────────────────────────────────────────
 export default function EditorPecas({ entradas }) {
   const { theme, mode } = useTheme()
-  const [conteudo, setConteudo] = useState('')
-  const [titulo, setTitulo]     = useState('')
-  const [copiado, setCopiado]     = useState(false)
-  const [exportando, setExportando] = useState(false)
+  const [conteudo, setConteudo]       = useState('')
+  const [titulo, setTitulo]           = useState('')
+  const [rascunhoAtualId, setRascunhoAtualId] = useState(null)
+  const [rascunhos, setRascunhos]     = useState(carregarRascunhos)
+  const [copiado, setCopiado]         = useState(false)
+  const [exportando, setExportando]   = useState(false)
   const [painelAberto, setPainelAberto] = useState(true)
+  const [mostrarRascunhos, setMostrarRascunhos] = useState(false)
+  const [autoSalvo, setAutoSalvo]     = useState(false)
   const editorRef = useRef()
 
-  // Persistir rascunho no localStorage
+  // Auto-salvar rascunho atual a cada 1 segundo de inatividade
   useEffect(() => {
-    const salvo = localStorage.getItem('rj_editor_draft')
-    if (salvo) {
-      try {
-        const { titulo: t, conteudo: c } = JSON.parse(salvo)
-        if (t) setTitulo(t)
-        if (c) setConteudo(c)
-      } catch {}
-    }
-  }, [])
-
-  useEffect(() => {
+    if (!conteudo.trim() && !titulo.trim()) return
     const timeout = setTimeout(() => {
-      localStorage.setItem('rj_editor_draft', JSON.stringify({ titulo, conteudo }))
-    }, 800)
+      setRascunhos(prev => {
+        const agora = new Date().toISOString()
+        let lista
+        if (rascunhoAtualId) {
+          lista = prev.map(r => r.id === rascunhoAtualId
+            ? { ...r, titulo, conteudo, atualizado_em: agora }
+            : r
+          )
+        } else {
+          const novoId = uid()
+          setRascunhoAtualId(novoId)
+          lista = [{ id: novoId, titulo, conteudo, criado_em: agora, atualizado_em: agora }, ...prev]
+        }
+        salvarRascunhos(lista)
+        return lista
+      })
+      setAutoSalvo(true)
+      setTimeout(() => setAutoSalvo(false), 2000)
+    }, 1000)
     return () => clearTimeout(timeout)
-  }, [titulo, conteudo])
+  }, [titulo, conteudo, rascunhoAtualId])
 
   function copiarTudo() {
     const texto = titulo ? `${titulo}\n\n${conteudo}` : conteudo
@@ -272,11 +371,8 @@ export default function EditorPecas({ entradas }) {
   async function baixarDocx() {
     if (!conteudo.trim() || exportando) return
     setExportando(true)
-    try {
-      await exportarDocx({ titulo, conteudo, entradas })
-    } catch (e) {
-      console.error('Erro ao exportar .docx', e)
-    }
+    try { await exportarDocx({ titulo, conteudo, entradas }) }
+    catch (e) { console.error('Erro ao exportar .docx', e) }
     setExportando(false)
   }
 
@@ -290,11 +386,30 @@ export default function EditorPecas({ entradas }) {
     URL.revokeObjectURL(url)
   }
 
-  function limpar() {
-    if (!conteudo.trim() || confirm('Descartar o rascunho atual?')) {
-      setTitulo('')
-      setConteudo('')
-      localStorage.removeItem('rj_editor_draft')
+  function novoRascunho() {
+    if (conteudo.trim() && !confirm('Abrir novo rascunho? O atual já está salvo no histórico.')) return
+    setTitulo('')
+    setConteudo('')
+    setRascunhoAtualId(null)
+    setMostrarRascunhos(false)
+  }
+
+  function carregarRascunho(r) {
+    setTitulo(r.titulo || '')
+    setConteudo(r.conteudo || '')
+    setRascunhoAtualId(r.id)
+    setMostrarRascunhos(false)
+  }
+
+  function excluirRascunho(id) {
+    if (!confirm('Excluir este rascunho permanentemente?')) return
+    setRascunhos(prev => {
+      const lista = prev.filter(r => r.id !== id)
+      salvarRascunhos(lista)
+      return lista
+    })
+    if (rascunhoAtualId === id) {
+      setTitulo(''); setConteudo(''); setRascunhoAtualId(null)
     }
   }
 
@@ -305,18 +420,19 @@ export default function EditorPecas({ entradas }) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
       {/* ── Toolbar ────────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0 14px',
-        flexWrap: 'wrap', flexShrink: 0,
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0 14px', flexWrap: 'wrap', flexShrink: 0 }}>
         <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', flex: 1 }}>
           Editor de Peças
         </div>
-
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {/* Rascunhos */}
+          <button onClick={() => setMostrarRascunhos(true)}
+            style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 5 }}>
+            📝 Rascunhos <span style={{ background: theme.border, borderRadius: 10, padding: '1px 6px', fontSize: 9 }}>{rascunhos.length}</span>
+          </button>
           <button onClick={() => setPainelAberto(p => !p)}
             style={{ background: painelAberto ? theme.gold + '22' : theme.raised, color: painelAberto ? theme.gold : theme.muted, border: `1px solid ${painelAberto ? theme.gold + '44' : theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
-            {painelAberto ? '← Ocultar citações' : '→ Citações'}
+            {painelAberto ? '← Citações' : '→ Citações'}
           </button>
           <button onClick={copiarTudo} disabled={!conteudo.trim()}
             style={{ background: copiado ? theme.success + '22' : theme.raised, color: copiado ? theme.success : theme.muted, border: `1px solid ${copiado ? theme.success + '44' : theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
@@ -330,9 +446,9 @@ export default function EditorPecas({ entradas }) {
             style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
             ↓ .txt
           </button>
-          <button onClick={limpar}
+          <button onClick={novoRascunho}
             style={{ background: 'none', color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
-            ✕ Limpar
+            ✕ Novo
           </button>
         </div>
       </div>
@@ -342,69 +458,55 @@ export default function EditorPecas({ entradas }) {
 
         {/* Editor */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {/* Título */}
           <input
             value={titulo}
             onChange={e => setTitulo(e.target.value)}
             placeholder="Título da peça (opcional)"
-            style={{
-              border: 'none', borderBottom: `1px solid ${theme.border}`,
-              borderRadius: '12px 12px 0 0', background: theme.cardBg,
-              fontSize: 15, fontWeight: 700, padding: '14px 20px',
-              color: theme.text, fontFamily: 'Playfair Display, Georgia, serif',
-              outline: 'none', width: '100%', boxSizing: 'border-box',
-            }}
+            style={{ border: 'none', borderBottom: `1px solid ${theme.border}`, borderRadius: '12px 12px 0 0', background: theme.cardBg, fontSize: 15, fontWeight: 700, padding: '14px 20px', color: theme.text, fontFamily: 'Playfair Display, Georgia, serif', outline: 'none', width: '100%', boxSizing: 'border-box' }}
           />
-
-          {/* Textarea principal */}
           <textarea
             ref={editorRef}
             value={conteudo}
             onChange={e => setConteudo(e.target.value)}
-            placeholder={`Redija a peça aqui.\n\nDicas:\n• Selecione um trecho e clique em "✦ Sugerir para este trecho" no painel lateral para receber sugestões de teses relevantes do repositório.\n• Clique em "↩ Inserir" em qualquer tese para inserí-la no cursor.\n• Escolha o formato de citação: Inline, Tese + ref. ou ABNT.\n\nO rascunho é salvo automaticamente.`}
-            style={{
-              flex: 1, border: 'none', background: theme.cardBg,
-              padding: '20px', color: theme.text,
-              fontSize: 14, lineHeight: 1.9, resize: 'none',
-              outline: 'none', fontFamily: 'Georgia, serif',
-              borderRadius: '0 0 0 12px',
-              boxSizing: 'border-box', width: '100%',
-            }}
+            placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "✦ Sugerir para este trecho" para receber teses relevantes do repositório.\n• Clique em "↩ Inserir" em qualquer tese para inserí-la no cursor.\n• Use ## para seções e **negrito** — o .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
+            style={{ flex: 1, border: 'none', background: theme.cardBg, padding: '20px', color: theme.text, fontSize: 14, lineHeight: 1.9, resize: 'none', outline: 'none', fontFamily: 'Georgia, serif', borderRadius: '0 0 0 12px', boxSizing: 'border-box', width: '100%' }}
             spellCheck
           />
 
           {/* Status bar */}
-          <div style={{
-            borderTop: `1px solid ${theme.border}`, padding: '6px 16px',
-            display: 'flex', gap: 16, fontSize: 10, color: theme.muted,
-            fontFamily: 'IBM Plex Mono, monospace', background: theme.cardBg,
-            borderRadius: '0 0 0 12px', flexShrink: 0,
-          }}>
+          <div style={{ borderTop: `1px solid ${theme.border}`, padding: '6px 16px', display: 'flex', gap: 16, fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', background: theme.cardBg, borderRadius: '0 0 0 12px', flexShrink: 0 }}>
             <span>{palavras} palavra{palavras !== 1 ? 's' : ''}</span>
             <span>{chars} caracteres</span>
-            <span style={{ marginLeft: 'auto', color: theme.success, opacity: 0.7 }}>
-              💾 rascunho salvo
+            {rascunhoAtualId && (
+              <span style={{ color: theme.muted, opacity: 0.6 }}>
+                rascunho #{rascunhos.findIndex(r => r.id === rascunhoAtualId) + 1}
+              </span>
+            )}
+            <span style={{ marginLeft: 'auto', color: autoSalvo ? theme.success : theme.muted, opacity: autoSalvo ? 1 : 0.5, transition: 'all .3s' }}>
+              {autoSalvo ? '✓ salvo' : '💾 auto-save'}
             </span>
           </div>
         </div>
 
         {/* Painel de citações */}
         {painelAberto && (
-          <div style={{
-            width: 300, borderLeft: `1px solid ${theme.border}`,
-            background: theme.surface, display: 'flex', flexDirection: 'column',
-            overflow: 'hidden', borderRadius: '0 12px 12px 0',
-            flexShrink: 0,
-          }}>
-            <PainelCitacoes
-              entradas={entradas}
-              editorRef={editorRef}
-              conteudo={conteudo}
-              setConteudo={setConteudo}
-            />
+          <div style={{ width: 300, borderLeft: `1px solid ${theme.border}`, background: theme.surface, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRadius: '0 12px 12px 0', flexShrink: 0 }}>
+            <PainelCitacoes entradas={entradas} editorRef={editorRef} conteudo={conteudo} setConteudo={setConteudo} />
           </div>
         )}
       </div>
+
+      {/* ── Modal de rascunhos ──────────────────────────────────────────── */}
+      {mostrarRascunhos && (
+        <PainelRascunhos
+          rascunhos={rascunhos}
+          rascunhoAtualId={rascunhoAtualId}
+          onCarregar={carregarRascunho}
+          onNovo={novoRascunho}
+          onExcluir={excluirRascunho}
+          onFechar={() => setMostrarRascunhos(false)}
+        />
+      )}
     </div>
   )
 }
