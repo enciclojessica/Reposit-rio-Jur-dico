@@ -10,7 +10,7 @@ export default function EntradaList({ entradas, onSelect }) {
       <div style={{ textAlign: 'center', padding: '60px 24px', color: theme.muted }}>
         <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.3 }}>🗄</div>
         <div style={{ fontSize: 14, marginBottom: 6 }}>Nenhuma entrada encontrada.</div>
-        <div style={{ fontSize: 12 }}>Tente outros termos de busca.</div>
+        <div style={{ fontSize: 12 }}>Tente outros termos ou ative a busca semântica ✦.</div>
       </div>
     )
   }
@@ -69,10 +69,22 @@ export default function EntradaList({ entradas, onSelect }) {
               <span style={{ fontSize: 10, color: theme.muted }}>
                 {e.teses?.length || 0} tese(s)
               </span>
-              <span style={{ fontSize: 10, color: theme.muted }}>
-                {new Date(e.criado_em).toLocaleDateString('pt-BR')}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {e._relevancia && (
+                  <span style={{ fontSize: 10, color: theme.gold, background: theme.gold + '22', border: `1px solid ${theme.gold}44`, borderRadius: 10, padding: '1px 7px', fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700 }}>
+                    ✦ {e._relevancia}%
+                  </span>
+                )}
+                <span style={{ fontSize: 10, color: theme.muted }}>
+                  {new Date(e.criado_em).toLocaleDateString('pt-BR')}
+                </span>
+              </div>
             </div>
+            {e._motivo && (
+              <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, opacity: 0.8, fontStyle: 'italic' }}>
+                ↳ {e._motivo}
+              </div>
+            )}
           </div>
         )
       })}

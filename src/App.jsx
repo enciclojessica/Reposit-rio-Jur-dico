@@ -43,6 +43,10 @@ export default function App() {
   const [areaFilter, setAreaFilter] = useState('all')
   const [tagFilter, setTagFilter]   = useState(null)
   const [search, setSearch]         = useState('')
+  const [modoSemantico, setModoSemantico] = useState(false)
+  const [buscandoSem, setBuscandoSem]   = useState(false)
+  const [resultadosSem, setResultadosSem] = useState(null) // null = não buscado ainda
+  const [erroSem, setErroSem]           = useState('')
   const [selected, setSelected]     = useState(null)
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
@@ -151,9 +155,44 @@ export default function App() {
     setTimeout(() => setToast(null), 3500)
   }
 
+  async function buscarSemantico() {
+    if (!search.trim() || buscandoSem) return
+    setBuscandoSem(true)
+    setResultadosSem(null)
+    setErroSem('')
+    try {
+      const res = await fetch('/api/busca-semantica', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: search, entradas }),
+      })
+      const json = await res.json()
+      if (json.error) throw new Error(json.error)
+      setResultadosSem(json.resultados || [])
+    } catch (err) {
+      setErroSem('Erro na busca: ' + err.message)
+    }
+    setBuscandoSem(false)
+  }
+
+  // Limpar resultados semânticos ao trocar modo ou limpar busca
+  function handleSearchChange(val) {
+    setSearch(val)
+    if (resultadosSem !== null) setResultadosSem(null)
+  }
+
   const todasAsTags = [...new Set(entradas.flatMap(e => e.tags || []))].sort()
 
-  const filtered = entradas.filter(e => {
+  // No modo semântico com resultado, usar ordem e IDs retornados pela IA
+  const filteredSemantico = resultadosSem !== null
+    ? resultadosSem
+        .map(r => ({ ...entradas.find(e => e.id === r.id), _relevancia: r.relevancia, _motivo: r.motivo }))
+        .filter(e => e.id)
+    : null
+
+  const filtered = filteredSemantico !== null
+    ? filteredSemantico
+    : entradas.filter(e => {
     const areaOk = areaFilter === 'all' || e.area === areaFilter
     if (!areaOk) return false
     if (!search) return true
@@ -460,10 +499,32 @@ export default function App() {
       default:
         return (
           <div>
-            <div style={{ position: 'relative', marginBottom: 16 }}>
-              <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }}>🔍</span>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por tema, fonte, referência..." style={{ paddingLeft: 38 }}/>
+            {/* Barra de busca com toggle semântico */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              <div style={{ position: 'relative', flex: 1 }}>
+                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }}>🔍</span>
+                <input
+                  value={search}
+                  onChange={e => handleSearchChange(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && modoSemantico && buscarSemantico()}
+                  placeholder={modoSemantico ? 'Descreva o que procura em linguagem natural...' : 'Buscar por tema, fonte, referência...'}
+                  style={{ paddingLeft: 38, paddingRight: modoSemantico ? 100 : 12 }}
+                />
+                {modoSemantico && search.trim() && (
+                  <button onClick={buscarSemantico} disabled={buscandoSem}
+                    style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: buscandoSem ? theme.border : theme.gold, color: buscandoSem ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: buscandoSem ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                    {buscandoSem ? '⟳' : '✦ Buscar'}
+                  </button>
+                )}
+              </div>
+              {/* Toggle exata / semântica */}
+              <button onClick={() => { setModoSemantico(m => !m); setResultadosSem(null); setErroSem('') }}
+                title={modoSemantico ? 'Modo: busca semântica (IA) — clique para voltar à busca exata' : 'Modo: busca exata — clique para ativar busca semântica por IA'}
+                style={{ flexShrink: 0, background: modoSemantico ? theme.gold + '22' : theme.raised, color: modoSemantico ? theme.gold : theme.muted, border: `1px solid ${modoSemantico ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '0 14px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontWeight: modoSemantico ? 700 : 400, whiteSpace: 'nowrap' }}>
+                {modoSemantico ? '✦ Semântica' : '✦ Semântica'}
+              </button>
             </div>
+            {erroSem && <div style={{ background: theme.toastErr, border: `1px solid ${theme.error}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, color: theme.error, marginBottom: 12 }}>✕ {erroSem}</div>}
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
               {[{ id: 'all', label: 'Todas', color: theme.gold }, ...Object.entries(AREAS).map(([k, v]) => ({ id: k, label: k, color: v.color, icon: v.icon }))].map(a => (
                 <button key={a.id} onClick={() => setAreaFilter(a.id)}
@@ -489,7 +550,12 @@ export default function App() {
                 ))}
               </div>
             )}
-            <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>{filtered.length} entrada(s){tagFilter ? ` com tag #${tagFilter}` : ''}</div>
+            <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>
+              {filteredSemantico !== null
+                ? `${filtered.length} resultado(s) semântico(s) para "${search}"`
+                : `${filtered.length} entrada(s)${tagFilter ? ` com tag #${tagFilter}` : ''}`
+              }
+            </div>
             <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}/>
           </div>
         )
