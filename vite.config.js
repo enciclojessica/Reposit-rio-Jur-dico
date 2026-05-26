@@ -8,6 +8,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           docx: ['docx'],
+          xlsx: ['xlsx'],
           vendor: ['react', 'react-dom'],
           supabase: ['@supabase/supabase-js'],
         }

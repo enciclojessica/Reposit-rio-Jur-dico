@@ -12,6 +12,7 @@ import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import EntradaPublica from './components/EntradaPublica'
+import ImportacaoLote from './components/ImportacaoLote'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -19,6 +20,7 @@ const VIEWS = {
   ALERTAS: 'alertas',
   EDITOR:     'editor',
   DASHBOARD: 'dashboard',
+  IMPORTAR:  'importar',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -335,6 +337,7 @@ export default function App() {
         {[
           { v: VIEWS.DASHBOARD, label: '◈ Dashboard' },
         { v: VIEWS.PESQUISA, label: '⌕ Pesquisar Jurisprudência' },
+        { v: VIEWS.IMPORTAR,  label: '⇪ Importar Planilha' },
           { v: VIEWS.BUSCA,    label: '✦ Busca para Peça' },
         { v: VIEWS.EDITOR,   label: '✎ Editor de Peças' },
         { v: VIEWS.ALERTAS,  label: '🔔 Alertas' },
@@ -427,6 +430,7 @@ export default function App() {
         { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
         { v: VIEWS.DASHBOARD, label: 'Dashboard', icon: '◈' },
+        ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
         { v: VIEWS.ALERTAS,  label: 'Alertas',   icon: '🔔' },
         { v: VIEWS.EDITOR,   label: 'Editor',    icon: '✎' },
         ...(isEditor ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
@@ -451,6 +455,11 @@ export default function App() {
 
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
+
+      case VIEWS.IMPORTAR:
+        return isEditor ? (
+          <div className="fade-up"><ImportacaoLote session={session} /></div>
+        ) : null
 
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas}/></div>
