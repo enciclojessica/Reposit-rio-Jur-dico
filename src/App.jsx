@@ -14,6 +14,7 @@ import Dashboard from './components/Dashboard'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import InstalarApp from './components/InstalarApp'
+import FlashCards from './components/FlashCards'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -21,7 +22,8 @@ const VIEWS = {
   ALERTAS: 'alertas',
   EDITOR:     'editor',
   DASHBOARD: 'dashboard',
-  IMPORTAR:  'importar',
+  IMPORTAR:   'importar',
+  FLASHCARDS: 'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -341,7 +343,8 @@ export default function App() {
         { v: VIEWS.IMPORTAR,  label: '⇪ Importar Planilha' },
           { v: VIEWS.BUSCA,    label: '✦ Busca para Peça' },
         { v: VIEWS.EDITOR,   label: '✎ Editor de Peças' },
-        { v: VIEWS.ALERTAS,  label: '🔔 Alertas' },
+        { v: VIEWS.ALERTAS,     label: '🔔 Alertas' },
+        { v: VIEWS.FLASHCARDS, label: '🃏 Flashcards' },
         ].map(item => (
           <button key={item.v} onClick={() => setView(item.v)}
             style={{
@@ -432,7 +435,8 @@ export default function App() {
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
         { v: VIEWS.DASHBOARD, label: 'Dashboard', icon: '◈' },
         ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
-        { v: VIEWS.ALERTAS,  label: 'Alertas',   icon: '🔔' },
+        { v: VIEWS.ALERTAS,     label: 'Alertas',   icon: '🔔' },
+        { v: VIEWS.FLASHCARDS, label: 'Flashcards', icon: '🃏' },
         { v: VIEWS.EDITOR,   label: 'Editor',    icon: '✎' },
         ...(isEditor ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
         ...(isAdmin  ? [{ v: VIEWS.MEMBROS, label: 'Membros', icon: '👥' }] : []),
@@ -456,6 +460,9 @@ export default function App() {
 
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
+
+      case VIEWS.FLASHCARDS:
+        return <div className="fade-up"><FlashCards entradas={entradas} /></div>
 
       case VIEWS.IMPORTAR:
         return isEditor ? (
