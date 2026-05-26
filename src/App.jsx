@@ -491,6 +491,9 @@ export default function App() {
             <Informativos
               onImportar={handleSalvarInformativo}
               isEditor={isEditor}
+              todasEntradas={entradas}
+              userId={session?.user?.id}
+              onAtualizar={loadEntradas}
             />
           </div>
         )

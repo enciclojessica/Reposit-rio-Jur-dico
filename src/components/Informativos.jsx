@@ -79,14 +79,41 @@ function DecisaoCard({ decisao, onImportar, importada }) {
   )
 }
 
-export default function Informativos({ onImportar, isEditor }) {
+export default function Informativos({ onImportar, isEditor, todasEntradas, userId, onAtualizar }) {
   const { theme, mode } = useTheme()
   const [tribunal, setTribunal]   = useState('STF')
   const [dados, setDados]         = useState(null)
   const [loading, setLoading]     = useState(false)
   const [erro, setErro]           = useState('')
   const [importadas, setImportadas] = useState(new Set())
-  const [edicao, setEdicao]       = useState('')
+  const [edicao, setEdicao]         = useState('')
+  const [autoImportando, setAutoImportando] = useState(false)
+  const [autoResultado, setAutoResultado]   = useState(null)
+
+  async function autoImportar() {
+    if (!isEditor || autoImportando) return
+    setAutoImportando(true)
+    setAutoResultado(null)
+    try {
+      const res = await fetch('/api/auto-importar-informativos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tribunal,
+          entradas: todasEntradas || [],
+          user_id: userId,
+          modo: 'manual',
+        }),
+      })
+      const json = await res.json()
+      if (json.error) throw new Error(json.error)
+      setAutoResultado(json)
+      if (json.salvas > 0 && onAtualizar) onAtualizar()
+    } catch (err) {
+      setAutoResultado({ erro: err.message })
+    }
+    setAutoImportando(false)
+  }
 
   // Carregar automaticamente ao montar e ao trocar tribunal
   useEffect(() => { buscar() }, [tribunal])
@@ -178,11 +205,50 @@ export default function Informativos({ onImportar, isEditor }) {
             onKeyDown={e => e.key === 'Enter' && buscar()}
           />
           <button onClick={buscar} disabled={loading}
-            style={{ background: loading ? theme.border : theme.gold, color: loading ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 12, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap' }}>
-            {loading ? '⟳ Carregando...' : '↻ Atualizar'}
+            style={{ background: loading ? theme.border : theme.raised, color: loading ? theme.muted : theme.muted, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '10px 16px', fontSize: 12, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap' }}>
+            {loading ? '⟳' : '↻ Atualizar'}
           </button>
+          {isEditor && (
+            <button onClick={autoImportar} disabled={autoImportando}
+              style={{ background: autoImportando ? theme.border : `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, color: autoImportando ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 12, fontWeight: 700, cursor: autoImportando ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap' }}>
+              {autoImportando ? '⟳ Analisando...' : '✦ Auto-importar relevantes'}
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Resultado auto-importação */}
+      {autoResultado && (
+        <div style={{
+          background: autoResultado.erro
+            ? (mode === 'dark' ? '#3b0f0f' : '#fef2f2')
+            : (mode === 'dark' ? '#0f2b1a' : '#f0fdf4'),
+          border: `1px solid ${autoResultado.erro ? theme.error : theme.success}`,
+          borderRadius: 10, padding: '12px 16px', marginBottom: 16,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <div>
+            {autoResultado.erro ? (
+              <div style={{ fontSize: 13, color: theme.error }}>✕ {autoResultado.erro}</div>
+            ) : (
+              <>
+                <div style={{ fontSize: 13, color: theme.success, fontWeight: 700, marginBottom: 2 }}>
+                  {autoResultado.salvas > 0
+                    ? `✓ ${autoResultado.salvas} decisão(ões) salva(s) automaticamente`
+                    : '— ' + (autoResultado.mensagem || 'Nenhuma decisão relevante encontrada.')}
+                </div>
+                {autoResultado.salvas > 0 && (
+                  <div style={{ fontSize: 11, color: theme.muted }}>
+                    Analisadas {autoResultado.total_analisadas} · Tag "auto-importado" adicionada
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          <button onClick={() => setAutoResultado(null)}
+            style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 18 }}>×</button>
+        </div>
+      )}
 
       {/* Erro */}
       {erro && (
