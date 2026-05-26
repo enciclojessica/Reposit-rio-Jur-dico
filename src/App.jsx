@@ -223,6 +223,26 @@ export default function App() {
     action(); return true
   }
 
+  // Salvar direto do informativo sem abrir formulário
+  async function handleSalvarInformativo(entry) {
+    if (!session) return
+    const payload = {
+      area:       entry.area,
+      tipo:       entry.tipo,
+      tema:       entry.tema,
+      fonte:      entry.fonte,
+      referencia: entry.referencia,
+      url:        entry.url,
+      status:     entry.status || 'vigente',
+      tags:       entry.tags || [],
+      teses:      entry.teses,
+      criado_por: session.user.id,
+    }
+    const { error } = await supabase.from('entradas').insert(payload)
+    if (error) notify('Erro ao salvar.', 'err')
+    else notify('Decisão salva no repositório.')
+  }
+
   async function handleSave(entry) {
     setSaving(true)
     const payload = {
@@ -340,13 +360,14 @@ export default function App() {
         <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Ferramentas</div>
 
         {[
-          { v: VIEWS.DASHBOARD, label: '◈ Dashboard' },
-        { v: VIEWS.PESQUISA, label: '⌕ Pesquisar Jurisprudência' },
-        { v: VIEWS.IMPORTAR,  label: '⇪ Importar Planilha' },
-          { v: VIEWS.BUSCA,    label: '✦ Busca para Peça' },
-        { v: VIEWS.EDITOR,   label: '✎ Editor de Peças' },
-        { v: VIEWS.ALERTAS,     label: '🔔 Alertas' },
-        { v: VIEWS.FLASHCARDS, label: '🃏 Flashcards' },
+          { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
+          { v: VIEWS.INFORMATIVOS, label: '📋 Informativos' },
+          { v: VIEWS.PESQUISA,     label: '⌕ Pesquisar Jurisprudência' },
+          { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
+          { v: VIEWS.BUSCA,        label: '✦ Busca para Peça' },
+          { v: VIEWS.EDITOR,       label: '✎ Editor de Peças' },
+          { v: VIEWS.ALERTAS,      label: '🔔 Alertas' },
+          { v: VIEWS.FLASHCARDS,   label: '🃏 Flashcards' },
         ].map(item => (
           <button key={item.v} onClick={() => setView(item.v)}
             style={{
@@ -468,7 +489,7 @@ export default function App() {
         return (
           <div className="fade-up">
             <Informativos
-              onImportar={entry => { setPrefillEntry(entry); setView(VIEWS.ADD) }}
+              onImportar={handleSalvarInformativo}
               isEditor={isEditor}
             />
           </div>
