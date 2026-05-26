@@ -112,3 +112,33 @@ export function BtnMuted({ onClick, children, style = {} }) {
     >{children}</button>
   )
 }
+
+
+// ── Status de teses ───────────────────────────────────────────────────────
+export const STATUS_META = {
+  vigente:     { label: 'Vigente',     cor: '#10b981', icon: '✓' },
+  vinculante:  { label: 'Vinculante',  cor: '#c9a452', icon: '★' },
+  em_revisao:  { label: 'Em revisão',  cor: '#f59e0b', icon: '⚠' },
+  superada:    { label: 'Superada',    cor: '#ef4444', icon: '✗' },
+}
+
+export function StatusBadge({ status, onClick, pequena }) {
+  const s = STATUS_META[status] || STATUS_META['vigente']
+  return (
+    <span
+      onClick={onClick}
+      title={onClick ? 'Clique para alterar o status' : s.label}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 4,
+        background: s.cor + '22', color: s.cor,
+        border: `1px solid ${s.cor}44`,
+        borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
+        fontSize: pequena ? 10 : 11,
+        fontFamily: 'IBM Plex Mono, monospace',
+        cursor: onClick ? 'pointer' : 'default',
+        userSelect: 'none', whiteSpace: 'nowrap',
+      }}>
+      {s.icon} {s.label}
+    </span>
+  )
+}

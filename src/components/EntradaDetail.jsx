@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { AREAS, Badge } from '../shared'
+import { AREAS, Badge, STATUS_META, StatusBadge } from '../shared'
 import { useTheme } from '../theme'
+import { supabase } from '../supabase'
 
 function gerarCitacaoABNT(entry) {
   const { area, tema, tipo, fonte, referencia, url, teses } = entry
@@ -40,10 +41,24 @@ function gerarCitacaoABNT(entry) {
   return citacao
 }
 
-export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOnly }) {
+export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOnly, onStatusChange }) {
   const { theme, mode } = useTheme()
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied]       = useState(false)
   const [copiedAbnt, setCopiedAbnt] = useState(false)
+  const [status, setStatus]       = useState(entry.status || 'vigente')
+  const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const [salvandoStatus, setSalvandoStatus] = useState(false)
+
+  async function alterarStatus(novoStatus) {
+    setSalvandoStatus(true)
+    setShowStatusMenu(false)
+    const { error } = await supabase.from('entradas').update({ status: novoStatus }).eq('id', entry.id)
+    if (!error) {
+      setStatus(novoStatus)
+      if (onStatusChange) onStatusChange(entry.id, novoStatus)
+    }
+    setSalvandoStatus(false)
+  }
   const am = AREAS[entry.area] || { color: theme.muted }
 
   function copyFichamento() {
@@ -74,6 +89,8 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOn
     setCopiedAbnt(true)
     setTimeout(() => setCopiedAbnt(false), 2000)
   }
+
+  const s = STATUS_META[status] || STATUS_META['vigente']
 
   const btnBase = {
     border: `1px solid ${theme.border}`,

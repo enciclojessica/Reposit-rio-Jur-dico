@@ -489,6 +489,9 @@ export default function App() {
               onDelete={isAdmin ? handleDelete : null}
               onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
               readOnly={!isEditor}
+              onStatusChange={(id, novoStatus) => {
+                setEntradas(prev => prev.map(e => e.id === id ? { ...e, status: novoStatus } : e))
+              }}
             />
           </div>
         ) : null

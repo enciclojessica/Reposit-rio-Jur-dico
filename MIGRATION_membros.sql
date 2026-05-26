@@ -121,3 +121,12 @@ CREATE POLICY "alertas_own" ON alertas FOR ALL
 -- ═══════════════════════════════════════════════════════════
 
 ALTER TABLE entradas ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Status das entradas
+-- ═══════════════════════════════════════════════════════════
+
+ALTER TABLE entradas
+  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'vigente'
+  CHECK (status IN ('vigente', 'vinculante', 'em_revisao', 'superada'));

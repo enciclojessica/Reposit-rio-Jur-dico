@@ -51,6 +51,9 @@ export default function EntradaList({ entradas, onSelect }) {
                 borderRadius: 4, padding: '1px 6px',
                 fontSize: 10, textTransform: 'uppercase', letterSpacing: 1,
               }}>{e.tipo}</span>
+              {e.status && e.status !== 'vigente' && (
+                <StatusBadge status={e.status} pequena />
+              )}
             </div>
             <div style={{
               fontSize: 14, color: theme.text,

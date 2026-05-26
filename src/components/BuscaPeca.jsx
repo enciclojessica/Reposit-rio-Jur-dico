@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '../theme'
+import { STATUS_META } from '../shared'
 
 export default function BuscaPeca({ entradas }) {
   const { theme, mode } = useTheme()
@@ -140,6 +141,12 @@ export default function BuscaPeca({ entradas }) {
               {copied ? '✓ Copiado' : '⎘ Copiar'}
             </button>
           </div>
+          {/* Aviso de entradas superadas na busca */}
+          {entradas.some(e => e.status === 'superada' && result.includes(e.tema?.slice(0, 20) || '')) && (
+            <div style={{ background: mode === 'dark' ? '#3b1a00' : '#fff7ed', border: '1px solid #f59e0b55', borderRadius: 8, padding: '10px 14px', marginBottom: 12, fontSize: 12, color: '#f59e0b' }}>
+              ⚠ Algumas teses sugeridas podem estar marcadas como superadas no repositório. Verifique o status antes de usar.
+            </div>
+          )}
           <div style={{
             fontSize: 13, color: theme.text, lineHeight: 1.8,
             whiteSpace: 'pre-wrap', fontFamily: 'monospace',
