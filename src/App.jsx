@@ -8,9 +8,11 @@ import EntradaForm from './components/EntradaForm'
 import BuscaPeca from './components/BuscaPeca'
 import PesquisaJuri from './components/PesquisaJuri'
 import Membros from './components/Membros'
+import Alertas from './components/Alertas'
 import { AREAS } from './shared'
 
 const VIEWS = {
+  ALERTAS: 'alertas',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -270,6 +272,7 @@ export default function App() {
         {[
           { v: VIEWS.PESQUISA, label: '⌕ Pesquisar Jurisprudência' },
           { v: VIEWS.BUSCA,    label: '✦ Busca para Peça' },
+        { v: VIEWS.ALERTAS,  label: '🔔 Alertas' },
         ].map(item => (
           <button key={item.v} onClick={() => setView(item.v)}
             style={{
@@ -358,6 +361,7 @@ export default function App() {
         { v: VIEWS.HOME,     label: 'Início',    icon: '🏠' },
         { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
+        { v: VIEWS.ALERTAS,  label: 'Alertas',   icon: '🔔' },
         ...(isEditor ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
         ...(isAdmin  ? [{ v: VIEWS.MEMBROS, label: 'Membros', icon: '👥' }] : []),
       ].map(item => (
@@ -380,6 +384,11 @@ export default function App() {
 
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
+
+      case VIEWS.ALERTAS:
+        return (
+          <div className="fade-up"><Alertas session={session} /></div>
+        )
 
       case VIEWS.ADD:
         if (!isEditor) return null

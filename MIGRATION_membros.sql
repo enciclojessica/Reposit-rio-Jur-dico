@@ -90,3 +90,27 @@ CREATE POLICY "entradas_delete" ON entradas FOR DELETE
 --
 -- INSERT INTO membros (user_id, role, nome, email)
 -- VALUES ('COLE_AQUI_O_UUID_DO_SEU_USER', 'admin', 'Jessica Farias Fusquiani', 'foxjessica01@gmail.com');
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Alertas de jurisprudência
+-- Rodar após a migração de membros
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS alertas (
+  id                 UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id            UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  email              TEXT NOT NULL,
+  tema               TEXT NOT NULL,
+  tribunal           TEXT DEFAULT 'todos',
+  ativo              BOOLEAN DEFAULT true,
+  ultima_verificacao TIMESTAMPTZ,
+  criado_em          TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE alertas ENABLE ROW LEVEL SECURITY;
+
+-- Cada usuário só vê e gerencia os próprios alertas
+CREATE POLICY "alertas_own" ON alertas FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
