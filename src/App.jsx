@@ -15,7 +15,6 @@ import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
-import Informativos from './components/Informativos'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
@@ -26,7 +25,6 @@ const VIEWS = {
   DASHBOARD: 'dashboard',
   IMPORTAR:   'importar',
   FLASHCARDS:   'flashcards',
-  INFORMATIVOS: 'informativos',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -224,27 +222,7 @@ export default function App() {
     action(); return true
   }
 
-  // Salvar direto do informativo sem abrir formulário
-  async function handleSalvarInformativo(entry) {
-    if (!session) return
-    const payload = {
-      area:       entry.area,
-      tipo:       entry.tipo,
-      tema:       entry.tema,
-      fonte:      entry.fonte,
-      referencia: entry.referencia,
-      url:        entry.url,
-      status:     entry.status || 'vigente',
-      tags:       entry.tags || [],
-      teses:      entry.teses,
-      criado_por: session.user.id,
-    }
-    const { error } = await supabase.from('entradas').insert(payload)
-    if (error) notify('Erro ao salvar.', 'err')
-    else notify('Decisão salva no repositório.')
-  }
-
-  async function handleSave(entry) {
+async function handleSave(entry) {
     setSaving(true)
     const payload = {
       area: entry.area, tema: entry.tema, tipo: entry.tipo,
@@ -362,7 +340,6 @@ export default function App() {
 
         {[
           { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
-          { v: VIEWS.INFORMATIVOS, label: '📋 Informativos' },
           { v: VIEWS.PESQUISA,     label: '⌕ Pesquisar Jurisprudência' },
           { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
           { v: VIEWS.BUSCA,        label: '✦ Busca para Peça' },
@@ -462,7 +439,6 @@ export default function App() {
         { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
         { v: VIEWS.DASHBOARD,    label: 'Dashboard',    icon: '◈' },
-        { v: VIEWS.INFORMATIVOS, label: 'Informativos', icon: '📋' },
         ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
         { v: VIEWS.ALERTAS,     label: 'Alertas',   icon: '🔔' },
         { v: VIEWS.FLASHCARDS, label: 'Flashcards', icon: '🃏' },
@@ -490,20 +466,7 @@ export default function App() {
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
 
-      case VIEWS.INFORMATIVOS:
-        return (
-          <div className="fade-up">
-            <Informativos
-              onImportar={handleSalvarInformativo}
-              isEditor={isEditor}
-              todasEntradas={entradas}
-              userId={session?.user?.id}
-              onAtualizar={loadEntradas}
-            />
-          </div>
-        )
-
-      case VIEWS.FLASHCARDS:
+case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
 
       case VIEWS.IMPORTAR:
