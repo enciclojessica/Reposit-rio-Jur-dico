@@ -11,6 +11,7 @@ import Membros from './components/Membros'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
+import EntradaPublica from './components/EntradaPublica'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -52,6 +53,7 @@ export default function App() {
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
   const [prefillEntry, setPrefillEntry] = useState(null)
+  const [entradaPublicaId, setEntradaPublicaId] = useState(null)
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const isMobile = useIsMobile()
@@ -69,7 +71,11 @@ export default function App() {
     const token = params.get('convite')
     if (token) {
       setConviteToken(token)
-      // Limpar da URL sem reload
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+    const entradaParam = params.get('entrada')
+    if (entradaParam) {
+      setEntradaPublicaId(entradaParam)
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
@@ -244,6 +250,14 @@ export default function App() {
   }
 
   // ── Loading states ─────────────────────────────────────────────────────
+  // Vista pública de entrada compartilhada — sem autenticação
+  if (entradaPublicaId) return (
+    <EntradaPublica
+      entradaId={entradaPublicaId}
+      onFechar={() => setEntradaPublicaId(null)}
+    />
+  )
+
   if (authLoading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
       Carregando...

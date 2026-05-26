@@ -48,6 +48,14 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOn
   const [status, setStatus]       = useState(entry.status || 'vigente')
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const [salvandoStatus, setSalvandoStatus] = useState(false)
+  const [linkCopiado, setLinkCopiado]     = useState(false)
+
+  function compartilhar() {
+    const link = `${window.location.origin}/?entrada=${entry.id}`
+    navigator.clipboard.writeText(link)
+    setLinkCopiado(true)
+    setTimeout(() => setLinkCopiado(false), 2500)
+  }
 
   async function alterarStatus(novoStatus) {
     setSalvandoStatus(true)
