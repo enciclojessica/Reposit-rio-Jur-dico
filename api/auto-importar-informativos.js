@@ -42,7 +42,7 @@ export default async function handler(req, res) {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5',
       max_tokens: 3000,
       system: `Você é um assistente de curadoria jurídica. 
 Dado o texto de um informativo (STF ou STJ) e um resumo do repositório de teses do usuário, identifique as decisões do informativo que são relevantes para ampliar ou complementar o repositório.

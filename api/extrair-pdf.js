@@ -16,7 +16,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 2000,
         system: `Você é um extrator de dados jurídicos. Leia o acórdão/decisão e retorne APENAS um objeto JSON válido, sem markdown, sem texto antes ou depois.
 
