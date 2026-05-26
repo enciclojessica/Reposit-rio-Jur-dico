@@ -3,7 +3,6 @@ import { useTheme } from './theme'
 export const AREAS = {
   'Cível':       { color: '#3b82f6', icon: '⚖️' },
   'Penal':       { color: '#ef4444', icon: '🔒' },
-  'Informativo': { color: '#10b981', icon: '📋' },
   'Doutrina':    { color: '#a855f7', icon: '📚' },
 }
 
