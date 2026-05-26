@@ -1,0 +1,393 @@
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { useTheme } from '../theme'
+import { AREAS } from '../shared'
+
+// ── Formatar citação inline e ABNT ────────────────────────────────────────
+function citacaoInline(entry, tese) {
+  const ref = entry.referencia || entry.fonte || entry.tema
+  return `(${entry.fonte?.toUpperCase() || 'FONTE'}, ${ref})`
+}
+
+function citacaoABNT(entry) {
+  const fonte  = (entry.fonte  || '').toUpperCase()
+  const tema   = entry.tema    || ''
+  const ref    = entry.referencia || ''
+  const url    = entry.url     || ''
+  const acesso = new Date().toLocaleDateString('pt-BR')
+  const tipo   = entry.tipo    || 'jurisprudência'
+
+  if (tipo === 'lei')       return `BRASIL. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
+  if (tipo === 'doutrina')  return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
+  if (tipo === 'súmula')    return `${fonte}. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
+  return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
+}
+
+// ── Inserir texto no cursor do textarea ───────────────────────────────────
+function inserirNoCursor(ref, conteudo, setConteudo, texto) {
+  const el    = ref.current
+  if (!el) return
+  const start = el.selectionStart
+  const end   = el.selectionEnd
+  const novo  = conteudo.slice(0, start) + texto + conteudo.slice(end)
+  setConteudo(novo)
+  setTimeout(() => {
+    el.selectionStart = el.selectionEnd = start + texto.length
+    el.focus()
+  }, 0)
+}
+
+// ── Painel de citações ────────────────────────────────────────────────────
+function PainelCitacoes({ entradas, onInserir, editorRef, conteudo, setConteudo }) {
+  const { theme, mode } = useTheme()
+  const [busca, setBusca]         = useState('')
+  const [sugerindo, setSugerindo] = useState(false)
+  const [sugestoes, setSugestoes] = useState([])
+  const [erroBusca, setErroBusca] = useState('')
+  const [formato, setFormato]     = useState('inline') // inline | abnt | tese
+
+  const filtradas = entradas.filter(e => {
+    if (!busca) return true
+    const q = busca.toLowerCase()
+    return (
+      e.tema?.toLowerCase().includes(q) ||
+      e.fonte?.toLowerCase().includes(q) ||
+      e.referencia?.toLowerCase().includes(q) ||
+      e.teses?.some(t => t.tese_assunto?.toLowerCase().includes(q))
+    )
+  })
+
+  async function sugerirParaTrecho() {
+    // Pegar seleção ou último parágrafo do editor
+    const el = editorRef.current
+    let trecho = ''
+    if (el && el.selectionStart !== el.selectionEnd) {
+      trecho = conteudo.slice(el.selectionStart, el.selectionEnd)
+    } else {
+      // Último parágrafo não vazio
+      const paras = conteudo.split('\n').filter(p => p.trim())
+      trecho = paras[paras.length - 1] || conteudo.slice(-300)
+    }
+    if (!trecho.trim()) return
+
+    setSugerindo(true)
+    setSugestoes([])
+    setErroBusca('')
+
+    try {
+      const ctx = JSON.stringify(entradas.map(e => ({
+        id: e.id, tema: e.tema, fonte: e.fonte, referencia: e.referencia,
+        tipo: e.tipo, teses: e.teses?.map(t => t.tese_assunto),
+      })))
+
+      const res = await fetch('/api/busca', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 800,
+          system: `Você é um assistente de prática jurídica. Dado um trecho de peça processual e um repositório de teses, identifique quais teses do repositório são relevantes para aquele trecho. Retorne APENAS um array JSON com os IDs relevantes (máx. 5), ordenados por relevância: ["id1","id2",...]. Sem texto adicional.`,
+          messages: [{ role: 'user', content: `Trecho: "${trecho}"\n\nRepositório: ${ctx}` }],
+        }),
+      })
+      const json = await res.json()
+      const text = (json.content || []).find(b => b.type === 'text')?.text || '[]'
+      const match = text.match(/\[[\s\S]*?\]/)
+      const ids = match ? JSON.parse(match[0]) : []
+      const encontradas = ids.map(id => entradas.find(e => e.id === id)).filter(Boolean)
+      setSugestoes(encontradas)
+      if (!encontradas.length) setErroBusca('Nenhuma tese relevante encontrada para este trecho.')
+    } catch {
+      setErroBusca('Erro ao consultar a IA.')
+    }
+    setSugerindo(false)
+  }
+
+  function inserir(entry, tese) {
+    let texto = ''
+    if (formato === 'abnt') {
+      texto = citacaoABNT(entry)
+    } else if (formato === 'tese' && tese) {
+      texto = `${tese.tese_assunto} ${citacaoInline(entry, tese)}`
+    } else {
+      texto = citacaoInline(entry, tese)
+    }
+    inserirNoCursor(editorRef, conteudo, setConteudo, texto)
+  }
+
+  const lista = sugestoes.length > 0 ? sugestoes : filtradas
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* Cabeçalho do painel */}
+      <div style={{ padding: '12px 14px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
+        <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10, fontFamily: 'IBM Plex Mono, monospace' }}>
+          Citações
+        </div>
+
+        {/* Formato de inserção */}
+        <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
+          {[
+            { id: 'inline', label: 'Inline' },
+            { id: 'tese',   label: 'Tese + ref.' },
+            { id: 'abnt',   label: 'ABNT' },
+          ].map(f => (
+            <button key={f.id} onClick={() => setFormato(f.id)}
+              style={{
+                flex: 1, background: formato === f.id ? theme.gold + '22' : theme.raised,
+                color: formato === f.id ? theme.gold : theme.muted,
+                border: `1px solid ${formato === f.id ? theme.gold + '55' : theme.border}`,
+                borderRadius: 6, padding: '5px 0', fontSize: 10, cursor: 'pointer',
+                fontFamily: 'IBM Plex Mono, monospace', textAlign: 'center',
+              }}>{f.label}</button>
+          ))}
+        </div>
+
+        {/* Busca */}
+        <input
+          value={busca}
+          onChange={e => { setBusca(e.target.value); setSugestoes([]) }}
+          placeholder="Buscar tese..."
+          style={{ marginBottom: 8, fontSize: 12 }}
+        />
+
+        {/* Sugerir para trecho */}
+        <button onClick={sugerirParaTrecho} disabled={sugerindo || !conteudo.trim()}
+          style={{
+            width: '100%', background: sugerindo ? theme.border : `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`,
+            color: sugerindo ? theme.muted : '#0b0f1a', border: 'none',
+            borderRadius: 6, padding: '8px 0', fontSize: 11, fontWeight: 700,
+            cursor: sugerindo ? 'not-allowed' : 'pointer',
+            fontFamily: 'IBM Plex Mono, monospace',
+          }}>
+          {sugerindo ? '⟳ Analisando...' : '✦ Sugerir para este trecho'}
+        </button>
+        {sugestoes.length > 0 && (
+          <div style={{ fontSize: 10, color: theme.gold, textAlign: 'center', marginTop: 6 }}>
+            {sugestoes.length} sugestão(ões) · <button onClick={() => setSugestoes([])} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 10 }}>limpar</button>
+          </div>
+        )}
+        {erroBusca && <div style={{ fontSize: 11, color: theme.muted, marginTop: 6 }}>{erroBusca}</div>}
+      </div>
+
+      {/* Lista de entradas */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+        {lista.length === 0 ? (
+          <div style={{ padding: 16, color: theme.muted, fontSize: 12, textAlign: 'center' }}>
+            {busca ? 'Nenhuma entrada encontrada.' : 'Repositório vazio.'}
+          </div>
+        ) : lista.map(entry => {
+          const cor = AREAS[entry.area]?.color || theme.muted
+          return (
+            <div key={entry.id} style={{
+              borderBottom: `1px solid ${theme.border}`,
+              padding: '10px 14px',
+            }}>
+              {/* Tema */}
+              <div style={{
+                fontSize: 12, color: theme.text, marginBottom: 6,
+                fontFamily: 'IBM Plex Mono, monospace', lineHeight: 1.4,
+              }}>
+                <span style={{ color: cor, marginRight: 6, fontSize: 10 }}>▌</span>
+                {entry.tema}
+              </div>
+
+              {/* Teses */}
+              {(entry.teses || []).map((t, i) => (
+                <div key={i} style={{ marginBottom: 4 }}>
+                  {t.tese_assunto && (
+                    <div style={{ fontSize: 11, color: theme.muted, marginBottom: 4, lineHeight: 1.4, paddingLeft: 10 }}>
+                      {t.tese_assunto.slice(0, 120)}{t.tese_assunto.length > 120 ? '...' : ''}
+                    </div>
+                  )}
+                  <button onClick={() => inserir(entry, t)}
+                    style={{
+                      marginLeft: 10, background: theme.raised,
+                      border: `1px solid ${theme.border}`,
+                      color: theme.gold, borderRadius: 4, padding: '3px 8px',
+                      fontSize: 10, cursor: 'pointer',
+                      fontFamily: 'IBM Plex Mono, monospace',
+                    }}>
+                    ↩ Inserir
+                  </button>
+                </div>
+              ))}
+
+              {/* Inserir só referência */}
+              {(!entry.teses?.length || formato === 'abnt') && (
+                <button onClick={() => inserir(entry, null)}
+                  style={{
+                    background: theme.raised, border: `1px solid ${theme.border}`,
+                    color: theme.gold, borderRadius: 4, padding: '3px 8px',
+                    fontSize: 10, cursor: 'pointer',
+                    fontFamily: 'IBM Plex Mono, monospace',
+                  }}>
+                  ↩ Inserir referência
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ── Editor principal ──────────────────────────────────────────────────────
+export default function EditorPecas({ entradas }) {
+  const { theme, mode } = useTheme()
+  const [conteudo, setConteudo] = useState('')
+  const [titulo, setTitulo]     = useState('')
+  const [copiado, setCopiado]   = useState(false)
+  const [painelAberto, setPainelAberto] = useState(true)
+  const editorRef = useRef()
+
+  // Persistir rascunho no localStorage
+  useEffect(() => {
+    const salvo = localStorage.getItem('rj_editor_draft')
+    if (salvo) {
+      try {
+        const { titulo: t, conteudo: c } = JSON.parse(salvo)
+        if (t) setTitulo(t)
+        if (c) setConteudo(c)
+      } catch {}
+    }
+  }, [])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem('rj_editor_draft', JSON.stringify({ titulo, conteudo }))
+    }, 800)
+    return () => clearTimeout(timeout)
+  }, [titulo, conteudo])
+
+  function copiarTudo() {
+    const texto = titulo ? `${titulo}\n\n${conteudo}` : conteudo
+    navigator.clipboard.writeText(texto)
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
+
+  function baixarTxt() {
+    const texto = titulo ? `${titulo}\n\n${conteudo}` : conteudo
+    const nome  = (titulo || 'peca').replace(/[^a-zA-Z0-9À-ÿ\s]/g, '').replace(/\s+/g, '_').slice(0, 40)
+    const blob  = new Blob([texto], { type: 'text/plain;charset=utf-8' })
+    const url   = URL.createObjectURL(blob)
+    const a     = document.createElement('a')
+    a.href = url; a.download = `${nome}.txt`; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function limpar() {
+    if (!conteudo.trim() || confirm('Descartar o rascunho atual?')) {
+      setTitulo('')
+      setConteudo('')
+      localStorage.removeItem('rj_editor_draft')
+    }
+  }
+
+  const palavras = conteudo.trim() ? conteudo.trim().split(/\s+/).length : 0
+  const chars    = conteudo.length
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+
+      {/* ── Toolbar ────────────────────────────────────────────────────── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0 14px',
+        flexWrap: 'wrap', flexShrink: 0,
+      }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', flex: 1 }}>
+          Editor de Peças
+        </div>
+
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={() => setPainelAberto(p => !p)}
+            style={{ background: painelAberto ? theme.gold + '22' : theme.raised, color: painelAberto ? theme.gold : theme.muted, border: `1px solid ${painelAberto ? theme.gold + '44' : theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+            {painelAberto ? '← Ocultar citações' : '→ Citações'}
+          </button>
+          <button onClick={copiarTudo} disabled={!conteudo.trim()}
+            style={{ background: copiado ? theme.success + '22' : theme.raised, color: copiado ? theme.success : theme.muted, border: `1px solid ${copiado ? theme.success + '44' : theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+            {copiado ? '✓ Copiado' : '⎘ Copiar'}
+          </button>
+          <button onClick={baixarTxt} disabled={!conteudo.trim()}
+            style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+            ↓ .txt
+          </button>
+          <button onClick={limpar}
+            style={{ background: 'none', color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+            ✕ Limpar
+          </button>
+        </div>
+      </div>
+
+      {/* ── Área principal ─────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', flex: 1, gap: 0, overflow: 'hidden', border: `1px solid ${theme.border}`, borderRadius: 12 }}>
+
+        {/* Editor */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* Título */}
+          <input
+            value={titulo}
+            onChange={e => setTitulo(e.target.value)}
+            placeholder="Título da peça (opcional)"
+            style={{
+              border: 'none', borderBottom: `1px solid ${theme.border}`,
+              borderRadius: '12px 12px 0 0', background: theme.cardBg,
+              fontSize: 15, fontWeight: 700, padding: '14px 20px',
+              color: theme.text, fontFamily: 'Playfair Display, Georgia, serif',
+              outline: 'none', width: '100%', boxSizing: 'border-box',
+            }}
+          />
+
+          {/* Textarea principal */}
+          <textarea
+            ref={editorRef}
+            value={conteudo}
+            onChange={e => setConteudo(e.target.value)}
+            placeholder={`Redija a peça aqui.\n\nDicas:\n• Selecione um trecho e clique em "✦ Sugerir para este trecho" no painel lateral para receber sugestões de teses relevantes do repositório.\n• Clique em "↩ Inserir" em qualquer tese para inserí-la no cursor.\n• Escolha o formato de citação: Inline, Tese + ref. ou ABNT.\n\nO rascunho é salvo automaticamente.`}
+            style={{
+              flex: 1, border: 'none', background: theme.cardBg,
+              padding: '20px', color: theme.text,
+              fontSize: 14, lineHeight: 1.9, resize: 'none',
+              outline: 'none', fontFamily: 'Georgia, serif',
+              borderRadius: '0 0 0 12px',
+              boxSizing: 'border-box', width: '100%',
+            }}
+            spellCheck
+          />
+
+          {/* Status bar */}
+          <div style={{
+            borderTop: `1px solid ${theme.border}`, padding: '6px 16px',
+            display: 'flex', gap: 16, fontSize: 10, color: theme.muted,
+            fontFamily: 'IBM Plex Mono, monospace', background: theme.cardBg,
+            borderRadius: '0 0 0 12px', flexShrink: 0,
+          }}>
+            <span>{palavras} palavra{palavras !== 1 ? 's' : ''}</span>
+            <span>{chars} caracteres</span>
+            <span style={{ marginLeft: 'auto', color: theme.success, opacity: 0.7 }}>
+              💾 rascunho salvo
+            </span>
+          </div>
+        </div>
+
+        {/* Painel de citações */}
+        {painelAberto && (
+          <div style={{
+            width: 300, borderLeft: `1px solid ${theme.border}`,
+            background: theme.surface, display: 'flex', flexDirection: 'column',
+            overflow: 'hidden', borderRadius: '0 12px 12px 0',
+            flexShrink: 0,
+          }}>
+            <PainelCitacoes
+              entradas={entradas}
+              editorRef={editorRef}
+              conteudo={conteudo}
+              setConteudo={setConteudo}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

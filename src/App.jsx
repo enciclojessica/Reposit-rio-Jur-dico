@@ -9,10 +9,12 @@ import BuscaPeca from './components/BuscaPeca'
 import PesquisaJuri from './components/PesquisaJuri'
 import Membros from './components/Membros'
 import Alertas from './components/Alertas'
+import EditorPecas from './components/EditorPecas'
 import { AREAS } from './shared'
 
 const VIEWS = {
   ALERTAS: 'alertas',
+  EDITOR:  'editor',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
 }
@@ -274,6 +276,7 @@ export default function App() {
         {[
           { v: VIEWS.PESQUISA, label: '⌕ Pesquisar Jurisprudência' },
           { v: VIEWS.BUSCA,    label: '✦ Busca para Peça' },
+        { v: VIEWS.EDITOR,   label: '✎ Editor de Peças' },
         { v: VIEWS.ALERTAS,  label: '🔔 Alertas' },
         ].map(item => (
           <button key={item.v} onClick={() => setView(item.v)}
@@ -364,6 +367,7 @@ export default function App() {
         { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
         { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
         { v: VIEWS.ALERTAS,  label: 'Alertas',   icon: '🔔' },
+        { v: VIEWS.EDITOR,   label: 'Editor',    icon: '✎' },
         ...(isEditor ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
         ...(isAdmin  ? [{ v: VIEWS.MEMBROS, label: 'Membros', icon: '👥' }] : []),
       ].map(item => (
@@ -386,6 +390,13 @@ export default function App() {
 
       case VIEWS.PESQUISA:
         return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
+
+      case VIEWS.EDITOR:
+        return (
+          <div className="fade-up" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <EditorPecas entradas={entradas}/>
+          </div>
+        )
 
       case VIEWS.ALERTAS:
         return (
