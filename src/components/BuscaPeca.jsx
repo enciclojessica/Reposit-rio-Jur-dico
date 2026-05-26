@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '../theme'
 
-const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages'
-
 export default function BuscaPeca({ entradas }) {
   const { theme, mode } = useTheme()
   const [query, setQuery] = useState('')
@@ -22,7 +20,7 @@ export default function BuscaPeca({ entradas }) {
         fonte: e.fonte, referencia: e.referencia, teses: e.teses,
       })))
 
-      const res = await fetch(ANTHROPIC_API, {
+      const res = await fetch('/api/busca', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,7 +32,7 @@ export default function BuscaPeca({ entradas }) {
       })
 
       const json = await res.json()
-      if (json.error) throw new Error(json.error.message)
+      if (json.error) throw new Error(json.error.message || json.error)
       setResult(json.content?.[0]?.text || 'Sem resposta.')
     } catch (err) {
       setError('Erro ao consultar a IA: ' + err.message)
