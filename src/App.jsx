@@ -6,9 +6,10 @@ import EntradaList from './components/EntradaList'
 import EntradaDetail from './components/EntradaDetail'
 import EntradaForm from './components/EntradaForm'
 import BuscaPeca from './components/BuscaPeca'
+import PesquisaJuri from './components/PesquisaJuri'
 import { AREAS } from './shared'
 
-const VIEWS = { HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail', BUSCA: 'busca', LOGIN: 'login' }
+const VIEWS = { HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail', BUSCA: 'busca', PESQUISA: 'pesquisa', LOGIN: 'login' }
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(window.innerWidth < 768)
@@ -32,11 +33,11 @@ export default function App() {
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState(null)
   const [showLogin, setShowLogin] = useState(false)
+  const [prefillEntry, setPrefillEntry] = useState(null)
   const isMobile = useIsMobile()
 
   const isLoggedIn = !!session
 
-  // Auth
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session); setAuthLoading(false)
@@ -48,7 +49,6 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Carregar entradas (público — sem restrição de autenticação)
   const loadEntradas = useCallback(async () => {
     const { data, error } = await supabase
       .from('entradas').select('*').order('criado_em', { ascending: false })
@@ -81,7 +81,6 @@ export default function App() {
     )
   })
 
-  // Ações que requerem login
   function requireLogin(action) {
     if (!isLoggedIn) { setShowLogin(true); return false }
     action()
@@ -98,7 +97,7 @@ export default function App() {
     if (view === VIEWS.ADD) {
       const { error } = await supabase.from('entradas').insert(payload)
       if (error) notify('Erro ao salvar.', 'err')
-      else { notify('Entrada salva.'); setView(VIEWS.HOME) }
+      else { notify('Entrada salva.'); setPrefillEntry(null); setView(VIEWS.HOME) }
     } else {
       const { error } = await supabase.from('entradas').update(payload).eq('id', selected.id)
       if (error) notify('Erro ao editar.', 'err')
@@ -114,13 +113,20 @@ export default function App() {
     else { notify('Entrada removida.'); setSelected(null); setView(VIEWS.HOME) }
   }
 
+  // Importar resultado da pesquisa de jurisprudência → formulário
+  function handleImportarPesquisa(entrada) {
+    if (!isLoggedIn) { setShowLogin(true); return }
+    setPrefillEntry(entrada)
+    setView(VIEWS.ADD)
+    notify('Preencha as teses e salve a entrada.')
+  }
+
   if (authLoading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
       Carregando...
     </div>
   )
 
-  // Tela de login sobreposta
   if (showLogin) return (
     <div>
       <button onClick={() => setShowLogin(false)} style={{
@@ -141,14 +147,12 @@ export default function App() {
     }))
   ]
 
-  // ── Sidebar desktop ────────────────────────────────────────────────────
   const Sidebar = () => (
     <div style={{
       width: 240, background: theme.surface,
       borderRight: `1px solid ${theme.borderGold}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo */}
       <div style={{
         padding: '16px', borderBottom: `1px solid ${theme.borderGold}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -184,10 +188,18 @@ export default function App() {
           )
         })}
 
-        <div style={{ margin: '12px 0', borderTop: `1px solid ${theme.border}` }}/>
+        <div style={{ margin: '12px 0', borderTop: `1px solid ${theme.border}`}}/>
         <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Ferramentas</div>
 
-        {/* Busca para Peça — público */}
+        <button onClick={() => setView(VIEWS.PESQUISA)}
+          style={{
+            width: '100%', background: view === VIEWS.PESQUISA ? theme.gold + '11' : 'none',
+            border: 'none', borderLeft: `2px solid ${view === VIEWS.PESQUISA ? theme.gold : 'transparent'}`,
+            padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
+            color: view === VIEWS.PESQUISA ? theme.gold : theme.muted, fontSize: 12,
+            fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
+          }}>⌕ Pesquisar Jurisprudência</button>
+
         <button onClick={() => setView(VIEWS.BUSCA)}
           style={{
             width: '100%', background: view === VIEWS.BUSCA ? theme.gold + '11' : 'none',
@@ -197,9 +209,8 @@ export default function App() {
             fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
           }}>✦ Busca para Peça</button>
 
-        {/* Nova Entrada — só logados */}
         {isLoggedIn && (
-          <button onClick={() => setView(VIEWS.ADD)}
+          <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }}
             style={{
               width: '100%', background: view === VIEWS.ADD ? theme.gold + '11' : 'none',
               border: 'none', borderLeft: `2px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
@@ -210,7 +221,6 @@ export default function App() {
         )}
       </div>
 
-      {/* Footer */}
       <div style={{ padding: '12px 16px', borderTop: `1px solid ${theme.borderGold}` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div style={{ fontSize: 10, color: theme.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
@@ -228,7 +238,6 @@ export default function App() {
     </div>
   )
 
-  // ── Mobile header ─────────────────────────────────────────────────────
   const MobileHeader = () => (
     <div style={{
       background: theme.surface, borderBottom: `1px solid ${theme.borderGold}`,
@@ -250,7 +259,6 @@ export default function App() {
     </div>
   )
 
-  // ── Mobile bottom nav ─────────────────────────────────────────────────
   const MobileNav = () => (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0,
@@ -258,8 +266,9 @@ export default function App() {
       display: 'flex', zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
       {[
-        { v: VIEWS.HOME, label: 'Início', icon: '🏠' },
-        { v: VIEWS.BUSCA, label: 'Busca IA', icon: '✦' },
+        { v: VIEWS.HOME,     label: 'Início',    icon: '🏠' },
+        { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
+        { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
         ...(isLoggedIn ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
       ].map(item => (
         <button key={item.v} onClick={() => setView(item.v)}
@@ -277,18 +286,25 @@ export default function App() {
     </div>
   )
 
-  // ── Conteúdo principal ────────────────────────────────────────────────
   function renderContent() {
     switch (view) {
+      case VIEWS.PESQUISA:
+        return (
+          <div className="fade-up">
+            <PesquisaJuri onImportar={handleImportarPesquisa} />
+          </div>
+        )
       case VIEWS.ADD:
         if (!isLoggedIn) { setShowLogin(true); return null }
         return (
           <div className="fade-up">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>←</button>
-              <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Nova Entrada</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
+                {prefillEntry ? 'Importar Jurisprudência' : 'Nova Entrada'}
+              </div>
             </div>
-            <EntradaForm onSave={handleSave} onCancel={() => setView(VIEWS.HOME)} loading={saving}/>
+            <EntradaForm initial={prefillEntry} onSave={handleSave} onCancel={() => { setPrefillEntry(null); setView(VIEWS.HOME) }} loading={saving}/>
           </div>
         )
       case VIEWS.EDIT:
@@ -322,7 +338,6 @@ export default function App() {
       default:
         return (
           <div>
-            {/* Search */}
             <div style={{ position: 'relative', marginBottom: 16 }}>
               <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }}>🔍</span>
               <input value={search} onChange={e => setSearch(e.target.value)}
@@ -330,8 +345,6 @@ export default function App() {
                 style={{ paddingLeft: 38, background: theme.inputBg, border: `1px solid ${theme.border}`, color: theme.text }}
               />
             </div>
-
-            {/* Filtros de área */}
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
               {[{ id: 'all', label: 'Todas', color: theme.gold }, ...Object.entries(AREAS).map(([k, v]) => ({ id: k, label: k, color: v.color, icon: v.icon }))].map(a => (
                 <button key={a.id} onClick={() => setAreaFilter(a.id)}
@@ -350,7 +363,6 @@ export default function App() {
                 </button>
               ))}
             </div>
-
             <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>{filtered.length} entrada(s)</div>
             <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}/>
           </div>
