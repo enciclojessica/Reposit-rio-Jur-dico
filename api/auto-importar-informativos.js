@@ -20,33 +20,11 @@ export default async function handler(req, res) {
 
   if (!userId) return res.status(400).json({ error: 'user_id obrigatório.' })
 
-  // ── 1. Buscar HTML do informativo ────────────────────────────────────
-  let urlInformativo
-  try {
-    const indexRes = await fetch('https://portal.stf.jus.br/textos/verTexto.asp?servico=informativoSTF', {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    })
-    const html = await indexRes.text()
-    const match = html.match(/informativo(\d{3,4})\.htm/i)
-    const num = match ? match[1] : '1217'
-    urlInformativo = tribunal === 'STF'
-      ? `https://www.stf.jus.br/arquivo/informativo/documento/informativo${num}.htm`
-      : 'https://scon.stj.jus.br/jurisprudencia/externo/informativo/'
-  } catch {
-    urlInformativo = tribunal === 'STF'
-      ? 'https://www.stf.jus.br/arquivo/informativo/documento/informativo1217.htm'
-      : 'https://scon.stj.jus.br/jurisprudencia/externo/informativo/'
-  }
-
-  const pageRes = await fetch(urlInformativo, { headers: { 'User-Agent': 'Mozilla/5.0' } })
-  const htmlPage = await pageRes.text()
-  const textoInformativo = htmlPage
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s{3,}/g, '\n')
-    .trim()
-    .slice(0, 8000)
+  // ── 1. Buscar informativo via web search ────────────────────────────
+  // (fetch direto ao portal do STF/STJ é bloqueado por servidores externos)
+  const query = `último informativo ${tribunal} jurisprudência decisões recentes 2026`
+  // textoInformativo será buscado pelo Claude com web_search no passo 3
+  const textoInformativo = query
 
   // ── 2. Resumo do repositório para contexto ───────────────────────────
   const resumoRepo = entradas.slice(0, 60).map(e => ({
