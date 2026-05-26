@@ -81,8 +81,25 @@ export default async function handler(req, res) {
         }),
       })
 
-      if (envio.ok) enviados++
-      else erros.push({ email, status: envio.status })
+      if (envio.ok) {
+        enviados++
+        // Criar notificação in-app para cada usuário
+        const resumoTemas = resultadosPorTema.map(t => t.tema).join(', ')
+        const totalDecisoes = resultadosPorTema.reduce((s, t) => s + t.resultados.length, 0)
+        // Descobrir user_id pelo e-mail
+        const { data: alertasUsuario } = await supabase
+          .from('alertas').select('user_id').eq('email', email).limit(1)
+        const uid = alertasUsuario?.[0]?.user_id
+        if (uid) {
+          await supabase.from('notificacoes').insert({
+            user_id: uid,
+            tipo: 'alerta',
+            titulo: `${totalDecisoes} nova(s) decisão(ões) para seus alertas`,
+            corpo: `Temas monitorados com novidades: ${resumoTemas}`,
+            dados: { temas: resultadosPorTema.map(t => t.tema), total: totalDecisoes },
+          })
+        }
+      } else erros.push({ email, status: envio.status })
 
     } catch (err) {
       erros.push({ email, err: err.message })

@@ -130,3 +130,27 @@ ALTER TABLE entradas ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
 ALTER TABLE entradas
   ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'vigente'
   CHECK (status IN ('vigente', 'vinculante', 'em_revisao', 'superada'));
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Notificações in-app
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS notificacoes (
+  id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  tipo       TEXT NOT NULL, -- 'alerta', 'informativo', 'sistema'
+  titulo     TEXT NOT NULL,
+  corpo      TEXT,
+  lida       BOOLEAN DEFAULT false,
+  dados      JSONB DEFAULT '{}',
+  criado_em  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE notificacoes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "notif_own" ON notificacoes FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS notif_user_lida ON notificacoes(user_id, lida);

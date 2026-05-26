@@ -16,6 +16,7 @@ import ImportacaoLote from './components/ImportacaoLote'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import Informativos from './components/Informativos'
+import SinoNotificacoes from './components/SinoNotificacoes'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -420,6 +421,10 @@ export default function App() {
               </div>
             )}
           </div>
+          <SinoNotificacoes
+            session={session}
+            onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
+          />
           <button onClick={toggle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '0 0 0 8px' }}>
             {mode === 'dark' ? '☀️' : '🌙'}
           </button>
