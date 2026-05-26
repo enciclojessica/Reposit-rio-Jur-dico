@@ -7,8 +7,8 @@ export default async function handler(req, res) {
   const { tribunal = 'STF', edicao } = req.query
 
   const query = edicao
-    ? `informativo ${tribunal} número ${edicao} jurisprudência decisões 2026`
-    : `último informativo ${tribunal} jurisprudência decisões recentes 2026 site:stf.jus.br OR site:stj.jus.br`
+    ? `informativo ${tribunal} ${edicao} 2026 decisões teses`
+    : `informativo ${tribunal} mais recente 2026 decisões`
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -20,33 +20,12 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 3000,
+        max_tokens: 1500,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        system: `Você é um extrator de dados jurídicos. Pesquise o último informativo do ${tribunal} e extraia as decisões.
-Retorne APENAS um objeto JSON válido, sem markdown, sem texto antes ou depois:
-{
-  "tribunal": "${tribunal}",
-  "edicao": "número da edição",
-  "data": "data no formato YYYY-MM-DD",
-  "url_fonte": "URL da página oficial do informativo",
-  "decisoes": [
-    {
-      "titulo": "tema resumido em até 80 caracteres",
-      "orgao": "Plenário / Primeira Turma / Segunda Turma etc",
-      "relator": "nome do relator",
-      "numero": "número do processo",
-      "area": "Cível ou Penal ou Informativo",
-      "tese": "enunciado da tese fixada",
-      "fundamentacao": "artigos ou dispositivos citados",
-      "url": "URL direta para o processo se disponível, senão string vazia"
-    }
-  ]
-}
-Extraia até 10 decisões. Apenas dados reais encontrados na busca.`,
-        messages: [{
-          role: 'user',
-          content: query,
-        }],
+        system: `Pesquise o último informativo do ${tribunal} e retorne JSON:
+{"tribunal":"${tribunal}","edicao":"","data":"YYYY-MM-DD","url_fonte":"","decisoes":[{"titulo":"","orgao":"","relator":"","numero":"","area":"Cível|Penal|Informativo","tese":"","fundamentacao":"","url":""}]}
+Máx 6 decisões. Só dados reais. Sem markdown.`,
+        messages: [{ role: 'user', content: query }],
       }),
     })
 
@@ -56,15 +35,12 @@ Extraia até 10 decisões. Apenas dados reais encontrados na busca.`,
     const text = (json.content || [])
       .filter(b => b.type === 'text')
       .map(b => b.text)
-      .join('')
-      .trim()
+      .join('').trim()
 
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) return res.status(422).json({ error: 'Não foi possível extrair dados do informativo.' })
 
-    const dados = JSON.parse(match[0])
-    return res.status(200).json(dados)
-
+    return res.status(200).json(JSON.parse(match[0]))
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }

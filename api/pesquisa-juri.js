@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 4000,
+        max_tokens: 1500,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         system: `Você é um pesquisador jurídico especializado em jurisprudência brasileira.
 Sua tarefa é buscar decisões reais nos portais oficiais dos tribunais (STJ, STF, TJs, TRFs).
