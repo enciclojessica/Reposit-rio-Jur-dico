@@ -177,6 +177,9 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
         </select>
         <FieldLabel>Tema / Assunto</FieldLabel>
         {inp(entry.tema, v => setF('tema', v), 'Ex: Dano moral — requisitos e configuração')}
+        <div style={{ fontSize: 10, color: entry.tema.length > 120 ? theme.error : theme.muted, textAlign: 'right', marginTop: 2 }}>
+          {entry.tema.length}/150 caracteres
+        </div>
         <FieldLabel>Fonte (Tribunal / Autor)</FieldLabel>
         {inp(entry.fonte, v => setF('fonte', v), 'Ex: STJ, TJSP, Caio Mário da Silva Pereira')}
         <FieldLabel>Referência</FieldLabel>
@@ -245,7 +248,11 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
       </BtnMuted>
 
       <div style={{ display: 'flex', gap: 10 }}>
-        <BtnMuted onClick={onCancel} style={{ flex: 1 }}>Cancelar</BtnMuted>
+        <BtnMuted onClick={() => {
+          const temDados = entry.tema.trim() || entry.fonte.trim() || entry.teses[0]?.tese_assunto?.trim()
+          if (temDados && !confirm('Descartar as alterações? Os dados não salvos serão perdidos.')) return
+          onCancel()
+        }} style={{ flex: 1 }}>Cancelar</BtnMuted>
         <BtnGold onClick={() => onSave(entry)} disabled={loading || extraindo || !entry.tema} style={{ flex: 2 }}>
           {loading ? 'Salvando...' : 'Salvar'}
         </BtnGold>

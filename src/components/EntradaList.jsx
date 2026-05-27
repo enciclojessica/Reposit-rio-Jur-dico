@@ -1,9 +1,24 @@
+import { useState } from 'react'
 import { AREAS } from '../shared'
 import { TagPill } from './TagInput'
 import { useTheme } from '../theme'
 
 export default function EntradaList({ entradas, onSelect }) {
   const { theme } = useTheme()
+  const [modoTabela, setModoTabela] = useState(false)
+
+  const ToggleModo = () => (
+    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8, gap: 4 }}>
+      <button onClick={() => setModoTabela(false)}
+        style={{ background: !modoTabela ? theme.gold + '22' : 'none', color: !modoTabela ? theme.gold : theme.muted, border: `1px solid ${!modoTabela ? theme.gold + '44' : theme.border}`, borderRadius: 6, padding: '4px 10px', fontSize: 10, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+        ▦ Cards
+      </button>
+      <button onClick={() => setModoTabela(true)}
+        style={{ background: modoTabela ? theme.gold + '22' : 'none', color: modoTabela ? theme.gold : theme.muted, border: `1px solid ${modoTabela ? theme.gold + '44' : theme.border}`, borderRadius: 6, padding: '4px 10px', fontSize: 10, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+        ≡ Tabela
+      </button>
+    </div>
+  )
 
   if (entradas.length === 0) {
     return (
@@ -15,8 +30,55 @@ export default function EntradaList({ entradas, onSelect }) {
     )
   }
 
+  if (modoTabela) return (
+    <div>
+      <ToggleModo />
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr>
+              {['Área', 'Tipo', 'Tema', 'Fonte', 'Teses', 'Status', 'Data'].map(h => (
+                <th key={h} style={{ textAlign: 'left', padding: '8px 10px', background: theme.raised, color: theme.muted, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {entradas.map(e => {
+              const am = AREAS[e.area] || { color: theme.muted }
+              return (
+                <tr key={e.id} onClick={() => onSelect(e)}
+                  style={{ cursor: 'pointer', borderBottom: `1px solid ${theme.border}22` }}
+                  onMouseEnter={ev => ev.currentTarget.style.background = theme.raised}
+                  onMouseLeave={ev => ev.currentTarget.style.background = 'transparent'}>
+                  <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                    <span style={{ color: am.color, fontSize: 10, fontWeight: 700 }}>{e.area}</span>
+                  </td>
+                  <td style={{ padding: '8px 10px', color: theme.muted, whiteSpace: 'nowrap', fontSize: 11 }}>{e.tipo}</td>
+                  <td style={{ padding: '8px 10px', color: theme.text, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Playfair Display, serif' }}>{e.tema}</td>
+                  <td style={{ padding: '8px 10px', color: theme.muted, whiteSpace: 'nowrap', fontSize: 11 }}>{e.fonte}</td>
+                  <td style={{ padding: '8px 10px', color: theme.muted, textAlign: 'center', fontSize: 11 }}>{e.teses?.length || 0}</td>
+                  <td style={{ padding: '8px 10px', whiteSpace: 'nowrap', fontSize: 10 }}>
+                    {e.status && e.status !== 'vigente' ? (
+                      <span style={{ color: { vinculante: '#c9a452', em_revisao: '#f59e0b', superada: '#ef4444' }[e.status] || theme.muted }}>
+                        {e.status}
+                      </span>
+                    ) : <span style={{ color: theme.muted, opacity: 0.4 }}>—</span>}
+                  </td>
+                  <td style={{ padding: '8px 10px', color: theme.muted, whiteSpace: 'nowrap', fontSize: 11 }}>
+                    {new Date(e.criado_em).toLocaleDateString('pt-BR')}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+
   return (
     <div style={{ padding: '4px 0' }}>
+      <ToggleModo />
       {entradas.map(e => {
         const am = AREAS[e.area] || { color: theme.muted, icon: '📄' }
         return (
@@ -85,7 +147,7 @@ export default function EntradaList({ entradas, onSelect }) {
             </div>
             {e._motivo && (
               <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, opacity: 0.8, fontStyle: 'italic' }}>
-                ↳ {e._motivo}
+                → {e._motivo}
               </div>
             )}
           </div>

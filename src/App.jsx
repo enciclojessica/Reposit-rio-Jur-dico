@@ -49,8 +49,13 @@ export default function App() {
   const [view, setView]             = useState(VIEWS.HOME)
   const [areaFilter, setAreaFilter] = useState('all')
   const [tagFilter, setTagFilter]   = useState(null)
+  const [ordenacao, setOrdenacao]    = useState('data_desc')
   const [search, setSearch]         = useState('')
   const [modoSemantico, setModoSemantico] = useState(false)
+  const [historicoBusca, setHistoricoBusca] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('rj_busca_historico') || '[]') } catch { return [] }
+  })
+  const [showHistorico, setShowHistorico] = useState(false)
   const [buscandoSem, setBuscandoSem]   = useState(false)
   const [resultadosSem, setResultadosSem] = useState(null) // null = não buscado ainda
   const [erroSem, setErroSem]           = useState('')
@@ -63,6 +68,7 @@ export default function App() {
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const isMobile = useIsMobile()
+  const [maisAberto, setMaisAberto] = useState(false)
 
   // Se logado mas sem registro em membros (migração ainda não aplicada),
   // concede acesso de editor como fallback para não bloquear o uso.
@@ -147,6 +153,33 @@ export default function App() {
   }, [session, conviteToken])
 
   // ── Entradas (leitura pública) ─────────────────────────────────────────
+  // Atalhos de teclado globais
+  useEffect(() => {
+    function handler(e) {
+      const tag = document.activeElement?.tagName
+      const editando = ['INPUT','TEXTAREA','SELECT'].includes(tag)
+      if (editando) return
+
+      // / — focar busca
+      if (e.key === '/' && view === VIEWS.HOME) {
+        e.preventDefault()
+        document.querySelector('input[placeholder*="Buscar"]')?.focus()
+      }
+      // N — nova entrada
+      if ((e.key === 'n' || e.key === 'N') && isEditor && view !== VIEWS.ADD) {
+        e.preventDefault()
+        setPrefillEntry(null); setView(VIEWS.ADD)
+      }
+      // Esc — voltar à lista ou fechar mais
+      if (e.key === 'Escape') {
+        if (maisAberto) { setMaisAberto(false); return }
+        if (view !== VIEWS.HOME) setView(VIEWS.HOME)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [view, isEditor, maisAberto])
+
   const loadEntradas = useCallback(async () => {
     const { data } = await supabase
       .from('entradas').select('*').order('criado_em', { ascending: false })
@@ -172,6 +205,12 @@ export default function App() {
     setBuscandoSem(true)
     setResultadosSem(null)
     setErroSem('')
+    // Salvar no histórico
+    setHistoricoBusca(prev => {
+      const nova = [search, ...prev.filter(h => h !== search)].slice(0, 5)
+      localStorage.setItem('rj_busca_historico', JSON.stringify(nova))
+      return nova
+    })
     try {
       const res = await fetch('/api/busca-semantica', {
         method: 'POST',
@@ -195,6 +234,17 @@ export default function App() {
 
   const todasAsTags = [...new Set(entradas.flatMap(e => e.tags || []))].sort()
 
+  function ordenarEntradas(lista) {
+    const l = [...lista]
+    switch (ordenacao) {
+      case 'data_asc':  return l.sort((a,b) => new Date(a.criado_em) - new Date(b.criado_em))
+      case 'tema_az':   return l.sort((a,b) => (a.tema||'').localeCompare(b.tema||'', 'pt-BR'))
+      case 'tema_za':   return l.sort((a,b) => (b.tema||'').localeCompare(a.tema||'', 'pt-BR'))
+      case 'fonte':     return l.sort((a,b) => (a.fonte||'').localeCompare(b.fonte||'', 'pt-BR'))
+      default:          return l.sort((a,b) => new Date(b.criado_em) - new Date(a.criado_em))
+    }
+  }
+
   // No modo semântico com resultado, usar ordem e IDs retornados pela IA
   const filteredSemantico = resultadosSem !== null
     ? resultadosSem
@@ -202,7 +252,7 @@ export default function App() {
         .filter(e => e.id)
     : null
 
-  const filtered = filteredSemantico !== null
+  const filteredRaw = filteredSemantico !== null
     ? filteredSemantico
     : entradas.filter(e => {
     const areaOk = areaFilter === 'all' || e.area === areaFilter
@@ -432,26 +482,92 @@ async function handleSave(entry) {
   )
 
   // ── Mobile bottom nav ──────────────────────────────────────────────────
+  // Itens fixos no mobile nav
+  const navFixos = [
+    { v: VIEWS.HOME,   label: 'Início',  icon: '🏠' },
+    { v: VIEWS.BUSCA,  label: 'Busca IA', icon: '✦' },
+    { v: VIEWS.EDITOR, label: 'Editor',   icon: '✎' },
+    ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova', icon: '+' }] : []),
+  ]
+  // Itens no menu "mais"
+  const navMais = [
+    { v: VIEWS.PESQUISA,    label: 'Pesquisar',    icon: '⌕' },
+    { v: VIEWS.DASHBOARD,   label: 'Dashboard',    icon: '◈' },
+    { v: VIEWS.ALERTAS,     label: 'Alertas',      icon: '🔔' },
+    { v: VIEWS.FLASHCARDS,  label: 'Flashcards',   icon: '🃏' },
+    ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
+    ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros',  icon: '👥' }] : []),
+  ]
+  const maisAtivo = navMais.some(n => n.v === view)
+
   const MobileNav = () => (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: theme.surface, borderTop: `1px solid ${theme.borderGold}`, display: 'flex', zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      {[
-        { v: VIEWS.HOME,     label: 'Início',    icon: '🏠' },
-        { v: VIEWS.PESQUISA, label: 'Pesquisar', icon: '⌕' },
-        { v: VIEWS.BUSCA,    label: 'Busca IA',  icon: '✦' },
-        { v: VIEWS.DASHBOARD,    label: 'Dashboard',    icon: '◈' },
-        ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
-        { v: VIEWS.ALERTAS,     label: 'Alertas',   icon: '🔔' },
-        { v: VIEWS.FLASHCARDS, label: 'Flashcards', icon: '🃏' },
-        { v: VIEWS.EDITOR,   label: 'Editor',    icon: '✎' },
-        ...(isEditor ? [{ v: VIEWS.ADD, label: 'Adicionar', icon: '+' }] : []),
-        ...(isAdmin  ? [{ v: VIEWS.MEMBROS, label: 'Membros', icon: '👥' }] : []),
-      ].map(item => (
-        <button key={item.v} onClick={() => setView(item.v)}
-          style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 4px', background: 'none', border: 'none', color: view === item.v ? theme.gold : theme.muted, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, borderTop: view === item.v ? `2px solid ${theme.gold}` : '2px solid transparent' }}>
-          <span style={{ fontSize: item.icon === '+' ? 20 : 16, lineHeight: 1, marginBottom: 2 }}>{item.icon}</span>
-          {item.label}
+    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }}>
+      {/* Drawer do menu "mais" */}
+      {maisAberto && (
+        <div
+          onClick={() => setMaisAberto(false)}
+          style={{ position: 'fixed', inset: 0, background: '#00000055', zIndex: 49 }}
+        />
+      )}
+      {maisAberto && (
+        <div style={{
+          position: 'absolute', bottom: '100%', left: 0, right: 0,
+          background: theme.surface, borderTop: `1px solid ${theme.borderGold}`,
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          padding: '12px 8px', gap: 4, zIndex: 51,
+          boxShadow: '0 -8px 32px #00000033',
+        }}>
+          {navMais.map(item => (
+            <button key={item.v}
+              onClick={() => { setView(item.v); setMaisAberto(false) }}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '10px 4px', background: view === item.v ? theme.gold + '22' : 'none',
+                border: `1px solid ${view === item.v ? theme.gold + '44' : 'transparent'}`,
+                borderRadius: 8,
+                color: view === item.v ? theme.gold : theme.muted,
+                cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
+              }}>
+              <span style={{ fontSize: 18, lineHeight: 1, marginBottom: 4 }}>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Barra principal */}
+      <div style={{
+        background: theme.surface, borderTop: `1px solid ${theme.borderGold}`,
+        display: 'flex', paddingBottom: 'env(safe-area-inset-bottom)',
+      }}>
+        {navFixos.map(item => (
+          <button key={item.v}
+            onClick={() => { setView(item.v); setMaisAberto(false) }}
+            style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+              padding: '10px 4px', background: 'none', border: 'none',
+              color: view === item.v ? theme.gold : theme.muted,
+              cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
+              borderTop: view === item.v ? `2px solid ${theme.gold}` : '2px solid transparent',
+            }}>
+            <span style={{ fontSize: item.icon === '+' ? 20 : 16, lineHeight: 1, marginBottom: 2 }}>{item.icon}</span>
+            {item.label}
+          </button>
+        ))}
+        {/* Botão "mais" */}
+        <button
+          onClick={() => setMaisAberto(m => !m)}
+          style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+            padding: '10px 4px', background: 'none', border: 'none',
+            color: maisAtivo ? theme.gold : theme.muted,
+            cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
+            borderTop: maisAtivo ? `2px solid ${theme.gold}` : '2px solid transparent',
+          }}>
+          <span style={{ fontSize: 16, lineHeight: 1, marginBottom: 2 }}>⋯</span>
+          Mais
         </button>
-      ))}
+      </div>
     </div>
   )
 
@@ -546,9 +662,37 @@ case VIEWS.FLASHCARDS:
                   value={search}
                   onChange={e => handleSearchChange(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && modoSemantico && buscarSemantico()}
+                  onFocus={() => setShowHistorico(true)}
+                  onBlur={() => setTimeout(() => setShowHistorico(false), 150)}
                   placeholder={modoSemantico ? 'Descreva o que procura em linguagem natural...' : 'Buscar por tema, fonte, referência...'}
                   style={{ paddingLeft: 38, paddingRight: modoSemantico ? 100 : 12 }}
                 />
+                {showHistorico && !search && historicoBusca.length > 0 && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 20,
+                    background: theme.surface, border: `1px solid ${theme.border}`,
+                    borderRadius: 8, marginTop: 4, overflow: 'hidden',
+                    boxShadow: theme.shadow,
+                  }}>
+                    <div style={{ padding: '6px 12px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: `1px solid ${theme.border}` }}>
+                      Buscas recentes
+                    </div>
+                    {historicoBusca.map((h, i) => (
+                      <div key={i}
+                        onMouseDown={() => { handleSearchChange(h); setShowHistorico(false) }}
+                        style={{
+                          padding: '8px 12px', fontSize: 12, color: theme.text,
+                          cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                          borderBottom: i < historicoBusca.length - 1 ? `1px solid ${theme.border}22` : 'none',
+                        }}
+                        onMouseEnter={ev => ev.currentTarget.style.background = theme.raised}
+                        onMouseLeave={ev => ev.currentTarget.style.background = 'transparent'}>
+                        <span style={{ color: theme.muted, fontSize: 12 }}>⟳</span>
+                        {h}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {modoSemantico && search.trim() && (
                   <button onClick={buscarSemantico} disabled={buscandoSem}
                     style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: buscandoSem ? theme.border : theme.gold, color: buscandoSem ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: buscandoSem ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
@@ -589,11 +733,25 @@ case VIEWS.FLASHCARDS:
                 ))}
               </div>
             )}
-            <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12 }}>
-              {filteredSemantico !== null
-                ? `${filtered.length} resultado(s) semântico(s) para "${search}"`
-                : `${filtered.length} entrada(s)${tagFilter ? ` com tag #${tagFilter}` : ''}`
-              }
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ fontSize: 11, color: theme.muted }}>
+                {filteredSemantico !== null
+                  ? `${filtered.length} resultado(s) semântico(s) para "${search}"`
+                  : `${filtered.length} entrada(s)${tagFilter ? ` com tag #${tagFilter}` : ''}`
+                }
+              </div>
+              {filteredSemantico === null && (
+                <select
+                  value={ordenacao}
+                  onChange={e => setOrdenacao(e.target.value)}
+                  style={{ width: 'auto', fontSize: 11, padding: '4px 8px', background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted }}>
+                  <option value="data_desc">Mais recentes</option>
+                  <option value="data_asc">Mais antigas</option>
+                  <option value="tema_az">Tema A-Z</option>
+                  <option value="tema_za">Tema Z-A</option>
+                  <option value="fonte">Fonte A-Z</option>
+                </select>
+              )}
             </div>
             <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}/>
           </div>

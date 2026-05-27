@@ -18,6 +18,7 @@ export default function PesquisaJuri({ onImportar }) {
   const [tribunal, setTribunal]   = useState('todos')
   const [resultados, setResultados] = useState([])
   const [loading, setLoading]     = useState(false)
+  const [statusMsg, setStatusMsg]   = useState('')
   const [error, setError]         = useState('')
   const [aviso, setAviso]         = useState('')
   const [importados, setImportados] = useState(new Set())
@@ -29,6 +30,20 @@ export default function PesquisaJuri({ onImportar }) {
     setError('')
     setAviso('')
     setImportados(new Set())
+
+    // Mensagens rotativas de progresso
+    const msgs = [
+      `Consultando ${tribunal === 'todos' ? 'STJ e STF' : tribunal}...`,
+      'Buscando decisões relevantes...',
+      'Verificando portais oficiais...',
+      'Organizando resultados...',
+    ]
+    let mi = 0
+    setStatusMsg(msgs[0])
+    const interval = setInterval(() => {
+      mi = (mi + 1) % msgs.length
+      setStatusMsg(msgs[mi])
+    }, 3000)
 
     try {
       const res = await fetch('/api/pesquisa-juri', {
@@ -43,6 +58,8 @@ export default function PesquisaJuri({ onImportar }) {
     } catch (err) {
       setError('Erro na pesquisa: ' + err.message)
     }
+    clearInterval(interval)
+    setStatusMsg('')
     setLoading(false)
   }
 

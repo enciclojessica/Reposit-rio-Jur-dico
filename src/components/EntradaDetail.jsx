@@ -49,6 +49,7 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOn
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const [salvandoStatus, setSalvandoStatus] = useState(false)
   const [linkCopiado, setLinkCopiado]     = useState(false)
+  const [showPreviewABNT, setShowPreviewABNT] = useState(false)
 
   function compartilhar() {
     const link = `${window.location.origin}/?entrada=${entry.id}`
@@ -144,15 +145,36 @@ export default function EntradaDetail({ entry, onClose, onDelete, onEdit, readOn
           {copied ? '✓' : '⎘'} {copied ? 'Copiado' : 'Copiar fichamento'}
         </button>
 
-        {/* Copiar ABNT */}
-        <button onClick={copyABNT} style={{
-          ...btnBase,
-          background: copiedAbnt ? theme.toastOk : theme.raised,
-          color: copiedAbnt ? theme.success : theme.gold,
-          borderColor: copiedAbnt ? theme.success : theme.borderGold,
-        }}>
-          {copiedAbnt ? '✓' : '§'} {copiedAbnt ? 'Copiado' : 'Citação ABNT'}
-        </button>
+        {/* Copiar ABNT com preview */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={copyABNT}
+            onMouseEnter={() => setShowPreviewABNT(true)}
+            onMouseLeave={() => setShowPreviewABNT(false)}
+            style={{
+              ...btnBase,
+              background: copiedAbnt ? theme.toastOk : theme.raised,
+              color: copiedAbnt ? theme.success : theme.gold,
+              borderColor: copiedAbnt ? theme.success : theme.borderGold,
+            }}>
+            {copiedAbnt ? '✓' : '§'} {copiedAbnt ? 'Copiado' : 'Citação ABNT'}
+          </button>
+          {showPreviewABNT && !copiedAbnt && (
+            <div style={{
+              position: 'absolute', bottom: 'calc(100% + 8px)', left: 0,
+              background: theme.surface, border: `1px solid ${theme.borderGold}`,
+              borderRadius: 8, padding: '10px 14px', width: 340,
+              fontSize: 11, color: theme.text, lineHeight: 1.7,
+              fontFamily: 'Georgia, serif', boxShadow: theme.shadow,
+              zIndex: 50,
+            }}>
+              <div style={{ fontSize: 9, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'IBM Plex Mono, monospace' }}>
+                Prévia ABNT NBR 6023
+              </div>
+              {gerarCitacaoABNT(entry)}
+            </div>
+          )}
+        </div>
 
         {/* Editar e Excluir — só para usuários logados */}
         {!readOnly && (
