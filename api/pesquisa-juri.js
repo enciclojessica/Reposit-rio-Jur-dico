@@ -23,22 +23,14 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 1500,
+        max_tokens: 800,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        system: `Você é um pesquisador jurídico especializado em jurisprudência brasileira.
-Pesquise decisões reais nos portais oficiais dos tribunais (STJ, STF, TJs, TRFs).
-
-REGRAS ABSOLUTAS:
-1. Retorne APENAS um array JSON válido, sem markdown.
-2. Cada item: { "tribunal": "", "tipo": "", "numero": "", "relator": "", "data": "", "ementa": "", "url": "", "area": "" }
-3. Todos os dados devem ser REAIS. Nunca invente processos, relatores ou ementas.
-4. "area" deve ser: "Cível", "Penal" ou "Doutrina".
-5. Retorne entre 5 e 8 resultados. Se não encontrar suficientes, retorne menos.`,
+        system: `Pesquisador jurídico brasileiro. Retorne APENAS array JSON, sem markdown:
+[{"tribunal":"","tipo":"","numero":"","relator":"","data":"","ementa":"","url":"","area":""}]
+Area: Cível, Penal ou Doutrina. Máx 5 resultados REAIS. Nunca invente dados.`,
         messages: [{
           role: 'user',
-          content: `Pesquise jurisprudência sobre: "${query}". ${tribunalFiltro}
-Acesse: https://scon.stj.jus.br/SCON/ e https://jurisprudencia.stf.jus.br/pages/search
-Retorne SOMENTE o array JSON.`
+          content: `Jurisprudência: "${query}". ${tribunalFiltro} Portais: scon.stj.jus.br e jurisprudencia.stf.jus.br`
         }],
       }),
     })
