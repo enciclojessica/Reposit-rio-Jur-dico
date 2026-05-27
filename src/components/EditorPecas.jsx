@@ -84,7 +84,7 @@ function PainelCitacoes({ entradas, onInserir, editorRef, conteudo, setConteudo 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
+          model: 'gemini-1.5-flash',
           max_tokens: 800,
           system: `Você é um assistente de prática jurídica. Dado um trecho de peça processual e um repositório de teses, identifique quais teses do repositório são relevantes para aquele trecho. Retorne APENAS um array JSON com os IDs relevantes (máx. 5), ordenados por relevância: ["id1","id2",...]. Sem texto adicional.`,
           messages: [{ role: 'user', content: `Trecho: "${trecho}"\n\nRepositório: ${ctx}` }],
