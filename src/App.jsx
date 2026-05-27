@@ -255,17 +255,21 @@ export default function App() {
   const filteredRaw = filteredSemantico !== null
     ? filteredSemantico
     : entradas.filter(e => {
-    const areaOk = areaFilter === 'all' || e.area === areaFilter
-    if (!areaOk) return false
-    if (!search) return true
-    const q = search.toLowerCase()
-    return (
-      e.tema?.toLowerCase().includes(q) ||
-      e.fonte?.toLowerCase().includes(q) ||
-      e.referencia?.toLowerCase().includes(q) ||
-      e.teses?.some(t => t.tese_assunto?.toLowerCase().includes(q))
-    )
-  })
+      const areaOk = areaFilter === 'all' || e.area === areaFilter
+      if (!areaOk) return false
+      const tag = !tagFilter || (e.tags || []).includes(tagFilter)
+      if (!tag) return false
+      if (!search) return true
+      const q = search.toLowerCase()
+      return (
+        e.tema?.toLowerCase().includes(q) ||
+        e.fonte?.toLowerCase().includes(q) ||
+        e.referencia?.toLowerCase().includes(q) ||
+        e.teses?.some(t => t.tese_assunto?.toLowerCase().includes(q))
+      )
+    })
+
+  const filtered = filteredSemantico !== null ? filteredRaw : ordenarEntradas(filteredRaw)
 
   function requireEditor(action) {
     if (!isEditor) { notify('Permissão insuficiente.', 'err'); return false }
