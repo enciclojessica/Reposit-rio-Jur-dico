@@ -154,3 +154,10 @@ CREATE POLICY "notif_own" ON notificacoes FOR ALL
   WITH CHECK (auth.uid() = user_id);
 
 CREATE INDEX IF NOT EXISTS notif_user_lida ON notificacoes(user_id, lida);
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Histórico de alterações nas entradas
+-- ═══════════════════════════════════════════════════════════
+
+ALTER TABLE entradas ADD COLUMN IF NOT EXISTS historico JSONB DEFAULT '[]';

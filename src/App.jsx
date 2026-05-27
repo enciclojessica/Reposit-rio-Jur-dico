@@ -296,6 +296,24 @@ async function handleSave(entry) {
     setSaving(false)
   }
 
+  async function handleDuplicar(entry) {
+    const payload = {
+      area: entry.area, tipo: entry.tipo,
+      tema: `${entry.tema} (cópia)`,
+      fonte: entry.fonte, referencia: entry.referencia,
+      url: entry.url, teses: entry.teses,
+      status: 'vigente', tags: entry.tags || [],
+      criado_por: session.user.id,
+    }
+    const { data, error } = await supabase.from('entradas').insert(payload).select().single()
+    if (error) notify('Erro ao duplicar.', 'err')
+    else {
+      notify('Entrada duplicada.')
+      setSelected(data)
+      setView(VIEWS.DETAIL)
+    }
+  }
+
   async function handleDelete() {
     if (!confirm('Remover esta entrada permanentemente?')) return
     const { error } = await supabase.from('entradas').delete().eq('id', selected.id)
@@ -644,6 +662,7 @@ case VIEWS.FLASHCARDS:
               onClose={() => setView(VIEWS.HOME)}
               onDelete={isAdmin ? handleDelete : null}
               onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
+              onDuplicar={isEditor ? handleDuplicar : null}
               readOnly={!isEditor}
               onStatusChange={(id, novoStatus) => {
                 setEntradas(prev => prev.map(e => e.id === id ? { ...e, status: novoStatus } : e))
