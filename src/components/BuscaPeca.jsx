@@ -25,7 +25,7 @@ export default function BuscaPeca({ entradas }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemini-1.5-flash',
+          model: 'claude-sonnet-4-5',
           max_tokens: 1500,
           system: 'Você é um assistente de prática jurídica. Dado um repositório de teses em JSON, selecione as mais relevantes para a peça indicada. Para cada tese: (1) tese/assunto, (2) fundamentação legal, (3) precedente, (4) como aplicar especificamente na peça. Técnico e objetivo. Formate em markdown. Se faltar cobertura no repositório, aponte as lacunas.',
           messages: [{ role: 'user', content: `Repositório:\n${ctx}\n\nPeça: ${query}` }],
