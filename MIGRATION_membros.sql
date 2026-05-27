@@ -161,3 +161,10 @@ CREATE INDEX IF NOT EXISTS notif_user_lida ON notificacoes(user_id, lida);
 -- ═══════════════════════════════════════════════════════════
 
 ALTER TABLE entradas ADD COLUMN IF NOT EXISTS historico JSONB DEFAULT '[]';
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Contador de uso das teses no editor
+-- ═══════════════════════════════════════════════════════════
+
+ALTER TABLE entradas ADD COLUMN IF NOT EXISTS uso_count INTEGER DEFAULT 0;

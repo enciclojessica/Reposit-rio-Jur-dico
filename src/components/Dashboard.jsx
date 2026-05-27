@@ -87,6 +87,31 @@ function Donut({ fatias, raio = 52 }) {
           </div>
         ))}
       </div>
+
+      {/* Mais citadas no editor */}
+      {stats.maisUsadas.length > 0 && (
+        <div style={{ ...card, marginTop: 14 }}>
+          <div style={secLabel}>Mais citadas em pecas</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {stats.maisUsadas.map((e, i) => {
+              const cor = AREAS[e.area]?.color || C.muted
+              const pct = Math.max(20, (e.uso_count / stats.maisUsadas[0].uso_count) * 80)
+              return (
+                <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, color: C.cream, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.tema}</div>
+                    <div style={{ fontSize: 10, color: C.muted }}>{e.fonte}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                    <div style={{ height: 6, background: cor, borderRadius: 3, width: pct }} />
+                    <span style={{ fontSize: 11, color: cor, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace', minWidth: 24, textAlign: 'right' }}>{e.uso_count}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -157,11 +182,16 @@ export default function Dashboard({ entradas }) {
     const totalTeses = entradas.reduce((s, e) => s + (e.teses?.length || 0), 0)
 
     // Recentes (últimas 5)
+    const maisUsadas = [...entradas]
+      .filter(e => (e.uso_count || 0) > 0)
+      .sort((a, b) => (b.uso_count || 0) - (a.uso_count || 0))
+      .slice(0, 5)
+
     const recentes = [...entradas]
       .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
       .slice(0, 5)
 
-    return { total, porArea, porTipo, meses, topFontes, lacunas, totalTeses, recentes }
+    return { total, porArea, porTipo, meses, topFontes, lacunas, totalTeses, recentes, maisUsadas }
   }, [entradas])
 
   const card = { background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20 }

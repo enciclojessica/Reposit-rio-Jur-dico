@@ -24,6 +24,16 @@ function citacaoABNT(entry) {
 }
 
 // ── Inserir texto no cursor do textarea ───────────────────────────────────
+// Registrar uso de tese no Supabase (fire-and-forget)
+async function registrarUsoTese(entryId) {
+  try {
+    const { supabase } = await import('../supabase')
+    const { data } = await supabase.from('entradas').select('uso_count').eq('id', entryId).single()
+    const novoCount = (data?.uso_count || 0) + 1
+    await supabase.from('entradas').update({ uso_count: novoCount }).eq('id', entryId)
+  } catch {}
+}
+
 function inserirNoCursor(ref, conteudo, setConteudo, texto) {
   const el    = ref.current
   if (!el) return
@@ -113,6 +123,7 @@ function PainelCitacoes({ entradas, onInserir, editorRef, conteudo, setConteudo 
       texto = citacaoInline(entry, tese)
     }
     inserirNoCursor(editorRef, conteudo, setConteudo, texto)
+    registrarUsoTese(entry.id) // fire-and-forget
   }
 
   const lista = sugestoes.length > 0 ? sugestoes : filtradas

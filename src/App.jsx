@@ -17,6 +17,7 @@ import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
+import { exportarRepositorioDocx } from './utils/exportarRepositorio'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -68,6 +69,7 @@ export default function App() {
   const [entradaPublicaId, setEntradaPublicaId] = useState(null)
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
+  const [exportandoRepo, setExportandoRepo] = useState(false)
   const isMobile = useIsMobile()
   const [maisAberto, setMaisAberto] = useState(false)
 
@@ -195,6 +197,14 @@ export default function App() {
       .subscribe()
     return () => supabase.removeChannel(channel)
   }, [authLoading, loadEntradas])
+
+  async function exportarRepo() {
+    if (exportandoRepo || !entradas.length) return
+    setExportandoRepo(true)
+    try { await exportarRepositorioDocx(entradas) }
+    catch (e) { console.error(e); notify('Erro ao exportar.', 'err') }
+    setExportandoRepo(false)
+  }
 
   function notify(msg, type = 'ok') {
     setToast({ msg, type })
@@ -478,6 +488,13 @@ async function handleSave(entry) {
           />
           <SeletorTema />
         </div>
+        {isEditor && (
+          <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
+            title="Exportar repositório completo em .docx"
+            style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: exportandoRepo ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoRepo ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
+            {exportandoRepo ? '⟳ Exportando...' : '↓ Exportar repositório .docx'}
+          </button>
+        )}
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
           : <button onClick={() => setShowLogin(true)} style={{ width: '100%', background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: 7, color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Acesso Interno</button>
@@ -495,6 +512,13 @@ async function handleSave(entry) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
         <SeletorTema />
+        {isEditor && (
+          <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
+            title="Exportar repositório completo em .docx"
+            style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: exportandoRepo ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoRepo ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
+            {exportandoRepo ? '⟳ Exportando...' : '↓ Exportar repositório .docx'}
+          </button>
+        )}
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
           : <button onClick={() => setShowLogin(true)} style={{ background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: '5px 10px', color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Login</button>

@@ -79,6 +79,12 @@ export default function EntradaList({ entradas, onSelect }) {
   return (
     <div style={{ padding: '4px 0' }}>
       <ToggleModo />
+      <style>{`
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
       {entradas.map(e => {
         const am = AREAS[e.area] || { color: theme.muted, icon: '📄' }
         return (
