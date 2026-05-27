@@ -16,6 +16,7 @@ import ImportacaoLote from './components/ImportacaoLote'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import SinoNotificacoes from './components/SinoNotificacoes'
+import SeletorTema from './components/SeletorTema'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
@@ -456,9 +457,7 @@ async function handleSave(entry) {
             session={session}
             onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
           />
-          <button onClick={toggle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, padding: '0 0 0 8px' }}>
-            {mode === 'dark' ? '☀️' : '🌙'}
-          </button>
+          <SeletorTema />
         </div>
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
@@ -476,7 +475,7 @@ async function handleSave(entry) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
-        <button onClick={toggle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}>{mode === 'dark' ? '☀️' : '🌙'}</button>
+        <SeletorTema />
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
           : <button onClick={() => setShowLogin(true)} style={{ background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: '5px 10px', color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Login</button>

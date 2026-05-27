@@ -5,6 +5,8 @@
 
 /* CSS variables controladas pelo ThemeProvider */
 :root {
+  --font-title:         'Playfair Display', Georgia, serif;
+  --font-body:          'IBM Plex Mono', monospace;
   --input-bg:           #0b0f1a;
   --input-border:       #1e2d45;
   --input-color:        #f0f4ff;
