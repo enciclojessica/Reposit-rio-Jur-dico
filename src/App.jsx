@@ -363,11 +363,12 @@ async function handleSave(entry) {
       borderRight: `1px solid ${theme.borderGold}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo */}
-      <div style={{ padding: 16, borderBottom: `1px solid ${theme.borderGold}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: theme.logoBg, borderRadius: 8, padding: '8px 12px 6px', boxShadow: theme.shadow, border: mode === 'light' ? `1px solid ${theme.border}` : 'none' }}>
-          <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 52, width: 'auto', display: 'block' }}/>
+      {/* Logo + SeletorTema */}
+      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.borderGold}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ background: theme.logoBg, borderRadius: 8, padding: '6px 10px 4px', boxShadow: theme.shadow, border: mode === 'light' ? `1px solid ${theme.border}` : 'none', flexShrink: 0 }}>
+          <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 40, width: 'auto', display: 'block' }}/>
         </div>
+        <SeletorTema />
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
