@@ -168,3 +168,62 @@ ALTER TABLE entradas ADD COLUMN IF NOT EXISTS historico JSONB DEFAULT '[]';
 -- ═══════════════════════════════════════════════════════════
 
 ALTER TABLE entradas ADD COLUMN IF NOT EXISTS uso_count INTEGER DEFAULT 0;
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Banco de Legislação Nacional
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS legislacao (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  codigo      TEXT NOT NULL,        -- 'CPC', 'CC', 'CDC', 'CPP', 'LEI9099', 'CF'
+  artigo      TEXT NOT NULL,        -- '300', '14', '5'
+  texto       TEXT NOT NULL,        -- texto completo do artigo
+  titulo      TEXT,                 -- rubrica/epígrafe se houver
+  capitulo    TEXT,                 -- capítulo ou seção
+  atualizado  DATE,                 -- data da última atualização
+  criado_em   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS legislacao_codigo_artigo ON legislacao(codigo, artigo);
+CREATE INDEX IF NOT EXISTS legislacao_texto_search  ON legislacao USING gin(to_tsvector('portuguese', texto));
+
+-- Acesso público de leitura (sem RLS bloqueante)
+ALTER TABLE legislacao ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "legislacao_leitura_publica" ON legislacao FOR SELECT USING (true);
+CREATE POLICY "legislacao_escrita_admin"   ON legislacao FOR ALL
+  USING (auth.uid() IS NOT NULL)
+  WITH CHECK (auth.uid() IS NOT NULL);
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Banco de legislação nacional
+-- ═══════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS legislacao (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  codigo      TEXT NOT NULL,        -- 'cpc', 'cdc', 'cc', 'cpp', 'cf', 'lei9099'
+  numero      INTEGER NOT NULL,     -- número do artigo
+  inciso      TEXT,                 -- inciso (I, II, III...) se houver
+  paragrafo   TEXT,                 -- §1º, §2º... se houver
+  texto       TEXT NOT NULL,        -- texto completo do artigo/inciso
+  titulo      TEXT,                 -- ex: "Art. 300. A tutela de urgência..."
+  vigente     BOOLEAN DEFAULT true,
+  criado_em   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS leg_codigo_numero ON legislacao(codigo, numero);
+CREATE INDEX IF NOT EXISTS leg_texto_search  ON legislacao USING gin(to_tsvector('portuguese', texto));
+
+-- Leitura pública (sem autenticação necessária)
+ALTER TABLE legislacao ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "legislacao_public_read" ON legislacao
+  FOR SELECT USING (true);
+CREATE POLICY "legislacao_editor_write" ON legislacao
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM membros
+      WHERE user_id = auth.uid()
+      AND role IN ('admin', 'editor')
+    )
+  );

@@ -475,10 +475,39 @@ export default function EditorPecas({ entradas }) {
             placeholder="Título da peça (opcional)"
             style={{ border: 'none', borderBottom: `1px solid ${theme.border}`, borderRadius: '12px 12px 0 0', background: theme.cardBg, fontSize: 15, fontWeight: 700, padding: '14px 20px', color: theme.text, fontFamily: 'Playfair Display, Georgia, serif', outline: 'none', width: '100%', boxSizing: 'border-box' }}
           />
+          {/* Popup de slash command */}
+          {slashCmd && slashOpts.length > 0 && (
+            <div style={{
+              position: 'absolute', bottom: '100%', left: 0, right: 0,
+              background: theme.surface, border: `1px solid ${theme.borderGold}`,
+              borderRadius: 10, boxShadow: theme.shadow, zIndex: 50,
+              maxHeight: 240, overflowY: 'auto', marginBottom: 4,
+            }}>
+              <div style={{ padding: '6px 12px', fontSize: 10, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1.5, borderBottom: `1px solid ${theme.border}`, fontFamily: 'IBM Plex Mono, monospace' }}>
+                {slashLoading ? 'Buscando...' : `${slashOpts.length} artigo(s) encontrado(s)`}
+              </div>
+              {slashOpts.map((a, i) => (
+                <div key={i}
+                  onClick={() => inserirArtigo(a)}
+                  style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: `1px solid ${theme.border}22` }}
+                  onMouseEnter={ev => ev.currentTarget.style.background = theme.raised}
+                  onMouseLeave={ev => ev.currentTarget.style.background = 'transparent'}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: theme.gold, marginBottom: 3, fontFamily: 'IBM Plex Mono, monospace' }}>
+                    {a.codigo?.toUpperCase()} Art. {a.numero}{a.inciso ? `, ${a.inciso}` : ''}{a.paragrafo ? `, ${a.paragrafo}` : ''}
+                  </div>
+                  <div style={{ fontSize: 11, color: theme.text, lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {a.texto?.slice(0, 120)}...
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <textarea
             ref={editorRef}
             value={conteudo}
             onChange={e => setConteudo(e.target.value)}
+            onKeyUp={e => handleSlashInput(e.target.value, e.target.selectionStart)}
             placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "✦ Sugerir para este trecho" para receber teses relevantes do repositório.\n• Clique em "↩ Inserir" em qualquer tese para inserí-la no cursor.\n• Use ## para seções e **negrito** — o .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
             style={{ flex: 1, border: 'none', background: theme.cardBg, padding: '20px', color: theme.text, fontSize: 14, lineHeight: 1.9, resize: 'none', outline: 'none', fontFamily: 'Georgia, serif', borderRadius: '0 0 0 12px', boxSizing: 'border-box', width: '100%' }}
             spellCheck

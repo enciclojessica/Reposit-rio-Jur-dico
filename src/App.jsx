@@ -6,7 +6,6 @@ import EntradaList from './components/EntradaList'
 import EntradaDetail from './components/EntradaDetail'
 import EntradaForm from './components/EntradaForm'
 import BuscaPeca from './components/BuscaPeca'
-import PesquisaJuri from './components/PesquisaJuri'
 import Membros from './components/Membros'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
@@ -424,8 +423,7 @@ async function handleSave(entry) {
 
         {[
           { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
-          { v: VIEWS.PESQUISA,     label: '⌕ Pesquisar Jurisprudência' },
-          { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
+            { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
           { v: VIEWS.BUSCA,        label: '✦ Busca para Peça' },
           { v: VIEWS.EDITOR,       label: '✎ Editor de Peças' },
           { v: VIEWS.ALERTAS,      label: '🔔 Alertas' },
