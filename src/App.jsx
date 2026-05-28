@@ -12,6 +12,7 @@ import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
+import ImportarLegislacao from './components/ImportarLegislacao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import SinoNotificacoes from './components/SinoNotificacoes'
@@ -25,6 +26,7 @@ const VIEWS = {
   EDITOR:     'editor',
   DASHBOARD: 'dashboard',
   IMPORTAR:   'importar',
+  LEGISLACAO: 'legislacao',
   FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
@@ -424,6 +426,7 @@ async function handleSave(entry) {
         {[
           { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
             { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
+          { v: VIEWS.LEGISLACAO,  label: '§ Importar Legislação' },
           { v: VIEWS.BUSCA,        label: '✦ Busca para Peça' },
           { v: VIEWS.EDITOR,       label: '✎ Editor de Peças' },
           { v: VIEWS.ALERTAS,      label: '🔔 Alertas' },
@@ -628,6 +631,11 @@ async function handleSave(entry) {
 
 case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
+
+      case VIEWS.LEGISLACAO:
+        return isEditor ? (
+          <div className="fade-up"><ImportarLegislacao /></div>
+        ) : null
 
       case VIEWS.IMPORTAR:
         return isEditor ? (
