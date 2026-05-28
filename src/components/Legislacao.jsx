@@ -73,7 +73,7 @@ function ArtigoModal({ artigo, onFechar }) {
               <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'IBM Plex Mono, monospace' }}>Experiência prática</div>
               {artigo.contexto && (
                 <div>
-                  <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Contexto</div>
+                  <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Comentário Didático</div>
                   <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontStyle: 'italic' }}>{artigo.contexto}</div>
                 </div>
               )}
@@ -149,7 +149,7 @@ function ArtigoCard({ artigo, onAbrir }) {
             <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {artigo.contexto && (
                 <div style={{ fontSize: 11, color: theme.muted }}>
-                  <span style={{ textTransform: 'uppercase', letterSpacing: 1, fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' }}>Contexto · </span>
+                  <span style={{ textTransform: 'uppercase', letterSpacing: 1, fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' }}>Comentário · </span>
                   {artigo.contexto}
                 </div>
               )}
