@@ -68,10 +68,7 @@ export default function ImportarLegislacao() {
 
     for (let i = 0; i < linhas.length; i += LOTE) {
       const lote = linhas.slice(i, i + LOTE)
-      const { error } = await supabase.from('legislacao').upsert(lote, {
-        onConflict: 'codigo,numero,inciso,paragrafo',
-        ignoreDuplicates: false,
-      })
+      const { error } = await supabase.from('legislacao').insert(lote)
       if (error) erro += lote.length
       else ok += lote.length
       setProgresso(Math.round(((i + LOTE) / linhas.length) * 100))

@@ -227,3 +227,24 @@ CREATE POLICY "legislacao_editor_write" ON legislacao
       AND role IN ('admin', 'editor')
     )
   );
+
+
+-- ═══════════════════════════════════════════════════════════
+-- CORREÇÃO: Políticas da tabela legislacao
+-- (Execute se a tabela já existe mas a importação falha)
+-- ═══════════════════════════════════════════════════════════
+
+-- Remover políticas antigas se existirem
+DROP POLICY IF EXISTS "legislacao_public_read"  ON legislacao;
+DROP POLICY IF EXISTS "legislacao_editor_write" ON legislacao;
+
+-- Leitura pública (sem autenticação)
+CREATE POLICY "legislacao_public_read" ON legislacao
+  FOR SELECT USING (true);
+
+-- Escrita para qualquer usuário autenticado
+CREATE POLICY "legislacao_auth_write" ON legislacao
+  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE POLICY "legislacao_auth_update" ON legislacao
+  FOR UPDATE USING (auth.uid() IS NOT NULL);
