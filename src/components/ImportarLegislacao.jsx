@@ -43,11 +43,15 @@ export default function ImportarLegislacao() {
           validas.push({
             codigo,
             numero,
-            inciso:    String(row.inciso    || '').trim() || null,
-            paragrafo: String(row.paragrafo || '').trim() || null,
-            titulo:    String(row.titulo    || '').trim() || null,
+            inciso:            String(row.inciso            || '').trim() || null,
+            paragrafo:         String(row.paragrafo         || '').trim() || null,
+            titulo:            String(row.titulo            || '').trim() || null,
             texto,
-            vigente:   true,
+            aplicacao_pratica: String(row.aplicacao_pratica || '').trim() || null,
+            contexto:          String(row.contexto          || '').trim() || null,
+            resultado:         String(row.resultado         || '').trim() || null,
+            origem:            String(row.origem            || '').trim() || null,
+            vigente:           true,
           })
         })
 

@@ -46,9 +46,38 @@ function ArtigoCard({ artigo, onCopiar }) {
             </span>
           </div>
           {/* Texto */}
-          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: 'Georgia, serif' }}>
+          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: 'Georgia, serif', marginBottom: artigo.aplicacao_pratica || artigo.contexto ? 10 : 0 }}>
             {artigo.texto}
           </div>
+
+          {/* Campos enriquecidos */}
+          {(artigo.aplicacao_pratica || artigo.contexto || artigo.resultado) && (
+            <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {artigo.contexto && (
+                <div>
+                  <span style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'IBM Plex Mono, monospace' }}>Contexto · </span>
+                  <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic' }}>{artigo.contexto}</span>
+                </div>
+              )}
+              {artigo.aplicacao_pratica && (
+                <div>
+                  <span style={{ fontSize: 9, color: meta.cor, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'IBM Plex Mono, monospace' }}>Aplicação · </span>
+                  <span style={{ fontSize: 12, color: theme.text }}>{artigo.aplicacao_pratica}</span>
+                </div>
+              )}
+              {artigo.resultado && (
+                <div>
+                  <span style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'IBM Plex Mono, monospace' }}>Resultado · </span>
+                  <span style={{ fontSize: 12, color: theme.success, fontWeight: 700 }}>{artigo.resultado}</span>
+                </div>
+              )}
+              {artigo.origem && (
+                <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
+                  📄 {artigo.origem}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         {/* Botão copiar */}
         <button onClick={copiar}

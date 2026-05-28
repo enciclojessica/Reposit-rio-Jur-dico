@@ -248,3 +248,13 @@ CREATE POLICY "legislacao_auth_write" ON legislacao
 
 CREATE POLICY "legislacao_auth_update" ON legislacao
   FOR UPDATE USING (auth.uid() IS NOT NULL);
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Campos enriquecidos na legislação
+-- ═══════════════════════════════════════════════════════════
+
+ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS aplicacao_pratica TEXT;
+ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS contexto          TEXT;
+ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS resultado         TEXT;
+ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS origem            TEXT;
