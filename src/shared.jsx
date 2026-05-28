@@ -4,6 +4,7 @@ export const AREAS = {
   'Cível':       { color: '#3b82f6', icon: '⚖️' },
   'Penal':       { color: '#ef4444', icon: '🔒' },
   'Doutrina':    { color: '#a855f7', icon: '📚' },
+  'Legislação':   { color: '#0ea5e9', icon: '§' },
 }
 
 export const TIPOS = ['jurisprudência', 'doutrina', 'súmula', 'lei']

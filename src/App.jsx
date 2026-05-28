@@ -13,6 +13,7 @@ import Dashboard from './components/Dashboard'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
+import Legislacao from './components/Legislacao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import SinoNotificacoes from './components/SinoNotificacoes'
@@ -26,7 +27,8 @@ const VIEWS = {
   EDITOR:     'editor',
   DASHBOARD: 'dashboard',
   IMPORTAR:   'importar',
-  LEGISLACAO: 'legislacao',
+  LEGISLACAO:    'legislacao',
+  LEG_VIEW:      'leg_view',
   FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
@@ -426,6 +428,7 @@ async function handleSave(entry) {
         {[
           { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
             { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
+          { v: VIEWS.LEG_VIEW,    label: '§ Legislação' },
           { v: VIEWS.LEGISLACAO,  label: '§ Importar Legislação' },
           { v: VIEWS.BUSCA,        label: '✦ Busca para Peça' },
           { v: VIEWS.EDITOR,       label: '✎ Editor de Peças' },
@@ -631,6 +634,9 @@ async function handleSave(entry) {
 
 case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
+
+      case VIEWS.LEG_VIEW:
+        return <div className="fade-up"><Legislacao /></div>
 
       case VIEWS.LEGISLACAO:
         return isEditor ? (
