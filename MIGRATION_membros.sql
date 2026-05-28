@@ -258,3 +258,13 @@ ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS aplicacao_pratica TEXT;
 ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS contexto          TEXT;
 ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS resultado         TEXT;
 ALTER TABLE legislacao ADD COLUMN IF NOT EXISTS origem            TEXT;
+
+
+-- ═══════════════════════════════════════════════════════════
+-- MIGRAÇÃO: Constraint única para deduplicação na importação
+-- ═══════════════════════════════════════════════════════════
+
+-- Permite upsert sem duplicar artigos com mesmo codigo+numero+inciso+paragrafo
+ALTER TABLE legislacao DROP CONSTRAINT IF EXISTS legislacao_unica;
+ALTER TABLE legislacao ADD CONSTRAINT legislacao_unica
+  UNIQUE (codigo, numero, inciso, paragrafo);
