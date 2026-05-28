@@ -73,6 +73,13 @@ export default function App() {
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const [exportandoRepo, setExportandoRepo] = useState(false)
+  const [countLegislacao, setCountLegislacao] = useState(0)
+
+  useEffect(() => {
+    supabase.from('legislacao').select('id', { count: 'exact', head: true })
+      .eq('vigente', true)
+      .then(({ count }) => setCountLegislacao(count || 0))
+  }, [])
   const isMobile = useIsMobile()
   const [maisAberto, setMaisAberto] = useState(false)
 
@@ -379,7 +386,7 @@ async function handleSave(entry) {
     { id: 'all', label: 'Todas as Áreas', count: entradas.length, color: theme.gold },
     ...Object.entries(AREAS).map(([k, v]) => ({
       id: k, label: k, color: v.color, icon: v.icon,
-      count: entradas.filter(e => e.area === k).length,
+      count: k === 'Legislação' ? countLegislacao : entradas.filter(e => e.area === k).length,
     }))
   ]
 
@@ -408,7 +415,10 @@ async function handleSave(entry) {
         {sidebarItems.map(n => {
           const active = areaFilter === n.id && view === VIEWS.HOME
           return (
-            <button key={n.id} onClick={() => { setAreaFilter(n.id); setView(VIEWS.HOME) }}
+            <button key={n.id} onClick={() => {
+                if (n.id === 'Legislação') { setView(VIEWS.LEG_VIEW); return }
+                setAreaFilter(n.id); setView(VIEWS.HOME)
+              }}
               style={{
                 width: '100%', background: active ? n.color + '11' : 'none',
                 border: 'none', borderLeft: `2px solid ${active ? n.color : 'transparent'}`,
