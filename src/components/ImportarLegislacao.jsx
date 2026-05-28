@@ -72,11 +72,25 @@ export default function ImportarLegislacao() {
 
     for (let i = 0; i < linhas.length; i += LOTE) {
       const lote = linhas.slice(i, i + LOTE)
-      // upsert: se o artigo já existe (mesmo codigo+numero+inciso+paragrafo), atualiza
-      const { error } = await supabase.from('legislacao').upsert(lote, {
-        onConflict: 'codigo,numero,inciso,paragrafo',
-        ignoreDuplicates: false,
-      })
+      // Buscar existentes para evitar duplicatas (NULL não funciona em UNIQUE constraint)
+      const checks = lote.map(l =>
+        `(codigo.eq.${l.codigo},numero.eq.${l.numero})`
+      )
+
+      // Deletar duplicatas antes de inserir
+      for (const l of lote) {
+        const q = supabase.from('legislacao')
+          .delete()
+          .eq('codigo',  l.codigo)
+          .eq('numero',  l.numero)
+        if (l.inciso)    q.eq('inciso',    l.inciso)
+        else             q.is('inciso',    null)
+        if (l.paragrafo) q.eq('paragrafo', l.paragrafo)
+        else             q.is('paragrafo', null)
+        await q
+      }
+
+      const { error } = await supabase.from('legislacao').insert(lote)
       if (error) erro += lote.length
       else ok += lote.length
       setProgresso(Math.round(((i + LOTE) / linhas.length) * 100))
