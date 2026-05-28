@@ -1,107 +1,148 @@
-// Pesquisa de jurisprudência — Datajud (CNJ) gratuito + Anthropic só para formatar
+// Pesquisa de jurisprudência
+// Estratégia: Datajud CNJ para busca por assunto/classe (metadados reais)
+//             + Anthropic web_search para busca textual em ementas
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const { query, tribunal } = req.body
   if (!query) return res.status(400).json({ error: 'Query obrigatória.' })
 
-  // Mapa de tribunais para siglas do Datajud
-  const TRIBUNAIS_MAP = {
-    'STJ':  'STJ',
-    'STF':  'STF',
-    'TST':  'TST',
-    'TJSP': 'TJSP',
-    'TJRJ': 'TJRJ',
-    'TRFs': 'TRF1',
+  const DATAJUD_KEY = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=='
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
+
+  // ── 1. Datajud — busca por assunto (tabela TPU do CNJ) ──────────────────
+  // Mapeia termos comuns para códigos de assunto TPU-CNJ
+  const ASSUNTOS_MAP = {
+    'dano moral': '10804',
+    'responsabilidade civil': '10804',
+    'indenização': '10804',
+    'negativação indevida': '10804',
+    'consumidor': '7771',
+    'contrato': '10926',
+    'alimentos': '1156',
+    'divórcio': '1128',
+    'guarda': '1143',
+    'furto': '10899',
+    'roubo': '10900',
+    'homicídio': '10895',
+    'tráfico': '10923',
+    'habeas corpus': '7778',
+    'mandado de segurança': '7780',
+    'usucapião': '10909',
+    'inventário': '10193',
+    'locação': '10913',
+    'acidente': '7759',
+    'trabalhista': '10000',
+    'rescisão': '10996',
+    'horas extras': '10007',
   }
 
-  try {
-    // ── Buscar no Datajud (CNJ) ──────────────────────────────────────────
-    const siglaTribunal = TRIBUNAIS_MAP[tribunal] || null
-    const urlBase = siglaTribunal
-      ? `https://api-publica.datajud.cnj.jus.br/api_publica_${siglaTribunal.toLowerCase()}/_search`
-      : 'https://api-publica.datajud.cnj.jus.br/api_publica_stj/_search'
+  const queryLower = query.toLowerCase()
+  const codigoAssunto = Object.entries(ASSUNTOS_MAP)
+    .find(([termo]) => queryLower.includes(termo))?.[1]
 
-    const payload = {
-      size: 8,
-      query: {
-        match: {
-          'ementa': {
-            query,
-            fuzziness: 'AUTO',
-          },
-        },
-      },
-      _source: ['tribunal', 'classe', 'numeroProcesso', 'relator', 'dataJulgamento', 'ementa', 'link'],
-      sort: [{ dataJulgamento: { order: 'desc' } }],
+  const tribunais = tribunal && tribunal !== 'todos'
+    ? [tribunal.toLowerCase()]
+    : ['stj', 'stf', 'tjsp', 'tjrj', 'trf1']
+
+  let resultadosDatajud = []
+
+  if (codigoAssunto) {
+    // Temos código TPU — buscar no Datajud com dados reais
+    for (const trib of tribunais.slice(0, 2)) {
+      try {
+        const r = await fetch(
+          `https://api-publica.datajud.cnj.jus.br/api_publica_${trib}/_search`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `APIKey ${DATAJUD_KEY}`,
+            },
+            body: JSON.stringify({
+              size: 5,
+              query: {
+                bool: {
+                  must: [{ match: { 'assunto.codigo': codigoAssunto } }],
+                  filter: [{ term: { grau: 'G2' } }], // só 2ª instância / acordãos
+                },
+              },
+              sort: [{ dataAjuizamento: { order: 'desc' } }],
+              _source: ['tribunal','classe','numeroProcesso','orgaoJulgador','dataAjuizamento','assunto','grau'],
+            }),
+          }
+        )
+        if (r.ok) {
+          const j = await r.json()
+          const hits = j?.hits?.hits || []
+          hits.forEach(h => {
+            const s = h._source || {}
+            resultadosDatajud.push({
+              tribunal:  s.tribunal || trib.toUpperCase(),
+              tipo:      s.classe?.nome || '',
+              numero:    s.numeroProcesso || '',
+              relator:   s.orgaoJulgador?.nome || '',
+              data:      s.dataAjuizamento ? s.dataAjuizamento.slice(0,10) : '',
+              ementa:    `${s.classe?.nome || ''} — Assunto: ${(s.assunto||[]).map(a=>a.nome).join(', ')}`,
+              url:       `https://www.jusbrasil.com.br/busca?q=${encodeURIComponent(s.numeroProcesso || query)}`,
+              area:      detectarArea(queryLower),
+              fonte:     'Datajud CNJ',
+            })
+          })
+        }
+      } catch {}
     }
+  }
 
-    const datajudRes = await fetch(urlBase, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'ApiKey cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!datajudRes.ok) throw new Error(`Datajud HTTP ${datajudRes.status}`)
-
-    const datajudJson = await datajudRes.json()
-    const hits = datajudJson?.hits?.hits || []
-
-    if (!hits.length) {
-      return res.status(200).json({ resultados: [], aviso: 'Nenhum resultado encontrado no Datajud.' })
-    }
-
-    // Formatar resultados
-    const resultados = hits.map(h => {
-      const s = h._source || {}
-      const area = detectarArea(s.ementa || s.txtEmenta || '')
-      return {
-        tribunal:  s.tribunal || siglaTribunal || 'CNJ',
-        tipo:      s.classe?.descricao || s.classe || '',
-        numero:    s.numeroProcesso || '',
-        relator:   s.relator?.nome || s.relator || '',
-        data:      s.dataJulgamento ? s.dataJulgamento.slice(0, 10) : '',
-        ementa:    (s.ementa || s.txtEmenta || '').slice(0, 400),
-        url:       s.link || `https://www.jusbrasil.com.br/busca?q=${encodeURIComponent(s.numeroProcesso || query)}`,
-        area,
-      }
-    })
-
-    return res.status(200).json({ resultados })
-
-  } catch (err) {
-    // Fallback: se Datajud falhar, tentar busca simples via Anthropic
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) return res.status(500).json({ error: 'Datajud indisponível e ANTHROPIC_API_KEY não configurada.' })
-
+  // ── 2. Anthropic web_search — busca textual em ementas reais ───────────
+  // Sempre executa para complementar com texto de ementa real
+  if (ANTHROPIC_KEY) {
     try {
+      const tribunalFiltro = tribunal && tribunal !== 'todos'
+        ? `Busque no ${tribunal}.`
+        : 'Busque no STJ e STF prioritariamente.'
+
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_KEY,
+          'anthropic-version': '2023-06-01',
+        },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5', max_tokens: 800,
+          model: 'claude-sonnet-4-5',
+          max_tokens: 800,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          system: 'Retorne APENAS array JSON de jurisprudência real: [{"tribunal":"","tipo":"","numero":"","relator":"","data":"","ementa":"","url":"","area":""}]. Area: Cível, Penal ou Doutrina. Máx 5 itens reais.',
-          messages: [{ role: 'user', content: `Jurisprudência sobre: "${query}". Tribunal: ${tribunal || 'todos'}` }],
+          system: 'Retorne APENAS array JSON com jurisprudência real encontrada na web: [{"tribunal":"","tipo":"","numero":"","relator":"","data":"YYYY-MM-DD","ementa":"","url":"","area":""}]. Area: Cível, Penal ou Doutrina. Máx 4 itens. Nunca invente dados.',
+          messages: [{ role: 'user', content: `Jurisprudência: "${query}". ${tribunalFiltro} site:stj.jus.br OR site:stf.jus.br` }],
         }),
       })
       const j = await r.json()
-      if (j.error) return res.status(500).json({ error: j.error.message })
-      const text = (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
-      const match = text.match(/\[[\s\S]*\]/)
-      return res.status(200).json({ resultados: match ? JSON.parse(match[0]) : [], fonte: 'fallback' })
-    } catch (e2) {
-      return res.status(500).json({ error: err.message })
-    }
+      if (!j.error) {
+        const text = (j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('')
+        const match = text.match(/\[[\s\S]*?\]/)
+        if (match) {
+          const webResults = JSON.parse(match[0])
+          webResults.forEach(w => { w.fonte = 'Portal Oficial' })
+          // Combinar: resultados web primeiro (têm ementa), Datajud depois (têm número)
+          const numerosJaPresentes = new Set(webResults.map(w=>w.numero).filter(Boolean))
+          const datajudFiltrado = resultadosDatajud.filter(d => !numerosJaPresentes.has(d.numero))
+          return res.status(200).json({ resultados: [...webResults, ...datajudFiltrado] })
+        }
+      }
+    } catch {}
   }
+
+  // Se só tem Datajud ou nenhum resultado
+  if (resultadosDatajud.length) {
+    return res.status(200).json({ resultados: resultadosDatajud, aviso: 'Resultados do Datajud CNJ (metadados processuais). Para texto de ementa, busque no portal do tribunal.' })
+  }
+
+  return res.status(200).json({ resultados: [], aviso: 'Nenhum resultado encontrado.' })
 }
 
-function detectarArea(ementa) {
-  const e = ementa.toLowerCase()
-  if (/crime|penal|homicídio|furto|roubo|tráfico|réu|condenado|pena|prisão|reclusão/i.test(e)) return 'Penal'
-  if (/doutrina|autor|obra|livro|artigo doutrinário/i.test(e)) return 'Doutrina'
+function detectarArea(q) {
+  if (/crime|penal|homicídio|furto|roubo|tráfico|réu|pena|prisão/i.test(q)) return 'Penal'
+  if (/doutrina|autor|obra|livro/i.test(q)) return 'Doutrina'
   return 'Cível'
 }
