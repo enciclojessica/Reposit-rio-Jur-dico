@@ -118,7 +118,14 @@ function CampoInline({ label, valor, onSalvar, multiline }) {
 // ── EntradaDetail ─────────────────────────────────────────────────────────
 export default function EntradaDetail({ entry: entryProp, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar }) {
   const { theme, mode } = useTheme()
-  const [entry, setEntry]         = useState(entryProp)
+  // Garantir que teses e historico são arrays mesmo se vierem como null/undefined
+  const entryNormalizado = {
+    ...entryProp,
+    teses:    Array.isArray(entryProp?.teses)    ? entryProp.teses    : [],
+    historico: Array.isArray(entryProp?.historico) ? entryProp.historico : [],
+    tags:     Array.isArray(entryProp?.tags)     ? entryProp.tags     : [],
+  }
+  const [entry, setEntry]         = useState(entryNormalizado)
   const [copied, setCopied]       = useState(false)
   const [copiedAbnt, setCopiedAbnt] = useState(false)
   const [status, setStatus]       = useState(entry.status || 'vigente')
@@ -278,7 +285,7 @@ export default function EntradaDetail({ entry: entryProp, onClose, onDelete, onE
           {showPreviewABNT && !copiedAbnt && (
             <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, background: theme.surface, border: `1px solid ${theme.borderGold}`, borderRadius: 8, padding: '10px 14px', width: 340, fontSize: 11, color: theme.text, lineHeight: 1.7, fontFamily: 'Georgia, serif', boxShadow: theme.shadow, zIndex: 50 }}>
               <div style={{ fontSize: 9, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'IBM Plex Mono, monospace' }}>Prévia ABNT NBR 6023</div>
-              {gerarCitacaoABNT(entry)}
+              {String(gerarCitacaoABNT(entry) || "")}
             </div>
           )}
         </div>
