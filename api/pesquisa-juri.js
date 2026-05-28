@@ -25,11 +25,11 @@ export default async function handler(req, res) {
     const payload = {
       size: 8,
       query: {
-        multi_match: {
-          query,
-          fields: ['ementa', 'decisao', 'txtEmenta', 'txtDecisao'],
-          type: 'best_fields',
-          fuzziness: 'AUTO',
+        match: {
+          'ementa': {
+            query,
+            fuzziness: 'AUTO',
+          },
         },
       },
       _source: ['tribunal', 'classe', 'numeroProcesso', 'relator', 'dataJulgamento', 'ementa', 'link'],
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'ApiKey cDZHYzlZa0JadVREZDJCendFbGFuZnVzZXY6SkJlTzNjLV9TRENyQk1RdnFKZGRqZw==',
+        'Authorization': 'ApiKey cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==',
       },
       body: JSON.stringify(payload),
     })
