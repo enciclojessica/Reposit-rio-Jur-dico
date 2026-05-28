@@ -14,6 +14,7 @@ import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
 import Legislacao from './components/Legislacao'
+import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import SinoNotificacoes from './components/SinoNotificacoes'
@@ -29,6 +30,7 @@ const VIEWS = {
   IMPORTAR:   'importar',
   LEGISLACAO:    'legislacao',
   LEG_VIEW:      'leg_view',
+  EXTRAIR:       'extrair',
   FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
@@ -437,6 +439,7 @@ async function handleSave(entry) {
 
         {[
           { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
+          { v: VIEWS.EXTRAIR,     label: '📄 Extrair de Petição' },
             { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
           { v: VIEWS.LEG_VIEW,    label: '§ Legislação' },
           { v: VIEWS.LEGISLACAO,  label: '§ Importar Legislação' },
@@ -644,6 +647,11 @@ async function handleSave(entry) {
 
 case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
+
+      case VIEWS.EXTRAIR:
+        return isEditor ? (
+          <div className="fade-up"><ExtrairPeticao /></div>
+        ) : null
 
       case VIEWS.LEG_VIEW:
         return <div className="fade-up"><Legislacao /></div>
