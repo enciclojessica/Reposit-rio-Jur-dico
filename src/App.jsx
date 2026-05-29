@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, Component } from 'react'
+import { useEffect, useState, useCallback, Component, useMemo } from 'react'
 import { supabase } from './supabase'
 import { useTheme } from './theme'
 import Auth from './components/Auth'
@@ -416,33 +416,42 @@ async function handleSave(entry) {
   const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
 
   // ── Sidebar ────────────────────────────────────────────────────────────
-  const Sidebar = () => (
+  const SidebarEl = useMemo(() => (
     <div style={{
       width: 220, background: theme.surface,
       borderRight: `1px solid ${theme.border}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo Síntese Jurídica — Estúdio Boutique */}
-      <div style={{ padding: '24px 20px 20px', borderBottom: `1px solid ${theme.border}`, textAlign: 'center' }}>
-        {/* Brasão circular */}
+      {/* Logo Síntese Jurídica — Têmis */}
+      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{
-          width: 64, height: 64, borderRadius: '50%', margin: '0 auto 12px',
-          background: theme.gold,
+          width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
+          border: '2px solid #C5A059',
+          background: '#800020',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: `0 4px 16px ${theme.gold}44`,
-          border: `3px solid ${theme.gold}`,
+          overflow: 'hidden',
+          boxShadow: '0 2px 12px #80002044',
           position: 'relative',
         }}>
+          <img
+            src="/logo-temis.png"
+            alt="Síntese Jurídica"
+            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
           <span style={{
-            color: '#ffffff', fontFamily: theme.fontTitle,
-            fontWeight: 700, fontSize: 22, letterSpacing: 1,
+            display: 'none', position: 'absolute', inset: 0,
+            alignItems: 'center', justifyContent: 'center',
+            color: '#ffffff', fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 18,
           }}>FF</span>
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2, marginBottom: 3 }}>
-          Síntese Jurídica
-        </div>
-        <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 3 }}>
-          Curadoria Jurídica
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
+            Síntese Jurídica
+          </div>
+          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, marginTop: 2 }}>
+            Curadoria Jurídica
+          </div>
         </div>
       </div>
 
@@ -533,7 +542,7 @@ async function handleSave(entry) {
         }
       </div>
     </div>
-  )
+  ), [theme, view, areaFilter, isAdmin, isEditor, session, role, exportandoRepo, entradas])
 
   // ── Mobile header ──────────────────────────────────────────────────────
   const MobileHeader = () => (
@@ -855,7 +864,7 @@ case VIEWS.FLASHCARDS:
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: theme.bg }}>
-      {!isMobile && <Sidebar/>}
+      {!isMobile && SidebarEl}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar desktop */}
         {!isMobile && (
