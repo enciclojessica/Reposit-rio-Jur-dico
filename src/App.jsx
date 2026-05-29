@@ -483,7 +483,6 @@ async function handleSave(entry) {
               </div>
             )}
           </div>
-          <SeletorTema />
         </div>
         {isEditor && (
           <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
@@ -813,7 +812,7 @@ case VIEWS.FLASHCARDS:
             {/* Barra de busca com toggle semântico */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
               <div style={{ position: 'relative', flex: 1 }}>
-                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }}>🔍</span>
+                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted, fontSize: 13, lineHeight: 1 }}>⌕</span>
                 <input
                   value={search}
                   onChange={e => handleSearchChange(e.target.value)}
@@ -851,7 +850,7 @@ case VIEWS.FLASHCARDS:
                 )}
                 {modoSemantico && search.trim() && (
                   <button onClick={buscarSemantico} disabled={buscandoSem}
-                    style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: buscandoSem ? theme.border : theme.gold, color: buscandoSem ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: buscandoSem ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                    style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: buscandoSem ? theme.border : theme.gold, color: buscandoSem ? theme.muted : (theme.isDark ? '#0f0a0b' : '#fff'), border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 11, fontWeight: 600, cursor: buscandoSem ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}>
                     {buscandoSem ? '~' : '✦ Buscar'}
                   </button>
                 )}
@@ -859,7 +858,7 @@ case VIEWS.FLASHCARDS:
               {/* Toggle exata / semântica */}
               <button onClick={() => { setModoSemantico(m => !m); setResultadosSem(null); setErroSem('') }}
                 title={modoSemantico ? 'Modo: busca semântica (IA) — clique para voltar à busca exata' : 'Modo: busca exata — clique para ativar busca semântica por IA'}
-                style={{ flexShrink: 0, background: modoSemantico ? theme.gold + '22' : theme.raised, color: modoSemantico ? theme.gold : theme.muted, border: `1px solid ${modoSemantico ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '0 14px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontWeight: modoSemantico ? 700 : 400, whiteSpace: 'nowrap' }}>
+                style={{ flexShrink: 0, background: modoSemantico ? theme.gold + '18' : 'transparent', color: modoSemantico ? theme.gold : theme.muted, border: `1px solid ${modoSemantico ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '0 16px', height: 40, fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: modoSemantico ? 600 : 400, whiteSpace: 'nowrap' }}>
                 {modoSemantico ? 'IA' : 'IA'}
               </button>
             </div>
@@ -867,21 +866,22 @@ case VIEWS.FLASHCARDS:
             {/* Filtro Linha 1 — Área */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
               {[
-                { id: 'all',      label: 'Todas',      color: theme.gold },
-                { id: 'Cível',    label: 'Cível',      color: '#1e3a8a' },
-                { id: 'Penal',    label: 'Penal',      color: '#800020' },
-                { id: 'Doutrina', label: 'Doutrina',   color: '#581c87' },
+                { id: 'all',      label: 'Todas' },
+                { id: 'Cível',    label: 'Cível' },
+                { id: 'Penal',    label: 'Penal' },
+                { id: 'Doutrina', label: 'Doutrina' },
               ].map(a => (
                 <button key={a.id} onClick={() => setAreaFilter(a.id)} style={{
                   flexShrink: 0,
-                  background: areaFilter === a.id ? a.color + '22' : theme.raised,
-                  color: areaFilter === a.id ? a.color : theme.muted,
-                  border: `1px solid ${areaFilter === a.id ? a.color + '55' : theme.border}`,
-                  borderRadius: 20, padding: '5px 14px', fontSize: 12, cursor: 'pointer',
+                  background: areaFilter === a.id ? theme.gold + '18' : 'transparent',
+                  color: areaFilter === a.id ? theme.gold : theme.muted,
+                  border: `1px solid ${areaFilter === a.id ? theme.gold + '55' : theme.border}`,
+                  borderRadius: 20, padding: '5px 16px', fontSize: 12, cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif', fontWeight: areaFilter === a.id ? 600 : 400,
+                  transition: 'all .15s',
                 }}>
                   {a.label}{' '}
-                  <span style={{ opacity: 0.6, fontSize: 10 }}>{a.id === 'all' ? entradas.length : entradas.filter(e => e.area === a.id).length}</span>
+                  <span style={{ opacity: 0.5, fontSize: 10 }}>{a.id === 'all' ? entradas.length : entradas.filter(e => e.area === a.id).length}</span>
                 </button>
               ))}
             </div>
@@ -896,11 +896,12 @@ case VIEWS.FLASHCARDS:
               ].map(f => (
                 <button key={f.id} onClick={() => setTipoFilter(f.id)} style={{
                   flexShrink: 0,
-                  background: tipoFilter === f.id ? theme.gold + '15' : 'none',
+                  background: tipoFilter === f.id ? theme.gold + '18' : 'transparent',
                   color: tipoFilter === f.id ? theme.gold : theme.muted,
-                  border: `1px solid ${tipoFilter === f.id ? theme.gold + '44' : theme.border}`,
-                  borderRadius: 6, padding: '3px 12px', fontSize: 11, cursor: 'pointer',
+                  border: `1px solid ${tipoFilter === f.id ? theme.gold + '55' : theme.border}`,
+                  borderRadius: 20, padding: '3px 14px', fontSize: 11, cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif', fontWeight: tipoFilter === f.id ? 600 : 400,
+                  transition: 'all .15s',
                 }}>
                   {f.label}
                 </button>
@@ -911,7 +912,7 @@ case VIEWS.FLASHCARDS:
             {todasAsTags.length > 0 && (
               <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4, flexWrap: 'wrap' }}>
                 <button onClick={() => setTagFilter(null)}
-                  style={{ flexShrink: 0, background: !tagFilter ? theme.gold + '22' : theme.raised, color: !tagFilter ? theme.gold : theme.muted, border: `1px solid ${!tagFilter ? theme.gold + '66' : theme.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                  style={{ flexShrink: 0, background: !tagFilter ? theme.gold + '18' : 'transparent', color: !tagFilter ? theme.gold : theme.muted, border: `1px solid ${!tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all .15s' }}>
                   todas as tags
                 </button>
                 {todasAsTags.map(t => (

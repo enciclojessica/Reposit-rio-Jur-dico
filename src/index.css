@@ -1,58 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* CSS variables controladas pelo ThemeProvider */
-:root {
-  --font-title:         'Playfair Display', Georgia, serif;
-  --font-body:          'IBM Plex Mono', monospace;
-  --input-bg:           #0b0f1a;
-  --input-border:       #1e2d45;
-  --input-color:        #f0f4ff;
-  --input-focus-border: #c9a452;
-  --scrollbar-track:    #111827;
-  --scrollbar-thumb:    #1e2d45;
-}
-
-* { box-sizing: border-box; }
+/* ── Reset base ─────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: #0b0f1a;
-  color: #f0f4ff;
-  font-family: 'IBM Plex Mono', monospace;
+  background: #fdfbf7;
+  color: #2c241b;
+  font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
   overscroll-behavior: none;
 }
 
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e8e3dc; border-radius: 4px; }
 
+/* ── Inputs — herdam a cor do container, nunca azul escuro ──────────────── */
 input, select, textarea {
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 6px;
-  padding: 10px 12px;
-  color: var(--input-color);
-  font-size: 14px;
-  font-family: 'IBM Plex Mono', monospace;
+  background: inherit;          /* herda do container, não sobrepõe */
+  border: 1px solid #e8e3dc;
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: inherit;
+  font-size: 13px;
+  font-family: 'Inter', system-ui, sans-serif;
   width: 100%;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
+
 input:focus, select:focus, textarea:focus {
-  border-color: var(--input-focus-border);
+  border-color: #800020;
+  box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.08);
 }
+
 textarea { resize: vertical; }
 
+/* ── Dark mode overrides via data-theme ──────────────────────────────────── */
+[data-dark="true"] body,
+.dark-mode {
+  background: #0f0a0b;
+  color: #f0e8df;
+}
+
+[data-dark="true"] input,
+[data-dark="true"] select,
+[data-dark="true"] textarea {
+  border-color: #3d1f22;
+}
+
+[data-dark="true"] input:focus,
+[data-dark="true"] select:focus,
+[data-dark="true"] textarea:focus {
+  border-color: #C5A059;
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+}
+
+/* ── Animações ───────────────────────────────────────────────────────────── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
-.fade-up { animation: fadeUp 0.2s ease; }
-.slide-up { animation: slideUp 0.25s ease; }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.fade-up  { animation: fadeUp  0.18s ease; }
+.slide-up { animation: slideUp 0.22s ease; }
