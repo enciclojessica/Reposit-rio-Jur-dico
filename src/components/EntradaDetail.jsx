@@ -119,11 +119,23 @@ function CampoInline({ label, valor, onSalvar, multiline }) {
 export default function EntradaDetail({ entry: entryProp, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar }) {
   const { theme, mode } = useTheme()
   // Garantir que teses e historico são arrays mesmo se vierem como null/undefined
+  function parseArr(val) {
+    if (Array.isArray(val)) return val
+    if (typeof val === 'string') { try { const p = JSON.parse(val); return Array.isArray(p) ? p : [] } catch { return [] } }
+    return []
+  }
   const entryNormalizado = {
     ...entryProp,
-    teses:    Array.isArray(entryProp?.teses)    ? entryProp.teses    : [],
-    historico: Array.isArray(entryProp?.historico) ? entryProp.historico : [],
-    tags:     Array.isArray(entryProp?.tags)     ? entryProp.tags     : [],
+    teses:    parseArr(entryProp?.teses),
+    historico: parseArr(entryProp?.historico),
+    tags:     parseArr(entryProp?.tags),
+    area:     entryProp?.area    || 'Cível',
+    tipo:     entryProp?.tipo    || 'jurisprudência',
+    tema:     entryProp?.tema    || '',
+    fonte:    entryProp?.fonte   || '',
+    referencia: entryProp?.referencia || '',
+    url:      entryProp?.url     || '',
+    status:   entryProp?.status  || 'vigente',
   }
   const [entry, setEntry]         = useState(entryNormalizado)
   const [copied, setCopied]       = useState(false)
