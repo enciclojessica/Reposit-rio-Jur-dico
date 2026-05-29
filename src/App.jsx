@@ -42,7 +42,6 @@ class ErrorBoundary extends Component {
   }
 }
 
-
 const VIEWS = {
   ALERTAS: 'alertas',
   EDITOR:     'editor',
@@ -374,53 +373,7 @@ async function handleSave(entry) {
     notify('Complete as teses e salve.')
   }
 
-  // ── Loading states ─────────────────────────────────────────────────────
-  // Vista pública de entrada compartilhada — sem autenticação
-  if (entradaPublicaId) return (
-    <EntradaPublica
-      entradaId={entradaPublicaId}
-      onFechar={() => setEntradaPublicaId(null)}
-    />
-  )
-
-  if (authLoading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
-      Carregando...
-    </div>
-  )
-
-  if (aceitandoConvite) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, flexDirection: 'column', gap: 16 }}>
-      <div style={{ fontSize: 32 }}>✦</div>
-      Ativando seu acesso...
-    </div>
-  )
-
-  if (showLogin) return (
-    <div>
-      <button onClick={() => setShowLogin(false)} style={{
-        position: 'fixed', top: 16, left: 16, zIndex: 200,
-        background: theme.raised, border: `1px solid ${theme.border}`,
-        borderRadius: 8, padding: '8px 14px', color: theme.muted,
-        fontSize: 13, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
-      }}>← Voltar</button>
-      <Auth conviteToken={conviteToken} />
-    </div>
-  )
-
-  const sidebarItems = [
-    { id: 'all', label: 'Todas as Áreas', count: entradas.length, color: theme.gold },
-    ...Object.entries(AREAS).map(([k, v]) => ({
-      id: k, label: k, color: v.color, icon: v.icon,
-      count: k === 'Legislação' ? countLegislacao : entradas.filter(e => e.area === k).length,
-    }))
-  ]
-
-  // ── Badge de papel ─────────────────────────────────────────────────────
-  const ROLE_COR = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
-  const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
-
-  // ── Sidebar ────────────────────────────────────────────────────────────
+  // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
   const SidebarEl = useMemo(() => (
     <div style={{
       width: 220, background: theme.surface,
@@ -538,6 +491,54 @@ async function handleSave(entry) {
       </div>
     </div>
   ), [theme, view, areaFilter, isAdmin, isEditor, session, role, exportandoRepo, entradas])
+
+  // ── Loading states ─────────────────────────────────────────────────────
+  // Vista pública de entrada compartilhada — sem autenticação
+  if (entradaPublicaId) return (
+    <EntradaPublica
+      entradaId={entradaPublicaId}
+      onFechar={() => setEntradaPublicaId(null)}
+    />
+  )
+
+  if (authLoading) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
+      Carregando...
+    </div>
+  )
+
+  if (aceitandoConvite) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, flexDirection: 'column', gap: 16 }}>
+      <div style={{ fontSize: 32 }}>✦</div>
+      Ativando seu acesso...
+    </div>
+  )
+
+  if (showLogin) return (
+    <div>
+      <button onClick={() => setShowLogin(false)} style={{
+        position: 'fixed', top: 16, left: 16, zIndex: 200,
+        background: theme.raised, border: `1px solid ${theme.border}`,
+        borderRadius: 8, padding: '8px 14px', color: theme.muted,
+        fontSize: 13, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+      }}>← Voltar</button>
+      <Auth conviteToken={conviteToken} />
+    </div>
+  )
+
+  const sidebarItems = [
+    { id: 'all', label: 'Todas as Áreas', count: entradas.length, color: theme.gold },
+    ...Object.entries(AREAS).map(([k, v]) => ({
+      id: k, label: k, color: v.color, icon: v.icon,
+      count: k === 'Legislação' ? countLegislacao : entradas.filter(e => e.area === k).length,
+    }))
+  ]
+
+  // ── Badge de papel ─────────────────────────────────────────────────────
+  const ROLE_COR = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
+  const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
+
+  // ── Sidebar ────────────────────────────────────────────────────────────
 
   // ── Mobile header ──────────────────────────────────────────────────────
   const MobileHeader = () => (
