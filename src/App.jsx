@@ -666,9 +666,23 @@ case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
 
       case VIEWS.EXTRAIR:
-        return isEditor ? (
-          <div className="fade-up"><ExtrairPeticao /></div>
-        ) : null
+        return (
+          <div className="fade-up">
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              {[
+                { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
+                { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
+                { v: VIEWS.EXTRAIR,    label: '📄 Extrair de Petição' },
+              ].map(btn => (
+                <button key={btn.v} onClick={() => setView(btn.v)}
+                  style={{ background: btn.v === VIEWS.EXTRAIR ? theme.gold + '22' : theme.raised, border: `1px solid ${btn.v === VIEWS.EXTRAIR ? theme.gold + '55' : theme.border}`, color: btn.v === VIEWS.EXTRAIR ? theme.gold : theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+            <ExtrairPeticao />
+          </div>
+        )
 
       case VIEWS.CONFIG:
         return (
@@ -681,14 +695,51 @@ case VIEWS.FLASHCARDS:
         return <div className="fade-up"><Legislacao /></div>
 
       case VIEWS.LEGISLACAO:
-        return isEditor ? (
-          <div className="fade-up"><ImportarLegislacao /></div>
-        ) : null
+        return (
+          <div className="fade-up">
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              {[
+                { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
+                { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
+                { v: VIEWS.EXTRAIR,    label: '📄 Extrair de Petição' },
+              ].map(btn => (
+                <button key={btn.v} onClick={() => setView(btn.v)}
+                  style={{ background: btn.v === VIEWS.LEGISLACAO ? theme.gold + '22' : theme.raised, border: `1px solid ${btn.v === VIEWS.LEGISLACAO ? theme.gold + '55' : theme.border}`, color: btn.v === VIEWS.LEGISLACAO ? theme.gold : theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+            <ImportarLegislacao />
+          </div>
+        )
 
       case VIEWS.IMPORTAR:
-        return isEditor ? (
-          <div className="fade-up"><ImportacaoLote session={session} /></div>
-        ) : null
+        if (!session) return (
+          <div style={{ textAlign: 'center', padding: '80px 0', color: theme.muted }}>
+            <div style={{ fontSize: 32, marginBottom: 16, opacity: 0.3 }}>🔒</div>
+            <div style={{ fontSize: 14, color: theme.text, marginBottom: 8 }}>Faça login para importar dados.</div>
+            <button onClick={() => setShowLogin(true)} style={{ background: theme.gold, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              Acessar
+            </button>
+          </div>
+        )
+        return (
+          <div className="fade-up">
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              {[
+                { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
+                { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
+                { v: VIEWS.EXTRAIR,    label: '📄 Extrair de Petição' },
+              ].map(btn => (
+                <button key={btn.v} onClick={() => setView(btn.v)}
+                  style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+            <ImportacaoLote session={session} />
+          </div>
+        )
 
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas}/></div>
