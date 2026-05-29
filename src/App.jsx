@@ -23,6 +23,25 @@ import { exportarRepositorioDocx } from './utils/exportarRepositorio'
 import { AREAS } from './shared'
 import { TagPill } from './components/TagInput'
 
+class ErrorBoundary extends Component {
+  constructor(p) { super(p); this.state = { error: null } }
+  static getDerivedStateFromError(e) { return { error: e } }
+  componentDidCatch(e, info) { console.error('EntradaDetail crash:', e, info) }
+  render() {
+    if (this.state.error) return (
+      <div style={{ padding: 24, color: '#ef4444', fontFamily: 'monospace', fontSize: 13, background: '#2a0f0f', borderRadius: 10, margin: 16 }}>
+        <div style={{ marginBottom: 8, fontWeight: 700 }}>Erro ao abrir entrada:</div>
+        <div style={{ opacity: 0.8 }}>{String(this.state.error?.message || this.state.error)}</div>
+        <button onClick={() => this.setState({ error: null })} style={{ marginTop: 12, padding: '6px 14px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: 'monospace' }}>
+          Fechar
+        </button>
+      </div>
+    )
+    return this.props.children
+  }
+}
+
+
 const VIEWS = {
   ALERTAS: 'alertas',
   EDITOR:     'editor',
@@ -711,17 +730,19 @@ case VIEWS.FLASHCARDS:
         return selected ? (
           <div className="fade-up">
             <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: 'IBM Plex Mono, monospace' }}>← Voltar à lista</button>
-            <EntradaDetail
-              entry={selected}
-              onClose={() => setView(VIEWS.HOME)}
-              onDelete={isAdmin ? handleDelete : null}
-              onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
-              onDuplicar={isEditor ? handleDuplicar : null}
-              readOnly={!isEditor}
-              onStatusChange={(id, novoStatus) => {
-                setEntradas(prev => prev.map(e => e.id === id ? { ...e, status: novoStatus } : e))
-              }}
-            />
+            <ErrorBoundary>
+              <EntradaDetail
+                entry={selected}
+                onClose={() => setView(VIEWS.HOME)}
+                onDelete={isAdmin ? handleDelete : null}
+                onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
+                onDuplicar={isEditor ? handleDuplicar : null}
+                readOnly={!isEditor}
+                onStatusChange={(id, novoStatus) => {
+                  setEntradas(prev => prev.map(e => e.id === id ? { ...e, status: novoStatus } : e))
+                }}
+              />
+            </ErrorBoundary>
           </div>
         ) : null
 
