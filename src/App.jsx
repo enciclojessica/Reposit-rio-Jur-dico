@@ -53,7 +53,7 @@ const VIEWS = {
   EXTRAIR:       'extrair',
   FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
-  BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
+  BUSCA: 'busca', MEMBROS: 'membros',
   CONFIG: 'config',
 }
 
@@ -660,9 +660,6 @@ async function handleSave(entry) {
         return isAdmin
           ? <div className="fade-up"><Membros session={session} /></div>
           : null
-
-      case VIEWS.PESQUISA:
-        return <div className="fade-up"><PesquisaJuri onImportar={handleImportarPesquisa} /></div>
 
 case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
