@@ -17,6 +17,7 @@ import Legislacao from './components/Legislacao'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
+import Configuracoes from './components/Configuracoes'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
@@ -53,6 +54,7 @@ const VIEWS = {
   FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', PESQUISA: 'pesquisa', MEMBROS: 'membros',
+  CONFIG: 'config',
 }
 
 function useIsMobile() {
@@ -74,6 +76,7 @@ export default function App() {
   const [entradas, setEntradas]     = useState([])
   const [view, setView]             = useState(VIEWS.HOME)
   const [areaFilter, setAreaFilter] = useState('all')
+  const [tipoFilter, setTipoFilter]   = useState('all')
   const [tagFilter, setTagFilter]   = useState(null)
   const [ordenacao, setOrdenacao]    = useState('data_desc')
   const [search, setSearch]         = useState('')
@@ -298,6 +301,8 @@ export default function App() {
     ? filteredSemantico
     : entradas.filter(e => {
       const areaOk = areaFilter === 'all' || e.area === areaFilter
+      const tipoOk = tipoFilter === 'all' || e.tipo === tipoFilter
+      if (!tipoOk) return false
       if (!areaOk) return false
       const tag = !tagFilter || (e.tags || []).includes(tagFilter)
       if (!tag) return false
@@ -456,57 +461,47 @@ async function handleSave(entry) {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-        {/* Nav items — estilo Estúdio Boutique */}
         {[
-          { id: 'home',    label: 'Início',         icon: '⌂', action: () => { setAreaFilter('all'); setView(VIEWS.HOME) }, active: () => view === VIEWS.HOME },
-          { id: 'leg',     label: 'Legislação',     icon: '§', action: () => setView(VIEWS.LEG_VIEW), active: () => view === VIEWS.LEG_VIEW },
-          { id: 'editor',  label: 'Petição Editor', icon: '✎', action: () => setView(VIEWS.EDITOR),   active: () => view === VIEWS.EDITOR },
-          { id: 'dash',    label: 'Dashboard',      icon: '◈', action: () => setView(VIEWS.DASHBOARD), active: () => view === VIEWS.DASHBOARD },
-          { id: 'import',  label: 'Importar',       icon: '↑', action: () => setView(VIEWS.IMPORTAR), active: () => view === VIEWS.IMPORTAR || view === VIEWS.LEGISLACAO || view === VIEWS.EXTRAIR },
-          { id: 'membros', label: 'Membros',        icon: '◉', action: () => setView(VIEWS.MEMBROS),  active: () => view === VIEWS.MEMBROS, adminOnly: true },
-        ].filter(n => !n.adminOnly || isAdmin).map(n => {
-          const active = n.active()
-          return (
-            <button key={n.id} onClick={n.action}
-              style={{
-                width: '100%', background: active ? theme.gold + '12' : 'none',
-                border: 'none', borderLeft: `3px solid ${active ? theme.gold : 'transparent'}`,
-                padding: '11px 20px', display: 'flex', alignItems: 'center', gap: 12,
-                cursor: 'pointer', color: active ? theme.text : theme.muted,
-                fontSize: 13, textAlign: 'left', transition: 'all .15s',
-              }}>
-              <span style={{ fontSize: 14, width: 16, textAlign: 'center', color: active ? theme.gold : theme.muted }}>{n.icon}</span>
-              <span style={{ fontFamily: theme.fontBody || 'Inter, sans-serif' }}>{n.label}</span>
-            </button>
-          )
-        })}
-
-        {/* Itens adicionais compactos */}
-        <div style={{ margin: '8px 0', borderTop: `1px solid ${theme.border}` }}/>
-        {[
-          { v: VIEWS.BUSCA,       label: 'Busca para Peça' },
-          { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
-          { v: VIEWS.ALERTAS,     label: 'Alertas' },
-        ].map(item => (
-          <button key={item.v} onClick={() => setView(item.v)}
-            style={{
-              width: '100%', background: view === item.v ? theme.gold + '11' : 'none',
-              border: 'none', borderLeft: `3px solid ${view === item.v ? theme.gold : 'transparent'}`,
-              padding: '8px 20px', textAlign: 'left', cursor: 'pointer',
-              color: view === item.v ? theme.gold : theme.muted, fontSize: 12,
-              fontFamily: theme.fontBody || 'Inter, sans-serif', transition: 'all .15s',
-            }}>{item.label}</button>
+          { id: 'home',   label: 'Início',          action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
+          { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
+          { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
+          { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
+          { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
+          { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
+        ].map(n => (
+          <button key={n.id} onClick={n.action} style={{
+            width: '100%', background: n.active ? theme.gold + '12' : 'none',
+            border: 'none', borderLeft: `3px solid ${n.active ? theme.gold : 'transparent'}`,
+            padding: '11px 20px', display: 'flex', alignItems: 'center', gap: 10,
+            cursor: 'pointer', color: n.active ? theme.text : theme.muted,
+            fontSize: 13, textAlign: 'left', transition: 'all .15s',
+            fontFamily: 'Inter, sans-serif',
+          }}>
+            {n.label}
+          </button>
         ))}
 
+        {isAdmin && (
+          <button onClick={() => setView(VIEWS.MEMBROS)} style={{
+            width: '100%', background: view === VIEWS.MEMBROS ? theme.gold + '12' : 'none',
+            border: 'none', borderLeft: `3px solid ${view === VIEWS.MEMBROS ? theme.gold : 'transparent'}`,
+            padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
+            color: view === VIEWS.MEMBROS ? theme.text : theme.muted, fontSize: 13,
+            fontFamily: 'Inter, sans-serif', transition: 'all .15s',
+          }}>Membros</button>
+        )}
+
         {isEditor && (
-          <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }}
-            style={{
-              width: '100%', background: view === VIEWS.ADD ? theme.gold + '11' : 'none',
+          <>
+            <div style={{ margin: '8px 16px', borderTop: `1px solid ${theme.border}` }}/>
+            <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }} style={{
+              width: '100%', background: view === VIEWS.ADD ? theme.gold + '12' : 'none',
               border: 'none', borderLeft: `3px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
-              padding: '8px 20px', textAlign: 'left', cursor: 'pointer',
-              color: view === VIEWS.ADD ? theme.gold : theme.muted, fontSize: 12,
-              fontFamily: theme.fontBody || 'Inter, sans-serif', transition: 'all .15s',
+              padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
+              color: view === VIEWS.ADD ? theme.gold : theme.gold, fontSize: 13,
+              fontFamily: 'Inter, sans-serif', fontWeight: 600, transition: 'all .15s',
             }}>+ Nova Entrada</button>
+          </>
         )}
       </div>
 
@@ -677,6 +672,13 @@ case VIEWS.FLASHCARDS:
           <div className="fade-up"><ExtrairPeticao /></div>
         ) : null
 
+      case VIEWS.CONFIG:
+        return (
+          <div className="fade-up">
+            <Configuracoes session={session} membro={membro} />
+          </div>
+        )
+
       case VIEWS.LEG_VIEW:
         return <div className="fade-up"><Legislacao /></div>
 
@@ -811,12 +813,45 @@ case VIEWS.FLASHCARDS:
               </button>
             </div>
             {erroSem && <div style={{ background: theme.toastErr, border: `1px solid ${theme.error}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, color: theme.error, marginBottom: 12 }}>✕ {erroSem}</div>}
-            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4 }}>
-              {[{ id: 'all', label: 'Todas', color: theme.gold }, ...Object.entries(AREAS).map(([k, v]) => ({ id: k, label: k, color: v.color, icon: v.icon }))].map(a => (
-                <button key={a.id} onClick={() => setAreaFilter(a.id)}
-                  style={{ flexShrink: 0, background: areaFilter === a.id ? a.color + '22' : theme.raised, color: areaFilter === a.id ? a.color : theme.muted, border: `1px solid ${areaFilter === a.id ? a.color + '66' : theme.border}`, borderRadius: 20, padding: '5px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap', transition: 'all .15s' }}>
-                  {a.icon ? `${a.icon} ` : ''}{a.label}{' '}
+            {/* Filtro Linha 1 — Área */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+              {[
+                { id: 'all',      label: 'Todas',      color: theme.gold },
+                { id: 'Cível',    label: 'Cível',      color: '#1e3a8a' },
+                { id: 'Penal',    label: 'Penal',      color: '#800020' },
+                { id: 'Doutrina', label: 'Doutrina',   color: '#581c87' },
+              ].map(a => (
+                <button key={a.id} onClick={() => setAreaFilter(a.id)} style={{
+                  flexShrink: 0,
+                  background: areaFilter === a.id ? a.color + '22' : theme.raised,
+                  color: areaFilter === a.id ? a.color : theme.muted,
+                  border: `1px solid ${areaFilter === a.id ? a.color + '55' : theme.border}`,
+                  borderRadius: 20, padding: '5px 14px', fontSize: 12, cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif', fontWeight: areaFilter === a.id ? 600 : 400,
+                }}>
+                  {a.label}{' '}
                   <span style={{ opacity: 0.6, fontSize: 10 }}>{a.id === 'all' ? entradas.length : entradas.filter(e => e.area === a.id).length}</span>
+                </button>
+              ))}
+            </div>
+            {/* Filtro Linha 2 — Tipo */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+              {[
+                { id: 'all',            label: 'Todos os tipos' },
+                { id: 'jurisprudência', label: 'Jurisprudência' },
+                { id: 'doutrina',       label: 'Doutrina' },
+                { id: 'súmula',         label: 'Súmula' },
+                { id: 'lei',            label: 'Lei' },
+              ].map(f => (
+                <button key={f.id} onClick={() => setTipoFilter(f.id)} style={{
+                  flexShrink: 0,
+                  background: tipoFilter === f.id ? theme.gold + '15' : 'none',
+                  color: tipoFilter === f.id ? theme.gold : theme.muted,
+                  border: `1px solid ${tipoFilter === f.id ? theme.gold + '44' : theme.border}`,
+                  borderRadius: 6, padding: '3px 12px', fontSize: 11, cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif', fontWeight: tipoFilter === f.id ? 600 : 400,
+                }}>
+                  {f.label}
                 </button>
               ))}
             </div>

@@ -12,7 +12,7 @@ export default defineConfig({
         name: 'Síntese Jurídica — Farias Fusquiani',
         short_name: 'Síntese',
         description: 'Plataforma de curadoria jurídica · Farias Fusquiani',
-        theme_color: '#fdfbf7',
+        theme_color: '#800020',
         background_color: '#fdfbf7',
         display: 'standalone',
         orientation: 'portrait-primary',
