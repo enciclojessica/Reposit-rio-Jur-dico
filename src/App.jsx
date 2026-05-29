@@ -18,6 +18,7 @@ import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import Configuracoes from './components/Configuracoes'
+import { Lock } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
@@ -488,12 +489,13 @@ async function handleSave(entry) {
           <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
             title="Exportar repositório completo em .docx"
             style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: exportandoRepo ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoRepo ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
-            {exportandoRepo ? '⟳ Exportando...' : '↓ Exportar repositório .docx'}
+            {exportandoRepo ? 'Exportando...' : 'Exportar repositório .docx'}
           </button>
         )}
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
-          : <button onClick={() => setShowLogin(true)} style={{ width: '100%', background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: 7, color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Acesso Interno</button>
+          : <button onClick={() => setShowLogin(true)} style={{ width: '100%', background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: 7, color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <Lock size={11} /> Acesso Interno</button>
         }
       </div>
     </div>
@@ -551,17 +553,16 @@ async function handleSave(entry) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
-        <SeletorTema />
         {isEditor && (
           <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
             title="Exportar repositório completo em .docx"
             style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: exportandoRepo ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoRepo ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
-            {exportandoRepo ? '⟳ Exportando...' : '↓ Exportar repositório .docx'}
+            {exportandoRepo ? 'Exportando...' : 'Exportar repositório .docx'}
           </button>
         )}
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
-          : <button onClick={() => setShowLogin(true)} style={{ background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: '5px 10px', color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>🔒 Login</button>
+          : <button onClick={() => setShowLogin(true)} style={{ background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: '5px 10px', color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}><Lock size={11} style={{marginRight:4}}/> Login</button>
         }
       </div>
     </div>
@@ -570,19 +571,18 @@ async function handleSave(entry) {
   // ── Mobile bottom nav ──────────────────────────────────────────────────
   // Itens fixos no mobile nav
   const navFixos = [
-    { v: VIEWS.HOME,   label: 'Início',  icon: '🏠' },
-    { v: VIEWS.BUSCA,  label: 'Busca IA', icon: '✦' },
-    { v: VIEWS.EDITOR, label: 'Editor',   icon: '✎' },
-    ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova', icon: '+' }] : []),
+    { v: VIEWS.HOME,   label: 'Início',  icon: 'home' },
+    { v: VIEWS.BUSCA,  label: 'Busca IA', icon: '*' },
+    { v: VIEWS.EDITOR, label: 'Editor',   icon: 'edit' },
+    ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova' }] : []),
   ]
   // Itens no menu "mais"
   const navMais = [
-    { v: VIEWS.PESQUISA,    label: 'Pesquisar',    icon: '⌕' },
-    { v: VIEWS.DASHBOARD,   label: 'Dashboard',    icon: '◈' },
-    { v: VIEWS.ALERTAS,     label: 'Alertas',      icon: '🔔' },
-    { v: VIEWS.FLASHCARDS,  label: 'Flashcards',   icon: '🃏' },
-    ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar', icon: '⇪' }] : []),
-    ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros',  icon: '👥' }] : []),
+    { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
+    { v: VIEWS.ALERTAS,     label: 'Alertas' },
+    { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
+    ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
+    ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
   ]
   const maisAtivo = navMais.some(n => n.v === view)
 
@@ -614,7 +614,6 @@ async function handleSave(entry) {
                 color: view === item.v ? theme.gold : theme.muted,
                 cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
               }}>
-              <span style={{ fontSize: 18, lineHeight: 1, marginBottom: 4 }}>{item.icon}</span>
               {item.label}
             </button>
           ))}
@@ -675,7 +674,7 @@ case VIEWS.FLASHCARDS:
               {[
                 { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
                 { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
-                { v: VIEWS.EXTRAIR,    label: '📄 Extrair de Petição' },
+                { v: VIEWS.EXTRAIR,    label: 'Extrair de Petição' },
               ].map(btn => (
                 <button key={btn.v} onClick={() => setView(btn.v)}
                   style={{ background: btn.v === VIEWS.EXTRAIR ? theme.gold + '22' : theme.raised, border: `1px solid ${btn.v === VIEWS.EXTRAIR ? theme.gold + '55' : theme.border}`, color: btn.v === VIEWS.EXTRAIR ? theme.gold : theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
@@ -704,7 +703,7 @@ case VIEWS.FLASHCARDS:
               {[
                 { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
                 { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
-                { v: VIEWS.EXTRAIR,    label: '📄 Extrair de Petição' },
+                { v: VIEWS.EXTRAIR,    label: 'Extrair de Petição' },
               ].map(btn => (
                 <button key={btn.v} onClick={() => setView(btn.v)}
                   style={{ background: btn.v === VIEWS.LEGISLACAO ? theme.gold + '22' : theme.raised, border: `1px solid ${btn.v === VIEWS.LEGISLACAO ? theme.gold + '55' : theme.border}`, color: btn.v === VIEWS.LEGISLACAO ? theme.gold : theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
@@ -719,7 +718,7 @@ case VIEWS.FLASHCARDS:
       case VIEWS.IMPORTAR:
         if (!session) return (
           <div style={{ textAlign: 'center', padding: '80px 0', color: theme.muted }}>
-            <div style={{ fontSize: 32, marginBottom: 16, opacity: 0.3 }}>🔒</div>
+            <div style={{ marginBottom: 16, opacity: 0.2, display:'flex', justifyContent:'center' }}><Lock size={48} /></div>
             <div style={{ fontSize: 14, color: theme.text, marginBottom: 8 }}>Faça login para importar dados.</div>
             <button onClick={() => setShowLogin(true)} style={{ background: theme.gold, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
               Acessar
@@ -732,7 +731,7 @@ case VIEWS.FLASHCARDS:
               {[
                 { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
                 { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
-                { v: VIEWS.EXTRAIR,    label: '📄 Extrair de Petição' },
+                { v: VIEWS.EXTRAIR,    label: 'Extrair de Petição' },
               ].map(btn => (
                 <button key={btn.v} onClick={() => setView(btn.v)}
                   style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
@@ -853,7 +852,7 @@ case VIEWS.FLASHCARDS:
                 {modoSemantico && search.trim() && (
                   <button onClick={buscarSemantico} disabled={buscandoSem}
                     style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', background: buscandoSem ? theme.border : theme.gold, color: buscandoSem ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: buscandoSem ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {buscandoSem ? '⟳' : '✦ Buscar'}
+                    {buscandoSem ? '~' : '✦ Buscar'}
                   </button>
                 )}
               </div>
@@ -861,7 +860,7 @@ case VIEWS.FLASHCARDS:
               <button onClick={() => { setModoSemantico(m => !m); setResultadosSem(null); setErroSem('') }}
                 title={modoSemantico ? 'Modo: busca semântica (IA) — clique para voltar à busca exata' : 'Modo: busca exata — clique para ativar busca semântica por IA'}
                 style={{ flexShrink: 0, background: modoSemantico ? theme.gold + '22' : theme.raised, color: modoSemantico ? theme.gold : theme.muted, border: `1px solid ${modoSemantico ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '0 14px', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontWeight: modoSemantico ? 700 : 400, whiteSpace: 'nowrap' }}>
-                {modoSemantico ? '✦ Semântica' : '✦ Semântica'}
+                {modoSemantico ? 'IA' : 'IA'}
               </button>
             </div>
             {erroSem && <div style={{ background: theme.toastErr, border: `1px solid ${theme.error}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, color: theme.error, marginBottom: 12 }}>✕ {erroSem}</div>}
@@ -960,26 +959,39 @@ case VIEWS.FLASHCARDS:
             display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
             padding: '0 28px', gap: 12, flexShrink: 0,
           }}>
-            <SinoNotificacoes
-              session={session}
-              onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
-            />
-            <div style={{ width: 1, height: 20, background: theme.border }} />
-            {/* Avatar + nome */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            {session ? (
+              <>
+                <SinoNotificacoes
+                  session={session}
+                  onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
+                />
+                <div style={{ width: 1, height: 20, background: theme.border }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {membro?.avatar_url ? (
+                    <img src={membro.avatar_url} alt="avatar"
+                      style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${theme.border}` }} />
+                  ) : (
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: theme.fontTitle }}>
+                        {(membro?.nome || session.user.email || 'JF').slice(0, 2).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <span style={{ fontSize: 13, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
+                    {membro?.nome || session.user.email?.split('@')[0] || ''}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <button onClick={() => setShowLogin(true)} style={{
+                background: theme.gold, color: '#fff', border: 'none',
+                borderRadius: 8, padding: '7px 18px', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                display: 'flex', alignItems: 'center', gap: 6,
               }}>
-                <span style={{ color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: theme.fontTitle }}>
-                  {session?.user?.email?.slice(0,2).toUpperCase() || 'JF'}
-                </span>
-              </div>
-              <span style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontBody || 'Inter, sans-serif' }}>
-                {session?.user?.user_metadata?.name || session?.user?.email?.split('@')[0] || 'Jessica Farias'}
-              </span>
-            </div>
-            <SeletorTema />
+                <Lock size={13} /> Acesso Interno
+              </button>
+            )}
           </div>
         )}
         {isMobile && <MobileHeader/>}

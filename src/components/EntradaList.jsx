@@ -22,10 +22,40 @@ export default function EntradaList({ entradas, onSelect }) {
 
   if (entradas.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '60px 24px', color: theme.muted }}>
-        <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.3 }}>🗄</div>
-        <div style={{ fontSize: 14, marginBottom: 6 }}>Nenhuma entrada encontrada.</div>
-        <div style={{ fontSize: 12 }}>Tente outros termos ou ative a busca semântica ✦.</div>
+      <div style={{ textAlign: 'center', padding: '80px 24px', maxWidth: 480, margin: '0 auto' }}>
+        {/* Ícone decorativo */}
+        <div style={{ marginBottom: 20, opacity: 0.15 }}>
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ color: theme.gold }}>
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        {/* Título de boas-vindas */}
+        <div style={{ fontSize: 20, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', marginBottom: 10, lineHeight: 1.3 }}>
+          Bem-vinda à Síntese Jurídica
+        </div>
+        {/* Subtítulo orientador */}
+        <div style={{ fontSize: 14, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.7, marginBottom: 24 }}>
+          Seu repositório está pronto para receber curadoria jurídica.<br/>
+          Utilize o módulo <strong style={{ color: theme.gold }}>Importar</strong> na barra lateral para carregar suas teses, doutrinas e jurisprudências.
+        </div>
+        {/* Dicas rápidas */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'left' }}>
+          {[
+            { icon: '⇪', label: 'Importar Planilha', desc: 'Carregue múltiplas teses via Excel ou CSV' },
+            { icon: '§',  label: 'Importar Legislação', desc: 'Adicione artigos do CPC, CDC, CC e outros' },
+            { icon: '📄', label: 'Extrair de Petição', desc: 'Extraia teses direto de um PDF' },
+          ].map(item => (
+            <div key={item.label} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ fontSize: 16, width: 24, textAlign: 'center', flexShrink: 0, marginTop: 1 }}>{item.icon}</div>
+              <div>
+                <div style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: 'Inter, sans-serif', marginBottom: 2 }}>{item.label}</div>
+                <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>{item.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
