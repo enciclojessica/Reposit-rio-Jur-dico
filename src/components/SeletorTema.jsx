@@ -1,161 +1,34 @@
-import { useState } from 'react'
-import { useTheme, TEMAS_CONFIG } from '../theme'
+import { useTheme } from '../theme'
 
-const GRUPOS = [...new Set(Object.values(TEMAS_CONFIG).map(t => t.grupo))]
-
-export default function SeletorTema() {
-  const { theme, mode, temaId, setTema } = useTheme()
-  const [aberto, setAberto] = useState(false)
-  const [grupoAtivo, setGrupoAtivo] = useState('Todos')
-
-  const temasFiltrados = grupoAtivo === 'Todos'
-    ? Object.entries(TEMAS_CONFIG)
-    : Object.entries(TEMAS_CONFIG).filter(([, t]) => t.grupo === grupoAtivo)
-
-  const temaAtual = TEMAS_CONFIG[temaId]
+export default function SeletorTema({ compact = false }) {
+  const { isDark, toggle, theme } = useTheme()
 
   return (
-    <div style={{ position: 'relative' }}>
-      {/* Botão */}
-      <button
-        onClick={() => setAberto(a => !a)}
-        title="Escolher tema visual"
-        style={{
-          background: theme.raised,
-          border: `1px solid ${theme.border}`,
-          borderRadius: 8,
-          padding: '5px 10px',
-          cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 6,
-          color: theme.muted,
-          fontSize: 11,
-          fontFamily: 'IBM Plex Mono, monospace',
-        }}
-      >
-        <span style={{ fontSize: 13 }}>{temaAtual?.isDark ? '🌙' : '☀️'}</span>
-        <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {temaAtual?.nome || 'Tema'}
+    <button
+      onClick={toggle}
+      title={isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+      style={{
+        background: theme.raised,
+        border: `1px solid ${theme.border}`,
+        borderRadius: 20,
+        padding: compact ? '4px 10px' : '5px 12px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        color: theme.muted,
+        fontSize: 12,
+        fontFamily: theme.fontBody || 'Inter, sans-serif',
+        flexShrink: 0,
+        transition: 'all .15s',
+      }}
+    >
+      <span style={{ fontSize: 14 }}>{isDark ? '☀' : '☾'}</span>
+      {!compact && (
+        <span style={{ color: theme.text, fontWeight: 500 }}>
+          {isDark ? 'Claro' : 'Escuro'}
         </span>
-        <span style={{ opacity: 0.4, fontSize: 8 }}>{aberto ? '▲' : '▼'}</span>
-      </button>
-
-      {/* Modal centralizado */}
-      {aberto && (
-        <>
-          <div
-            onClick={() => setAberto(false)}
-            style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#00000077' }}
-          />
-          <div style={{
-            position: 'fixed',
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90vw', maxWidth: 380,
-            maxHeight: '80vh',
-            background: theme.surface,
-            border: `1px solid ${theme.borderGold}`,
-            borderRadius: 16,
-            boxShadow: '0 24px 64px #00000099',
-            zIndex: 201,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}>
-            {/* Header */}
-            <div style={{ padding: '14px 16px 10px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'IBM Plex Mono, monospace' }}>
-                  Escolher Tema
-                </div>
-                <button onClick={() => setAberto(false)}
-                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>
-              </div>
-              {/* Filtros */}
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                {['Todos', ...GRUPOS].map(g => {
-                  const ativo = grupoAtivo === g
-                  return (
-                    <button key={g} onClick={() => setGrupoAtivo(g)}
-                      style={{
-                        background: ativo ? theme.gold + '22' : 'none',
-                        color: ativo ? theme.gold : theme.muted,
-                        border: `1px solid ${ativo ? theme.gold + '55' : theme.border}`,
-                        borderRadius: 20, padding: '2px 8px', fontSize: 9,
-                        cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
-                        whiteSpace: 'nowrap',
-                      }}>{g}</button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Lista */}
-            <div style={{ overflowY: 'auto', flex: 1 }}>
-              {temasFiltrados.map(([id, t]) => {
-                const ativo = temaId === id
-                return (
-                  <button key={id}
-                    onClick={() => { setTema(id); setAberto(false) }}
-                    style={{
-                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '10px 14px',
-                      background: ativo ? theme.gold + '15' : 'transparent',
-                      border: 'none',
-                      borderBottom: `1px solid ${theme.border}22`,
-                      cursor: 'pointer', textAlign: 'left',
-                    }}
-                    onMouseEnter={ev => { if (!ativo) ev.currentTarget.style.background = theme.raised }}
-                    onMouseLeave={ev => { if (!ativo) ev.currentTarget.style.background = 'transparent' }}
-                  >
-                    {/* Miniatura de cores */}
-                    <div style={{
-                      width: 38, height: 28, borderRadius: 6, flexShrink: 0,
-                      background: t.bg,
-                      border: ativo ? `2px solid ${t.gold}` : `1px solid ${t.border}`,
-                      display: 'flex', overflow: 'hidden',
-                    }}>
-                      <div style={{ width: 10, background: t.surface }} />
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, padding: '4px 3px' }}>
-                        <div style={{ height: 4, background: t.gold, borderRadius: 2 }} />
-                        <div style={{ height: 3, background: t.muted, borderRadius: 2, opacity: 0.5 }} />
-                        <div style={{ height: 3, background: t.muted, borderRadius: 2, opacity: 0.3 }} />
-                      </div>
-                    </div>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                        <span style={{
-                          fontSize: 12, fontWeight: ativo ? 700 : 400,
-                          color: ativo ? theme.gold : theme.text,
-                          fontFamily: t.fontTitle,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        }}>
-                          {t.nome}
-                        </span>
-                        {ativo && (
-                          <span style={{ fontSize: 9, color: theme.gold, background: theme.gold + '22', borderRadius: 10, padding: '1px 6px', whiteSpace: 'nowrap', flexShrink: 0, fontFamily: 'IBM Plex Mono, monospace' }}>
-                            ativo
-                          </span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {t.isDark ? '🌙' : '☀️'} {t.grupo}
-                      </div>
-                    </div>
-
-                    {/* Swatches */}
-                    <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
-                      {[t.gold, t.civel, t.penal].map((cor, i) => (
-                        <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: cor }} />
-                      ))}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </>
       )}
-    </div>
+    </button>
   )
 }

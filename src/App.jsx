@@ -66,7 +66,7 @@ function useIsMobile() {
 }
 
 export default function App() {
-  const { theme, mode, toggle } = useTheme()
+  const { theme, mode, isDark, toggle } = useTheme()
   const [session, setSession]       = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
   const [membro, setMembro]         = useState(null)   // { role, nome, email }
