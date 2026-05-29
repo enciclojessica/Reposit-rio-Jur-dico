@@ -422,10 +422,22 @@ async function handleSave(entry) {
       borderRight: `1px solid ${theme.borderGold}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo + SeletorTema */}
-      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.borderGold}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <div style={{ background: theme.logoBg, borderRadius: 8, padding: '6px 10px 4px', boxShadow: theme.shadow, border: mode === 'light' ? `1px solid ${theme.border}` : 'none', flexShrink: 0 }}>
-          <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 40, width: 'auto', display: 'block' }}/>
+      {/* Logo Síntese Jurídica */}
+      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{
+          width: 42, height: 42, borderRadius: 8, flexShrink: 0,
+          background: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 8px #80002033',
+        }}>
+          <span style={{ color: '#ffffff', fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 17, letterSpacing: 0.5 }}>FF</span>
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
+            Síntese Jurídica
+          </div>
+          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>
+            Curadoria Jurídica
+          </div>
         </div>
         <SeletorTema />
       </div>
@@ -506,7 +518,12 @@ async function handleSave(entry) {
       </div>
 
       {/* Footer */}
-      <div style={{ padding: '12px 16px', borderTop: `1px solid ${theme.borderGold}` }}>
+      <div style={{ padding: '12px 16px', borderTop: `1px solid ${theme.border}` }}>
+        {/* Assinatura institucional */}
+        <div style={{ textAlign: 'center', marginBottom: 10, paddingBottom: 8, borderBottom: `1px solid ${theme.border}` }}>
+          <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1, marginBottom: 1 }}>Plataforma e Curadoria</div>
+          <div style={{ fontSize: 10, color: theme.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 10, color: theme.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

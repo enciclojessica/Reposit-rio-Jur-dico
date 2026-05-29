@@ -21,7 +21,7 @@ function citacaoABNT(entry) {
 }
 
 function txt(text, opts = {}) {
-  return new TextRun({ text: String(text || ''), font: 'Arial', size: 24, ...opts })
+  return new TextRun({ text: String(text || ''), font: 'Times New Roman', size: 24, ...opts })
 }
 
 function paragrafo(children, opts = {}) {
@@ -162,12 +162,12 @@ export async function exportarRepositorioDocx(entradas) {
   // ── Rodapé ───────────────────────────────────────────────────────────
   const rodape = new Footer({
     children: [paragrafo([
-      txt(`Repositório Jurídico · Farias Fusquiani · ${data}`, { size: 16, color: 'aaaaaa' }),
+      txt(`Síntese Jurídica · Farias Fusquiani · ${data}`, { size: 16, color: 'aaaaaa' }),
     ], { alignment: AlignmentType.CENTER })],
   })
 
   const doc = new Document({
-    styles: { default: { document: { run: { font: 'Arial', size: 24 } } } },
+    styles: { default: { document: { run: { font: 'Times New Roman', size: 24 } } } },
     sections: [
       {
         properties: { page: { size: { width: A4_W, height: A4_H }, margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN } } },

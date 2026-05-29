@@ -43,13 +43,13 @@ function parseLinha(linha) {
     return new Paragraph({
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 360, after: 180 },
-      children: [new TextRun({ text: trim.slice(3), bold: true, size: 28, font: 'Arial' })],
+      children: [new TextRun({ text: trim.slice(3), bold: true, size: 28, font: 'Times New Roman' })],
     })
   if (trim.startsWith('### '))
     return new Paragraph({
       heading: HeadingLevel.HEADING_2,
       spacing: { before: 240, after: 120 },
-      children: [new TextRun({ text: trim.slice(4), bold: true, size: 24, font: 'Arial' })],
+      children: [new TextRun({ text: trim.slice(4), bold: true, size: 24, font: 'Times New Roman' })],
     })
   if (!trim)
     return new Paragraph({ spacing: { before: 0, after: 160 } })
@@ -58,9 +58,9 @@ function parseLinha(linha) {
   const partes = trim.split(/(\*\*[^*]+\*\*)/)
   for (const parte of partes) {
     if (parte.startsWith('**') && parte.endsWith('**'))
-      runs.push(new TextRun({ text: parte.slice(2, -2), bold: true, size: 24, font: 'Arial' }))
+      runs.push(new TextRun({ text: parte.slice(2, -2), bold: true, size: 24, font: 'Times New Roman' }))
     else if (parte)
-      runs.push(new TextRun({ text: parte, size: 24, font: 'Arial' }))
+      runs.push(new TextRun({ text: parte, size: 24, font: 'Times New Roman' }))
   }
   return new Paragraph({
     alignment: AlignmentType.JUSTIFIED,
@@ -79,12 +79,12 @@ export async function exportarDocx({ titulo, conteudo, entradas = [] }) {
     new Paragraph({
       spacing: { before: 720, after: 360 },
       border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'C9A452', space: 6 } },
-      children: [new TextRun({ text: 'REFERÊNCIAS', bold: true, size: 24, font: 'Arial' })],
+      children: [new TextRun({ text: 'REFERÊNCIAS', bold: true, size: 24, font: 'Times New Roman' })],
     }),
     ...citadas.map(e => new Paragraph({
       alignment: AlignmentType.JUSTIFIED,
       spacing: { before: 0, after: 200, line: 240 },
-      children: [new TextRun({ text: citacaoABNT(e), size: 22, font: 'Arial' })],
+      children: [new TextRun({ text: citacaoABNT(e), size: 22, font: 'Times New Roman' })],
     })),
   ] : []
 
@@ -92,7 +92,7 @@ export async function exportarDocx({ titulo, conteudo, entradas = [] }) {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { before: 0, after: 480 },
-      children: [new TextRun({ text: titulo, bold: true, size: 28, font: 'Arial' })],
+      children: [new TextRun({ text: titulo, bold: true, size: 28, font: 'Times New Roman' })],
     }),
   ] : []
 
@@ -100,20 +100,20 @@ export async function exportarDocx({ titulo, conteudo, entradas = [] }) {
     children: [new Paragraph({
       tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
       children: [
-        new TextRun({ text: data, size: 18, font: 'Arial', color: '888888' }),
+        new TextRun({ text: data, size: 18, font: 'Times New Roman', color: '888888' }),
       ],
     })],
   })
 
   const doc = new Document({
     styles: {
-      default: { document: { run: { font: 'Arial', size: 24 } } },
+      default: { document: { run: { font: 'Times New Roman', size: 24 } } },
       paragraphStyles: [
         { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal',
-          run: { size: 28, bold: true, font: 'Arial' },
+          run: { size: 28, bold: true, font: 'Times New Roman' },
           paragraph: { spacing: { before: 360, after: 180 }, outlineLevel: 0 } },
         { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal',
-          run: { size: 24, bold: true, font: 'Arial' },
+          run: { size: 24, bold: true, font: 'Times New Roman' },
           paragraph: { spacing: { before: 240, after: 120 }, outlineLevel: 1 } },
       ],
     },
