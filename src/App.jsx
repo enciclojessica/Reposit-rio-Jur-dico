@@ -418,111 +418,94 @@ async function handleSave(entry) {
   // ── Sidebar ────────────────────────────────────────────────────────────
   const Sidebar = () => (
     <div style={{
-      width: 240, background: theme.surface,
-      borderRight: `1px solid ${theme.borderGold}`,
+      width: 220, background: theme.surface,
+      borderRight: `1px solid ${theme.border}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo Síntese Jurídica */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Logo Síntese Jurídica — Estúdio Boutique */}
+      <div style={{ padding: '24px 20px 20px', borderBottom: `1px solid ${theme.border}`, textAlign: 'center' }}>
+        {/* Brasão circular */}
         <div style={{
-          width: 42, height: 42, borderRadius: 8, flexShrink: 0,
-          background: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px #80002033',
+          width: 64, height: 64, borderRadius: '50%', margin: '0 auto 12px',
+          background: theme.gold,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 4px 16px ${theme.gold}44`,
+          border: `3px solid ${theme.gold}`,
+          position: 'relative',
         }}>
-          <span style={{ color: '#ffffff', fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 17, letterSpacing: 0.5 }}>FF</span>
+          <span style={{
+            color: '#ffffff', fontFamily: theme.fontTitle,
+            fontWeight: 700, fontSize: 22, letterSpacing: 1,
+          }}>FF</span>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
-            Síntese Jurídica
-          </div>
-          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2, marginTop: 2 }}>
-            Curadoria Jurídica
-          </div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2, marginBottom: 3 }}>
+          Síntese Jurídica
         </div>
-        <SeletorTema />
+        <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 3 }}>
+          Curadoria Jurídica
+        </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
-        {/* Áreas */}
-        <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Áreas</div>
-        {sidebarItems.map(n => {
-          const active = areaFilter === n.id && view === VIEWS.HOME
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+        {/* Nav items — estilo Estúdio Boutique */}
+        {[
+          { id: 'home',    label: 'Início',         icon: '⌂', action: () => { setAreaFilter('all'); setView(VIEWS.HOME) }, active: () => view === VIEWS.HOME },
+          { id: 'leg',     label: 'Legislação',     icon: '§', action: () => setView(VIEWS.LEG_VIEW), active: () => view === VIEWS.LEG_VIEW },
+          { id: 'editor',  label: 'Petição Editor', icon: '✎', action: () => setView(VIEWS.EDITOR),   active: () => view === VIEWS.EDITOR },
+          { id: 'dash',    label: 'Dashboard',      icon: '◈', action: () => setView(VIEWS.DASHBOARD), active: () => view === VIEWS.DASHBOARD },
+          { id: 'import',  label: 'Importar',       icon: '↑', action: () => setView(VIEWS.IMPORTAR), active: () => view === VIEWS.IMPORTAR || view === VIEWS.LEGISLACAO || view === VIEWS.EXTRAIR },
+          { id: 'membros', label: 'Membros',        icon: '◉', action: () => setView(VIEWS.MEMBROS),  active: () => view === VIEWS.MEMBROS, adminOnly: true },
+        ].filter(n => !n.adminOnly || isAdmin).map(n => {
+          const active = n.active()
           return (
-            <button key={n.id} onClick={() => {
-                if (n.id === 'Legislação') { setView(VIEWS.LEG_VIEW); return }
-                setAreaFilter(n.id); setView(VIEWS.HOME)
-              }}
+            <button key={n.id} onClick={n.action}
               style={{
-                width: '100%', background: active ? n.color + '11' : 'none',
-                border: 'none', borderLeft: `2px solid ${active ? n.color : 'transparent'}`,
-                padding: '9px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                width: '100%', background: active ? theme.gold + '12' : 'none',
+                border: 'none', borderLeft: `3px solid ${active ? theme.gold : 'transparent'}`,
+                padding: '11px 20px', display: 'flex', alignItems: 'center', gap: 12,
                 cursor: 'pointer', color: active ? theme.text : theme.muted,
-                fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', textAlign: 'left', transition: 'all .15s',
+                fontSize: 13, textAlign: 'left', transition: 'all .15s',
               }}>
-              <span>{n.icon ? `${n.icon} ` : ''}{n.label}</span>
-              <span style={{ background: active ? n.color + '33' : theme.border + '66', color: active ? n.color : theme.muted, borderRadius: 10, padding: '1px 7px', fontSize: 10 }}>{n.count}</span>
+              <span style={{ fontSize: 14, width: 16, textAlign: 'center', color: active ? theme.gold : theme.muted }}>{n.icon}</span>
+              <span style={{ fontFamily: theme.fontBody || 'Inter, sans-serif' }}>{n.label}</span>
             </button>
           )
         })}
 
-        <div style={{ margin: '12px 0', borderTop: `1px solid ${theme.border}` }}/>
-        <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Ferramentas</div>
-
+        {/* Itens adicionais compactos */}
+        <div style={{ margin: '8px 0', borderTop: `1px solid ${theme.border}` }}/>
         {[
-          { v: VIEWS.DASHBOARD,    label: '◈ Dashboard' },
-          { v: VIEWS.EXTRAIR,     label: '📄 Extrair de Petição' },
-            { v: VIEWS.IMPORTAR,     label: '⇪ Importar Planilha' },
-          { v: VIEWS.LEG_VIEW,    label: '§ Legislação' },
-          { v: VIEWS.LEGISLACAO,  label: '§ Importar Legislação' },
-          { v: VIEWS.BUSCA,        label: '✦ Busca para Peça' },
-          { v: VIEWS.EDITOR,       label: '✎ Editor de Peças' },
-          { v: VIEWS.ALERTAS,      label: '🔔 Alertas' },
-          { v: VIEWS.FLASHCARDS,   label: '🃏 Flashcards' },
+          { v: VIEWS.BUSCA,       label: 'Busca para Peça' },
+          { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
+          { v: VIEWS.ALERTAS,     label: 'Alertas' },
         ].map(item => (
           <button key={item.v} onClick={() => setView(item.v)}
             style={{
               width: '100%', background: view === item.v ? theme.gold + '11' : 'none',
-              border: 'none', borderLeft: `2px solid ${view === item.v ? theme.gold : 'transparent'}`,
-              padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
+              border: 'none', borderLeft: `3px solid ${view === item.v ? theme.gold : 'transparent'}`,
+              padding: '8px 20px', textAlign: 'left', cursor: 'pointer',
               color: view === item.v ? theme.gold : theme.muted, fontSize: 12,
-              fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
+              fontFamily: theme.fontBody || 'Inter, sans-serif', transition: 'all .15s',
             }}>{item.label}</button>
         ))}
 
-        {/* Ações que exigem membro */}
         {isEditor && (
           <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }}
             style={{
               width: '100%', background: view === VIEWS.ADD ? theme.gold + '11' : 'none',
-              border: 'none', borderLeft: `2px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
-              padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
+              border: 'none', borderLeft: `3px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
+              padding: '8px 20px', textAlign: 'left', cursor: 'pointer',
               color: view === VIEWS.ADD ? theme.gold : theme.muted, fontSize: 12,
-              fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
+              fontFamily: theme.fontBody || 'Inter, sans-serif', transition: 'all .15s',
             }}>+ Nova Entrada</button>
-        )}
-
-        {isAdmin && (
-          <>
-            <div style={{ margin: '12px 0', borderTop: `1px solid ${theme.border}` }}/>
-            <div style={{ padding: '4px 16px 8px', fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>Administração</div>
-            <button onClick={() => setView(VIEWS.MEMBROS)}
-              style={{
-                width: '100%', background: view === VIEWS.MEMBROS ? theme.gold + '11' : 'none',
-                border: 'none', borderLeft: `2px solid ${view === VIEWS.MEMBROS ? theme.gold : 'transparent'}`,
-                padding: '9px 16px', textAlign: 'left', cursor: 'pointer',
-                color: view === VIEWS.MEMBROS ? theme.gold : theme.muted, fontSize: 12,
-                fontFamily: 'IBM Plex Mono, monospace', transition: 'all .15s',
-              }}>👥 Membros</button>
-          </>
         )}
       </div>
 
       {/* Footer */}
-      <div style={{ padding: '12px 16px', borderTop: `1px solid ${theme.border}` }}>
-        {/* Assinatura institucional */}
-        <div style={{ textAlign: 'center', marginBottom: 10, paddingBottom: 8, borderBottom: `1px solid ${theme.border}` }}>
-          <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1, marginBottom: 1 }}>Plataforma e Curadoria</div>
-          <div style={{ fontSize: 10, color: theme.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
+      <div style={{ padding: '14px 20px', borderTop: `1px solid ${theme.border}` }}>
+        <div style={{ textAlign: 'center', marginBottom: 10, paddingBottom: 10, borderBottom: `1px solid ${theme.border}` }}>
+          <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 2 }}>Plataforma e Curadoria</div>
+          <div style={{ fontSize: 11, color: theme.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 3, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -535,10 +518,6 @@ async function handleSave(entry) {
               </div>
             )}
           </div>
-          <SinoNotificacoes
-            session={session}
-            onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
-          />
           <SeletorTema />
         </div>
         {isEditor && (
@@ -878,6 +857,35 @@ case VIEWS.FLASHCARDS:
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: theme.bg }}>
       {!isMobile && <Sidebar/>}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Topbar desktop */}
+        {!isMobile && (
+          <div style={{
+            height: 56, background: theme.surface, borderBottom: `1px solid ${theme.border}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+            padding: '0 28px', gap: 12, flexShrink: 0,
+          }}>
+            <SinoNotificacoes
+              session={session}
+              onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
+            />
+            <div style={{ width: 1, height: 20, background: theme.border }} />
+            {/* Avatar + nome */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: theme.fontTitle }}>
+                  {session?.user?.email?.slice(0,2).toUpperCase() || 'JF'}
+                </span>
+              </div>
+              <span style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontBody || 'Inter, sans-serif' }}>
+                {session?.user?.user_metadata?.name || session?.user?.email?.split('@')[0] || 'Jessica Farias'}
+              </span>
+            </div>
+            <SeletorTema />
+          </div>
+        )}
         {isMobile && <MobileHeader/>}
         <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '16px 16px 80px' : 28 }}>
           {renderContent()}
