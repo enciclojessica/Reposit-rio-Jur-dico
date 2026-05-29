@@ -376,7 +376,11 @@ async function handleSave(entry) {
     setExportandoRepo(false)
   }
 
-    // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
+    // Constantes de role — declaradas antes do useMemo para evitar TDZ
+  const ROLE_COR   = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
+  const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
+
+  // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
   const SidebarEl = useMemo(() => (
     <div style={{
       width: 220, background: theme.surface,
@@ -536,10 +540,6 @@ async function handleSave(entry) {
       count: k === 'Legislação' ? countLegislacao : entradas.filter(e => e.area === k).length,
     }))
   ]
-
-  // ── Badge de papel ─────────────────────────────────────────────────────
-  const ROLE_COR = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
-  const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
 
   // ── Sidebar ────────────────────────────────────────────────────────────
 
