@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Component } from 'react'
 import { supabase } from './supabase'
 import { useTheme } from './theme'
 import Auth from './components/Auth'
