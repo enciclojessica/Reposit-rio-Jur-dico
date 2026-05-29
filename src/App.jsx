@@ -231,18 +231,7 @@ export default function App() {
     return () => supabase.removeChannel(channel)
   }, [authLoading, loadEntradas])
 
-  async function exportarRepo() {
-    if (exportandoRepo || !entradas.length) return
-    setExportandoRepo(true)
-    try { await exportarRepositorioDocx(entradas) }
-    catch (e) { console.error(e); notify('Erro ao exportar.', 'err') }
-    setExportandoRepo(false)
-  }
-
-  function notify(msg, type = 'ok') {
-    setToast({ msg, type })
-    setTimeout(() => setToast(null), 3500)
-  }
+  // exportarRepo e notify movidos para antes do useMemo — evitar TDZ
 
   async function buscarSemantico() {
     if (!search.trim() || buscandoSem) return
@@ -373,7 +362,21 @@ async function handleSave(entry) {
     notify('Complete as teses e salve.')
   }
 
-  // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
+  // ── Funções declaradas ANTES do useMemo — evitar TDZ ─────────────────────
+  function notify(msg, type = 'ok') {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3500)
+  }
+
+  async function exportarRepo() {
+    if (exportandoRepo || !entradas.length) return
+    setExportandoRepo(true)
+    try { await exportarRepositorioDocx(entradas) }
+    catch (e) { console.error(e); notify('Erro ao exportar.', 'err') }
+    setExportandoRepo(false)
+  }
+
+    // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
   const SidebarEl = useMemo(() => (
     <div style={{
       width: 220, background: theme.surface,
