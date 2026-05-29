@@ -28,5 +28,37 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Auto-recuperação: se o app não montar em 8s, limpa SW e caches e recarrega
+      (function() {
+        var montou = false;
+        window.addEventListener('DOMContentLoaded', function() {
+          setTimeout(function() {
+            var root = document.getElementById('root');
+            if (root && root.children.length === 0 && !montou) {
+              // App não montou — provável SW/cache corrompido
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                  regs.forEach(function(r) { r.unregister(); });
+                });
+              }
+              if (window.caches) {
+                caches.keys().then(function(keys) {
+                  return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+                }).then(function() {
+                  if (!sessionStorage.getItem('recarregou')) {
+                    sessionStorage.setItem('recarregou', '1');
+                    location.reload(true);
+                  }
+                });
+              }
+            } else {
+              montou = true;
+              sessionStorage.removeItem('recarregou');
+            }
+          }, 8000);
+        });
+      })();
+    </script>
   </body>
 </html>

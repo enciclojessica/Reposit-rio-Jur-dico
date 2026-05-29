@@ -52,6 +52,10 @@ export default defineConfig({
       workbox: {
         // Cache-first para assets estáticos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
+        navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           // Fontes Google — cache longo
           {
