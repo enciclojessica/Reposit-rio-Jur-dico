@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { Upload, Download, Check, X, AlertCircle, RotateCcw } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
@@ -190,19 +191,21 @@ export default function ImportacaoLote({ session }) {
       {etapa === 'upload' && (
         <>
           <div style={{ ...card, borderStyle: 'dashed', textAlign: 'center', padding: 40 }}>
-            <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.4 }}>📊</div>
-            <div style={{ fontSize: 14, color: theme.text, marginBottom: 8 }}>
-              Arraste uma planilha ou clique para selecionar
+            <div style={{ marginBottom: 12, opacity: 0.4, display: 'flex', justifyContent: 'center' }}>
+              <Upload size={40} color={theme.muted} />
+            </div>
+            <div style={{ fontSize: 14, color: theme.text, marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>
+              Selecione uma planilha para importar
             </div>
             <div style={{ fontSize: 12, color: theme.muted, marginBottom: 20 }}>
               Formatos aceitos: .xlsx, .xls, .csv
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={gerarTemplate}
-                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
-                ↓ Baixar template
+                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Download size={14} /> Template
               </button>
-              <label style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+              <label style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 + Selecionar arquivo
                 <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleArquivo} style={{ display: 'none' }} />
               </label>
@@ -217,7 +220,7 @@ export default function ImportacaoLote({ session }) {
 
           {/* Instruções */}
           <div style={card}>
-            <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }}>
+            <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
               Formato esperado
             </div>
             <div style={{ overflowX: 'auto' }}>
@@ -244,7 +247,7 @@ export default function ImportacaoLote({ session }) {
                     ['aplicacao_pratica', '', 'Texto livre', 'Usar em petições de indenização.'],
                   ].map(([col, req, vals, ex]) => (
                     <tr key={col}>
-                      <td style={{ padding: '6px 10px', fontFamily: 'monospace', color: theme.gold, borderBottom: `1px solid ${theme.border}22` }}>{col}</td>
+                      <td style={{ padding: '6px 10px', fontFamily: 'Inter, sans-serif', color: theme.gold, borderBottom: `1px solid ${theme.border}22` }}>{col}</td>
                       <td style={{ padding: '6px 10px', color: req ? theme.error : theme.muted, textAlign: 'center', borderBottom: `1px solid ${theme.border}22` }}>{req || '—'}</td>
                       <td style={{ padding: '6px 10px', color: theme.muted, borderBottom: `1px solid ${theme.border}22` }}>{vals}</td>
                       <td style={{ padding: '6px 10px', color: theme.text, borderBottom: `1px solid ${theme.border}22`, fontStyle: 'italic' }}>{ex}</td>
@@ -263,12 +266,12 @@ export default function ImportacaoLote({ session }) {
           {/* Resumo */}
           <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
             <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderLeft: `3px solid ${theme.success}` }}>
-              <div style={{ fontSize: 26, fontWeight: 700, color: theme.success, fontFamily: 'IBM Plex Mono, monospace' }}>{validas}</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: theme.success, fontFamily: 'Inter, sans-serif' }}>{validas}</div>
               <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>prontas para importar</div>
             </div>
             {invalidas > 0 && (
               <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderLeft: `3px solid ${theme.error}` }}>
-                <div style={{ fontSize: 26, fontWeight: 700, color: theme.error, fontFamily: 'IBM Plex Mono, monospace' }}>{invalidas}</div>
+                <div style={{ fontSize: 26, fontWeight: 700, color: theme.error, fontFamily: 'Inter, sans-serif' }}>{invalidas}</div>
                 <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>com erros — serão ignoradas</div>
               </div>
             )}
@@ -292,7 +295,7 @@ export default function ImportacaoLote({ session }) {
                     return (
                       <tr key={idx} style={{ background: temErro ? (mode === 'dark' ? '#2a0a0a' : '#fff5f5') : 'transparent' }}>
                         <td style={{ padding: '8px 12px', color: temErro ? theme.error : theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>
-                          {temErro ? '✕' : '✓'} {idx + 1}
+                          {temErro ? <X size={11} color={theme.error} /> : <Check size={11} color={theme.success} />} {idx + 1}
                         </td>
                         <td style={{ padding: '8px 12px', color: AREAS[parsed.area]?.color || theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.area}</td>
                         <td style={{ padding: '8px 12px', color: theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.tipo}</td>
@@ -315,11 +318,11 @@ export default function ImportacaoLote({ session }) {
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             <button onClick={reiniciar}
-              style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+              style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
               ← Cancelar
             </button>
             <button onClick={importar} disabled={validas === 0}
-              style={{ background: validas === 0 ? theme.border : theme.gold, color: validas === 0 ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: validas === 0 ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+              style={{ background: validas === 0 ? theme.border : theme.gold, color: validas === 0 ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: validas === 0 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}>
               Importar {validas} entrada{validas !== 1 ? 's' : ''}
             </button>
           </div>
@@ -329,8 +332,10 @@ export default function ImportacaoLote({ session }) {
       {/* ── Etapa 3: Importando ─────────────────────────────────────────── */}
       {etapa === 'importando' && (
         <div style={{ ...card, textAlign: 'center', padding: 60 }}>
-          <div style={{ fontSize: 32, marginBottom: 16 }}>⟳</div>
-          <div style={{ fontSize: 14, color: theme.text, marginBottom: 20 }}>Importando entradas...</div>
+          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+            <RotateCcw size={32} color={theme.gold} style={{ animation: 'spin 1s linear infinite' }} />
+          </div>
+          <div style={{ fontSize: 14, color: theme.text, marginBottom: 20, fontFamily: 'Inter, sans-serif' }}>Importando entradas...</div>
           <div style={{ background: theme.border, borderRadius: 8, height: 8, overflow: 'hidden', maxWidth: 320, margin: '0 auto' }}>
             <div style={{ height: '100%', background: theme.gold, width: `${progresso}%`, transition: 'width .3s ease', borderRadius: 8 }} />
           </div>
@@ -341,7 +346,7 @@ export default function ImportacaoLote({ session }) {
       {/* ── Etapa 4: Concluído ──────────────────────────────────────────── */}
       {etapa === 'concluido' && (
         <div style={{ ...card, textAlign: 'center', padding: 50 }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>{resultados.erro === 0 ? '✓' : '⚠'}</div>
+          <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>{resultados.erro === 0 ? <Check size={40} color={theme.success} /> : <AlertCircle size={40} color={theme.error} />}</div>
           <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
             Importação concluída
           </div>
@@ -350,7 +355,7 @@ export default function ImportacaoLote({ session }) {
             {resultados.erro > 0 && <span style={{ color: theme.error }}> · {resultados.erro} com erro</span>}
           </div>
           <button onClick={reiniciar}
-            style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginTop: 20 }}>
+            style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginTop: 20 }}>
             Importar mais
           </button>
         </div>
