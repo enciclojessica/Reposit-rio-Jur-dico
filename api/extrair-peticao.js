@@ -12,8 +12,8 @@ export default async function handler(req, res) {
   if (!anthropicKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
   if (!serviceKey)   return res.status(500).json({ error: 'SUPABASE_SERVICE_KEY não configurada.' })
 
-  const { pdf_base64, filename, user_id } = req.body
-  if (!pdf_base64) return res.status(400).json({ error: 'PDF não recebido.' })
+  const { pdf_base64, media_type, filename, user_id } = req.body
+  if (!pdf_base64) return res.status(400).json({ error: 'Arquivo não recebido.' })
   if (!user_id)    return res.status(400).json({ error: 'user_id obrigatório.' })
 
   // ── Chamar Claude ────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         messages: [{
           role: 'user',
           content: [
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdf_base64 } },
+            { type: 'document', source: { type: 'base64', media_type: media_type || 'application/pdf', data: pdf_base64 } },
             { type: 'text', text: `Extraia o conhecimento jurídico desta peça${filename ? ` (${filename})` : ''}. Retorne APENAS o JSON, sem nenhum texto adicional.` },
           ],
         }],

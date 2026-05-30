@@ -28,11 +28,17 @@ export default function ExtrairPeticao() {
         reader.readAsDataURL(arquivo)
       })
 
+      const ext = arquivo.name.split('.').pop().toLowerCase()
+      const mediaType = ext === 'pdf' ? 'application/pdf'
+        : ext === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : 'application/msword'
+
       const res  = await fetch('/api/extrair-peticao', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pdf_base64: base64,
+          media_type: mediaType,
           filename:   arquivo.name,
           user_id:    session.user.id,
         }),
@@ -67,7 +73,7 @@ export default function ExtrairPeticao() {
           Extrair de Petição
         </div>
         <div style={{ fontSize: 12, color: theme.muted, lineHeight: 1.6 }}>
-          Suba uma petição em PDF. O sistema extrai as teses jurídicas e os artigos citados e salva diretamente no repositório e na legislação.
+          Suba uma petição em PDF ou Word (.docx). O sistema extrai as teses jurídicas e os artigos citados e salva diretamente no repositório e na legislação.
         </div>
       </div>
 
@@ -78,14 +84,14 @@ export default function ExtrairPeticao() {
             <>
               <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.4 }}>📄</div>
               <div style={{ fontSize: 14, color: theme.text, marginBottom: 8 }}>
-                Selecione a petição em PDF
+                Selecione a petição (PDF ou Word)
               </div>
               <div style={{ fontSize: 12, color: theme.muted, marginBottom: 20 }}>
-                Petições iniciais, contestações, recursos, memoriais...
+                Petições iniciais, contestações, recursos, memoriais — PDF ou Word (.docx)
               </div>
               <label style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
-                + Selecionar PDF
-                <input ref={fileRef} type="file" accept=".pdf" onChange={e => setArquivo(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+                + Selecionar arquivo
+                <input ref={fileRef} type="file" accept=".pdf,.docx,.doc" onChange={e => setArquivo(e.target.files?.[0] || null)} style={{ display: 'none' }} />
               </label>
             </>
           ) : (
