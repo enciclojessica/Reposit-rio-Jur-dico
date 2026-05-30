@@ -13,6 +13,7 @@ import Dashboard from './components/Dashboard'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
+import ImportarHub from './components/ImportarHub'
 import Legislacao from './components/Legislacao'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
@@ -666,24 +667,7 @@ async function handleSave(entry) {
 case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
 
-      case VIEWS.EXTRAIR:
-        return (
-          <div className="fade-up">
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              {[
-                { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
-                { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
-                { v: VIEWS.EXTRAIR,    label: 'Extrair de Petição' },
-              ].map(btn => (
-                <button key={btn.v} onClick={() => setView(btn.v)}
-                  style={{ background: btn.v === VIEWS.EXTRAIR ? theme.gold + '22' : theme.raised, border: `1px solid ${btn.v === VIEWS.EXTRAIR ? theme.gold + '55' : theme.border}`, color: btn.v === VIEWS.EXTRAIR ? theme.gold : theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-            <ExtrairPeticao />
-          </div>
-        )
+
 
       case VIEWS.CONFIG:
         return (
@@ -695,52 +679,12 @@ case VIEWS.FLASHCARDS:
       case VIEWS.LEG_VIEW:
         return <div className="fade-up"><Legislacao /></div>
 
-      case VIEWS.LEGISLACAO:
-        return (
-          <div className="fade-up">
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              {[
-                { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
-                { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
-                { v: VIEWS.EXTRAIR,    label: 'Extrair de Petição' },
-              ].map(btn => (
-                <button key={btn.v} onClick={() => setView(btn.v)}
-                  style={{ background: btn.v === VIEWS.LEGISLACAO ? theme.gold + '22' : theme.raised, border: `1px solid ${btn.v === VIEWS.LEGISLACAO ? theme.gold + '55' : theme.border}`, color: btn.v === VIEWS.LEGISLACAO ? theme.gold : theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-            <ImportarLegislacao />
-          </div>
-        )
 
+
+      case VIEWS.EXTRAIR:
+      case VIEWS.LEGISLACAO:
       case VIEWS.IMPORTAR:
-        if (!session) return (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: theme.muted }}>
-            <div style={{ marginBottom: 16, opacity: 0.2, display:'flex', justifyContent:'center' }}><Lock size={48} /></div>
-            <div style={{ fontSize: 14, color: theme.text, marginBottom: 8 }}>Faça login para importar dados.</div>
-            <button onClick={() => setShowLogin(true)} style={{ background: theme.gold, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-              Acessar
-            </button>
-          </div>
-        )
-        return (
-          <div className="fade-up">
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              {[
-                { v: VIEWS.IMPORTAR,   label: '⇪ Importar Planilha' },
-                { v: VIEWS.LEGISLACAO, label: '§ Importar Legislação' },
-                { v: VIEWS.EXTRAIR,    label: 'Extrair de Petição' },
-              ].map(btn => (
-                <button key={btn.v} onClick={() => setView(btn.v)}
-                  style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-            <ImportacaoLote session={session} />
-          </div>
-        )
+        return <ImportarHub session={session} initialTab={view} setView={setView} theme={theme} />
 
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas}/></div>
