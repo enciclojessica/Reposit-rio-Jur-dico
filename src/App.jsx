@@ -549,8 +549,21 @@ async function handleSave(entry) {
   // ── Mobile header ──────────────────────────────────────────────────────
   const MobileHeader = () => (
     <div style={{ background: theme.surface, borderBottom: `1px solid ${theme.borderGold}`, padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <div style={{ background: theme.logoBg, borderRadius: 6, padding: '4px 8px 3px', border: mode === 'light' ? `1px solid ${theme.border}` : 'none' }}>
-        <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 32, width: 'auto', display: 'block' }}/>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{
+          width: 36, height: 36, borderRadius: '50%',
+          background: '#800020', border: '2px solid #C5A059',
+          overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <img src="/logo-temis.png" alt="Síntese Jurídica"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={e => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:14px">FF</span>' }}
+          />
+        </div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Síntese Jurídica</div>
+          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>Curadoria Jurídica</div>
+        </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
