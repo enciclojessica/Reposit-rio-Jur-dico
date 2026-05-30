@@ -88,30 +88,7 @@ function Donut({ fatias, raio = 52 }) {
         ))}
       </div>
 
-      {/* Mais citadas no editor */}
-      {stats.maisUsadas.length > 0 && (
-        <div style={{ ...card, marginTop: 14 }}>
-          <div style={secLabel}>Mais citadas em pecas</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {stats.maisUsadas.map((e, i) => {
-              const cor = AREAS[e.area]?.color || C.muted
-              const pct = Math.max(20, (e.uso_count / stats.maisUsadas[0].uso_count) * 80)
-              return (
-                <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, color: C.cream, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.tema}</div>
-                    <div style={{ fontSize: 10, color: C.muted }}>{e.fonte}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <div style={{ height: 6, background: cor, borderRadius: 3, width: pct }} />
-                    <span style={{ fontSize: 11, color: cor, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace', minWidth: 24, textAlign: 'right' }}>{e.uso_count}</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }
@@ -305,6 +282,31 @@ export default function Dashboard({ entradas }) {
             </div>
           )}
         </div>
+
+        {/* Mais citadas */}
+        {stats.maisUsadas.length > 0 && (
+          <div style={card}>
+            <div style={secLabel}>Mais citadas em peças</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {stats.maisUsadas.map(e => {
+                const cor = AREAS[e.area]?.color || theme.muted
+                const pct = Math.max(16, (e.uso_count / stats.maisUsadas[0].uso_count) * 80)
+                return (
+                  <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, color: theme.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'IBM Plex Mono, monospace' }}>{e.tema}</div>
+                      <div style={{ fontSize: 10, color: theme.muted, marginTop: 2 }}>{e.fonte}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      <div style={{ height: 6, background: cor, borderRadius: 3, width: pct, opacity: 0.75 }} />
+                      <span style={{ fontSize: 11, color: cor, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace', minWidth: 24, textAlign: 'right' }}>{e.uso_count}</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Entradas recentes */}
         <div style={card}>
