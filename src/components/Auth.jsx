@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { Lock, Mail, Eye, EyeOff, Moon, Sun, AlertCircle, CheckCircle } from 'lucide-react'
 
 export default function Auth() {
   const { theme, mode, toggle } = useTheme()
-  const [email, setEmail] = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [screen, setScreen] = useState('login') // login | register | forgot
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [screen, setScreen]     = useState('login') // login | register | forgot
+  const [loading, setLoading]   = useState(false)
+  const [error, setError]       = useState('')
+  const [success, setSuccess]   = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -27,142 +29,176 @@ export default function Auth() {
           redirectTo: window.location.origin + '/reset-password',
         })
         if (error) setError(error.message)
-        else setSuccess('Link de redefinição enviado para ' + email + '. Verifique sua caixa de entrada.')
+        else setSuccess('Link enviado para ' + email + '. Verifique sua caixa de entrada.')
       }
     } catch { setError('Erro inesperado. Tente novamente.') }
     setLoading(false)
   }
 
-  const titles = { login: 'Acesso', register: 'Cadastro', forgot: 'Redefinir Senha' }
-  const btnLabels = { login: 'ENTRAR', register: 'CRIAR CONTA', forgot: 'ENVIAR LINK' }
+  const bgPage = mode === 'dark'
+    ? 'linear-gradient(160deg, #0f0a0b 0%, #1a0f10 60%, #0f0a0b 100%)'
+    : 'linear-gradient(160deg, #fdfbf7 0%, #f5f0e8 60%, #fdfbf7 100%)'
+
+  const inp = {
+    width: '100%', background: theme.raised,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 8, padding: '10px 14px',
+    color: theme.text, fontSize: 13,
+    fontFamily: 'Inter, sans-serif',
+    outline: 'none', transition: 'border-color .15s',
+    boxSizing: 'border-box',
+  }
 
   return (
     <div style={{
-      minHeight: '100vh',
-      background: mode === 'dark'
-        ? 'linear-gradient(135deg, #060a12 0%, #0b0f1a 50%, #0f1525 100%)'
-        : 'linear-gradient(135deg, #ebe7dd 0%, #f4f1ea 50%, #f9f7f3 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
-      position: 'relative',
+      minHeight: '100vh', background: bgPage,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 24, position: 'relative',
     }}>
-      {/* Theme toggle */}
+      {/* Toggle tema */}
       <button onClick={toggle} style={{
         position: 'fixed', top: 16, right: 16,
         background: theme.raised, border: `1px solid ${theme.border}`,
-        borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
-        color: theme.muted, fontSize: 18, lineHeight: 1,
+        borderRadius: 8, padding: '7px 12px', cursor: 'pointer',
+        color: theme.muted, display: 'flex', alignItems: 'center', gap: 6,
+        fontSize: 12, fontFamily: 'Inter, sans-serif',
       }}>
-        {mode === 'dark' ? '☀️' : '🌙'}
+        {mode === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+        {mode === 'dark' ? 'Claro' : 'Escuro'}
       </button>
 
       <div style={{ width: '100%', maxWidth: 400 }}>
+
+        {/* Logo Têmis + identidade */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: '50%',
+            background: '#800020',
+            border: '3px solid #C5A059',
+            boxShadow: '0 8px 32px rgba(128,0,32,0.3)',
+            overflow: 'hidden', margin: '0 auto 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <img src="/logo-temis.png" alt="Síntese Jurídica"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={e => {
+                e.target.style.display = 'none'
+                e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:24px">FF</span>'
+              }}
+            />
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.2, marginBottom: 4 }}>
+            Síntese Jurídica
+          </div>
+          <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 3, fontFamily: 'Inter, sans-serif' }}>
+            Curadoria Jurídica · Farias Fusquiani
+          </div>
+        </div>
+
         {/* Card */}
         <div style={{
           background: theme.surface,
-          border: `1px solid ${theme.borderGold}`,
-          borderRadius: 16, padding: '32px 32px 28px',
+          border: `1px solid ${theme.border}`,
+          borderRadius: 16, padding: '28px 28px 24px',
           boxShadow: theme.shadow,
         }}>
-          {/* Logo */}
-          <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <div style={{
-              display: 'inline-block',
-              background: theme.logoBg,
-              borderRadius: 12,
-              padding: '12px 20px 8px',
-              boxShadow: '0 4px 20px #00000022',
-              border: mode === 'light' ? `1px solid ${theme.border}` : 'none',
-            }}>
-              <img src="/logo.png" alt="Farias Fusquiani"
-                style={{ height: 110, width: 'auto', display: 'block' }}/>
+          {/* Título da tela */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22 }}>
+            <div style={{ flex: 1, height: 1, background: theme.border }} />
+            <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, fontFamily: 'Inter, sans-serif' }}>
+              {{ login: 'Acesso', register: 'Cadastro', forgot: 'Redefinir Senha' }[screen]}
             </div>
-          </div>
-
-          {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <div style={{ flex: 1, height: 1, background: theme.border }}/>
-            <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2 }}>
-              {titles[screen]}
-            </div>
-            <div style={{ flex: 1, height: 1, background: theme.border }}/>
+            <div style={{ flex: 1, height: 1, background: theme.border }} />
           </div>
 
           <form onSubmit={handleSubmit}>
+            {/* E-mail */}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 }}>E-mail</div>
-              <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="seu@email.com" required autoComplete="email"
-                style={{ background: theme.inputBg, border: `1px solid ${theme.border}`, color: theme.text }}
-              />
+              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>E-mail</div>
+              <div style={{ position: 'relative' }}>
+                <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder="seu@email.com" required autoComplete="email"
+                  style={{ ...inp, paddingLeft: 36 }} />
+              </div>
             </div>
 
+            {/* Senha */}
             {screen !== 'forgot' && (
-              <div style={{ marginBottom: screen === 'login' ? 8 : 20 }}>
-                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 }}>Senha</div>
-                <input
-                  type="password" value={password} onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••" required minLength={6}
-                  autoComplete={screen === 'login' ? 'current-password' : 'new-password'}
-                  style={{ background: theme.inputBg, border: `1px solid ${theme.border}`, color: theme.text }}
-                />
+              <div style={{ marginBottom: screen === 'login' ? 8 : 18 }}>
+                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Senha</div>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
+                  <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••" required minLength={6}
+                    autoComplete={screen === 'login' ? 'current-password' : 'new-password'}
+                    style={{ ...inp, paddingLeft: 36, paddingRight: 38 }} />
+                  <button type="button" onClick={() => setShowPass(s => !s)}
+                    style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', padding: 2 }}>
+                    {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Esqueci a senha — só no login */}
+            {/* Esqueci a senha */}
             {screen === 'login' && (
-              <div style={{ textAlign: 'right', marginBottom: 20 }}>
-                <button type="button"
-                  onClick={() => { setScreen('forgot'); setError(''); setSuccess('') }}
-                  style={{
-                    background: 'none', border: 'none', color: theme.gold,
-                    fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
-                  }}>
+              <div style={{ textAlign: 'right', marginBottom: 18 }}>
+                <button type="button" onClick={() => { setScreen('forgot'); setError(''); setSuccess('') }}
+                  style={{ background: 'none', border: 'none', color: theme.gold, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                   Esqueci a senha
                 </button>
               </div>
             )}
 
+            {/* Mensagens */}
             {error && (
-              <div style={{ background: mode === 'dark' ? '#3b0f0f' : '#fef2f2', border: `1px solid ${theme.error}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: theme.error, marginBottom: 14 }}>
-                {error}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: mode === 'dark' ? '#2a0f0f' : '#fff0f0', border: `1px solid ${theme.error}44`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: theme.error, marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
+                <AlertCircle size={14} /> {error}
               </div>
             )}
             {success && (
-              <div style={{ background: mode === 'dark' ? '#0f2b1a' : '#f0fdf4', border: `1px solid ${theme.success}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: theme.success, marginBottom: 14 }}>
-                {success}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: mode === 'dark' ? '#0a1a10' : '#f0fdf4', border: `1px solid ${theme.success}44`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: theme.success, marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
+                <CheckCircle size={14} /> {success}
               </div>
             )}
 
+            {/* Botão principal */}
             <button type="submit" disabled={loading} style={{
               width: '100%',
-              background: loading ? theme.raised : `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`,
-              color: loading ? theme.muted : '#0b0f1a',
-              border: 'none', borderRadius: 8, padding: '12px',
-              fontSize: 14, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace',
+              background: loading ? theme.border : theme.gold,
+              color: loading ? theme.muted : '#fff',
+              border: 'none', borderRadius: 8, padding: '11px',
+              fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif',
               cursor: loading ? 'not-allowed' : 'pointer',
-              marginBottom: 14, letterSpacing: 1,
+              marginBottom: 16, letterSpacing: 0.5,
               boxShadow: loading ? 'none' : `0 4px 16px ${theme.gold}44`,
+              transition: 'all .15s',
             }}>
-              {loading ? '...' : btnLabels[screen]}
+              {loading ? '...' : { login: 'Entrar', register: 'Criar conta', forgot: 'Enviar link' }[screen]}
             </button>
           </form>
 
-          {/* Links de navegação */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+          {/* Links auxiliares */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             {screen !== 'login' && (
               <button onClick={() => { setScreen('login'); setError(''); setSuccess('') }}
-                style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 Já tenho conta
               </button>
             )}
             {screen !== 'register' && (
               <button onClick={() => { setScreen('register'); setError(''); setSuccess('') }}
-                style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 Criar conta
               </button>
             )}
           </div>
+        </div>
+
+        {/* Rodapé */}
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 10, color: theme.muted, fontFamily: 'Inter, sans-serif', letterSpacing: 1, textTransform: 'uppercase', opacity: 0.6 }}>
+          Plataforma e Curadoria · Farias Fusquiani
         </div>
       </div>
     </div>
