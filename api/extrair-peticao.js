@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
+export const config = { maxDuration: 60 } // Vercel Pro/hobby max
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
@@ -14,86 +16,108 @@ export default async function handler(req, res) {
   if (!pdf_base64) return res.status(400).json({ error: 'PDF não recebido.' })
   if (!user_id)    return res.status(400).json({ error: 'user_id obrigatório.' })
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': anthropicKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 4000,
-      system: `Você é um Doutrinador e Estrategista Processual de alto rigor técnico. Sua missão ao analisar qualquer documento jurídico — seja uma petição inicial, sentença, acórdão, trecho doutrinário ou dispositivo legal — é extrair conhecimento jurídico universal e abstrato, completamente desvinculado dos fatos concretos narrados no documento.
+  // ── Chamar Claude ────────────────────────────────────────────────────
+  let claudeRes
+  try {
+    claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 4000,
+        system: `Você é um Doutrinador e Estrategista Processual. Analise o documento e extraia conhecimento jurídico universal e abstrato, completamente desvinculado dos fatos concretos do caso.
 
-REGRA ABSOLUTA: Jamais registre, resuma ou faça referência aos fatos específicos do caso (nomes das partes, endereços, valores envolvidos, descrições de eventos como acidentes, infiltrações, cancelamentos de voo, etc.). O produto final deve ser integralmente reutilizável em qualquer demanda futura que envolva os mesmos institutos jurídicos.
+REGRA ABSOLUTA: Jamais mencione fatos específicos do caso (partes, valores, eventos concretos). Todo conteúdo deve ser reutilizável em qualquer demanda futura.
 
-Retorne APENAS um objeto JSON válido, sem markdown:
+Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto antes ou depois:
 {
   "meta": {
-    "tipo_peca": "ex: Petição Inicial, Sentença, Acórdão, Artigo Doutrinário...",
-    "numero_processo": "se houver, senão null",
-    "resultado": "ex: Procedente, Improcedente, Acordo, Em andamento, Desconhecido"
+    "tipo_peca": "string",
+    "numero_processo": "string ou null",
+    "resultado": "string ou null"
   },
   "teses": [
     {
-      "area": "Cível, Penal ou Doutrina",
-      "tipo": "jurisprudência, doutrina, súmula ou lei",
-      "tema": "tema jurídico abstrato e universal — ex: 'Responsabilidade civil extracontratual — configuração do nexo causal'",
-      "fonte": "tribunal, autor ou órgão",
-      "referencia": "número do processo, súmula, obra ou referência bibliográfica",
-      "tese_assunto": "Enunciado da tese em linguagem universal e abstrata, pronta para uso em qualquer demanda",
-      "fundamentacao_legal": "dispositivos legais e súmulas aplicáveis",
-      "precedente_sumula": "precedente ou súmula vinculante se houver",
-      "ratio_decidendi": "Fundamento determinante do entendimento, extraído em nível de princípio geral, sem menção ao caso concreto",
-      "aplicacao_pratica": "Tese universal e abstrata: regra geral diretamente aplicável a múltiplos cenários e ritos processuais, ignorando integralmente os fatos específicos do documento analisado. Redigida como instrução tática pronta para uso imediato em demandas futuras."
+      "area": "Cível",
+      "tipo": "jurisprudência",
+      "tema": "string",
+      "fonte": "string",
+      "referencia": "string",
+      "tese_assunto": "string",
+      "fundamentacao_legal": "string",
+      "precedente_sumula": "string",
+      "ratio_decidendi": "string",
+      "aplicacao_pratica": "string"
     }
   ],
   "artigos": [
     {
-      "codigo": "cpc, cdc, cc, cpp, cf, lei9099 ou código da lei (ex: lei8078)",
+      "codigo": "cpc",
       "numero": 300,
-      "inciso": "I, II... ou null",
-      "paragrafo": "§1º... ou null",
-      "texto": "Texto literal e íntegro do dispositivo legal conforme o documento",
-      "aplicacao_pratica": "Tese processual ou material universal extraída deste dispositivo: regra abstrata e reutilizável que explica como e quando este artigo deve ser invocado, independentemente dos fatos concretos do documento analisado",
-      "contexto": "COMENTÁRIO DIDÁTICO em duas camadas obrigatórias — Camada 1 (Clareza): explique a essência do dispositivo sem jargões, de forma que um estudante do primeiro semestre compreenda imediatamente sua função e seu propósito no sistema jurídico. Camada 2 (Profundidade Técnica): analise os requisitos materiais, exceções processuais, súmulas correlatas, entendimentos divergentes e armadilhas processuais que advogados seniores precisam dominar ao invocar este dispositivo em juízo.",
-      "resultado": "null — não referenciar resultado de caso concreto"
+      "inciso": null,
+      "paragrafo": null,
+      "texto": "string",
+      "aplicacao_pratica": "string",
+      "contexto": "string"
     }
   ]
-}
+}`,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdf_base64 } },
+            { type: 'text', text: `Extraia o conhecimento jurídico desta peça${filename ? ` (${filename})` : ''}. Retorne APENAS o JSON, sem nenhum texto adicional.` },
+          ],
+        }],
+      }),
+    })
+  } catch (err) {
+    return res.status(500).json({ error: `Erro ao chamar IA: ${err.message}` })
+  }
 
-CRITÉRIOS DE QUALIDADE:
-— Cada tese e cada artigo extraído deve ser um ativo de conhecimento autônomo, compreensível e aplicável sem qualquer referência ao documento de origem.
-— O campo aplicacao_pratica deve ser redigido como uma regra geral (ex: 'Em ações de responsabilidade civil, o pedido de tutela de urgência exige...'), nunca como relato do que ocorreu no caso.
-— O campo contexto dos artigos deve sempre ter as duas camadas: didática e técnica. Nunca omita nenhuma das duas.
-— Extraia todas as teses identificáveis e todos os artigos legais citados ou fundamentantes no documento.`,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdf_base64 } },
-          { type: 'text', text: `Analise este documento jurídico${filename ? ` (${filename})` : ''} e extraia o conhecimento jurídico universal conforme as instruções. Retorne apenas o JSON.` },
-        ],
-      }],
-    }),
-  })
+  const claudeJson = await claudeRes.json()
+  if (claudeJson.error) return res.status(500).json({ error: claudeJson.error.message })
 
-  const json = await response.json()
-  if (json.error) return res.status(500).json({ error: json.error.message })
+  // ── Parser defensivo — trata respostas não-JSON ───────────────────────
+  const text = (claudeJson.content || [])
+    .filter(b => b.type === 'text')
+    .map(b => b.text)
+    .join('')
 
-  const text  = (json.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
-  const match = text.match(/\{[\s\S]*\}/)
-  if (!match) return res.status(422).json({ error: 'Não foi possível extrair dados do documento.' })
+  let dados
+  try {
+    // Tentar parse direto
+    dados = JSON.parse(text.trim())
+  } catch {
+    // Extrair JSON com regex
+    const match = text.match(/\{[\s\S]*\}/)
+    if (!match) {
+      return res.status(422).json({
+        error: 'A IA não retornou JSON válido. Tente com um PDF menor ou mais legível.',
+        raw_preview: text.slice(0, 300),
+      })
+    }
+    try {
+      dados = JSON.parse(match[0])
+    } catch (e2) {
+      return res.status(422).json({
+        error: `JSON inválido extraído: ${e2.message}. Tente com um PDF diferente.`,
+        raw_preview: match[0].slice(0, 300),
+      })
+    }
+  }
 
-  const dados    = JSON.parse(match[0])
+  // ── Salvar no Supabase ────────────────────────────────────────────────
   const supabase = createClient(supabaseUrl, serviceKey)
   const origem   = filename || dados.meta?.tipo_peca || 'Documento importado'
 
-  let tesesSalvas   = 0
-  let artigosSalvos = 0
+  let tesesSalvas = 0, artigosSalvos = 0
   const erros = []
 
-  // Salvar teses no repositório
   for (const t of (dados.teses || [])) {
     if (!t.tema?.trim()) continue
     const { error } = await supabase.from('entradas').insert({
@@ -118,20 +142,15 @@ CRITÉRIOS DE QUALIDADE:
     else tesesSalvas++
   }
 
-  // Salvar artigos na legislação (com deduplicação)
   for (const a of (dados.artigos || [])) {
     if (!a.codigo?.trim() || !a.numero) continue
-
-    // Deletar duplicata se existir
-    const delQ = supabase.from('legislacao')
+    // Deduplicar
+    await supabase.from('legislacao')
       .delete()
       .eq('codigo', a.codigo.toLowerCase())
       .eq('numero', parseInt(a.numero))
-    if (a.inciso)    delQ.eq('inciso', a.inciso)
-    else             delQ.is('inciso', null)
-    if (a.paragrafo) delQ.eq('paragrafo', a.paragrafo)
-    else             delQ.is('paragrafo', null)
-    await delQ
+      .is('inciso', a.inciso || null)
+      .is('paragrafo', a.paragrafo || null)
 
     const { error } = await supabase.from('legislacao').insert({
       codigo:            a.codigo.toLowerCase(),

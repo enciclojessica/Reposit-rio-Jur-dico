@@ -17,10 +17,15 @@ function viewToAba(view) {
   return 'planilha'
 }
 
-export default function ImportarHub({ session, initialTab, setView, theme: themeProp }) {
+export default function ImportarHub({ session, initialTab, onAbaChange, setView, theme: themeProp }) {
   const { theme } = useTheme()
   const t = theme || themeProp
   const [aba, setAba] = useState(() => viewToAba(initialTab))
+
+  function trocarAba(novaAba) {
+    setAba(novaAba)
+    if (onAbaChange) onAbaChange(novaAba)
+  }
 
   if (!session) return (
     <div style={{ textAlign: 'center', padding: '80px 24px' }}>
@@ -59,7 +64,7 @@ export default function ImportarHub({ session, initialTab, setView, theme: theme
           return (
             <button
               key={a.id}
-              onClick={() => setAba(a.id)}
+              onClick={() => trocarAba(a.id)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 7,
                 padding: '10px 18px',
