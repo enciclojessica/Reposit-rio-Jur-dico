@@ -1,10 +1,15 @@
 import { useTheme } from './theme'
 
 export const AREAS = {
-  'Cível':       { color: '#3b82f6', icon: '⚖️' },
-  'Penal':       { color: '#ef4444', icon: '🔒' },
-  'Doutrina':    { color: '#a855f7', icon: '📚' },
-  'Legislação':   { color: '#0ea5e9', icon: '§' },
+  'Cível':          { color: '#800020', icon: '⚖' },
+  'Penal':          { color: '#ef4444', icon: '§' },
+  'Constitucional': { color: '#c9a452', icon: '§' },
+  'Trabalhista':    { color: '#f59e0b', icon: '§' },
+  'Tributário':     { color: '#0ea5e9', icon: '§' },
+  'Administrativo': { color: '#10b981', icon: '§' },
+  'Consumidor':     { color: '#8b5cf6', icon: '§' },
+  'Doutrina':       { color: '#a855f7', icon: '§' },
+  'Legislação':     { color: '#6b7280', icon: '§' },
 }
 
 export const TIPOS = ['jurisprudência', 'doutrina', 'súmula', 'lei']
