@@ -3,7 +3,7 @@ import { AREAS } from '../shared'
 import { TagPill } from './TagInput'
 import { useTheme } from '../theme'
 
-export default function EntradaList({ entradas, onSelect }) {
+export default function EntradaList({ entradas, onSelect, onImportar }) {
   const { theme } = useTheme()
   const [modoTabela, setModoTabela] = useState(false)
 

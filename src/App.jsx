@@ -78,6 +78,7 @@ export default function App() {
   const [view, setView]             = useState(VIEWS.HOME)
   const [areaFilter, setAreaFilter] = useState('all')
   const [tipoFilter, setTipoFilter]   = useState('all')
+  const [importarAba, setImportarAba]   = useState('planilha')
   const [tagFilter, setTagFilter]   = useState(null)
   const [ordenacao, setOrdenacao]    = useState('data_desc')
   const [search, setSearch]         = useState('')
@@ -684,7 +685,7 @@ case VIEWS.FLASHCARDS:
       case VIEWS.EXTRAIR:
       case VIEWS.LEGISLACAO:
       case VIEWS.IMPORTAR:
-        return <ImportarHub session={session} initialTab={view} setView={setView} theme={theme} />
+        return <ImportarHub session={session} initialTab={importarAba} setView={setView} theme={theme} />
 
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas}/></div>
@@ -887,7 +888,7 @@ case VIEWS.FLASHCARDS:
                 </select>
               )}
             </div>
-            <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}/>
+            <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }} onImportar={aba => { setImportarAba(aba || 'planilha'); setView(VIEWS.IMPORTAR) }}/>
           </div>
         )
     }
