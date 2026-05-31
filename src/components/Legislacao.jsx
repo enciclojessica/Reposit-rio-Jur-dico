@@ -248,8 +248,7 @@ export default function Legislacao() {
         `Art. ${a.numero}`,
         a.inciso    || '',
         a.paragrafo || '',
-        (a.texto    || '').replace(/
-/g, ' '),
+        (a.texto    || '').split('\n').join(' '),
       ])
 
       // Gera CSV com BOM UTF-8 para Excel abrir corretamente
