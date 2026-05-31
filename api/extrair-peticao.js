@@ -44,10 +44,11 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         'Content-Type': 'application/json',
         'x-api-key': anthropicKey,
         'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'pdfs-2024-09-25',
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 4000,
+        max_tokens: 8000,
         system: SYSTEM,
         messages: [{ role: 'user', content: userContent }],
       }),
@@ -56,7 +57,14 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
     return res.status(500).json({ error: `Erro ao chamar IA: ${err.message}` })
   }
 
-  const claudeJson = await claudeRes.json()
+  // Resposta vazia = timeout da Vercel antes de o Claude responder
+  const rawBody = await claudeRes.text()
+  if (!rawBody || !rawBody.trim()) {
+    return res.status(504).json({ error: 'Tempo excedido. O PDF é muito grande — converta para texto (.docx) ou divida em partes menores.' })
+  }
+  let claudeJson
+  try { claudeJson = JSON.parse(rawBody) }
+  catch (e) { return res.status(500).json({ error: `Resposta inválida da IA: ${e.message}` }) }
   if (claudeJson.error) return res.status(500).json({ error: claudeJson.error.message })
 
   // ── Parser defensivo ──────────────────────────────────────────────────
