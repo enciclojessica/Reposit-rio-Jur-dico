@@ -103,7 +103,7 @@ export default function ImportacaoLote({ session }) {
   const [linhas, setLinhas]       = useState([])
   const [erros, setErros]         = useState({})
   const [progresso, setProgresso] = useState(0)
-  const [resultados, setResultados] = useState({ ok: 0, erro: 0 })
+  const [resultados, setResultados] = useState({ ok: 0, erro: 0, errosMsgs: [] })
   const [erroArquivo, setErroArquivo] = useState('')
 
   function handleArquivo(e) {
@@ -149,6 +149,7 @@ export default function ImportacaoLote({ session }) {
   async function importar() {
     setEtapa('importando')
     let inseridos = 0, atualizados = 0, erro = 0
+    const errosMsgs = []
 
     const validas = linhas.filter(l => !erros[l.idx])
     for (let i = 0; i < validas.length; i++) {
@@ -163,22 +164,21 @@ export default function ImportacaoLote({ session }) {
         .limit(1)
 
       if (existentes && existentes.length > 0) {
-        // Atualizar a entrada existente preservando o id e criado_por original
         const { error } = await supabase
           .from('entradas')
           .update({ ...payload, criado_por: undefined })
           .eq('id', existentes[0].id)
-        if (error) erro++
+        if (error) { erro++; errosMsgs.push(`Linha ${i + 2}: "${payload.tema.slice(0, 50)}" — ${error.message}`) }
         else atualizados++
       } else {
         const { error } = await supabase.from('entradas').insert(payload)
-        if (error) erro++
+        if (error) { erro++; errosMsgs.push(`Linha ${i + 2}: "${payload.tema.slice(0, 50)}" — ${error.message}`) }
         else inseridos++
       }
       setProgresso(Math.round(((i + 1) / validas.length) * 100))
     }
 
-    setResultados({ ok: inseridos + atualizados, inseridos, atualizados, erro })
+    setResultados({ ok: inseridos + atualizados, inseridos, atualizados, erro, errosMsgs })
     setEtapa('concluido')
   }
 
@@ -374,6 +374,20 @@ export default function ImportacaoLote({ session }) {
              {resultados.atualizados > 0 && <span style={{ color: '#c9a452' }}>{resultados.atualizados} atualizada{resultados.atualizados !== 1 ? 's' : ''}</span>}
             {resultados.erro > 0 && <span style={{ color: theme.error }}> · {resultados.erro} com erro</span>}
           </div>
+
+          {resultados.errosMsgs && resultados.errosMsgs.length > 0 && (
+            <div style={{ marginTop: 16, textAlign: 'left', background: theme.inputBg, border: `1px solid ${theme.error}44`, borderRadius: 8, padding: '12px 16px', maxHeight: 200, overflowY: 'auto' }}>
+              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace' }}>
+                Detalhes dos erros
+              </div>
+              {resultados.errosMsgs.map((msg, i) => (
+                <div key={i} style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 4, lineHeight: 1.5, wordBreak: 'break-word' }}>
+                  {msg}
+                </div>
+              ))}
+            </div>
+          )}
+
           <button onClick={reiniciar}
             style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginTop: 20 }}>
             Importar mais
