@@ -148,19 +148,37 @@ export default function ImportacaoLote({ session }) {
 
   async function importar() {
     setEtapa('importando')
-    let ok = 0, erro = 0
+    let inseridos = 0, atualizados = 0, erro = 0
 
     const validas = linhas.filter(l => !erros[l.idx])
     for (let i = 0; i < validas.length; i++) {
       const l = validas[i]
       const payload = { ...l.parsed, criado_por: session.user.id }
-      const { error } = await supabase.from('entradas').insert(payload)
-      if (error) erro++
-      else ok++
+
+      // Verificar se já existe entrada com o mesmo tema (case-insensitive)
+      const { data: existentes } = await supabase
+        .from('entradas')
+        .select('id')
+        .ilike('tema', payload.tema.trim())
+        .limit(1)
+
+      if (existentes && existentes.length > 0) {
+        // Atualizar a entrada existente preservando o id e criado_por original
+        const { error } = await supabase
+          .from('entradas')
+          .update({ ...payload, criado_por: undefined })
+          .eq('id', existentes[0].id)
+        if (error) erro++
+        else atualizados++
+      } else {
+        const { error } = await supabase.from('entradas').insert(payload)
+        if (error) erro++
+        else inseridos++
+      }
       setProgresso(Math.round(((i + 1) / validas.length) * 100))
     }
 
-    setResultados({ ok, erro })
+    setResultados({ ok: inseridos + atualizados, inseridos, atualizados, erro })
     setEtapa('concluido')
   }
 
@@ -351,7 +369,9 @@ export default function ImportacaoLote({ session }) {
             Importação concluída
           </div>
           <div style={{ fontSize: 14, color: theme.text, marginBottom: 6 }}>
-            <span style={{ color: theme.success }}>{resultados.ok} entrada{resultados.ok !== 1 ? 's' : ''} importada{resultados.ok !== 1 ? 's' : ''}</span>
+            {resultados.inseridos > 0 && <span style={{ color: theme.success }}>{resultados.inseridos} nova{resultados.inseridos !== 1 ? 's' : ''}</span>}
+             {resultados.inseridos > 0 && resultados.atualizados > 0 && <span style={{ color: theme.muted }}> · </span>}
+             {resultados.atualizados > 0 && <span style={{ color: '#c9a452' }}>{resultados.atualizados} atualizada{resultados.atualizados !== 1 ? 's' : ''}</span>}
             {resultados.erro > 0 && <span style={{ color: theme.error }}> · {resultados.erro} com erro</span>}
           </div>
           <button onClick={reiniciar}
