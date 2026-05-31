@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Download } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 
@@ -186,6 +187,7 @@ export default function Legislacao() {
   const [codigos, setCodigos]                    = useState([])
   const [total, setTotal]                        = useState(0)
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
+  const [exportando, setExportando] = useState(false)
 
   useEffect(() => {
     supabase.from('legislacao').select('codigo').eq('vigente', true).then(({ data }) => {
@@ -223,16 +225,73 @@ export default function Legislacao() {
     setLoading(false)
   }
 
+  async function exportarPlanilha() {
+    setExportando(true)
+    try {
+      // Busca todos os artigos sem limite para exportação completa
+      let q = supabase.from('legislacao').select('*').eq('vigente', true)
+        .order('codigo', { ascending: true })
+        .order('numero', { ascending: true })
+        .order('inciso',    { ascending: true, nullsFirst: true })
+        .order('paragrafo', { ascending: true, nullsFirst: true })
+
+      if (codigoAtivo !== 'todos') q = q.eq('codigo', codigoAtivo)
+
+      const { data } = await q
+      if (!data || data.length === 0) { setExportando(false); return }
+
+      const meta = CODIGOS_META
+      const cabecalho = ['Código', 'Diploma', 'Artigo', 'Inciso', 'Parágrafo', 'Texto']
+      const linhas = data.map(a => [
+        (a.codigo || '').toUpperCase(),
+        meta[a.codigo]?.nome || a.codigo?.toUpperCase() || '',
+        `Art. ${a.numero}`,
+        a.inciso    || '',
+        a.paragrafo || '',
+        (a.texto    || '').replace(/
+/g, ' '),
+      ])
+
+      // Gera CSV com BOM UTF-8 para Excel abrir corretamente
+      const bom = '﻿'
+      const csv = bom + [cabecalho, ...linhas]
+        .map(row => row.map(cel => `"${String(cel).replace(/"/g, '""')}"`).join(';'))
+        .join('
+')
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement('a')
+      const nome = codigoAtivo === 'todos' ? 'legislacao_completa' : `legislacao_${codigoAtivo}`
+      a.href     = url
+      a.download = `${nome}.csv`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) { console.error(e) }
+    setExportando(false)
+  }
+
   return (
     <div style={{ paddingBottom: 40 }}>
       {/* Header */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
-          Legislação
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+            Legislação
+          </div>
+          <div style={{ fontSize: 12, color: theme.muted }}>
+            {total > 0 ? `${total} artigos importados · clique em qualquer artigo para ver detalhes` : 'Nenhum artigo importado — use § Importar Legislação'}
+          </div>
         </div>
-        <div style={{ fontSize: 12, color: theme.muted }}>
-          {total > 0 ? `${total} artigos importados · clique em qualquer artigo para ver detalhes` : 'Nenhum artigo importado — use § Importar Legislação'}
-        </div>
+        {total > 0 && (
+          <button
+            onClick={exportarPlanilha}
+            disabled={exportando}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '8px 14px', color: exportando ? theme.muted : theme.gold, fontSize: 12, cursor: exportando ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0 }}>
+            <Download size={13} />
+            {exportando ? 'Gerando...' : 'Exportar .csv'}
+          </button>
+        )}
       </div>
 
       {total === 0 ? (
