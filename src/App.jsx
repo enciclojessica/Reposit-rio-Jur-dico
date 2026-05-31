@@ -99,6 +99,8 @@ export default function App() {
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const [exportandoRepo, setExportandoRepo] = useState(false)
+  const [confirmLimpar, setConfirmLimpar]   = useState(false)
+  const [limpandoRepo, setLimpandoRepo]     = useState(false)
   const [countLegislacao, setCountLegislacao] = useState(0)
 
   useEffect(() => {
@@ -358,6 +360,22 @@ async function handleSave(entry) {
     else { notify('Entrada removida.'); setSelected(null); setView(VIEWS.HOME) }
   }
 
+  async function limparTodoRepositorio() {
+    setLimpandoRepo(true)
+    try {
+      const { error } = await supabase.from('entradas').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+      if (error) { notify('Erro ao limpar repositório.', 'err') }
+      else {
+        setEntradas([])
+        setSelected(null)
+        setView(VIEWS.HOME)
+        notify('Repositório limpo. Todas as entradas foram removidas.')
+      }
+    } catch (e) { notify('Erro inesperado.', 'err') }
+    setLimpandoRepo(false)
+    setConfirmLimpar(false)
+  }
+
   function handleImportarPesquisa(entrada) {
     if (!isEditor) { notify('Apenas editores podem importar entradas.', 'err'); return }
     setPrefillEntry(entrada)
@@ -486,11 +504,10 @@ async function handleSave(entry) {
             )}
           </div>
         </div>
-        {isEditor && (
-          <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
-            title="Exportar repositório completo em .docx"
-            style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: exportandoRepo ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoRepo ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
-            {exportandoRepo ? 'Exportando...' : 'Exportar repositório .docx'}
+        {isAdmin && (
+          <button onClick={() => setConfirmLimpar(true)}
+            style={{ width: '100%', background: '#1a0808', border: '1px solid #3a1010', borderRadius: 6, padding: 7, color: '#c0504d', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+            Limpar repositório
           </button>
         )}
         {session
@@ -500,7 +517,7 @@ async function handleSave(entry) {
         }
       </div>
     </div>
-  ), [theme, view, areaFilter, isAdmin, isEditor, session, role, exportandoRepo, entradas])
+  ), [theme, view, areaFilter, isAdmin, isEditor, session, role, entradas, confirmLimpar]
 
   // ── Loading states ─────────────────────────────────────────────────────
   // Vista pública de entrada compartilhada — sem autenticação
@@ -567,13 +584,6 @@ async function handleSave(entry) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
-        {isEditor && (
-          <button onClick={exportarRepo} disabled={exportandoRepo || !entradas.length}
-            title="Exportar repositório completo em .docx"
-            style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: exportandoRepo ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoRepo ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
-            {exportandoRepo ? 'Exportando...' : 'Exportar repositório .docx'}
-          </button>
-        )}
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
           : <button onClick={() => setShowLogin(true)} style={{ background: theme.gold, border: 'none', borderRadius: 6, padding: '5px 14px', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5 }}><Lock size={11} /> Acesso Interno</button>
@@ -866,19 +876,18 @@ case VIEWS.FLASHCARDS:
               ))}
             </div>
 
-            {/* Filtro por tag */}
+            {/* Filtro por tag — select compacto */}
             {todasAsTags.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 16, paddingBottom: 4, flexWrap: 'wrap' }}>
-                <button onClick={() => setTagFilter(null)}
-                  style={{ flexShrink: 0, background: !tagFilter ? theme.gold + '18' : 'transparent', color: !tagFilter ? theme.gold : theme.muted, border: `1px solid ${!tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all .15s' }}>
-                  todas as tags
-                </button>
-                {todasAsTags.map(t => (
-                  <button key={t} onClick={() => setTagFilter(tagFilter === t ? null : t)}
-                    style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                    <TagPill tag={t} pequena style={{ opacity: tagFilter && tagFilter !== t ? 0.45 : 1 }} />
-                  </button>
-                ))}
+              <div style={{ marginBottom: 16 }}>
+                <select
+                  value={tagFilter || ''}
+                  onChange={ev => setTagFilter(ev.target.value || null)}
+                  style={{ width: '100%', background: tagFilter ? theme.gold + '12' : theme.raised, border: `1px solid ${tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '7px 12px', color: tagFilter ? theme.gold : theme.muted, fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', cursor: 'pointer', outline: 'none' }}>
+                  <option value=''>Filtrar por tag...</option>
+                  {todasAsTags.map(t => (
+                    <option key={t} value={t}>#{t}</option>
+                  ))}
+                </select>
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -965,6 +974,31 @@ case VIEWS.FLASHCARDS:
       {toast && (
         <div style={{ position: 'fixed', bottom: isMobile ? 80 : 24, right: 16, background: toast.type === 'err' ? theme.toastErr : theme.toastOk, border: `1px solid ${toast.type === 'err' ? theme.error : theme.success}`, borderRadius: 8, padding: '10px 16px', color: theme.text, fontSize: 13, boxShadow: theme.shadow, zIndex: 100, maxWidth: 320 }}>
           {toast.type === 'err' ? '✕ ' : '✓ '}{toast.msg}
+        </div>
+      )}
+
+      {/* Modal — Limpar todo o repositório */}
+      {confirmLimpar && (
+        <div style={{ position: 'fixed', inset: 0, background: '#00000099', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: theme.surface, border: '1px solid #5a1f1f', borderRadius: 14, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 16px 48px #000000cc' }}>
+            <div style={{ fontSize: 36, marginBottom: 14, color: '#c0504d' }}>⚠</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', marginBottom: 10 }}>
+              Limpar todo o repositório?
+            </div>
+            <div style={{ fontSize: 12, color: theme.muted, marginBottom: 24, lineHeight: 1.7 }}>
+              Esta ação remove <span style={{ color: '#c0504d', fontWeight: 700 }}>{entradas.length} entrada(s)</span> permanentemente do banco de dados. Exporte um backup antes se necessário.
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button onClick={() => setConfirmLimpar(false)}
+                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 22px', cursor: 'pointer', fontSize: 13, fontFamily: 'IBM Plex Mono, monospace' }}>
+                Cancelar
+              </button>
+              <button onClick={limparTodoRepositorio} disabled={limpandoRepo}
+                style={{ background: '#3b0f0f', border: '1px solid #c0504d', color: '#c0504d', borderRadius: 8, padding: '10px 22px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}>
+                {limpandoRepo ? 'Limpando...' : 'Confirmar exclusão'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
