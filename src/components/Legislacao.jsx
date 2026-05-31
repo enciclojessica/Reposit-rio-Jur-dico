@@ -80,7 +80,7 @@ function ArtigoModal({ artigo, onFechar }) {
               )}
               {artigo.aplicacao_pratica && (
                 <div>
-                  <div style={{ fontSize: 10, color: meta.cor, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Como foi aplicado</div>
+                  <div style={{ fontSize: 10, color: meta.cor, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Aplicação prática</div>
                   <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6 }}>{artigo.aplicacao_pratica}</div>
                 </div>
               )}
