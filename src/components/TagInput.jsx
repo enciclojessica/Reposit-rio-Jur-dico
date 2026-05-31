@@ -36,18 +36,26 @@ export function TagPill({ tag, onRemove, pequena }) {
   )
 }
 
+
+// Diplomas legais sugeridos como tags
+const TAGS_SUGERIDAS = [
+  'CC','CDC','CPC','CPP','CF','CTB','CP','CLT',
+  'STJ','STF','TJSP','TJRJ','TJMG',
+  'Lei 9.099','Lei 9.870','Lei 10.741','Lei 11.343','Lei 13.964',
+]
+
 export default function TagInput({ tags = [], onChange, todasAsTags = [] }) {
   const { theme } = useTheme()
   const [input, setInput]       = useState('')
   const [foco, setFoco]         = useState(false)
   const inputRef = useRef()
 
-  const sugestoes = todasAsTags
+  const sugestoes = [...new Set([...TAGS_SUGERIDAS, ...todasAsTags])]
     .filter(t => !tags.includes(t) && t.toLowerCase().includes(input.toLowerCase()))
-    .slice(0, 6)
+    .slice(0, 8)
 
   function adicionar(tag) {
-    const limpa = tag.trim().toLowerCase().replace(/[^a-z0-9À-ÿ\-_]/gi, '')
+    const limpa = tag.trim().replace(/[^a-zA-Z0-9À-ÿ\-_.]/g, '')
     if (!limpa || tags.includes(limpa) || tags.length >= 10) return
     onChange([...tags, limpa])
     setInput('')
