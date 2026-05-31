@@ -622,6 +622,7 @@ async function handleSave(entry) {
   // Itens no menu "mais"
   const navMais = [
     { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
+    { v: VIEWS.LEG_VIEW,    label: 'Legislação' },
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
     { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
