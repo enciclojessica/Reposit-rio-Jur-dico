@@ -228,7 +228,6 @@ export default function Legislacao() {
   async function exportarPlanilha() {
     setExportando(true)
     try {
-      // Busca todos os artigos sem limite para exportação completa
       let q = supabase.from('legislacao').select('*').eq('vigente', true)
         .order('codigo', { ascending: true })
         .order('numero', { ascending: true })
@@ -241,29 +240,38 @@ export default function Legislacao() {
       if (!data || data.length === 0) { setExportando(false); return }
 
       const meta = CODIGOS_META
-      const cabecalho = ['Código', 'Diploma', 'Artigo', 'Inciso', 'Parágrafo', 'Texto']
-      const linhas = data.map(a => [
-        (a.codigo || '').toUpperCase(),
-        meta[a.codigo]?.nome || a.codigo?.toUpperCase() || '',
-        `Art. ${a.numero}`,
-        a.inciso    || '',
-        a.paragrafo || '',
-        (a.texto    || '').split('\n').join(' '),
-      ])
+      const sep = ';'
+      const nl = String.fromCharCode(13) + String.fromCharCode(10)
+      const bom = String.fromCharCode(0xFEFF)
 
-      // Gera CSV com BOM UTF-8 para Excel abrir corretamente
-      const bom = '﻿'
-      const csv = bom + [cabecalho, ...linhas]
-        .map(row => row.map(cel => `"${String(cel).replace(/"/g, '""')}"`).join(';'))
-        .join('
-')
+      function escapeCsv(val) {
+        const s = String(val || '').split(String.fromCharCode(10)).join(' ').split(String.fromCharCode(13)).join(' ')
+        return '"' + s.split('"').join('""') + '"'
+      }
+
+      const cabecalho = ['Codigo', 'Diploma', 'Artigo', 'Inciso', 'Paragrafo', 'Texto']
+      const linhas = data.map(function(a) {
+        return [
+          (a.codigo || '').toUpperCase(),
+          (meta[a.codigo] && meta[a.codigo].nome) ? meta[a.codigo].nome : (a.codigo || '').toUpperCase(),
+          'Art. ' + a.numero,
+          a.inciso    || '',
+          a.paragrafo || '',
+          a.texto     || '',
+        ]
+      })
+
+      const rows = [cabecalho].concat(linhas)
+      const csv = bom + rows.map(function(row) {
+        return row.map(escapeCsv).join(sep)
+      }).join(nl)
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
       const url  = URL.createObjectURL(blob)
       const a    = document.createElement('a')
-      const nome = codigoAtivo === 'todos' ? 'legislacao_completa' : `legislacao_${codigoAtivo}`
+      const nome = codigoAtivo === 'todos' ? 'legislacao_completa' : ('legislacao_' + codigoAtivo)
       a.href     = url
-      a.download = `${nome}.csv`
+      a.download = nome + '.csv'
       a.click()
       URL.revokeObjectURL(url)
     } catch (e) { console.error(e) }
