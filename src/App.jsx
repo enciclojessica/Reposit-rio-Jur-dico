@@ -607,6 +607,7 @@ async function handleSave(entry) {
     { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
+    ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configuracoes' }] : []),
   ]
   const maisAtivo = navMais.some(n => n.v === view)
 
