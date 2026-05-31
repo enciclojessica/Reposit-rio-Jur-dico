@@ -72,56 +72,89 @@ export default function ExtrairPeticao() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { setErro('Faça login para continuar.'); setEtapa('erro'); return }
 
+      // Buscar API key de forma segura via endpoint autenticado
+      const keyRes = await fetch('/api/get-anthropic-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: session.user.id }),
+      })
+      const keyJson = await keyRes.json()
+      if (!keyRes.ok || keyJson.error) { setErro(keyJson.error || 'Erro ao obter configuração.'); setEtapa('erro'); return }
+      const apiKey = keyJson.key
+
       const ext    = arquivo.name.split('.').pop().toLowerCase()
       const isDocx = ext === 'docx' || ext === 'doc'
 
-      let payload = {}
+      // ── Montar conteúdo para o Claude ──────────────────────────────────
+      let userContent
+      const SYSTEM = `Você é um Doutrinador e Estrategista Processual. Analise o documento e extraia conhecimento jurídico universal e abstrato, completamente desvinculado dos fatos concretos do caso.
+
+REGRA ABSOLUTA: Jamais mencione fatos específicos do caso (partes, valores, eventos concretos). Todo conteúdo deve ser reutilizável em qualquer demanda futura.
+
+Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto antes ou depois:
+{"meta":{"tipo_peca":"string","numero_processo":"string ou null","resultado":"string ou null"},"teses":[{"area":"Cível","tipo":"jurisprudência","tema":"string","fonte":"string","referencia":"string","tese_assunto":"string","fundamentacao_legal":"string","precedente_sumula":"string","ratio_decidendi":"string","aplicacao_pratica":"string"}],"artigos":[{"codigo":"cpc","numero":300,"inciso":null,"paragrafo":null,"texto":"string","aplicacao_pratica":"string","contexto":"string"}]}`
 
       if (isDocx) {
-        // Extrair texto do Word no browser, enviar como texto
         setProgresso('Lendo o arquivo Word...')
         const texto = await extrairTextoDocx(arquivo)
         if (!texto || texto.length < 30) {
-          setErro('Não foi possível extrair texto do arquivo. Tente converter para PDF.')
+          setErro('Não foi possível extrair texto do arquivo.')
           setEtapa('erro'); return
         }
-        payload = {
-          texto,
-          filename:  arquivo.name,
-          user_id:   session.user.id,
-        }
-        setProgresso('Enviando texto para análise...')
+        userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
+        setProgresso('Analisando com IA...')
       } else {
-        // PDF: enviar como base64
         setProgresso('Preparando o PDF...')
         const base64 = await toBase64(arquivo)
-        payload = {
-          pdf_base64: base64,
-          filename:   arquivo.name,
-          user_id:    session.user.id,
-        }
-        setProgresso('Enviando PDF para análise...')
+        userContent = [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+          { type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.` },
+        ]
+        setProgresso('Analisando PDF com IA — pode levar até 30 segundos...')
       }
 
-      const res = await fetch('/api/extrair-peticao', {
+      // ── Chamar Claude diretamente no browser (sem timeout da Vercel) ──
+      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
+        headers: {
+          'Content-Type':      'application/json',
+          'x-api-key':         apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta':    'pdfs-2024-09-25',
+        },
+        body: JSON.stringify({
+          model:      'claude-sonnet-4-20250514',
+          max_tokens: 8000,
+          system:     SYSTEM,
+          messages:   [{ role: 'user', content: userContent }],
+        }),
       })
 
       setProgresso('Processando resposta...')
-      const json = await res.json()
+      const claudeJson = await claudeRes.json()
+      if (claudeJson.error) { setErro(claudeJson.error.message); setEtapa('erro'); return }
 
-      if (!res.ok || json.error) {
-        if (res.status === 504) {
-          setErro('Tempo excedido. O PDF é muito grande — divida em partes menores ou converta para texto antes.')
-        } else {
-          setErro(json.error || `Erro ${res.status}`)
-        }
-        setEtapa('erro'); return
+      const rawText = (claudeJson.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
+      let dados
+      try { dados = JSON.parse(rawText.trim()) }
+      catch {
+        const match = rawText.match(/\{[\s\S]*\}/)
+        if (!match) { setErro('A IA não retornou JSON válido. Tente novamente.'); setEtapa('erro'); return }
+        try { dados = JSON.parse(match[0]) }
+        catch (e) { setErro(`JSON inválido: ${e.message}`); setEtapa('erro'); return }
       }
 
-      setResultado(json)
+      // ── Persistir no Supabase via endpoint leve (< 2s, sem timeout) ──
+      setProgresso('Salvando no repositório...')
+      const saveRes = await fetch('/api/salvar-extracao', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ dados, filename: arquivo.name, user_id: session.user.id }),
+      })
+      const saveJson = await saveRes.json()
+      if (!saveRes.ok || saveJson.error) { setErro(saveJson.error || `Erro ${saveRes.status}`); setEtapa('erro'); return }
+
+      setResultado(saveJson)
       setEtapa('concluido')
     } catch (err) {
       setErro(err.message || 'Erro inesperado.')
