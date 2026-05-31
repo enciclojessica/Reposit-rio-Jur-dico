@@ -45,13 +45,59 @@ function TabPerfil({ session, membro }) {
   async function uploadAvatar(file) {
     if (!file || !session) return
     setUploading(true)
-    const ext  = file.name.split('.').pop()
-    const path = `${session.user.id}/avatar.${ext}`
-    const { error } = await supabase.storage.from('avatares').upload(path, file, { upsert: true })
-    if (!error) {
-      const { data } = supabase.storage.from('avatares').getPublicUrl(path)
-      setAvatarUrl(data.publicUrl)
+    setMsg(null)
+
+    try {
+      // Validar tipo e tamanho
+      if (!file.type.startsWith('image/')) {
+        setMsg({ tipo: 'erro', texto: 'Selecione um arquivo de imagem (JPG, PNG, WebP).' })
+        setUploading(false); return
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setMsg({ tipo: 'erro', texto: 'Imagem muito grande. Máximo 5MB.' })
+        setUploading(false); return
+      }
+
+      // Redimensionar para 400x400 no browser antes de enviar
+      const blob = await new Promise((resolve) => {
+        const img = new Image()
+        const url = URL.createObjectURL(file)
+        img.onload = () => {
+          const size = 400
+          const canvas = document.createElement('canvas')
+          canvas.width = size; canvas.height = size
+          const ctx = canvas.getContext('2d')
+          const ratio = Math.min(size / img.width, size / img.height)
+          const w = img.width * ratio, h = img.height * ratio
+          ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h)
+          URL.revokeObjectURL(url)
+          canvas.toBlob(resolve, 'image/jpeg', 0.85)
+        }
+        img.src = url
+      })
+
+      const path = `${session.user.id}/avatar.jpg`
+
+      // Tentar criar bucket se não existir
+      await supabase.storage.createBucket('avatares', { public: true }).catch(() => {})
+
+      const { error } = await supabase.storage.from('avatares').upload(path, blob, {
+        upsert: true,
+        contentType: 'image/jpeg',
+      })
+
+      if (error) {
+        setMsg({ tipo: 'erro', texto: `Erro ao enviar foto: ${error.message}` })
+      } else {
+        const { data } = supabase.storage.from('avatares').getPublicUrl(path)
+        // Adicionar timestamp para forçar reload do cache
+        setAvatarUrl(data.publicUrl + '?t=' + Date.now())
+        setMsg({ tipo: 'ok', texto: 'Foto atualizada. Clique em Salvar para confirmar.' })
+      }
+    } catch (err) {
+      setMsg({ tipo: 'erro', texto: `Erro inesperado: ${err.message}` })
     }
+
     setUploading(false)
   }
 
