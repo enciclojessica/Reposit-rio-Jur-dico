@@ -19,6 +19,7 @@ import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import Configuracoes from './components/Configuracoes'
+import { exportarPlanilhaTeses } from './utils/exportarTeses'
 import { Lock } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
@@ -99,6 +100,7 @@ export default function App() {
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const [exportandoRepo, setExportandoRepo] = useState(false)
+  const [exportandoTeses, setExportandoTeses] = useState(false)
   const [confirmLimpar, setConfirmLimpar]   = useState(false)
   const [limpandoRepo, setLimpandoRepo]     = useState(false)
   const [countLegislacao, setCountLegislacao] = useState(0)
@@ -114,7 +116,8 @@ export default function App() {
   // Se logado mas sem registro em membros (migração ainda não aplicada),
   // concede acesso de editor como fallback para não bloquear o uso.
   const role     = membro?.role || (session && !membroLoading ? 'editor' : null)
-  const isAdmin  = role === 'admin'
+  const isOwner  = session?.user?.email === 'foxjessica01@gmail.com'
+  const isAdmin  = role === 'admin' || isOwner
   const isEditor = role === 'editor' || isAdmin
   const isMembro = !!membro
 
@@ -361,6 +364,8 @@ async function handleSave(entry) {
   }
 
   async function limparTodoRepositorio() {
+    const OWNER = 'foxjessica01@gmail.com'
+    if (session?.user?.email !== OWNER) { notify('Apenas a proprietaria pode limpar o repositorio.', 'err'); return }
     setLimpandoRepo(true)
     try {
       const { error } = await supabase.from('entradas').delete().neq('id', '00000000-0000-0000-0000-000000000000')
@@ -387,6 +392,14 @@ async function handleSave(entry) {
   function notify(msg, type = 'ok') {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3500)
+  }
+
+  async function exportarTesesPlanilha() {
+    if (exportandoTeses || !entradas.length) return
+    setExportandoTeses(true)
+    try { exportarPlanilhaTeses(entradas) }
+    catch (e) { console.error(e); notify('Erro ao exportar planilha.', 'err') }
+    setExportandoTeses(false)
   }
 
   async function exportarRepo() {
@@ -504,10 +517,16 @@ async function handleSave(entry) {
             )}
           </div>
         </div>
+        {isOwner && entradas.length > 0 && (
+          <button onClick={exportarTesesPlanilha} disabled={exportandoTeses}
+            style={{ width: '100%', background: theme.raised, border: '1px solid ' + theme.border, borderRadius: 6, padding: 7, color: exportandoTeses ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
+            {exportandoTeses ? 'Exportando...' : 'Exportar planilha'}
+          </button>
+        )}
         {isAdmin && (
           <button onClick={() => setConfirmLimpar(true)}
             style={{ width: '100%', background: '#1a0808', border: '1px solid #3a1010', borderRadius: 6, padding: 7, color: '#c0504d', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-            Limpar repositório
+            Limpar repositorio
           </button>
         )}
         {session
@@ -608,6 +627,7 @@ async function handleSave(entry) {
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configuracoes' }] : []),
+    ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
   ]
   const maisAtivo = navMais.some(n => n.v === view)
 
@@ -630,7 +650,7 @@ async function handleSave(entry) {
         }}>
           {navMais.map(item => (
             <button key={item.v}
-              onClick={() => { setView(item.v); setMaisAberto(false) }}
+              onClick={() => { if (item.action) { item.action(); setMaisAberto(false) } else { setView(item.v); setMaisAberto(false) } }}
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '10px 4px', background: view === item.v ? theme.gold + '22' : 'none',
@@ -911,7 +931,15 @@ case VIEWS.FLASHCARDS:
                 </select>
               )}
             </div>
-            <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }} onImportar={aba => { setImportarAba(aba || 'planilha'); setView(VIEWS.IMPORTAR) }}/>
+            <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }} onImportar={aba => { setImportarAba(aba || 'planilha'); setView(VIEWS.IMPORTAR) }}
+              isAdmin={isAdmin}
+              onDeleteMultiple={isAdmin ? async (ids) => {
+                const OWNER = 'foxjessica01@gmail.com'
+                if (session?.user?.email !== OWNER) { notify('Sem permissao para esta acao.', 'err'); return }
+                const { error } = await supabase.from('entradas').delete().in('id', ids)
+                if (error) notify('Erro ao excluir entradas.', 'err')
+                else { notify(ids.length + ' entrada(s) removida(s).'); }
+              } : null}/>
           </div>
         )
     }
