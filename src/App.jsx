@@ -517,7 +517,7 @@ async function handleSave(entry) {
         }
       </div>
     </div>
-  ), [theme, view, areaFilter, isAdmin, isEditor, session, role, entradas, confirmLimpar]
+  ), [theme, view, areaFilter, isAdmin, isEditor, session, role, entradas, confirmLimpar])
 
   // ── Loading states ─────────────────────────────────────────────────────
   // Vista pública de entrada compartilhada — sem autenticação
