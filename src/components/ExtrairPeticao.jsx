@@ -78,7 +78,10 @@ export default function ExtrairPeticao() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: session.user.id }),
       })
-      const keyJson = await keyRes.json()
+      const keyRaw = await keyRes.text()
+      if (!keyRaw || !keyRaw.trim()) { setErro('Erro ao obter configuração da API. Tente novamente.'); setEtapa('erro'); return }
+      let keyJson
+      try { keyJson = JSON.parse(keyRaw) } catch { setErro('Resposta inválida do servidor. Tente novamente.'); setEtapa('erro'); return }
       if (!keyRes.ok || keyJson.error) { setErro(keyJson.error || 'Erro ao obter configuração.'); setEtapa('erro'); return }
       const apiKey = keyJson.key
 
