@@ -73,9 +73,9 @@ export default function ExtrairPeticao() {
       if (!session) { setErro('Faça login para continuar.'); setEtapa('erro'); return }
 
       // Buscar API key de forma segura via endpoint autenticado
-      const keyRes = await fetch('/api/get-anthropic-config', {
+      const keyRes = await fetch('/api/get-anthropic-config?t=' + Date.now(), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
         body: JSON.stringify({ user_id: session.user.id }),
       })
       const keyRaw = await keyRes.text()
