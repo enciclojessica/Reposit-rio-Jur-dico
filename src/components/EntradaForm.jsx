@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { supabase } from '../supabase'
 import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted } from '../shared'
 import TagInput from './TagInput'
 import { useTheme } from '../theme'
