@@ -856,10 +856,8 @@ case VIEWS.FLASHCARDS:
             {/* Filtro Linha 1 — Área */}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
               {[
-                { id: 'all',      label: 'Todas' },
-                { id: 'Cível',    label: 'Cível' },
-                { id: 'Penal',    label: 'Penal' },
-
+                { id: 'all', label: 'Todas' },
+                ...Object.keys(AREAS).map(a => ({ id: a, label: a })),
               ].map(a => (
                 <button key={a.id} onClick={() => setAreaFilter(a.id)} style={{
                   flexShrink: 0,
