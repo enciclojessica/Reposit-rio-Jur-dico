@@ -50,36 +50,45 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Cache-first para assets estáticos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
+          // Rotas internas /api/* — network-only, nunca cachear
+          {
+            urlPattern: /^\/api\/.*/,
+            handler: 'NetworkOnly',
+          },
+          // Anthropic — network-only
+          {
+            urlPattern: /^https:\/\/api\.anthropic\.com\/.*/i,
+            handler: 'NetworkOnly',
+          },
+          // Supabase Storage — network-only
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            handler: 'NetworkOnly',
+          },
+          // Supabase REST — network-first
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-data-v2',
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
+              networkTimeoutSeconds: 8,
+            },
+          },
           // Fontes Google — cache longo
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts',
+              cacheName: 'google-fonts-v2',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
-          },
-          // Supabase — network-first, fallback para cache
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-data',
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
-              networkTimeoutSeconds: 8,
-            },
-          },
-          // API Anthropic e externas — network-only (nunca cachear)
-          {
-            urlPattern: /^https:\/\/api\.anthropic\.com\/.*/i,
-            handler: 'NetworkOnly',
           },
         ],
       },
