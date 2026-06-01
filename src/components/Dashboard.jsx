@@ -110,7 +110,7 @@ function StatCard({ label, valor, cor, sub }) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────
-export default function Dashboard({ entradas }) {
+export default function Dashboard({ entradas, countLegislacao = 0 }) {
   const { theme } = useTheme()
 
   const stats = useMemo(() => {
@@ -189,6 +189,8 @@ export default function Dashboard({ entradas }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>
         <StatCard label="Entradas" valor={stats.total} cor={theme.gold}
           sub={`${stats.totalTeses} teses`} />
+        <StatCard label="Legislação" valor={countLegislacao} cor={'#10b981'}
+          sub="artigos cadastrados" />
         {stats.porArea.map(a => (
           <StatCard key={a.label} label={a.label} valor={a.valor} cor={a.cor} />
         ))}
