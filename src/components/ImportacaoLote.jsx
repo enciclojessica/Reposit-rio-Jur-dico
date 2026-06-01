@@ -40,7 +40,7 @@ function validarLinha(linha, mapa, i) {
 
   if (!tema) erros.push('tema obrigatório')
   if (area && !Object.keys(AREAS).includes(area))
-    erros.push(`área inválida: "${area}" (use Cível, Penal, Constitucional, Trabalhista, Tributário, Administrativo, Consumidor, Doutrina ou Legislação)`)
+    erros.push(`área inválida: "${area}" (use Cível, Penal, Constitucional, Trabalhista, Tributário, Administrativo, Consumidor, Família, Previdenciário, Ambiental, Internacional ou Digital)`)
   if (tipo && !TIPOS.includes(tipo))
     erros.push(`tipo inválido: "${tipo}"`)
 
@@ -253,7 +253,7 @@ export default function ImportacaoLote({ session }) {
                 <tbody>
                   {[
                     ['tema', '✓', 'Texto livre', 'Dano moral — banco de dados'],
-                    ['area', '', 'Cível · Penal · Constitucional · Trabalhista · Tributário · Administrativo · Consumidor · Doutrina · Legislação', 'Cível'],
+                    ['area', '', 'Cível · Penal · Constitucional · Trabalhista · Tributário · Administrativo · Consumidor · Família · Previdenciário · Ambiental · Internacional · Digital', 'Cível'],
                     ['tipo', '', 'jurisprudência · doutrina · súmula · lei', 'jurisprudência'],
                     ['fonte', '', 'Texto livre', 'STJ'],
                     ['referencia', '', 'Texto livre', 'REsp 1.234.567/SP'],
