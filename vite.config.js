@@ -7,6 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      selfDestroying: true, // temporario: desregistra SW em todos os clientes
       includeAssets: ['logo.png', 'icon-*.png'],
       manifest: {
         name: 'Síntese Jurídica — Farias Fusquiani',
