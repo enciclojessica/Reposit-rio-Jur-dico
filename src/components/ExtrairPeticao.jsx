@@ -7,7 +7,6 @@ import { Upload, FileText, Check, AlertCircle, RotateCcw } from 'lucide-react'
 async function extrairTextoDocx(file) {
   const arrayBuffer = await file.arrayBuffer()
 
-  // Importar JSZip via CDN
   if (!window._JSZip) {
     await new Promise((resolve, reject) => {
       const s = document.createElement('script')
@@ -24,8 +23,6 @@ async function extrairTextoDocx(file) {
   if (!xmlFile) throw new Error('Arquivo Word inválido — word/document.xml ausente.')
 
   const xml = await xmlFile.async('text')
-
-  // Extrair parágrafos de forma estruturada
   const paragraphs = []
   const parser = new DOMParser()
   const doc = parser.parseFromString(xml, 'application/xml')
@@ -53,6 +50,32 @@ async function toBase64(file) {
   })
 }
 
+// Fetch seguro: lê o corpo como texto antes do parse, expõe erro HTTP detalhado
+async function fetchSeguro(url, opts) {
+  const res = await fetch(url, opts)
+  const texto = await res.text()
+
+  if (!res.ok) {
+    // Corpo pode ser HTML de erro (Nginx/Vercel) ou JSON com mensagem
+    let detalhe = texto.slice(0, 300)
+    try {
+      const j = JSON.parse(texto)
+      detalhe = j.error?.message || j.error || j.message || detalhe
+    } catch {}
+    throw new Error(`HTTP ${res.status} em ${url.split('?')[0]}: ${detalhe}`)
+  }
+
+  if (!texto || !texto.trim()) {
+    throw new Error(`Resposta vazia de ${url.split('?')[0]} (HTTP ${res.status})`)
+  }
+
+  try {
+    return JSON.parse(texto)
+  } catch (e) {
+    throw new Error(`JSON inválido de ${url.split('?')[0]}: ${e.message} — início da resposta: ${texto.slice(0, 120)}`)
+  }
+}
+
 export default function ExtrairPeticao() {
   const { theme } = useTheme()
   const fileRef = useRef()
@@ -69,27 +92,34 @@ export default function ExtrairPeticao() {
     setProgresso('Verificando sessão...')
 
     try {
+      // ── 1. Sessão ──────────────────────────────────────────────────────
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { setErro('Faça login para continuar.'); setEtapa('erro'); return }
+      if (!session) {
+        setErro('Sessão expirada. Faça login novamente.')
+        setEtapa('erro'); return
+      }
 
-      // Buscar API key de forma segura via endpoint autenticado
-      const keyRes = await fetch('/api/get-anthropic-config?t=' + Date.now(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-        body: JSON.stringify({ user_id: session.user.id }),
-      })
-      const keyRaw = await keyRes.text()
-      if (!keyRaw || !keyRaw.trim()) { setErro('Erro ao obter configuração da API. Tente novamente.'); setEtapa('erro'); return }
-      let keyJson
-      try { keyJson = JSON.parse(keyRaw) } catch { setErro('Resposta inválida do servidor. Tente novamente.'); setEtapa('erro'); return }
-      if (!keyRes.ok || keyJson.error) { setErro(keyJson.error || 'Erro ao obter configuração.'); setEtapa('erro'); return }
-      const apiKey = keyJson.key
+      // ── 2. API key via endpoint seguro ─────────────────────────────────
+      setProgresso('Obtendo configuração da API...')
+      let apiKey
+      try {
+        const keyJson = await fetchSeguro('/api/get-anthropic-config?t=' + Date.now(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store' },
+          body: JSON.stringify({ user_id: session.user.id }),
+        })
+        apiKey = keyJson.key
+        if (!apiKey) throw new Error('Chave não retornada pelo servidor.')
+      } catch (e) {
+        setErro('Falha ao obter configuração: ' + e.message)
+        setEtapa('erro'); return
+      }
 
+      // ── 3. Preparar conteúdo do arquivo ────────────────────────────────
       const ext    = arquivo.name.split('.').pop().toLowerCase()
       const isDocx = ext === 'docx' || ext === 'doc'
-
-      // ── Montar conteúdo para o Claude ──────────────────────────────────
       let userContent
+
       const SYSTEM = `Você é um Doutrinador e Estrategista Processual. Analise o documento e extraia conhecimento jurídico universal e abstrato, completamente desvinculado dos fatos concretos do caso.
 
 REGRA ABSOLUTA: Jamais mencione fatos específicos do caso (partes, valores, eventos concretos). Todo conteúdo deve ser reutilizável em qualquer demanda futura.
@@ -99,69 +129,138 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
       if (isDocx) {
         setProgresso('Lendo o arquivo Word...')
-        const texto = await extrairTextoDocx(arquivo)
-        if (!texto || texto.length < 30) {
-          setErro('Não foi possível extrair texto do arquivo.')
+        let texto
+        try {
+          texto = await extrairTextoDocx(arquivo)
+        } catch (e) {
+          setErro('Falha ao ler o .docx: ' + e.message)
           setEtapa('erro'); return
         }
+
+        if (!texto || texto.trim().length < 30) {
+          setErro('O arquivo Word não continha texto legível (extraído: ' + (texto?.length ?? 0) + ' caracteres). Tente converter para PDF.')
+          setEtapa('erro'); return
+        }
+
+        console.log('[ExtrairPeticao] DOCX extraído:', texto.length, 'chars. Início:', texto.slice(0, 100))
         userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
-        setProgresso('Analisando com IA...')
+        setProgresso('Texto extraído (' + texto.length + ' chars). Analisando com IA...')
+
       } else {
-        setProgresso('Preparando o PDF...')
-        const base64 = await toBase64(arquivo)
+        // PDF
+        if (arquivo.size > 10 * 1024 * 1024) {
+          setErro('PDF muito grande (' + (arquivo.size / 1024 / 1024).toFixed(1) + ' MB). Limite: 10 MB.')
+          setEtapa('erro'); return
+        }
+
+        setProgresso('Lendo o PDF (' + (arquivo.size / 1024).toFixed(0) + ' KB)...')
+        let base64Data
+        try {
+          base64Data = await toBase64(arquivo)
+        } catch (e) {
+          setErro('Falha ao ler o PDF: ' + e.message)
+          setEtapa('erro'); return
+        }
+
+        if (!base64Data || base64Data.length < 100) {
+          setErro('PDF resultou em base64 vazio ou corrompido (' + (base64Data?.length ?? 0) + ' chars).')
+          setEtapa('erro'); return
+        }
+
+        console.log('[ExtrairPeticao] PDF convertido para base64:', base64Data.length, 'chars')
         userContent = [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } },
           { type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.` },
         ]
-        setProgresso('Analisando PDF com IA — pode levar até 30 segundos...')
+        setProgresso('PDF pronto. Enviando para análise — pode levar até 40 segundos...')
       }
 
-      // ── Chamar Claude diretamente no browser (sem timeout da Vercel) ──
-      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method:  'POST',
-        headers: {
-          'Content-Type':                          'application/json',
-          'x-api-key':                             apiKey,
-          'anthropic-version':                     '2023-06-01',
-          'anthropic-beta':                        'pdfs-2024-09-25',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model:      'claude-sonnet-4-20250514',
-          max_tokens: 8000,
-          system:     SYSTEM,
-          messages:   [{ role: 'user', content: userContent }],
-        }),
-      })
+      // ── 4. Chamar Claude diretamente no browser ────────────────────────
+      console.log('[ExtrairPeticao] Chamando api.anthropic.com...')
+      let claudeJson
+      try {
+        const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type':                              'application/json',
+            'x-api-key':                                 apiKey,
+            'anthropic-version':                         '2023-06-01',
+            'anthropic-beta':                            'pdfs-2024-09-25',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify({
+            model:      'claude-sonnet-4-20250514',
+            max_tokens: 8000,
+            system:     SYSTEM,
+            messages:   [{ role: 'user', content: userContent }],
+          }),
+        })
 
-      setProgresso('Processando resposta...')
-      const claudeJson = await claudeRes.json()
-      if (claudeJson.error) { setErro(claudeJson.error.message); setEtapa('erro'); return }
+        setProgresso('Processando resposta da IA...')
+        const claudeRaw = await claudeRes.text()
+        console.log('[ExtrairPeticao] Claude HTTP', claudeRes.status, '— resposta:', claudeRaw.length, 'chars. Início:', claudeRaw.slice(0, 200))
 
+        if (!claudeRes.ok) {
+          let detalhe = claudeRaw.slice(0, 300)
+          try { detalhe = JSON.parse(claudeRaw)?.error?.message || detalhe } catch {}
+          throw new Error(`Claude HTTP ${claudeRes.status}: ${detalhe}`)
+        }
+
+        if (!claudeRaw || !claudeRaw.trim()) {
+          throw new Error('Claude retornou resposta vazia (possível timeout de rede no mobile).')
+        }
+
+        claudeJson = JSON.parse(claudeRaw)
+        if (claudeJson.error) throw new Error('Claude API error: ' + (claudeJson.error.message || JSON.stringify(claudeJson.error)))
+
+      } catch (e) {
+        setErro('Falha na chamada à IA: ' + e.message)
+        setEtapa('erro'); return
+      }
+
+      // ── 5. Extrair JSON do texto retornado ─────────────────────────────
+      setProgresso('Interpretando resultado...')
       const rawText = (claudeJson.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
+      console.log('[ExtrairPeticao] Texto bruto do Claude:', rawText.length, 'chars. Início:', rawText.slice(0, 200))
+
       let dados
-      try { dados = JSON.parse(rawText.trim()) }
-      catch {
+      try {
+        dados = JSON.parse(rawText.trim())
+      } catch {
         const match = rawText.match(/\{[\s\S]*\}/)
-        if (!match) { setErro('A IA não retornou JSON válido. Tente novamente.'); setEtapa('erro'); return }
-        try { dados = JSON.parse(match[0]) }
-        catch (e) { setErro(`JSON inválido: ${e.message}`); setEtapa('erro'); return }
+        if (!match) {
+          setErro('A IA não retornou JSON válido. Texto recebido: ' + rawText.slice(0, 200))
+          setEtapa('erro'); return
+        }
+        try {
+          dados = JSON.parse(match[0])
+        } catch (e) {
+          setErro('JSON malformado na resposta da IA: ' + e.message + ' — trecho: ' + match[0].slice(0, 150))
+          setEtapa('erro'); return
+        }
       }
 
-      // ── Persistir no Supabase via endpoint leve (< 2s, sem timeout) ──
+      // ── 6. Persistir via endpoint leve ─────────────────────────────────
       setProgresso('Salvando no repositório...')
-      const saveRes = await fetch('/api/salvar-extracao', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ dados, filename: arquivo.name, user_id: session.user.id }),
-      })
-      const saveJson = await saveRes.json()
-      if (!saveRes.ok || saveJson.error) { setErro(saveJson.error || `Erro ${saveRes.status}`); setEtapa('erro'); return }
+      let saveJson
+      try {
+        saveJson = await fetchSeguro('/api/salvar-extracao', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ dados, filename: arquivo.name, user_id: session.user.id }),
+        })
+      } catch (e) {
+        setErro('Falha ao salvar no repositório: ' + e.message)
+        setEtapa('erro'); return
+      }
 
+      console.log('[ExtrairPeticao] Salvo com sucesso:', saveJson)
       setResultado(saveJson)
       setEtapa('concluido')
+
     } catch (err) {
-      setErro(err.message || 'Erro inesperado.')
+      console.error('[ExtrairPeticao] Erro não capturado:', err)
+      setErro('Erro inesperado: ' + (err.message || String(err)))
       setEtapa('erro')
     }
   }
@@ -200,7 +299,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
                 Selecione a petição
               </div>
               <div style={{ fontSize: 12, color: theme.muted, marginBottom: 20, fontFamily: 'Inter, sans-serif' }}>
-                PDF ou Word (.docx) · Petições, contestações, recursos, memoriais
+                PDF ou Word (.docx) · máx. 10 MB
               </div>
               <label style={{ background: theme.gold, color: '#fff', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'inline-block' }}>
                 + Selecionar arquivo
@@ -298,7 +397,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             <AlertCircle size={16} color={theme.error} />
             <div style={{ fontSize: 14, color: theme.error, fontWeight: 700, fontFamily: 'Inter, sans-serif' }}>Erro na extração</div>
           </div>
-          <div style={{ fontSize: 13, color: theme.muted, marginBottom: 16, lineHeight: 1.6, fontFamily: 'Inter, sans-serif' }}>
+          <div style={{ fontSize: 13, color: theme.muted, marginBottom: 16, lineHeight: 1.6, fontFamily: 'Inter, sans-serif', wordBreak: 'break-word' }}>
             {erro}
           </div>
           <button onClick={reiniciar}
