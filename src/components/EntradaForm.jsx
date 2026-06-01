@@ -34,7 +34,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
     setEntry(e => ({ ...e, teses: e.teses.filter((_, j) => j !== i) }))
   }
 
-  // ── OCR de PDF ──────────────────────────────────────────────────────────
+  // ── OCR de PDF — fluxo browser (sem timeout Vercel) ────────────────────
   async function handlePDF(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -50,20 +50,72 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
     setPdfNome(file.name)
 
     try {
-      // Converter para base64
+      // 1. Obter sessão
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente.')
+
+      // 2. Obter API key via endpoint seguro
+      const keyRes = await fetch('/api/get-anthropic-config?t=' + Date.now(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
+        body: JSON.stringify({ user_id: session.user.id }),
+      })
+      const keyRaw = await keyRes.text()
+      if (!keyRaw || !keyRaw.trim()) throw new Error('Configuração da API indisponível.')
+      const keyJson = JSON.parse(keyRaw)
+      if (!keyRes.ok || keyJson.error) throw new Error(keyJson.error || 'Erro ao obter configuração.')
+      const apiKey = keyJson.key
+
+      // 3. Converter PDF para base64
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload  = () => resolve(reader.result.split(',')[1])
         reader.onerror = reject
         reader.readAsDataURL(file)
       })
+      if (!base64 || base64.length < 100) throw new Error('PDF não pôde ser lido (' + (base64?.length ?? 0) + ' chars).')
 
-      const res = await fetch('/api/extrair-pdf', {
+      // 4. Chamar Claude diretamente no browser
+      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pdf_base64: base64, filename: file.name }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta': 'pdfs-2024-09-25',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4000,
+          system: 'Extraia metadados jurídicos do documento. Retorne SOMENTE JSON válido, sem markdown: {"tipo_item":"string","ementa":"string","tribunal":"string","relator":"string","data":"string","numero":"string","url":"string","fundamentacao_legal":"string","teses":["string"]}',
+          messages: [{ role: 'user', content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: 'Extraia os metadados do acórdão. Retorne APENAS o JSON.' }
+          ]}],
+        }),
       })
-      const json = await res.json()
+
+      const claudeRaw = await claudeRes.text()
+      if (!claudeRes.ok) {
+        let detalhe = claudeRaw.slice(0, 200)
+        try { detalhe = JSON.parse(claudeRaw)?.error?.message || detalhe } catch {}
+        throw new Error('Claude HTTP ' + claudeRes.status + ': ' + detalhe)
+      }
+      if (!claudeRaw || !claudeRaw.trim()) throw new Error('Claude retornou resposta vazia.')
+
+      const claudeJson = JSON.parse(claudeRaw)
+      if (claudeJson.error) throw new Error(claudeJson.error.message || JSON.stringify(claudeJson.error))
+
+      const rawText = (claudeJson.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
+      let dadosExtraidos
+      try { dadosExtraidos = JSON.parse(rawText.trim()) }
+      catch {
+        const match = rawText.match(/\{[\s\S]*\}/)
+        if (!match) throw new Error('IA não retornou JSON válido.')
+        dadosExtraidos = JSON.parse(match[0])
+      }
+      const json = { dados: dadosExtraidos }
       if (json.error) throw new Error(json.error)
 
       const d = json.dados
