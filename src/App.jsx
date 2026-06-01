@@ -859,7 +859,7 @@ case VIEWS.FLASHCARDS:
                 { id: 'all',      label: 'Todas' },
                 { id: 'Cível',    label: 'Cível' },
                 { id: 'Penal',    label: 'Penal' },
-                { id: 'Doutrina', label: 'Doutrina' },
+
               ].map(a => (
                 <button key={a.id} onClick={() => setAreaFilter(a.id)} style={{
                   flexShrink: 0,
