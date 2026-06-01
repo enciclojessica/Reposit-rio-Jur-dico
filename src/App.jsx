@@ -733,7 +733,7 @@ case VIEWS.FLASHCARDS:
         return <ImportarHub key="importar-hub" session={session} initialTab={importarAba} onAbaChange={setImportarAba} setView={setView} theme={theme} />
 
       case VIEWS.DASHBOARD:
-        return <div className="fade-up"><Dashboard entradas={entradas}/></div>
+        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao}/></div>
 
       case VIEWS.EDITOR:
         return (
