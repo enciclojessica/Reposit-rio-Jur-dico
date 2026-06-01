@@ -87,7 +87,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5',
           max_tokens: 4000,
           system: 'Extraia metadados jurídicos do documento. Retorne SOMENTE JSON válido, sem markdown: {"tipo_item":"string","ementa":"string","tribunal":"string","relator":"string","data":"string","numero":"string","url":"string","fundamentacao_legal":"string","teses":["string"]}',
           messages: [{ role: 'user', content: [
