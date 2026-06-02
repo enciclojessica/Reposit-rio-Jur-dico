@@ -88,7 +88,7 @@ export default function Auth() {
             />
           </div>
           <div style={{ fontSize: 22, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.2, marginBottom: 4 }}>
-            Lexia
+            Lex.IA
           </div>
           <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 3, fontFamily: 'Inter, sans-serif' }}>
             Inteligência Jurídica · Farias Fusquiani
