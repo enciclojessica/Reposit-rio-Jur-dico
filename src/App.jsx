@@ -604,6 +604,7 @@ async function handleSave(entry) {
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
+        <SeletorTema compact />
         {session
           ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
           : <button onClick={() => setShowLogin(true)} style={{ background: theme.gold, border: 'none', borderRadius: 6, padding: '5px 14px', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5 }}><Lock size={11} /> Acesso Interno</button>
@@ -958,6 +959,8 @@ case VIEWS.FLASHCARDS:
           }}>
             {session ? (
               <>
+                <SeletorTema compact />
+                <div style={{ width: 1, height: 20, background: theme.border }} />
                 <SinoNotificacoes
                   session={session}
                   onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
