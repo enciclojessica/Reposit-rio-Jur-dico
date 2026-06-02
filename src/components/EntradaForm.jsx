@@ -184,7 +184,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
           ...prev,
           area:       (d.area && AREAS[d.area]) ? d.area : prev.area,
           tema:       d.ementa ? d.ementa.slice(0, 100).trimEnd() + '...' : prev.tema,
-          tipo:       'jurisprudencia',
+          tipo:       'jurisprudência',
           fonte:      d.tribunal || prev.fonte,
           referencia: [d.tipo_item, d.numero].filter(Boolean).join(' ') || prev.referencia,
           url:        d.url || prev.url,
