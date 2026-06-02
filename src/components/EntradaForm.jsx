@@ -288,7 +288,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
               {extraindo ? 'Extraindo e analisando o acordao...' : 'Importar PDF do Acordao'}
             </div>
             <div style={{ fontSize: 11, color: theme.muted }}>
-              {pdfNome ? ('Arquivo: ' + pdfNome) : ('Upload do PDF — extrai metadados, teses, ratio decidendi e aplicacao pratica. Max. ' + MAX_PDF_MB + 'MB.')}
+              {pdfNome ? ('Arquivo: ' + pdfNome) : ('Upload do PDF — extrai metadados, teses, fundamento da decisao e aplicacao pratica. Max. ' + MAX_PDF_MB + 'MB.')}
             </div>
           </div>
           <label style={{
@@ -389,10 +389,10 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
           {inp(t.fundamentacao_legal, v => setT(i, 'fundamentacao_legal', v), 'Art. X, Lei Y / Sumula Z')}
 
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center' }}>
-            <FieldLabel>Ratio Decidendi</FieldLabel>
+            <FieldLabel>Fundamento da Decisão</FieldLabel>
             <IaBadge status={iaStatus[i + '_ratio_decidendi']} theme={theme} />
           </div>
-          <IaField value={t.ratio_decidendi} onChange={v => setT(i, 'ratio_decidendi', v)} placeholder="Fundamento determinante da decisao" teseIdx={i} fieldName="ratio_decidendi" />
+          <IaField value={t.ratio_decidendi} onChange={v => setT(i, 'ratio_decidendi', v)} placeholder="Fundamento determinante da decisãoento determinante da decisao" teseIdx={i} fieldName="ratio_decidendi" />
 
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center' }}>
             <FieldLabel>Aplicacao Pratica</FieldLabel>
