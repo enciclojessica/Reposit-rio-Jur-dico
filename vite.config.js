@@ -10,7 +10,7 @@ export default defineConfig({
       selfDestroying: true, // temporario: desregistra SW em todos os clientes
       includeAssets: ['logo.png', 'icon-*.png'],
       manifest: {
-        name: 'Síntese Jurídica — Farias Fusquiani',
+        name: 'Lexia — Farias Fusquiani',
         short_name: 'Síntese',
         description: 'Plataforma de curadoria jurídica · Farias Fusquiani',
         theme_color: '#800020',
