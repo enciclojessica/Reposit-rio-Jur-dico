@@ -325,6 +325,7 @@ async function handleSave(entry) {
       area: entry.area, tema: entry.tema, tipo: entry.tipo,
       fonte: entry.fonte, referencia: entry.referencia, url: entry.url,
       teses: entry.teses, criado_por: session.user.id,
+      ia_status: entry.ia_status || 'manual',
     }
     if (view === VIEWS.ADD) {
       const { error } = await supabase.from('entradas').insert(payload)
