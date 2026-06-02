@@ -88,7 +88,7 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
         `## Tese ${i+1}: ${s(t?.tese_assunto)}`,
         `Fundamentação: ${s(t?.fundamentacao_legal)}`,
         `Precedente: ${s(t?.precedente_sumula)}`,
-        `Ratio: ${s(t?.ratio_decidendi)}`,
+        `Fundamento: ${s(t?.ratio_decidendi)}`,
         `Aplicação: ${s(t?.aplicacao_pratica)}`,
         '',
       ]),
@@ -218,7 +218,7 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
               ['Tese / Assunto',      s(t.tese_assunto),        false],
               ['Fundamentação Legal', s(t.fundamentacao_legal),  false],
               ['Precedente / Súmula', s(t.precedente_sumula),    false],
-              ['Ratio Decidendi',     s(t.ratio_decidendi),      true],
+              ['Fundamento da Decisão',     s(t.ratio_decidendi),      true],
               ['Aplicação Prática',   s(t.aplicacao_pratica),    true],
             ].filter(([, val]) => val).map(([label, val, isIa]) => (
               <div key={label} style={{
