@@ -600,7 +600,7 @@ async function handleSave(entry) {
           />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Lexia</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Lex.IA</div>
           <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>Inteligência Jurídica</div>
         </div>
       </div>
