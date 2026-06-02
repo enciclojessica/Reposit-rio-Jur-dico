@@ -79,7 +79,7 @@ export default function Auth() {
             overflow: 'hidden', margin: '0 auto 16px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <img src="/logo-temis.png" alt="Síntese Jurídica"
+            <img src="/logo-temis.png" alt="Lexia"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={e => {
                 e.target.style.display = 'none'
@@ -88,10 +88,10 @@ export default function Auth() {
             />
           </div>
           <div style={{ fontSize: 22, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.2, marginBottom: 4 }}>
-            Síntese Jurídica
+            Lexia
           </div>
           <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 3, fontFamily: 'Inter, sans-serif' }}>
-            Curadoria Jurídica · Farias Fusquiani
+            Inteligência Jurídica · Farias Fusquiani
           </div>
         </div>
 
