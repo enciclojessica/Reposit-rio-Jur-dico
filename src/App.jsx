@@ -422,7 +422,7 @@ async function handleSave(entry) {
       borderRight: `1px solid ${theme.border}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo Síntese Jurídica — Têmis */}
+      {/* Logo Lexia — Têmis */}
       <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{
           width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
@@ -435,7 +435,7 @@ async function handleSave(entry) {
         }}>
           <img
             src="/logo-temis.png"
-            alt="Síntese Jurídica"
+            alt="Lexia"
             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
@@ -447,10 +447,10 @@ async function handleSave(entry) {
         </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
-            Síntese Jurídica
+            Lexia
           </div>
           <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, marginTop: 2 }}>
-            Curadoria Jurídica
+            Inteligência Jurídica
           </div>
         </div>
       </div>
@@ -592,14 +592,14 @@ async function handleSave(entry) {
           background: '#800020', border: '2px solid #C5A059',
           overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <img src="/logo-temis.png" alt="Síntese Jurídica"
+          <img src="/logo-temis.png" alt="Lexia"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             onError={e => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:14px">FF</span>' }}
           />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Síntese Jurídica</div>
-          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>Curadoria Jurídica</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Lexia</div>
+          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>Inteligência Jurídica</div>
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
