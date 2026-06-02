@@ -67,7 +67,7 @@ export default function InstalarApp() {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
-          Instalar Lexia no iPhone
+          Instalar Lex.IA no iPhone
         </div>
         <button onClick={() => setShowIOSGuia(false)}
           style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>
@@ -102,7 +102,7 @@ export default function InstalarApp() {
       <img src="/icon-72.png" alt="Lexia" style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, marginBottom: 2 }}>
-          Instalar Lexia
+          Instalar Lex.IA
         </div>
         <div style={{ fontSize: 11, color: theme.muted }}>
           Acesso rápido, carregamento instantâneo, funciona offline.
