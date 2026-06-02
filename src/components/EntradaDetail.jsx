@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AlertTriangle } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META } from '../shared'
 import { supabase } from '../supabase'
@@ -44,11 +45,14 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
     referencia: s(raw?.referencia) || '',
     url:        s(raw?.url)        || '',
     status:     s(raw?.status)     || 'vigente',
+    ia_status:  s(raw?.ia_status)  || 'manual',
     criado_em:  s(raw?.criado_em)  || '',
     teses:      arr(raw?.teses),
     historico:  arr(raw?.historico),
     tags:       arr(raw?.tags),
   }
+
+  const iasPendente = entry.ia_status === 'ia_pendente'
 
   const [status, setStatus]               = useState(entry.status)
   const [showStatus, setShowStatus]       = useState(false)
@@ -211,14 +215,27 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
               Tese {i+1}
             </div>
             {[
-              ['Tese / Assunto',      s(t.tese_assunto)],
-              ['Fundamentação Legal', s(t.fundamentacao_legal)],
-              ['Precedente / Súmula', s(t.precedente_sumula)],
-              ['Ratio Decidendi',     s(t.ratio_decidendi)],
-              ['Aplicação Prática',   s(t.aplicacao_pratica)],
-            ].filter(([, val]) => val).map(([label, val]) => (
-              <div key={label} style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 }}>{label}</div>
+              ['Tese / Assunto',      s(t.tese_assunto),        false],
+              ['Fundamentação Legal', s(t.fundamentacao_legal),  false],
+              ['Precedente / Súmula', s(t.precedente_sumula),    false],
+              ['Ratio Decidendi',     s(t.ratio_decidendi),      true],
+              ['Aplicação Prática',   s(t.aplicacao_pratica),    true],
+            ].filter(([, val]) => val).map(([label, val, isIa]) => (
+              <div key={label} style={{
+                marginBottom: 12,
+                background: isIa && iasPendente ? (mode === 'dark' ? '#1c160033' : '#fffbeb66') : 'transparent',
+                border: isIa && iasPendente ? '1px dashed #c9a45266' : '1px solid transparent',
+                borderRadius: isIa && iasPendente ? 8 : 0,
+                padding: isIa && iasPendente ? '10px 12px' : 0,
+              }}>
+                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {label}
+                  {isIa && iasPendente && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#c9a452', fontSize: 9, fontFamily: 'IBM Plex Mono, monospace', background: '#c9a45218', border: '1px solid #c9a45244', borderRadius: 4, padding: '1px 6px' }}>
+                      <AlertTriangle size={8} /> IA · Pendente de revisão
+                    </span>
+                  )}
+                </div>
                 <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7 }}>{val}</div>
               </div>
             ))}
