@@ -2,7 +2,40 @@ import { useState } from 'react'
 import { AREAS } from '../shared'
 import { TagPill } from './TagInput'
 import { useTheme } from '../theme'
-import { Trash2, Square, CheckSquare } from 'lucide-react'
+import { Trash2, Square, CheckSquare, AlertTriangle, CheckCircle } from 'lucide-react'
+
+// Badge de status IA para os cards da listagem
+function IaStatusBadge({ status, theme }) {
+  if (!status || status === 'manual') return null
+  if (status === 'ia_revisado') {
+    return (
+      <span style={{
+        display: 'inline-flex', alignItems: 'center', gap: 3,
+        background: (theme.success || '#10b981') + '18',
+        color: theme.success || '#10b981',
+        border: '1px solid ' + (theme.success || '#10b981') + '44',
+        borderRadius: 4, padding: '2px 7px',
+        fontSize: 9, fontFamily: 'IBM Plex Mono, monospace',
+        fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5,
+      }}>
+        <CheckCircle size={9} /> IA Revisado
+      </span>
+    )
+  }
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 3,
+      background: '#c9a45218',
+      color: '#c9a452',
+      border: '1px solid #c9a45244',
+      borderRadius: 4, padding: '2px 7px',
+      fontSize: 9, fontFamily: 'IBM Plex Mono, monospace',
+      fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5,
+    }}>
+      <AlertTriangle size={9} /> IA · Revisar
+    </span>
+  )
+}
 
 export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMultiple, isAdmin }) {
   const { theme } = useTheme()
@@ -82,7 +115,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
     <div>
       <ToggleModo />
 
-      {/* Barra de seleção múltipla — só para admin */}
+      {/* Barra de seleção múltipla */}
       {isAdmin && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, padding: '8px 12px', background: selecionados.size > 0 ? '#1a0f00' : 'transparent', border: '1px solid ' + (selecionados.size > 0 ? theme.gold + '44' : 'transparent'), borderRadius: 8, transition: 'all .2s' }}>
           <button onClick={toggleTodos} style={{ background: 'none', border: 'none', color: selecionados.size === entradas.length && entradas.length > 0 ? theme.gold : theme.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', padding: 0 }}>
@@ -107,14 +140,14 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
             <thead>
               <tr style={{ borderBottom: '1px solid ' + theme.border }}>
                 {isAdmin && <th style={{ width: 32, padding: '8px 4px' }}></th>}
-                {['Área', 'Tipo', 'Tema', 'Tribunal', 'Data', 'Teses'].map(h => (
+                {['Área', 'Tipo', 'Tema', 'Tribunal', 'Data', 'Teses', 'IA'].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: theme.muted, fontWeight: 600, fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {entradas.map(e => {
-                const area = AREAS[e.area] || {}
+                const area    = AREAS[e.area] || {}
                 const checked = selecionados.has(e.id)
                 return (
                   <tr key={e.id} onClick={() => onSelect(e)}
@@ -132,6 +165,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{e.tribunal}</td>
                     <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{e.data_julgamento ? new Date(e.data_julgamento).toLocaleDateString('pt-BR') : '—'}</td>
                     <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{(e.teses || []).length}</td>
+                    <td style={{ padding: '8px 12px' }}><IaStatusBadge status={e.ia_status} theme={theme} /></td>
                   </tr>
                 )
               })}
@@ -141,14 +175,13 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {entradas.map(e => {
-            const area = AREAS[e.area] || {}
+            const area    = AREAS[e.area] || {}
             const checked = selecionados.has(e.id)
             return (
               <div key={e.id}
                 onClick={() => onSelect(e)}
                 style={{ background: checked ? theme.gold + '08' : theme.raised, border: '1px solid ' + (checked ? theme.gold + '55' : theme.border), borderLeft: '3px solid ' + (area.cor || theme.border), borderRadius: 10, padding: '14px 16px', cursor: 'pointer', transition: 'all .15s', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
 
-                {/* Checkbox admin */}
                 {isAdmin && (
                   <div onClick={ev => toggleSelect(e.id, ev)} style={{ paddingTop: 2, flexShrink: 0 }}>
                     {checked
@@ -163,6 +196,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     <span style={{ background: (area.cor || theme.muted) + '22', color: area.cor || theme.muted, border: '1px solid ' + (area.cor || theme.muted) + '44', borderRadius: 4, padding: '2px 7px', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{e.area}</span>
                     <span style={{ background: theme.muted + '18', color: theme.muted, border: '1px solid ' + theme.border, borderRadius: 4, padding: '2px 7px', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}>{e.tipo}</span>
                     {e.tribunal && <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{e.tribunal}</span>}
+                    <IaStatusBadge status={e.ia_status} theme={theme} />
                     {e.tags && e.tags.map && e.tags.map(t => <TagPill key={t} tag={t} pequena />)}
                   </div>
                   <div style={{ fontSize: 15, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.4, marginBottom: 4 }}>{e.tema}</div>
