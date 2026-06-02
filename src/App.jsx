@@ -436,8 +436,9 @@ async function handleSave(entry) {
           <img
             src="/logo-temis.png"
             alt="Lexia"
+            onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            style={{ width: '100%', height: '100%', cursor: 'pointer', objectFit: 'cover', display: 'block' }}
           />
           <span style={{
             display: 'none', position: 'absolute', inset: 0,
@@ -593,7 +594,8 @@ async function handleSave(entry) {
           overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <img src="/logo-temis.png" alt="Lexia"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+            onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
             onError={e => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:14px">FF</span>' }}
           />
         </div>
