@@ -249,6 +249,14 @@ export default function EditorPecas({ entradas }) {
   const [painelAberto, setPainelAberto]     = useState(true)
   const [mostrarRascunhos, setMostrarRascunhos] = useState(false)
   const [autoSalvo, setAutoSalvo]           = useState(false)
+  const [isMobile, setIsMobile]             = useState(window.innerWidth < 768)
+  const [painelMobileAberto, setPainelMobileAberto] = useState(false)
+
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
 
   // ── Estado dos slash commands ─────────────────────────────────────────
   const [slashCmd, setSlashCmd]             = useState('')
@@ -374,7 +382,12 @@ export default function EditorPecas({ entradas }) {
             <BookOpen size={13} /> Rascunhos
             <span style={{ background: theme.border, borderRadius: 10, padding: '1px 6px', fontSize: 9 }}>{rascunhos.length}</span>
           </button>
-          <button onClick={() => setPainelAberto(p => !p)} style={{ ...btnBase, color: painelAberto ? theme.gold : theme.muted, background: painelAberto ? theme.gold + '11' : theme.raised, borderColor: painelAberto ? theme.gold + '44' : theme.border }}>
+          <button onClick={() => isMobile ? setPainelMobileAberto(p => !p) : setPainelAberto(p => !p)}
+            style={{ ...btnBase,
+              color: (isMobile ? painelMobileAberto : painelAberto) ? theme.gold : theme.muted,
+              background: (isMobile ? painelMobileAberto : painelAberto) ? theme.gold + '11' : theme.raised,
+              borderColor: (isMobile ? painelMobileAberto : painelAberto) ? theme.gold + '44' : theme.border
+            }}>
             <ChevronDown size={13} /> Citações
           </button>
           <button onClick={copiarTudo} disabled={!conteudo.trim()} style={{ ...btnBase, color: copiado ? theme.success : theme.muted }}>
@@ -457,10 +470,31 @@ export default function EditorPecas({ entradas }) {
           </div>
         </div>
 
-        {/* Painel citações */}
-        {painelAberto && (
+        {/* Painel citações — lateral no desktop, modal no mobile */}
+        {!isMobile && painelAberto && (
           <div style={{ width: 300, borderLeft: `1px solid ${theme.border}`, background: theme.surface, display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
             <PainelCitacoes entradas={entradas} editorRef={editorRef} conteudo={conteudo} setConteudo={setConteudo} rito={rito} />
+          </div>
+        )}
+        {/* Modal de citações no mobile */}
+        {isMobile && painelMobileAberto && (
+          <div onClick={() => setPainelMobileAberto(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 300, background: '#00000066' }}>
+            <div onClick={e => e.stopPropagation()} style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              height: '75vh', background: theme.surface,
+              borderTopLeftRadius: 20, borderTopRightRadius: 20,
+              border: `1px solid ${theme.border}`,
+              display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Citações</span>
+                <button onClick={() => setPainelMobileAberto(false)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>×</button>
+              </div>
+              <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <PainelCitacoes entradas={entradas} editorRef={editorRef} conteudo={conteudo} setConteudo={setConteudo} rito={rito} />
+              </div>
+            </div>
           </div>
         )}
       </div>
