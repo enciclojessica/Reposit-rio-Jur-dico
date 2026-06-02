@@ -10,8 +10,8 @@ export default defineConfig({
       selfDestroying: true, // temporario: desregistra SW em todos os clientes
       includeAssets: ['logo.png', 'icon-*.png'],
       manifest: {
-        name: 'Lexia — Farias Fusquiani',
-        short_name: 'Síntese',
+        name: 'Lexia',
+        short_name: 'Lexia',
         description: 'Plataforma de curadoria jurídica · Farias Fusquiani',
         theme_color: '#800020',
         background_color: '#fdfbf7',
