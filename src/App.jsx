@@ -18,7 +18,7 @@ import Legislacao from './components/Legislacao'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
-import Configuracoes from './components/Configuracoes'
+import Configurações from './components/Configurações'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
 import { Lock } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
@@ -366,7 +366,7 @@ async function handleSave(entry) {
 
   async function limparTodoRepositorio() {
     const OWNER = 'foxjessica01@gmail.com'
-    if (session?.user?.email !== OWNER) { notify('Apenas a proprietaria pode limpar o repositorio.', 'err'); return }
+    if (session?.user?.email !== OWNER) { notify('Apenas a proprietária pode limpar o repositório.', 'err'); return }
     setLimpandoRepo(true)
     try {
       const { error } = await supabase.from('entradas').delete().neq('id', '00000000-0000-0000-0000-000000000000')
@@ -629,7 +629,7 @@ async function handleSave(entry) {
     { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
-    ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configuracoes' }] : []),
+    ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
   ]
   const maisAtivo = navMais.some(n => n.v === view)
@@ -720,7 +720,7 @@ case VIEWS.FLASHCARDS:
       case VIEWS.CONFIG:
         return (
           <div className="fade-up">
-            <Configuracoes session={session} membro={membro} />
+            <Configurações session={session} membro={membro} />
           </div>
         )
 
@@ -936,7 +936,7 @@ case VIEWS.FLASHCARDS:
               isAdmin={isAdmin}
               onDeleteMultiple={isAdmin ? async (ids) => {
                 const OWNER = 'foxjessica01@gmail.com'
-                if (session?.user?.email !== OWNER) { notify('Sem permissao para esta acao.', 'err'); return }
+                if (session?.user?.email !== OWNER) { notify('Sem permissão para esta ação.', 'err'); return }
                 const { error } = await supabase.from('entradas').delete().in('id', ids)
                 if (error) notify('Erro ao excluir entradas.', 'err')
                 else { notify(ids.length + ' entrada(s) removida(s).'); }
