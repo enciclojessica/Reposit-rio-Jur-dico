@@ -88,16 +88,16 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
           </svg>
         </div>
         <div style={{ fontSize: 16, color: theme.text, fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
-          Repositorio vazio
+          Repositório vazio
         </div>
         <div style={{ fontSize: 13, color: theme.muted, marginBottom: 28, fontFamily: 'Inter, sans-serif', lineHeight: 1.6 }}>
-          Nenhuma tese, jurisprudencia ou doutrina cadastrada ainda.
+          Nenhuma tese, jurisprudência ou doutrina cadastrada ainda.
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280, margin: '0 auto' }}>
           {[
             { label: 'Importar via planilha', aba: 'planilha' },
-            { label: 'Importar via peticao', aba: 'peticao' },
-            { label: 'Importar legislacao', aba: 'legislacao' },
+            { label: 'Importar via petição', aba: 'peticao' },
+            { label: 'Importar legislação', aba: 'legislacao' },
           ].map(item => (
             <button key={item.aba} onClick={() => onImportar && onImportar(item.aba)}
               style={{ background: theme.raised, border: '1px solid ' + theme.border, borderRadius: 8, padding: '10px 16px', color: theme.muted, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all .15s' }}>
