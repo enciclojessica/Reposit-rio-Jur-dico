@@ -448,7 +448,7 @@ async function handleSave(entry) {
         </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
-            Lexia
+            Lex.IA
           </div>
           <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, marginTop: 2 }}>
             Inteligência Jurídica
