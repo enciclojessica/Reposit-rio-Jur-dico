@@ -722,7 +722,7 @@ case VIEWS.FLASHCARDS:
       case VIEWS.CONFIG:
         return (
           <div className="fade-up">
-            <Configurações session={session} membro={membro} />
+            <Configuracoes session={session} membro={membro} />
           </div>
         )
 
