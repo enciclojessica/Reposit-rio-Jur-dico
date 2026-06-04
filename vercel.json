@@ -29,6 +29,10 @@
     {
       "path": "/api/cron/verificar-alertas",
       "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/radar-informativos",
+      "schedule": "0 9 * * 1"
     }
   ]
 }
