@@ -218,16 +218,33 @@ function TabRadar({ session }) {
   }
 
   async function executarRadar() {
-    if (executando || !session) return
+    if (executando) return
     setExecutando(true); setResultado(null); setErro(null)
     try {
-      const { data: { session: s } } = await supabase.auth.getSession()
+      // Forçar refresh do token para garantir que está válido
+      const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession()
+      const token = refreshData?.session?.access_token
+
+      if (refreshErr || !token) {
+        // Tentar com a sessão atual como fallback
+        const { data: sessionData } = await supabase.auth.getSession()
+        const fallbackToken = sessionData?.session?.access_token
+        if (!fallbackToken) throw new Error('Sessão expirada. Faça login novamente.')
+
+        const res = await fetch('/api/radar-informativos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${fallbackToken}` },
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Erro ao executar radar')
+        setResultado(json)
+        await carregarStatus()
+        return
+      }
+
       const res = await fetch('/api/radar-informativos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${s?.access_token}`,
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Erro ao executar radar')
