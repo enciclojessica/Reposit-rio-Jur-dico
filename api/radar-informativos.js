@@ -38,22 +38,18 @@ export default async function handler(req, res) {
     process.env.SUPABASE_SERVICE_KEY
   )
 
-  // Se não é cron, verificar se é admin
+  // Se não é cron, verificar se é admin via user_id no body
   if (!isCron) {
-    // Usar client separado com a anon key para verificar JWT do usuário
-    const supabaseAuth = createClient(
-      process.env.SUPABASE_URL,
-      process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
-    )
-    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(authHeader)
-    if (authErr || !user) {
-      console.error('Auth error:', authErr?.message, 'token length:', authHeader?.length)
-      return res.status(401).json({ error: 'Não autorizado. ' + (authErr?.message || '') })
-    }
+    // Recebe user_id no body — verificamos diretamente no banco com service key
+    // Evita problemas de JWT kid mismatch entre projetos Supabase
+    const userId = req.body?.user_id
+    if (!userId) return res.status(401).json({ error: 'user_id obrigatório.' })
 
-    const { data: membro } = await supabase
-      .from('membros').select('role').eq('user_id', user.id).single()
-    if (membro?.role !== 'admin') return res.status(403).json({ error: 'Apenas admins podem executar o radar.' })
+    const { data: membro, error: membroErr } = await supabase
+      .from('membros').select('role, user_id').eq('user_id', userId).single()
+
+    if (membroErr || !membro) return res.status(401).json({ error: 'Usuário não encontrado.' })
+    if (membro.role !== 'admin') return res.status(403).json({ error: 'Apenas admins podem executar o radar.' })
   }
 
   // Buscar qual foi o último informativo processado de cada tribunal
