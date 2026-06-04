@@ -229,12 +229,14 @@ function TabRadar({ session }) {
         throw new Error('Sessão não encontrada. Faça logout e login novamente.')
       }
 
+      // Enviar user_id no body — servidor verifica admin direto no banco
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user?.id) throw new Error('Usuário não identificado. Faça logout e login novamente.')
+
       const res = await fetch('/api/radar-informativos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id }),
       })
 
       // Log para debug
