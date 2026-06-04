@@ -40,8 +40,16 @@ export default async function handler(req, res) {
 
   // Se não é cron, verificar se é admin
   if (!isCron) {
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader)
-    if (authErr || !user) return res.status(401).json({ error: 'Não autorizado.' })
+    // Usar client separado com a anon key para verificar JWT do usuário
+    const supabaseAuth = createClient(
+      process.env.SUPABASE_URL,
+      process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+    )
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(authHeader)
+    if (authErr || !user) {
+      console.error('Auth error:', authErr?.message, 'token length:', authHeader?.length)
+      return res.status(401).json({ error: 'Não autorizado. ' + (authErr?.message || '') })
+    }
 
     const { data: membro } = await supabase
       .from('membros').select('role').eq('user_id', user.id).single()
