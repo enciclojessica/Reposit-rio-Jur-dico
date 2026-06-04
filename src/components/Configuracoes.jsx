@@ -221,33 +221,31 @@ function TabRadar({ session }) {
     if (executando) return
     setExecutando(true); setResultado(null); setErro(null)
     try {
-      // Forçar refresh do token para garantir que está válido
-      const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession()
-      const token = refreshData?.session?.access_token
+      // Buscar sessão atual — getSession() é síncrono e não falha
+      const { data: { session: sessaoAtual } } = await supabase.auth.getSession()
+      const token = sessaoAtual?.access_token
 
-      if (refreshErr || !token) {
-        // Tentar com a sessão atual como fallback
-        const { data: sessionData } = await supabase.auth.getSession()
-        const fallbackToken = sessionData?.session?.access_token
-        if (!fallbackToken) throw new Error('Sessão expirada. Faça login novamente.')
-
-        const res = await fetch('/api/radar-informativos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${fallbackToken}` },
-        })
-        const json = await res.json()
-        if (!res.ok) throw new Error(json.error || 'Erro ao executar radar')
-        setResultado(json)
-        await carregarStatus()
-        return
+      if (!token) {
+        throw new Error('Sessão não encontrada. Faça logout e login novamente.')
       }
 
       const res = await fetch('/api/radar-informativos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
       })
+
+      // Log para debug
+      if (!res.ok) {
+        const txt = await res.text()
+        let msg = 'Erro ao executar radar'
+        try { msg = JSON.parse(txt).error || msg } catch {}
+        throw new Error(`HTTP ${res.status}: ${msg}`)
+      }
+
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Erro ao executar radar')
       setResultado(json)
       await carregarStatus()
     } catch (err) {
