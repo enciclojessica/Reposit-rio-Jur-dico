@@ -634,6 +634,7 @@ async function handleSave(entry) {
     { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
+    ...(session  ? [{ v: VIEWS.OAB,     label: 'Estudos OAB'   }] : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
   ]
