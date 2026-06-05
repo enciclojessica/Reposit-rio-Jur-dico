@@ -19,6 +19,7 @@ import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import Configuracoes from './components/Configuracoes'
+import OabDashboard from './components/OabDashboard'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
 import { Lock } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
@@ -57,6 +58,7 @@ const VIEWS = {
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', MEMBROS: 'membros',
   CONFIG: 'config',
+  OAB: 'oab',
 }
 
 function useIsMobile() {
@@ -463,7 +465,8 @@ async function handleSave(entry) {
           { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
           { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
           { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
-          { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
+          { id: 'oab',    label: 'Estudos OAB',      action: () => setView(VIEWS.OAB),       active: view === VIEWS.OAB },
+    { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
         ].map(n => (
           <button key={n.id} onClick={n.action} style={{
             width: '100%', background: n.active ? theme.gold + '12' : 'none',
@@ -718,6 +721,13 @@ case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
 
 
+
+      case VIEWS.OAB:
+        return (
+          <div className="fade-up">
+            <OabDashboard session={session} />
+          </div>
+        )
 
       case VIEWS.CONFIG:
         return (
