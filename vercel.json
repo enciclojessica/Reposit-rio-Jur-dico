@@ -31,7 +31,7 @@
       "schedule": "0 8 * * 1"
     },
     {
-      "path": "/api/cron/radar-informativos",
+      "path": "/api/radar-informativos",
       "schedule": "0 9 * * 1"
     }
   ]
