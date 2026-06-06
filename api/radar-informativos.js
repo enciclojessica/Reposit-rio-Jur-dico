@@ -39,17 +39,26 @@ export default async function handler(req, res) {
   )
 
   // Se não é cron, verificar se é admin via user_id no body
-  if (!isCron) {
-    // Recebe user_id no body — verificamos diretamente no banco com service key
-    // Evita problemas de JWT kid mismatch entre projetos Supabase
+ if (!isCron) {
     const userId = req.body?.user_id
     if (!userId) return res.status(401).json({ error: 'user_id obrigatório.' })
 
-    const { data: membro, error: membroErr } = await supabase
-      .from('membros').select('role, user_id').eq('user_id', userId).single()
+    // Verificar usuário via Auth Admin (usa service key, independe de RLS)
+    const { data: authData, error: authErr } = await supabase.auth.admin.getUserById(userId)
+    if (authErr || !authData?.user) {
+      return res.status(401).json({ error: `Erro de autenticação: ${authErr?.message || 'usuário não encontrado'}` })
+    }
 
-    if (membroErr || !membro) return res.status(401).json({ error: 'Usuário não encontrado.' })
-    if (membro.role !== 'admin') return res.status(403).json({ error: 'Apenas admins podem executar o radar.' })
+    const userEmail = authData.user.email
+    const ADMIN_EMAILS = ['foxjessica01@gmail.com']
+
+    if (!ADMIN_EMAILS.includes(userEmail)) {
+      // Para outros usuários, verificar role na tabela membros
+      const { data: membro, error: membroErr } = await supabase
+        .from('membros').select('role').eq('user_id', userId).single()
+      if (membroErr) return res.status(401).json({ error: `Erro DB: ${membroErr.message}` })
+      if (!membro || membro.role !== 'admin') return res.status(403).json({ error: 'Apenas admins podem executar o radar.' })
+    }
   }
 
   // Buscar qual foi o último informativo processado de cada tribunal
