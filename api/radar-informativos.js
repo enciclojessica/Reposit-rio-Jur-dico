@@ -7,11 +7,9 @@ import { createClient } from '@supabase/supabase-js'
 const TRIBUNAIS = {
   STJ: {
     nome: 'STJ',
-    // URL pública dos informativos do STJ (PDF direto por número)
     urlInformativo: (n) => `https://scon.stj.jus.br/SCON/GetPDF/informativo/informativo${String(n).padStart(3,'0')}.pdf`,
-    // Página de listagem para descobrir último número
     urlLista: 'https://scon.stj.jus.br/SCON/informativo/toc.jsp',
-    area: 'Cível', // padrão — Claude vai identificar a área correta
+    area: 'Cível',
   },
   STF: {
     nome: 'STF',
@@ -24,12 +22,10 @@ const TRIBUNAIS = {
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || ''
 
 export default async function handler(req, res) {
-  // Aceita GET (cron) e POST (admin manual)
   if (req.method !== 'GET' && req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  // Verificar autorização — cron secret ou admin autenticado
   const authHeader = req.headers['authorization']?.replace('Bearer ', '')
   const isCron = process.env.CRON_SECRET && authHeader === process.env.CRON_SECRET
 
@@ -38,13 +34,14 @@ export default async function handler(req, res) {
     process.env.SUPABASE_SERVICE_KEY
   )
 
-  // Se não é cron, verificar se é admin via user_id no body
- if (!isCron) {
+  // Se não é cron, verificar se é admin
+  if (!isCron) {
     const userId = req.body?.user_id
     if (!userId) return res.status(401).json({ error: 'user_id obrigatório.' })
 
     // Verificar usuário via Auth Admin (usa service key, independe de RLS)
     const { data: authData, error: authErr } = await supabase.auth.admin.getUserById(userId)
+
     if (authErr || !authData?.user) {
       return res.status(401).json({ error: `Erro de autenticação: ${authErr?.message || 'usuário não encontrado'}` })
     }
@@ -61,7 +58,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // Buscar qual foi o último informativo processado de cada tribunal
+  // Buscar último informativo processado por tribunal
   const { data: ultimosProcessados } = await supabase
     .from('radar_informativos')
     .select('tribunal, ultimo_numero')
@@ -78,7 +75,6 @@ export default async function handler(req, res) {
     try {
       const ultimoSalvo = ultimosPorTribunal[sigla] || 0
 
-      // Descobrir número do último informativo disponível via Claude com web search
       const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -111,14 +107,12 @@ export default async function handler(req, res) {
         continue
       }
 
-      // Processar apenas os novos — máximo 3 por execução para controlar custo
       const novos = []
       const inicio = ultimoSalvo + 1
       const fim = Math.min(ultimoDisponivel, ultimoSalvo + 3)
 
       for (let num = inicio; num <= fim; num++) {
         try {
-          // Baixar e processar o informativo via Claude
           const urlPdf = config.urlInformativo(num)
 
           const extrairRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -170,7 +164,6 @@ Retorne APENAS o JSON, sem markdown.`,
           }
 
           if (parsed.teses?.length) {
-            // Inserir cada tese como entrada no repositório
             for (const t of parsed.teses) {
               await supabase.from('entradas').insert({
                 area:       t.area || config.area,
@@ -187,7 +180,6 @@ Retorne APENAS o JSON, sem markdown.`,
                   ratio_decidendi:     '',
                   aplicacao_pratica:   t.aplicacao_pratica || '',
                 }],
-                // criado_por null indica entrada do radar (não vinculada a usuário)
                 criado_por: null,
               })
             }
@@ -198,7 +190,6 @@ Retorne APENAS o JSON, sem markdown.`,
         }
       }
 
-      // Atualizar último processado
       await supabase.from('radar_informativos').upsert({
         tribunal: sigla,
         ultimo_numero: fim,
@@ -212,7 +203,6 @@ Retorne APENAS o JSON, sem markdown.`,
     }
   }
 
-  // Notificar admin por e-mail se houver novidades
   const totalTeses = resultado.processados
     .flatMap(p => p.novos || [])
     .reduce((acc, n) => acc + (n.teses || 0), 0)
@@ -245,4 +235,4 @@ Retorne APENAS o JSON, sem markdown.`,
   }
 
   return res.status(200).json(resultado)
-}
+}fix: auth radar admin
