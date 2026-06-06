@@ -5,7 +5,7 @@ import { useTheme } from '../theme'
 import {
   Play, Pause, RotateCcw, CheckCircle, Clock, TrendingUp,
   Trophy, Target, Calendar, Download, ChevronDown, ChevronUp,
-  Star, Circle, Timer, Filter, BarChart2, RefreshCw
+  Star, Circle, Timer, Filter, BarChart2, RefreshCw, BookOpen
 } from 'lucide-react'
 
 // ── Paleta das disciplinas ─────────────────────────────────────────────────────
