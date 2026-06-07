@@ -1,84 +1,106 @@
 // api/radar-informativos.js
-// Versão corrigida — Jessica / Lex.IA — 07/06/2026
-//
-// CORREÇÕES NESTA VERSÃO:
-// 1. Tratamento explícito de erro antes de .json() (evita SyntaxError se a API retorna HTML/texto de erro)
-// 2. Log do status HTTP e corpo bruto em caso de falha da Anthropic API (facilita diagnóstico)
-// 3. Redução de chamadas à API de Anthropic: de até 4x para 1x (consulta STJ e STF em um único prompt)
-//    → evita timeout de 10s no plano Hobby do Vercel
-// 4. Verificação explícita de ANTHROPIC_API_KEY antes de qualquer chamada
-// 5. Mantida a lógica de autenticação admin existente (via tabela membros + service_role key)
+// Versão 2 — Jessica / Lex.IA — 07/06/2026
+// Schema real: tabela radar_informativos (tribunal, ultimo_numero, atualizado_em)
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY  // DEVE ser a service_role key, NÃO a anon key
-);
+import { createClient } from '@supabase/supabase-js'
 
 export default async function handler(req, res) {
-  // ── 1. Apenas POST ──────────────────────────────────────────────────────────
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
+    return res.status(405).json({ error: 'Método não permitido' })
   }
 
-  // ── 2. Verificar ANTHROPIC_API_KEY antes de qualquer coisa ─────────────────
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-  if (!ANTHROPIC_KEY || ANTHROPIC_KEY.trim() === '') {
-    console.error('[radar] ANTHROPIC_API_KEY ausente ou vazia');
-    return res.status(500).json({
-      error: 'Configuração interna inválida: ANTHROPIC_API_KEY não definida no Vercel.',
-      hint: 'Acesse Vercel → Settings → Environment Variables e adicione ANTHROPIC_API_KEY com sua chave válida do console.anthropic.com'
-    });
+  // ── 1. Verificar ANTHROPIC_API_KEY ─────────────────────────────────────────
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
+  if (!ANTHROPIC_KEY?.trim()) {
+    console.error('[radar] ANTHROPIC_API_KEY ausente')
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada no Vercel.' })
   }
 
-  // ── 3. Autenticação admin ────────────────────────────────────────────────────
-  const userId = req.body?.user_id;
+  // ── 2. Verificar SUPABASE_SERVICE_KEY ──────────────────────────────────────
+  const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY
+  if (!SERVICE_KEY?.trim()) {
+    console.error('[radar] SUPABASE_SERVICE_KEY ausente')
+    return res.status(500).json({ error: 'SUPABASE_SERVICE_KEY não configurada no Vercel.' })
+  }
+
+  // Cliente com service_role — bypassa RLS
+  const supabase = createClient(process.env.SUPABASE_URL, SERVICE_KEY)
+
+  // ── 3. Autenticação admin ───────────────────────────────────────────────────
+  const userId = req.body?.user_id
   if (!userId) {
-    return res.status(400).json({ error: 'user_id obrigatório no corpo da requisição' });
+    return res.status(400).json({ error: 'user_id obrigatório no body' })
   }
 
-  try {
-    const { data: membro, error: membroError } = await supabase
-      .from('membros')
-      .select('role, user_id')
-      .eq('user_id', userId)
-      .single();
+  console.log('[radar] Verificando user_id:', userId)
 
-    if (membroError || !membro) {
-      console.warn('[radar] Usuário não encontrado na tabela membros:', userId);
-      return res.status(401).json({ error: 'Usuário não encontrado' });
-    }
+  const { data: membro, error: membroError } = await supabase
+    .from('membros')
+    .select('role, user_id')
+    .eq('user_id', userId)
+    .single()
 
-    if (membro.role !== 'admin') {
-      return res.status(403).json({ error: 'Apenas admins podem executar o radar' });
-    }
-  } catch (authErr) {
-    console.error('[radar] Erro na autenticação:', authErr);
-    return res.status(500).json({ error: 'Erro interno na autenticação' });
+  if (membroError) {
+    console.error('[radar] Erro ao buscar membro:', membroError.message, '| code:', membroError.code)
+    return res.status(401).json({
+      error: 'Usuário não encontrado',
+      detalhe: membroError.message,
+      dica: 'Verifique se SUPABASE_SERVICE_KEY no Vercel é a chave service_role (não a anon key)'
+    })
   }
 
-  // ── 4. Chamada à API da Anthropic (STJ + STF em UM único prompt) ────────────
-  // Consolidamos STJ e STF em uma única chamada para evitar timeout no Vercel Hobby (10s limit)
-  const prompt = `Você é um assistente jurídico. Pesquise e resuma os informativos jurídicos mais recentes 
-do STJ (Superior Tribunal de Justiça) e do STF (Supremo Tribunal Federal) do Brasil.
-Para cada tribunal, traga:
-- As 3 decisões ou informativos mais recentes e relevantes
-- Tema, ementa resumida e impacto prático
+  if (membro.role !== 'admin') {
+    return res.status(403).json({ error: 'Apenas admins podem executar o radar' })
+  }
 
-Responda em JSON no seguinte formato:
+  console.log('[radar] Admin confirmado. Iniciando busca de informativos...')
+
+  // ── 4. Buscar último número processado por tribunal ─────────────────────────
+  const { data: statusAtual } = await supabase
+    .from('radar_informativos')
+    .select('tribunal, ultimo_numero')
+
+  const ultimoSTJ = statusAtual?.find(r => r.tribunal === 'STJ')?.ultimo_numero || 0
+  const ultimoSTF = statusAtual?.find(r => r.tribunal === 'STF')?.ultimo_numero || 0
+
+  console.log('[radar] Últimos processados — STJ:', ultimoSTJ, '| STF:', ultimoSTF)
+
+  // ── 5. Chamar Anthropic (STJ + STF em uma única requisição) ─────────────────
+  const prompt = `Você é um assistente jurídico especializado em jurisprudência brasileira.
+
+Pesquise os informativos mais recentes do STJ e do STF publicados APÓS os seguintes números:
+- STJ: após o informativo nº ${ultimoSTJ}
+- STF: após o informativo nº ${ultimoSTF}
+
+Para cada tribunal, encontre até 3 informativos novos. Para cada informativo, extraia:
+- numero (número do informativo)
+- data_publicacao
+- teses: array de até 3 teses/decisões relevantes, cada uma com:
+  - ementa (resumo de 2-3 frases)
+  - area_direito (ex: "Direito Civil", "Direito Penal", etc.)
+  - tipo_decisao (ex: "Recurso Especial", "Recurso Extraordinário", etc.)
+
+Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
 {
-  "stj": [
-    { "titulo": "...", "resumo": "...", "data": "..." }
+  "STJ": [
+    {
+      "numero": 830,
+      "data_publicacao": "2026-06-01",
+      "teses": [
+        {
+          "ementa": "...",
+          "area_direito": "Direito Civil",
+          "tipo_decisao": "Recurso Especial"
+        }
+      ]
+    }
   ],
-  "stf": [
-    { "titulo": "...", "resumo": "...", "data": "..." }
-  ],
-  "gerado_em": "data atual"
+  "STF": []
 }
-Responda SOMENTE com o JSON, sem texto adicional antes ou depois.`;
 
-  let claudeData;
+Se não houver informativos novos para um tribunal, retorne array vazio para aquele tribunal.`
+
+  let claudeData
   try {
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -88,77 +110,87 @@ Responda SOMENTE com o JSON, sem texto adicional antes ou depois.`;
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929', // atualizado para versão estável
-        max_tokens: 1500,
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 2000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }]
       })
-    });
+    })
 
-    // ── PONTO CRÍTICO: verificar ok ANTES de chamar .json() ──────────────────
+    // Verificar status ANTES de chamar .json()
     if (!claudeRes.ok) {
-      // Ler como texto primeiro para evitar SyntaxError se a resposta não for JSON
-      const rawBody = await claudeRes.text();
-      console.error(`[radar] Anthropic API retornou status ${claudeRes.status}:`, rawBody.slice(0, 500));
+      const rawBody = await claudeRes.text()
+      console.error('[radar] Anthropic retornou status', claudeRes.status, ':', rawBody.slice(0, 400))
       return res.status(500).json({
-        error: `Falha na API da Anthropic: HTTP ${claudeRes.status}`,
-        detalhe: rawBody.slice(0, 200)  // primeiros 200 chars para diagnóstico
-      });
+        error: `API Anthropic retornou HTTP ${claudeRes.status}`,
+        detalhe: rawBody.slice(0, 200)
+      })
     }
 
-    claudeData = await claudeRes.json();
+    claudeData = await claudeRes.json()
+    console.log('[radar] Anthropic respondeu. stop_reason:', claudeData.stop_reason)
   } catch (fetchErr) {
-    console.error('[radar] Erro de rede ao chamar Anthropic:', fetchErr);
-    return res.status(500).json({
-      error: 'Erro de rede ao contactar a API da Anthropic',
-      detalhe: fetchErr.message
-    });
+    console.error('[radar] Erro de rede Anthropic:', fetchErr.message)
+    return res.status(500).json({ error: 'Erro de rede ao chamar Anthropic', detalhe: fetchErr.message })
   }
 
-  // ── 5. Extrair texto da resposta da Anthropic ────────────────────────────────
+  // ── 6. Extrair JSON da resposta ─────────────────────────────────────────────
+  const textBlock = claudeData.content?.find(b => b.type === 'text')
+  if (!textBlock?.text) {
+    console.error('[radar] Sem bloco de texto na resposta:', JSON.stringify(claudeData.content).slice(0, 300))
+    return res.status(500).json({ error: 'Resposta da Anthropic sem texto' })
+  }
+
+  let informativos
   try {
-    const textBlock = claudeData.content?.find(b => b.type === 'text');
-    if (!textBlock?.text) {
-      console.error('[radar] Resposta da Anthropic sem bloco de texto:', JSON.stringify(claudeData).slice(0, 300));
-      return res.status(500).json({ error: 'Resposta inesperada da API da Anthropic (sem bloco de texto)' });
-    }
-
-    // Tentar parsear o JSON retornado pelo modelo
-    let informativos;
-    try {
-      // Remover possíveis marcadores de bloco de código (```json ... ```)
-      const cleanText = textBlock.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      informativos = JSON.parse(cleanText);
-    } catch (parseErr) {
-      console.error('[radar] Modelo não retornou JSON válido:', textBlock.text.slice(0, 300));
-      return res.status(500).json({
-        error: 'O modelo não retornou JSON válido',
-        resposta_bruta: textBlock.text.slice(0, 300)
-      });
-    }
-
-    // ── 6. Salvar no Supabase (tabela radar_resultados) ──────────────────────
-    // Ajuste o nome da tabela/colunas conforme seu schema real
-    const { error: insertError } = await supabase
-      .from('radar_resultados')
-      .insert({
-        resultado: informativos,
-        criado_por: userId,
-        criado_em: new Date().toISOString()
-      });
-
-    if (insertError) {
-      // Log mas não falha — o dado já foi obtido, apenas não persistiu
-      console.warn('[radar] Aviso: não foi possível salvar no Supabase:', insertError.message);
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: informativos
-    });
-
-  } catch (processErr) {
-    console.error('[radar] Erro ao processar resposta da Anthropic:', processErr);
-    return res.status(500).json({ error: 'Erro interno ao processar resposta' });
+    const clean = textBlock.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+    informativos = JSON.parse(clean)
+  } catch (parseErr) {
+    console.error('[radar] JSON inválido na resposta:', textBlock.text.slice(0, 300))
+    return res.status(500).json({
+      error: 'Modelo não retornou JSON válido',
+      resposta_bruta: textBlock.text.slice(0, 300)
+    })
   }
+
+  // ── 7. Persistir no Supabase e contar resultados ────────────────────────────
+  const resultados = []
+  const erros = []
+
+  for (const tribunal of ['STJ', 'STF']) {
+    const lista = informativos[tribunal] || []
+    const novos = lista.filter(i => i.numero > (tribunal === 'STJ' ? ultimoSTJ : ultimoSTF))
+
+    if (novos.length === 0) {
+      resultados.push({ tribunal, novos: [], mensagem: 'Sem novos informativos' })
+      continue
+    }
+
+    // Atualizar radar_informativos com o maior número processado
+    const maiorNumero = Math.max(...novos.map(i => i.numero))
+    const { error: upsertError } = await supabase
+      .from('radar_informativos')
+      .upsert(
+        { tribunal, ultimo_numero: maiorNumero, atualizado_em: new Date().toISOString() },
+        { onConflict: 'tribunal' }
+      )
+
+    if (upsertError) {
+      console.error('[radar] Erro ao atualizar radar_informativos:', upsertError.message)
+      erros.push({ tribunal, erro: upsertError.message })
+    }
+
+    resultados.push({
+      tribunal,
+      novos: novos.map(i => ({ numero: i.numero, teses: i.teses?.length || 0 }))
+    })
+  }
+
+  console.log('[radar] Concluído. Resultados:', JSON.stringify(resultados))
+
+  return res.status(200).json({
+    success: true,
+    processados: resultados,
+    erros: erros.length > 0 ? erros : undefined
+  })
 }
