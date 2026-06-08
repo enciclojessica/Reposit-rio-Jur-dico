@@ -1,4 +1,4 @@
-// api/radar-informativos.js — producao final
+// api/radar-informativos.js — producao final v2 1780918223
 import { createClient } from "@supabase/supabase-js"
 
 export default async function handler(req, res) {
