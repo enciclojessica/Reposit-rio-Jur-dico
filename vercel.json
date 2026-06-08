@@ -14,30 +14,23 @@
     },
     {
       "source": "/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
     },
     {
       "source": "/workbox-(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
     }
   ],
   "functions": {
-    "api/*.js": {
-      "maxDuration": 30
-    }
+    "api/*.js": { "maxDuration": 30 }
   },
   "crons": [
-    {
-      "path": "/api/cron/verificar-alertas",
-      "schedule": "0 8 * * 1"
-    },
-    {
-      "path": "/api/radar-informativos",
-      "schedule": "0 9 * * 1"
+    { "path": "/api/cron/verificar-alertas", "schedule": "0 8 * * 1" },
+    { "path": "/api/radar-informativos", "schedule": "0 9 * * 1" }
+  ],
+  "build": {
+    "env": {
+      "VERCEL_FORCE_NO_BUILD_CACHE": "1"
     }
-  ]
+  }
 }
