@@ -233,7 +233,7 @@ function TabRadar({ session }) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user?.id) throw new Error('Usuário não identificado. Faça logout e login novamente.')
 
-      const res = await fetch('/api/radar-v2', {
+      const res = await fetch('/api/radar-informativos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id }),
