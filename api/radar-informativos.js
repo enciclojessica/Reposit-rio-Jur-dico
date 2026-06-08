@@ -1,38 +1,42 @@
-// api/radar-informativos.js v3-debug
+// api/radar-informativos.js v4-debug
 import { createClient } from "@supabase/supabase-js"
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "metodo nao permitido" })
+  const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || ""
+  const SUPA_URL = process.env.SUPABASE_URL || ""
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || ""
 
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
-  const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY
-  const SUPA_URL = process.env.SUPABASE_URL
-
-  const debug = {
-    has_anthropic: !!ANTHROPIC_KEY,
+  // Retornar debug independente do método ou body
+  const debugInfo = {
+    method: req.method,
     has_service_key: !!SERVICE_KEY,
-    service_key_inicio: SERVICE_KEY ? SERVICE_KEY.slice(0,30) : "AUSENTE",
+    service_key_prefix: SERVICE_KEY.slice(0, 25),
     has_url: !!SUPA_URL,
+    url_value: SUPA_URL,
+    has_anthropic: !!ANTHROPIC_KEY,
     body: req.body,
     user_id: req.body?.user_id,
     content_type: req.headers["content-type"],
+    host: req.headers["host"],
   }
 
-  if (!ANTHROPIC_KEY) return res.status(500).json({ error: "sem ANTHROPIC_API_KEY", debug })
-  if (!SERVICE_KEY) return res.status(500).json({ error: "sem SUPABASE_SERVICE_KEY", debug })
+  if (req.method !== "POST") {
+    return res.status(200).json({ msg: "use POST", debug: debugInfo })
+  }
 
   const userId = req.body?.user_id
-  if (!userId) return res.status(400).json({ error: "user_id ausente", debug })
-
-  const supabase = createClient(SUPA_URL, SERVICE_KEY)
-  const { data: membro, error: err } = await supabase
-    .from("membros").select("role").eq("user_id", userId).single()
-
-  if (err || !membro) {
-    return res.status(401).json({ error: "usuario nao encontrado", debug, supa_err: err?.message, supa_code: err?.code })
+  if (!userId) {
+    return res.status(400).json({ error: "user_id ausente", debug: debugInfo })
   }
 
-  if (membro.role !== "admin") return res.status(403).json({ error: "nao admin", debug })
+  const supabase = createClient(SUPA_URL, SERVICE_KEY)
+  const { data, error } = await supabase
+    .from("membros").select("role").eq("user_id", userId).single()
 
-  return res.status(200).json({ success: true, debug })
+  return res.status(200).json({
+    supabase_data: data,
+    supabase_error: error?.message,
+    supabase_code: error?.code,
+    debug: debugInfo
+  })
 }
