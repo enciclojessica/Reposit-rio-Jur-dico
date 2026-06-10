@@ -271,11 +271,21 @@ function Resultado({ respostas, questoes, tempo, onReiniciar, theme }) {
 // ── Componente principal ────────────────────────────────────────
 export default function OabQuestoes({ session, sessaoOabId }) {
   const { theme } = useTheme()
-  const [tela, setTela]         = useState('config')  // config | questoes | resultado
-  const [questoes, setQuestoes] = useState([])
-  const [respostas, setRespostas] = useState({})
-  const [idx, setIdx]           = useState(0)
-  const [config, setConfig]     = useState(null)
+  const [tela, setTela]         = useState(() => {
+    try { return localStorage.getItem('oab_tela') || 'config' } catch { return 'config' }
+  })
+  const [questoes, setQuestoes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('oab_questoes') || '[]') } catch { return [] }
+  })
+  const [respostas, setRespostas] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('oab_respostas') || '{}') } catch { return {} }
+  })
+  const [idx, setIdx]           = useState(() => {
+    try { return parseInt(localStorage.getItem('oab_idx') || '0', 10) } catch { return 0 }
+  })
+  const [config, setConfig]     = useState(() => {
+    try { return JSON.parse(localStorage.getItem('oab_config') || 'null') } catch { return null }
+  })
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro]         = useState(null)
   const [tempo, setTempo]       = useState(0)
@@ -295,6 +305,17 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     }
     return () => clearInterval(timerRef.current)
   }, [rodando])
+
+  // Persistência da sessão no localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('oab_tela', tela)
+      localStorage.setItem('oab_questoes', JSON.stringify(questoes))
+      localStorage.setItem('oab_respostas', JSON.stringify(respostas))
+      localStorage.setItem('oab_idx', String(idx))
+      localStorage.setItem('oab_config', JSON.stringify(config))
+    } catch {}
+  }, [tela, questoes, respostas, idx, config])
 
   async function carregarStats() {
     const { data } = await supabase
@@ -367,6 +388,8 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     setIdx(0)
     setTempo(0)
     setTela('questoes')
+    // Limpar cache de sessão anterior
+    try { localStorage.removeItem('oab_tela'); localStorage.removeItem('oab_questoes'); localStorage.removeItem('oab_respostas'); localStorage.removeItem('oab_idx'); localStorage.removeItem('oab_config') } catch {}
     if (cfg.modo === 'simulado') setRodando(true)
     setCarregando(false)
   }
@@ -498,3 +521,4 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     </div>
   )
 }
+
