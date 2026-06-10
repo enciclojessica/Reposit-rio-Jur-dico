@@ -32,7 +32,7 @@ const METODO_COR = {
   "Discursiva":      { bg:"#fffbeb", text:"#b45309" },
 }
 
-// ── Cronograma completo (48º Exame OAB — Jun/2026 a Fev/2027) ─────────────────
+// ── Cronograma completo (47º Exame OAB — Jun/2026 a Fev/2027) ─────────────────
 const RAW = [
   { date:"2026-06-07", fase:"1ª Fase", disciplina:"Ética Profissional", topico:"Lei 8.906/94: deveres, incompatibilidades, impedimentos, infrações e sanções disciplinares", metodos:["Questões FGV","Lei Seca"] },
   { date:"2026-06-13", fase:"1ª Fase", disciplina:"Ética Profissional", topico:"CED (Resolução OAB 02/2015): relações com cliente, sigilo, publicidade, honorários", metodos:["Questões FGV","Lei Seca"] },
@@ -83,7 +83,7 @@ const RAW = [
   { date:"2026-10-24", fase:"1ª Fase", disciplina:"Direito Empresarial", topico:"Revisão Empresarial: questões FGV — sociedades, títulos de crédito, recuperação judicial", metodos:["Questões FGV","Lei Seca"] },
   { date:"2026-10-25", fase:"1ª Fase", disciplina:"Direito Administrativo", topico:"Revisão Administrativo: questões FGV — licitação, atos, agentes, responsabilidade civil", metodos:["Questões FGV","Lei Seca"] },
   { date:"2026-10-31", fase:"1ª Fase", disciplina:"Simulado Geral", topico:"Simulado completo: 80 questões — foco nas disciplinas com menor % de acertos", metodos:["Simulado","Questões FGV"] },
-  { date:"2026-11-01", fase:"1ª Fase", disciplina:"Ética Profissional", topico:"Intensivo Ética: resolução de todas as questões FGV disponíveis (exames 1–47)", metodos:["Questões FGV"] },
+  { date:"2026-11-01", fase:"1ª Fase", disciplina:"Ética Profissional", topico:"Intensivo Ética: resolução de todas as questões FGV disponíveis (exames 1–45)", metodos:["Questões FGV"] },
   { date:"2026-11-07", fase:"1ª Fase", disciplina:"Direito Civil", topico:"Intensivo Civil: questões FGV — obrigações e responsabilidade civil (maior incidência FGV)", metodos:["Questões FGV","Súmulas STJ/STF"] },
   { date:"2026-11-08", fase:"1ª Fase", disciplina:"Processo Civil", topico:"Intensivo Proc. Civil: questões FGV — recursos e tutelas provisórias", metodos:["Questões FGV","Súmulas STJ/STF"] },
   { date:"2026-11-14", fase:"1ª Fase", disciplina:"Direito Constitucional", topico:"Intensivo Constitucional: questões FGV — direitos fundamentais e controle de constitucionalidade", metodos:["Questões FGV","Súmulas STJ/STF"] },
@@ -235,7 +235,7 @@ function exportarICS(sessions, dados) {
     'PRODID:-//LexIA//OAB Dashboard//PT',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:Lex.IA — Estudos OAB 48° Exame',
+    'X-WR-CALNAME:Lex.IA — Estudos OAB 47° Exame',
     'X-WR-TIMEZONE:America/Sao_Paulo',
   ]
 
@@ -501,7 +501,7 @@ export default function OabDashboard({ session }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 2 }}>
-            Estudos OAB — 48º Exame
+            Estudos OAB — 47º Exame
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
             1ª Fase: 10/01/2027 · 2ª Fase: 28/02/2027
@@ -648,7 +648,7 @@ export default function OabDashboard({ session }) {
       {/* Footer */}
       <div style={{ marginTop: 24, borderTop: `1px solid ${theme.border}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
         <span>Lex.IA · Inteligência Jurídica · Farias Fusquiani</span>
-        <span>48º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
+        <span>47º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
       </div>
     </div>
   )
