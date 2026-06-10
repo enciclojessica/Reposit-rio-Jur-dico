@@ -79,9 +79,9 @@ function TabPerfil({ session, membro }) {
       const path = `${session.user.id}/avatar.jpg`
 
       // Tentar criar bucket se não existir
-      await supabase.storage.createBucket('Avatares', { public: true }).catch(() => {})
+      await supabase.storage.createBucket('avatares', { public: true }).catch(() => {})
 
-      const { error } = await supabase.storage.from('Avatares').upload(path, blob, {
+      const { error } = await supabase.storage.from('avatares').upload(path, blob, {
         upsert: true,
         contentType: 'image/jpeg',
       })
@@ -89,7 +89,7 @@ function TabPerfil({ session, membro }) {
       if (error) {
         setMsg({ tipo: 'erro', texto: `Erro ao enviar foto: ${error.message}` })
       } else {
-        const { data } = supabase.storage.from('Avatares').getPublicUrl(path)
+        const { data } = supabase.storage.from('avatares').getPublicUrl(path)
         // Adicionar timestamp para forçar reload do cache
         setAvatarUrl(data.publicUrl + '?t=' + Date.now())
         setMsg({ tipo: 'ok', texto: 'Foto atualizada. Clique em Salvar para confirmar.' })
