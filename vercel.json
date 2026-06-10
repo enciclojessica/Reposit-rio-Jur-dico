@@ -20,9 +20,5 @@
       "source": "/workbox-(.*)",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
     }
-  ],
-  "crons": [
-    { "path": "/api/cron/verificar-alertas", "schedule": "0 8 * * 1" },
-    { "path": "/api/radar-informativos", "schedule": "0 9 * * 1" }
   ]
 }
