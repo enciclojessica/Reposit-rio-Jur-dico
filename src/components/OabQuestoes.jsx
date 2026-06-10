@@ -140,8 +140,7 @@ function ConfigurarSessao({ onIniciar, onZerar, stats, theme }) {
 const EXAME_ANO = {
   '38': '2023.1', '39': '2023.2', '40': '2024.1', '41': '2024.2',
   '42': '2024.3', '43': '2025.1', '44': '2025.2', '45': '2025.3',
-  '46': '2026.1', '47': '2026.2', '48': '2026.3',
-  '46-simulado': '2026.1 Sim.',
+  '46': '2026.1', '47': '2026.2',
 }
 
 function QuestaoCard({ questao, idx, total, respondida, onResponder, mostrarGabarito, theme }) {
