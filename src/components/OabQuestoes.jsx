@@ -35,10 +35,11 @@ function fmtTempo(s) {
 }
 
 // ── Tela de configuração ────────────────────────────────────────
-function ConfigurarSessao({ onIniciar, stats, theme }) {
+function ConfigurarSessao({ onIniciar, onZerar, stats, theme }) {
   const [modo, setModo]       = useState('estudo')
   const [disciplina, setDisc] = useState('Todas')
   const [exame, setExame]     = useState('Todos')
+  const [qtdCustom, setQtdCustom] = useState(10)
 
   return (
     <div style={{ maxWidth: 520 }}>
@@ -62,6 +63,16 @@ function ConfigurarSessao({ onIniciar, stats, theme }) {
           </div>
         ))}
       </div>
+
+      {/* Zerar estatísticas */}
+      {stats.total > 0 && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12, marginTop: -8 }}>
+          <button onClick={onZerar}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: `1px solid #ef444433`, borderRadius: 6, padding: '4px 12px', color: '#ef4444', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+            <RotateCcw size={11} /> Zerar estatísticas
+          </button>
+        </div>
+      )}
 
       {/* Modo */}
       <div style={{ marginBottom: 16 }}>
@@ -99,7 +110,24 @@ function ConfigurarSessao({ onIniciar, stats, theme }) {
         </div>
       </div>
 
-      <button onClick={() => onIniciar({ modo, disciplina, exame })}
+      {/* Quantidade personalizada — só para modo bloco e estudo */}
+      {(modo === 'bloco' || modo === 'estudo') && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 11, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 8 }}>
+            Quantidade de questões
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[5, 10, 15, 20, 30].map(n => (
+              <button key={n} onClick={() => setQtdCustom(n)}
+                style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${qtdCustom === n ? theme.gold + '66' : theme.border}`, background: qtdCustom === n ? theme.gold + '11' : theme.raised, color: qtdCustom === n ? theme.gold : theme.muted, fontSize: 13, fontWeight: qtdCustom === n ? 700 : 400, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button onClick={() => onIniciar({ modo, disciplina, exame, qtdCustom })}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: theme.gold, border: 'none', borderRadius: 10, padding: '13px', fontSize: 14, fontWeight: 700, color: '#0b0f1a', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
         <Zap size={16} /> Iniciar sessão
       </button>
@@ -147,11 +175,7 @@ function QuestaoCard({ questao, idx, total, respondida, onResponder, mostrarGaba
             {EXAME_ANO[questao.exame] ? ` · ${EXAME_ANO[questao.exame]}` : ''}
           </span>
         )}
-        {questao.topico && (
-          <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
-            {questao.topico}
-          </span>
-        )}
+
         <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', marginLeft: 'auto' }}>
           {idx+1}/{total}
         </span>
@@ -302,7 +326,9 @@ export default function OabQuestoes({ session, sessaoOabId }) {
   })
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro]         = useState(null)
-  const [tempo, setTempo]       = useState(0)
+  const [tempo, setTempo]       = useState(() => {
+    try { return parseInt(localStorage.getItem('oab_tempo') || '0', 10) } catch { return 0 }
+  })
   const [rodando, setRodando]   = useState(false)
   const timerRef = useRef(null)
   const [statsGerais, setStatsGerais] = useState({ total: 0, acertos: 0 })
@@ -328,8 +354,9 @@ export default function OabQuestoes({ session, sessaoOabId }) {
       localStorage.setItem('oab_respostas', JSON.stringify(respostas))
       localStorage.setItem('oab_idx', String(idx))
       localStorage.setItem('oab_config', JSON.stringify(config))
+      localStorage.setItem('oab_tempo', String(tempo))
     } catch {}
-  }, [tela, questoes, respostas, idx, config])
+  }, [tela, questoes, respostas, idx, config, tempo])
 
   async function carregarStats() {
     const { data } = await supabase
@@ -341,12 +368,19 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     }
   }
 
+  async function zerarEstatisticas() {
+    if (!window.confirm('Zerar todas as estatísticas? Esta ação não pode ser desfeita.')) return
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('oab_respostas').delete().eq('user_id', user.id)
+    setStatsGerais({ total: 0, acertos: 0 })
+  }
+
   async function iniciarSessao(cfg) {
     setConfig(cfg)
     setCarregando(true)
     setErro(null)
 
-    const qtd = cfg.modo === 'simulado' ? 80 : cfg.modo === 'bloco' ? 10 : 1
+    const qtd = cfg.modo === 'simulado' ? 80 : (cfg.qtdCustom || (cfg.modo === 'bloco' ? 10 : 1))
 
     // Buscar questões do banco
     let query = supabase.from('oab_questoes').select('*')
@@ -402,8 +436,6 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     setIdx(0)
     setTempo(0)
     setTela('questoes')
-    // Limpar cache de sessão anterior
-    try { localStorage.removeItem('oab_tela'); localStorage.removeItem('oab_questoes'); localStorage.removeItem('oab_respostas'); localStorage.removeItem('oab_idx'); localStorage.removeItem('oab_config') } catch {}
     if (cfg.modo === 'simulado') setRodando(true)
     setCarregando(false)
   }
@@ -465,7 +497,7 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     <div style={{ paddingBottom: 40 }}>
 
       {tela === 'config' && (
-        <ConfigurarSessao onIniciar={iniciarSessao} stats={statsGerais} theme={theme} />
+        <ConfigurarSessao onIniciar={iniciarSessao} onZerar={zerarEstatisticas} stats={statsGerais} theme={theme} />
       )}
 
       {tela === 'questoes' && questaoAtual && (
