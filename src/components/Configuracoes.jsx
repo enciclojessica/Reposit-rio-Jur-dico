@@ -146,7 +146,7 @@ function TabPerfil({ session, membro }) {
           style={{ width: '100%', background: theme.bgDeep, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '9px 12px', color: theme.muted, fontSize: 13, fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', cursor: 'not-allowed' }} />
       </Campo>
 
-      <Campo label="OAB">
+      <Campo label="OAB (opcional)">
         <div style={{ display: 'flex', gap: 8 }}>
           <div style={{ flex: 2 }}>{inp(oab, setOab, 'Número (ex: 123456)')}</div>
           <div style={{ flex: 1 }}>
