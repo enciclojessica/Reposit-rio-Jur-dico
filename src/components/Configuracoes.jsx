@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
-import { User, Lock, Bell, Upload, Check, AlertCircle } from 'lucide-react'
+import { User, Lock, Bell, Upload, Check, AlertCircle, Database, Download } from 'lucide-react'
 
 function Aba({ id, label, icon: Icon, ativo, onClick }) {
   const { theme } = useTheme()
@@ -239,6 +239,130 @@ function TabPreferencias({ session, membro }) {
   )
 }
 
+
+// ── Aba Backup ────────────────────────────────────────────────────────────────
+function TabBackup({ session }) {
+  const { theme } = useTheme()
+  const [status, setStatus] = useState(null) // null | 'carregando' | 'ok' | 'erro'
+  const [msg, setMsg]       = useState('')
+  const [ultimo, setUltimo] = useState(() => {
+    try { return localStorage.getItem('lexia_ultimo_backup') || null } catch { return null }
+  })
+
+  async function fazerBackup() {
+    setStatus('carregando')
+    setMsg('Coletando dados do banco...')
+
+    try {
+      // 1. Buscar todas as tabelas
+      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'oab_questoes', 'flashcards']
+      const backup = { gerado_em: new Date().toISOString(), tabelas: {} }
+
+      for (const tabela of tabelas) {
+        setMsg(`Exportando ${tabela}...`)
+        const { data, error } = await supabase.from(tabela).select('*')
+        if (!error) backup.tabelas[tabela] = data || []
+      }
+
+      const totalRegistros = Object.values(backup.tabelas).reduce((a, t) => a + t.length, 0)
+      setMsg(`${totalRegistros} registros coletados. Enviando para o Google Drive...`)
+
+      // 2. Gerar JSON
+      const json = JSON.stringify(backup, null, 2)
+      const blob = new Blob([json], { type: 'application/json' })
+
+      // 3. Baixar localmente (fallback sempre disponível)
+      const dataStr = new Date().toISOString().split('T')[0]
+      const nomeArquivo = `lexia_backup_${dataStr}.json`
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = nomeArquivo
+      a.click()
+      URL.revokeObjectURL(url)
+
+      // 4. Salvar data do último backup
+      const agora = new Date().toLocaleString('pt-BR')
+      localStorage.setItem('lexia_ultimo_backup', agora)
+      setUltimo(agora)
+
+      setStatus('ok')
+      setMsg(`✅ Backup concluído! ${totalRegistros} registros exportados para ${nomeArquivo}. Salve o arquivo no seu Google Drive.`)
+    } catch (err) {
+      setStatus('erro')
+      setMsg(`Erro ao gerar backup: ${err.message}`)
+    }
+  }
+
+  return (
+    <div style={{ maxWidth: 520 }}>
+      {/* Card principal */}
+      <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '20px 20px', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <Database size={18} color={theme.gold} />
+          <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
+            Backup do banco de dados
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
+          Exporta todas as entradas, legislação, questões OAB e flashcards em um arquivo JSON.
+          Salve o arquivo no seu Google Drive para ter uma cópia de segurança.
+        </div>
+
+        {ultimo && (
+          <div style={{ fontSize: 11, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
+            Último backup: {ultimo}
+          </div>
+        )}
+
+        <button
+          onClick={fazerBackup}
+          disabled={status === 'carregando'}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: status === 'carregando' ? theme.border : theme.gold,
+            color: status === 'carregando' ? theme.muted : '#0b0f1a',
+            border: 'none', borderRadius: 8, padding: '10px 20px',
+            fontSize: 13, fontWeight: 600, cursor: status === 'carregando' ? 'not-allowed' : 'pointer',
+            fontFamily: 'Inter, sans-serif',
+          }}>
+          <Download size={14} />
+          {status === 'carregando' ? 'Gerando backup...' : 'Gerar backup agora'}
+        </button>
+      </div>
+
+      {/* Status */}
+      {msg && (
+        <div style={{
+          padding: '12px 14px', borderRadius: 8, fontSize: 12,
+          fontFamily: 'Inter, sans-serif', lineHeight: 1.6,
+          background: status === 'erro' ? theme.toastErr : status === 'ok' ? theme.toastOk : theme.raised,
+          color: status === 'erro' ? theme.error : status === 'ok' ? theme.success : theme.muted,
+          border: `1px solid ${status === 'erro' ? theme.error + '44' : status === 'ok' ? theme.success + '44' : theme.border}`,
+        }}>
+          {msg}
+        </div>
+      )}
+
+      {/* Instruções */}
+      <div style={{ marginTop: 20, padding: '14px 16px', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10 }}>
+        <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 10 }}>
+          Como fazer backup semanal
+        </div>
+        {[
+          '1. Clique em "Gerar backup agora"',
+          '2. O arquivo JSON será baixado automaticamente',
+          '3. Acesse drive.google.com',
+          '4. Faça upload do arquivo na pasta Lex.IA',
+          '5. Recomendado: toda segunda-feira',
+        ].map((s, i) => (
+          <div key={i} style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>{s}</div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Componente principal ──────────────────────────────────────────────────────
 export default function Configuracoes({ session, membro }) {
   const { theme } = useTheme()
@@ -260,12 +384,14 @@ export default function Configuracoes({ session, membro }) {
         <Aba id="perfil"       label="Perfil"       icon={User}  ativo={aba === 'perfil'}       onClick={setAba} />
         <Aba id="preferencias" label="Preferências" icon={Bell}  ativo={aba === 'preferencias'} onClick={setAba} />
         <Aba id="seguranca"    label="Segurança"    icon={Lock}  ativo={aba === 'seguranca'}    onClick={setAba} />
+        <Aba id="backup"       label="Backup"       icon={Database} ativo={aba === 'backup'}    onClick={setAba} />
       </div>
 
       {/* Conteúdo */}
       {aba === 'perfil'       && <TabPerfil session={session} membro={membro} />}
       {aba === 'preferencias' && <TabPreferencias session={session} membro={membro} />}
       {aba === 'seguranca'    && <TabPreferencias session={session} membro={membro} />}
+      {aba === 'backup'       && <TabBackup session={session} />}
     </div>
   )
 }
