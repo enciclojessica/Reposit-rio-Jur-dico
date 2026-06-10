@@ -108,6 +108,14 @@ function ConfigurarSessao({ onIniciar, stats, theme }) {
 }
 
 // ── Card de questão ─────────────────────────────────────────────
+
+const EXAME_ANO = {
+  '38': '2023.1', '39': '2023.2', '40': '2024.1', '41': '2024.2',
+  '42': '2024.3', '43': '2025.1', '44': '2025.2', '45': '2025.3',
+  '46': '2026.1', '47': '2026.2', '48': '2026.3',
+  '46-simulado': '2026.1 Sim.',
+}
+
 function QuestaoCard({ questao, idx, total, respondida, onResponder, mostrarGabarito, theme }) {
   const [selecionada, setSelecionada] = useState(null)
   const cor = DISC_COR[questao.disciplina] || '#6b7280'
@@ -133,6 +141,12 @@ function QuestaoCard({ questao, idx, total, respondida, onResponder, mostrarGaba
         <span style={{ fontSize: 10, fontWeight: 600, color: cor, background: cor+'18', border: `1px solid ${cor}33`, borderRadius: 4, padding: '2px 7px', fontFamily: 'IBM Plex Mono, monospace' }}>
           {questao.disciplina}
         </span>
+        {questao.exame && (
+          <span style={{ fontSize: 10, fontWeight: 600, color: '#94a3b8', background: '#94a3b818', border: '1px solid #94a3b833', borderRadius: 4, padding: '2px 7px', fontFamily: 'IBM Plex Mono, monospace' }}>
+            {questao.exame.includes('simulado') ? 'Simulado' : `${questao.exame}º Exame`}
+            {EXAME_ANO[questao.exame] ? ` · ${EXAME_ANO[questao.exame]}` : ''}
+          </span>
+        )}
         {questao.topico && (
           <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
             {questao.topico}
