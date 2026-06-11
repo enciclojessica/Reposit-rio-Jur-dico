@@ -471,6 +471,12 @@ export default function OabQuestoes({ session, sessaoOabId }) {
   }
 
   const questaoAtual = questoes[idx]
+
+  // Guard: se ficou travado em tela='questoes' sem questões (ex: após rebuild), volta para config
+  if (tela === 'questoes' && !questaoAtual && !carregando && !erro) {
+    setTela('config')
+    return null
+  }
   const todasRespondidas = questoes.length > 0 && questoes.every(q => respostas[q.id])
 
   if (carregando) return (
