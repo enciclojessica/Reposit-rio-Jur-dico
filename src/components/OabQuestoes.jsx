@@ -418,7 +418,7 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
             </span>
           </div>
           {questao.justificativa && (
-            <div style={{ fontSize:12, color:theme.text, fontFamily:'Georgia, serif', lineHeight:1.6 }}>
+            <div style={{ fontSize:12, color:'#e2e8f0', fontFamily:'Georgia, serif', lineHeight:1.6 }}>
               {questao.justificativa}
             </div>
           )}
