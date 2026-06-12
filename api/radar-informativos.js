@@ -88,7 +88,7 @@ Responda SOMENTE com o JSON, sem texto adicional antes ou depois.`;
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929', // atualizado para versão estável
+        model: 'claude-sonnet-4-6', // atualizado para versão estável
         max_tokens: 1500,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }]

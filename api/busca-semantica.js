@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-6',
         max_tokens: 800,
         system: `Você é um sistema de busca semântica jurídica.
 Dado um repositório de teses e uma consulta em linguagem natural, identifique as entradas mais relevantes semanticamente — mesmo que não compartilhem as mesmas palavras exatas.

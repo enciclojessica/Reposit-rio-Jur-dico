@@ -86,7 +86,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
       const res  = await fetch('/api/busca', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5', max_tokens: 600,
+          model: 'claude-sonnet-4-6', max_tokens: 600,
           system: `Você é assistente de prática jurídica. ${ritoCtx}Dado o trecho de peça e o repositório de teses, retorne APENAS um array JSON com os IDs mais relevantes (máx 5), ordenados por relevância: ["id1","id2",...]. Sem texto adicional.`,
           messages: [{ role: 'user', content: `Trecho: "${trecho}"\n\nRepositório: ${ctx}` }],
         }),

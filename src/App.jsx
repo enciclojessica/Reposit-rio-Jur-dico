@@ -745,7 +745,7 @@ case VIEWS.FLASHCARDS:
       case VIEWS.EXTRAIR:
       case VIEWS.LEGISLACAO:
       case VIEWS.IMPORTAR:
-        return <ImportarHub key="importar-hub" session={session} initialTab={importarAba} onAbaChange={setImportarAba} setView={setView} theme={theme} />
+        return <ImportarHub key="importar-hub" session={session} initialTab={importarAba} onAbaChange={setImportarAba} setView={setView} theme={theme} onImportar={handleImportarPesquisa} isEditor={isEditor} todasEntradas={entradas} onAtualizar={loadEntradas} />
 
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao}/></div>

@@ -47,7 +47,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         'anthropic-beta': 'pdfs-2024-09-25',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-6',
         max_tokens: 8000,
         system: SYSTEM,
         messages: [{ role: 'user', content: userContent }],

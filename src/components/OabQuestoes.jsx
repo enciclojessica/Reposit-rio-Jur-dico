@@ -30,6 +30,8 @@ const DISC_COR = {
   "Direito Processual Civil":  "#2563eb",
   "Direito Processual Penal":  "#a21caf",
   "Direito Processual do Trabalho": "#d97706",
+  "Direito do Consumidor":          "#047857",
+  "Direito da Criança e do Adolescente": "#db2777",
 }
 
 const DISCIPLINAS = Object.keys(DISC_COR)
@@ -89,11 +91,11 @@ function PainelStats({ session, theme, onVoltar }) {
         .sort((a,b) => b.total - a.total)
       setStats(statsArr)
 
-      // Histórico de simulados
+      // Histórico de sessões (simulado, estudo, bloco)
       const simulados = {}
-      data.filter(r => r.modo === 'simulado' && r.sessao_oab_id).forEach(r => {
+      data.filter(r => r.sessao_oab_id).forEach(r => {
         const sid = r.sessao_oab_id
-        if (!simulados[sid]) simulados[sid] = { id: sid, total: 0, acertos: 0, data: r.criado_em }
+        if (!simulados[sid]) simulados[sid] = { id: sid, total: 0, acertos: 0, data: r.criado_em, modo: r.modo }
         simulados[sid].total++
         if (r.acertou) simulados[sid].acertos++
       })
@@ -176,13 +178,13 @@ function PainelStats({ session, theme, onVoltar }) {
       {historico.length > 0 && (
         <>
           <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginTop:20, marginBottom:10 }}>
-            <History size={11} style={{ marginRight:5, verticalAlign:'middle' }} />Simulados realizados
+            <History size={11} style={{ marginRight:5, verticalAlign:'middle' }} />Sessões realizadas
           </div>
           {historico.map((s, i) => (
             <div key={s.id} style={{ background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:8, padding:'10px 14px', marginBottom:8, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
               <div>
                 <div style={{ fontSize:12, color:theme.text, fontFamily:'Inter, sans-serif', fontWeight:600 }}>
-                  Simulado #{historico.length - i}
+                  {s.modo === 'simulado' ? 'Simulado' : s.modo === 'bloco' ? 'Bloco' : 'Estudo'} #{historico.length - i}
                 </div>
                 <div style={{ fontSize:10, color:theme.muted, fontFamily:'IBM Plex Mono, monospace', marginTop:2 }}>
                   {fmtData(s.data)} · {s.total} questões
@@ -729,7 +731,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
         setEntradasSugeridas([])
         if (idx < questoes.length - 1) setIdx(i => i+1)
         else finalizarSessao()
-      }, 1800)
+      }, 3500)
     }
   }
 
@@ -845,14 +847,15 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
                 📚 No seu repositório sobre este tema:
               </div>
               {entradasSugeridas.map(e => (
-                <a key={e.id} href={`/entrada/${e.id}`}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: `1px solid ${theme.border}`, textDecoration: 'none' }}>
+                <div key={e.id}
+                  onClick={() => window.location.href = `/?entrada=${e.id}`}
+                  style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:`1px solid ${theme.border}`, cursor:'pointer' }}>
                   <BookOpen size={12} color={theme.gold} />
                   <div>
-                    <div style={{ fontSize: 12, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{e.tema}</div>
-                    <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{e.area} · {e.tipo}</div>
+                    <div style={{ fontSize:12, color:theme.text, fontFamily:'Inter, sans-serif' }}>{e.tema}</div>
+                    <div style={{ fontSize:10, color:theme.muted, fontFamily:'IBM Plex Mono, monospace' }}>{e.area} · {e.tipo}</div>
                   </div>
-                </a>
+                </div>
               ))}
             </div>
           )}
