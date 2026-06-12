@@ -272,7 +272,7 @@ function exportarICS(sessions, dados) {
 }
 
 // ── Card de sessão ─────────────────────────────────────────────────────────────
-function SessaoCard({ s, dados, onAtualizar, theme }) {
+function SessaoCard({ s, dados, onAtualizar, onPraticar, theme }) {
   const [aberto, setAberto] = useState(false)
   const d = dados[s.id] || {}
   const status = d.status || 'A Fazer'
@@ -405,6 +405,15 @@ function SessaoCard({ s, dados, onAtualizar, theme }) {
 
           {/* Cronômetro */}
           <Cronometro sessionId={s.id} onSalvar={salvarTempo} theme={theme} />
+
+          {/* Botão Praticar */}
+          {s.disciplina !== 'Simulado Geral' && onPraticar && (
+            <button
+              onClick={() => onPraticar(s.disciplina)}
+              style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: cor+'15', border: `1px solid ${cor}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: cor, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              <BookOpen size={13} /> Praticar questões de {s.disciplina}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -417,6 +426,7 @@ export default function OabDashboard({ session }) {
   const [dados, setDados]     = useState({})
   const [carregando, setCarregando] = useState(true)
   const [aba, setAba]         = useState('cronograma')
+  const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
   const [fFase, setFFase]     = useState('Todas')
   const [fDisc, setFDisc]     = useState('Todas')
   const [fStatus, setFStatus] = useState('Todos')
@@ -544,6 +554,13 @@ export default function OabDashboard({ session }) {
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: cor, flexShrink: 0 }} />
                 <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', width: 60, flexShrink: 0 }}>{fmt(s.date)}</span>
                 <span style={{ fontSize: 12, color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.disciplina} — {s.topico}</span>
+                {s.disciplina !== 'Simulado Geral' && (
+                  <button
+                    onClick={() => { setDisciplinaFiltro(s.disciplina); setAba('questoes') }}
+                    style={{ fontSize: 10, color: cor, background: cor+'15', border: `1px solid ${cor}33`, borderRadius: 5, padding: '3px 8px', cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                    Praticar ▶
+                  </button>
+                )}
               </div>
             )
           })}
@@ -588,14 +605,14 @@ export default function OabDashboard({ session }) {
 
           {/* Lista de sessões */}
           {filtradas.map(s => (
-            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} theme={theme} />
+            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc) => { setDisciplinaFiltro(disc); setAba('questoes') }} theme={theme} />
           ))}
         </>
       )}
 
       {/* ABA: Questões */}
       {aba === 'questoes' && (
-        <OabQuestoes session={session} />
+        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} onSair={() => { setDisciplinaFiltro(null); setAba('cronograma') }} />
       )}
 
       {/* ABA: Estatísticas */}

@@ -211,12 +211,15 @@ function PainelStats({ session, theme, onVoltar }) {
 }
 
 // ── Tela de configuração ────────────────────────────────────────
-function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, theme }) {
+function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicial, theme }) {
   const [modo, setModo]         = useState('estudo')
-  const [disciplina, setDisc]   = useState('Todas')
+  const [disciplina, setDisc]   = useState(disciplinaInicial || 'Todas')
   const [exame, setExame]       = useState('Todos')
   const [qtdCustom, setQtdCustom] = useState(10)
   const [busca, setBusca]       = useState('')
+
+  // Atualizar disciplina se vier do cronograma
+  useEffect(() => { if (disciplinaInicial) setDisc(disciplinaInicial) }, [disciplinaInicial])
 
   return (
     <div style={{ maxWidth: 520 }}>
@@ -508,7 +511,7 @@ function Resultado({ respostas, questoes, tempo, onReiniciar, onRevisao, theme }
 }
 
 // ── Componente principal ────────────────────────────────────────
-export default function OabQuestoes({ session, sessaoOabId }) {
+export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial }) {
   const { theme } = useTheme()
   const [tela, setTela]       = useState(() => { try { return localStorage.getItem('oab_tela') || 'config' } catch { return 'config' } })
   const [questoes, setQuestoes] = useState(() => { try { return JSON.parse(localStorage.getItem('oab_questoes') || '[]') } catch { return [] } })
@@ -522,6 +525,18 @@ export default function OabQuestoes({ session, sessaoOabId }) {
   const timerRef = useRef(null)
   const [statsGerais, setStatsGerais] = useState({ total:0, acertos:0 })
   const [favoritas, setFavoritas] = useState(new Set())
+  const [entradasSugeridas, setEntradasSugeridas] = useState([])
+
+  // Se veio do cronograma com disciplina pré-selecionada, iniciar direto
+  useEffect(() => {
+    if (disciplinaInicial) {
+      // Limpar sessão anterior e ir para config com disciplina pré-selecionada
+      setTela('config')
+      setQuestoes([])
+      setRespostas({})
+      setIdx(0)
+    }
+  }, [disciplinaInicial])
 
   useEffect(() => { if (session) { carregarStats(); carregarFavoritas() } }, [session])
 
@@ -687,6 +702,18 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     const acertou = alternativa === questao?.gabarito
     setRespostas(r => ({ ...r, [questaoId]: alternativa }))
 
+    // Opção 2: se errou, buscar entradas do repositório sobre a disciplina
+    if (!acertou && questao?.disciplina) {
+      const { data: entradas } = await supabase
+        .from('entradas')
+        .select('id, tema, area, tipo')
+        .or(`area.ilike.%${questao.disciplina}%,tema.ilike.%${questao.disciplina}%`)
+        .limit(3)
+      setEntradasSugeridas(entradas || [])
+    } else {
+      setEntradasSugeridas([])
+    }
+
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from('oab_respostas').insert({
       user_id:       user.id,
@@ -699,6 +726,7 @@ export default function OabQuestoes({ session, sessaoOabId }) {
 
     if (config?.modo === 'estudo') {
       setTimeout(() => {
+        setEntradasSugeridas([])
         if (idx < questoes.length - 1) setIdx(i => i+1)
         else finalizarSessao()
       }, 1800)
@@ -763,6 +791,7 @@ export default function OabQuestoes({ session, sessaoOabId }) {
           onZerar={zerarEstatisticas}
           onStats={() => setTela('stats')}
           stats={statsGerais}
+          disciplinaInicial={disciplinaInicial}
           theme={theme}
         />
       )}
@@ -808,6 +837,25 @@ export default function OabQuestoes({ session, sessaoOabId }) {
             onFavoritar={toggleFavorita}
             theme={theme}
           />
+
+          {/* Opção 2: Entradas sugeridas do repositório após erro */}
+          {entradasSugeridas.length > 0 && (
+            <div style={{ marginTop: 12, padding: '12px 14px', background: theme.raised, border: `1px solid ${theme.gold}44`, borderRadius: 10 }}>
+              <div style={{ fontSize: 11, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+                📚 No seu repositório sobre este tema:
+              </div>
+              {entradasSugeridas.map(e => (
+                <a key={e.id} href={`/entrada/${e.id}`}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: `1px solid ${theme.border}`, textDecoration: 'none' }}>
+                  <BookOpen size={12} color={theme.gold} />
+                  <div>
+                    <div style={{ fontSize: 12, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{e.tema}</div>
+                    <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{e.area} · {e.tipo}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
 
           <div style={{ display:'flex', gap:10, marginTop:14 }}>
             {idx > 0 && (
