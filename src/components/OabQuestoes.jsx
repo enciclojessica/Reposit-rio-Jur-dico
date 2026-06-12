@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, ChevronRight, RotateCcw,
   Timer, Trophy, BookOpen, Zap, RefreshCw,
   ChevronLeft, BarChart2, AlertCircle, Search,
-  History, Target, TrendingUp
+  History, Target, TrendingUp, Bookmark, BookmarkCheck
 } from 'lucide-react'
 
 const DISC_COR = {
@@ -35,10 +35,11 @@ const DISC_COR = {
 const DISCIPLINAS = Object.keys(DISC_COR)
 const EXAMES = ['Todos','38','39','40','41','42','43','44','45']
 const MODOS  = [
-  { id: 'estudo',   label: 'Estudo',   desc: 'Uma por vez com feedback imediato' },
-  { id: 'bloco',    label: 'Bloco',    desc: 'Responda todas e veja o resultado' },
-  { id: 'revisao',  label: 'Revisão',  desc: 'Só questões que você errou antes' },
-  { id: 'simulado', label: 'Simulado', desc: '80 questões cronometradas — condições reais' },
+  { id: 'estudo',    label: 'Estudo',    desc: 'Uma por vez com feedback imediato' },
+  { id: 'bloco',     label: 'Bloco',     desc: 'Responda todas e veja o resultado' },
+  { id: 'revisao',   label: 'Revisão',   desc: 'Só questões que você errou antes' },
+  { id: 'favoritas', label: 'Favoritas', desc: 'Questões que você marcou com ★' },
+  { id: 'simulado',  label: 'Simulado',  desc: '80 questões cronometradas — condições reais' },
 ]
 
 const EXAME_ANO = {
@@ -286,8 +287,8 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, theme }) {
         </div>
       </div>
 
-      {/* Filtros — ocultos no modo revisão e simulado */}
-      {modo !== 'revisao' && (
+      {/* Filtros — ocultos no modo revisão, favoritas e simulado */}
+      {modo !== 'revisao' && modo !== 'favoritas' && (
         <div style={{ display:'flex', gap:10, marginBottom:16 }}>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:6 }}>Disciplina</div>
@@ -331,7 +332,7 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, theme }) {
 }
 
 // ── Card de questão ─────────────────────────────────────────────
-function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, theme }) {
+function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, theme }) {
   const [selecionada, setSelecionada] = useState(respostaDada || null)
   const cor = DISC_COR[questao.disciplina] || '#6b7280'
   const alts = ['A','B','C','D']
@@ -367,6 +368,11 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
         <span style={{ fontSize:10, color:theme.muted, fontFamily:'IBM Plex Mono, monospace', marginLeft:'auto' }}>
           {idx+1}/{total}
         </span>
+        <button onClick={() => onFavoritar && onFavoritar(questao.id)}
+          title={favorita ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          style={{ background:'none', border:'none', cursor:'pointer', padding:'2px 4px', color: favorita ? theme.gold : theme.muted, flexShrink:0 }}>
+          {favorita ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+        </button>
       </div>
 
       {/* Enunciado */}
@@ -515,8 +521,9 @@ export default function OabQuestoes({ session, sessaoOabId }) {
   const [rodando, setRodando] = useState(false)
   const timerRef = useRef(null)
   const [statsGerais, setStatsGerais] = useState({ total:0, acertos:0 })
+  const [favoritas, setFavoritas] = useState(new Set())
 
-  useEffect(() => { if (session) carregarStats() }, [session])
+  useEffect(() => { if (session) { carregarStats(); carregarFavoritas() } }, [session])
 
   useEffect(() => {
     if (rodando) { timerRef.current = setInterval(() => setTempo(t => t+1), 1000) }
@@ -540,6 +547,29 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     if (data) setStatsGerais({ total: data.length, acertos: data.filter(r => r.acertou).length })
   }
 
+  async function carregarFavoritas() {
+    const { data } = await supabase
+      .from('oab_favoritas')
+      .select('questao_id')
+      .eq('user_id', session.user.id)
+    if (data) setFavoritas(new Set(data.map(f => f.questao_id)))
+  }
+
+  async function toggleFavorita(questaoId) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (favoritas.has(questaoId)) {
+      await supabase.from('oab_favoritas')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('questao_id', questaoId)
+      setFavoritas(prev => { const s = new Set(prev); s.delete(questaoId); return s })
+    } else {
+      await supabase.from('oab_favoritas')
+        .insert({ user_id: user.id, questao_id: questaoId })
+      setFavoritas(prev => new Set([...prev, questaoId]))
+    }
+  }
+
   async function zerarEstatisticas() {
     if (!window.confirm('Zerar todas as estatísticas? Esta ação não pode ser desfeita.')) return
     const { data: { user } } = await supabase.auth.getUser()
@@ -556,8 +586,27 @@ export default function OabQuestoes({ session, sessaoOabId }) {
     let selecionadas = []
 
     try {
-      // ── Modo Revisão: buscar questões erradas do histórico ──
-      if (cfg.modo === 'revisao') {
+      // ── Modo Favoritas ──
+      if (cfg.modo === 'favoritas') {
+        if (favoritas.size === 0) {
+          setErro('Você ainda não marcou nenhuma questão como favorita. Use o ★ durante a sessão.')
+          setCarregando(false)
+          return
+        }
+        const { data: questoesFav } = await supabase
+          .from('oab_questoes')
+          .select('*')
+          .in('id', [...favoritas].slice(0, 200))
+
+        if (!questoesFav || questoesFav.length === 0) {
+          setErro('Não foi possível carregar as questões favoritas.')
+          setCarregando(false)
+          return
+        }
+        selecionadas = questoesFav.sort(() => Math.random() - 0.5)
+
+      // ── Modo Revisão ──
+      } else if (cfg.modo === 'revisao') {
         const { data: { user } } = await supabase.auth.getUser()
 
         // Buscar IDs das questões erradas (última resposta por questão)
@@ -740,6 +789,11 @@ export default function OabQuestoes({ session, sessaoOabId }) {
                 REVISÃO
               </span>
             )}
+            {config?.modo === 'favoritas' && (
+              <span style={{ fontSize:10, color:theme.gold, background:theme.gold+'18', border:`1px solid ${theme.gold}33`, borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+                ★ FAVORITAS
+              </span>
+            )}
           </div>
 
           <QuestaoCard
@@ -750,6 +804,8 @@ export default function OabQuestoes({ session, sessaoOabId }) {
             respostaDada={respostas[questaoAtual.id] || null}
             onResponder={registrarResposta}
             mostrarGabarito={config?.modo !== 'bloco' && config?.modo !== 'simulado'}
+            favorita={favoritas.has(questaoAtual.id)}
+            onFavoritar={toggleFavorita}
             theme={theme}
           />
 
