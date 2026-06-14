@@ -6,3 +6,8 @@ dist/
 .vercel
 *.log
 .DS_Store
+rodar-topicos-local.mjs
+popular-topicos-local.mjs
+popular-topicos.mjs
+executar-topicos.mjs
+rodar-topicos.bat

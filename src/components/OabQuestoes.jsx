@@ -219,6 +219,18 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
   const [exame, setExame]       = useState('Todos')
   const [qtdCustom, setQtdCustom] = useState(10)
   const [busca, setBusca]       = useState('')
+  const [topico, setTopico]     = useState('Todos')
+  const [topicos, setTopicos]   = useState([])
+
+  // Buscar tópicos quando disciplina muda
+  useEffect(() => {
+    if (disciplina === 'Todas') { setTopicos([]); setTopico('Todos'); return }
+    supabase.from('oab_questoes').select('topico').eq('disciplina', disciplina).not('topico','is',null)
+      .then(({ data }) => {
+        const uniq = [...new Set((data||[]).map(r=>r.topico).filter(Boolean))].sort()
+        setTopicos(uniq); setTopico('Todos')
+      })
+  }, [disciplina])
 
   // Atualizar disciplina se vier do cronograma
   useEffect(() => { if (disciplinaInicial) setDisc(disciplinaInicial) }, [disciplinaInicial])
@@ -294,24 +306,37 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
 
       {/* Filtros — ocultos no modo revisão, favoritas e simulado */}
       {modo !== 'revisao' && modo !== 'favoritas' && (
-        <div style={{ display:'flex', gap:10, marginBottom:16 }}>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:6 }}>Disciplina</div>
-            <select value={disciplina} onChange={e => setDisc(e.target.value)}
-              style={{ width:'100%', background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:8, color:theme.text, fontSize:12, padding:'8px 10px', fontFamily:'Inter, sans-serif', outline:'none' }}>
-              <option value="Todas">Todas</option>
-              {DISCIPLINAS.map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
+        <div>
+          <div style={{ display:'flex', gap:10, marginBottom:16 }}>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:6 }}>Disciplina</div>
+              <select value={disciplina} onChange={e => setDisc(e.target.value)}
+                style={{ width:'100%', background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:8, color:theme.text, fontSize:12, padding:'8px 10px', fontFamily:'Inter, sans-serif', outline:'none' }}>
+                <option value="Todas">Todas</option>
+                {DISCIPLINAS.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </div>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:6 }}>Exame</div>
+              <select value={exame} onChange={e => setExame(e.target.value)}
+                style={{ width:'100%', background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:8, color:theme.text, fontSize:12, padding:'8px 10px', fontFamily:'Inter, sans-serif', outline:'none' }}>
+                {EXAMES.map(e => <option key={e} value={e}>{e==='Todos' ? 'Todos' : `${e}º Exame`}</option>)}
+              </select>
+            </div>
           </div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:6 }}>Exame</div>
-            <select value={exame} onChange={e => setExame(e.target.value)}
-              style={{ width:'100%', background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:8, color:theme.text, fontSize:12, padding:'8px 10px', fontFamily:'Inter, sans-serif', outline:'none' }}>
-              {EXAMES.map(e => <option key={e} value={e}>{e==='Todos' ? 'Todos' : `${e}º Exame`}</option>)}
-            </select>
-          </div>
+          {disciplina !== 'Todas' && topicos.length > 0 && (
+            <div style={{ marginBottom:16 }}>
+              <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:6 }}>Tópico</div>
+              <select value={topico} onChange={e => setTopico(e.target.value)}
+                style={{ width:'100%', background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:8, color:theme.text, fontSize:12, padding:'8px 10px', fontFamily:'Inter, sans-serif', outline:'none' }}>
+                <option value="Todos">Todos os tópicos</option>
+                {topicos.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          )}
         </div>
       )}
+
 
       {/* Quantidade — só estudo e bloco */}
       {(modo === 'estudo' || modo === 'bloco') && (
@@ -328,7 +353,7 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
         </div>
       )}
 
-      <button onClick={() => onIniciar({ modo, disciplina, exame, qtdCustom, busca: busca.trim() })}
+      <button onClick={() => onIniciar({ modo, disciplina, exame, topico, qtdCustom, busca: busca.trim() })}
         style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:theme.gold, border:'none', borderRadius:10, padding:'13px', fontSize:14, fontWeight:700, color:'#0b0f1a', cursor:'pointer', fontFamily:'Inter, sans-serif' }}>
         <Zap size={16} /> Iniciar sessão
       </button>
@@ -663,6 +688,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
           .ilike('enunciado', `%${cfg.busca}%`)
         if (cfg.disciplina !== 'Todas') q = q.eq('disciplina', cfg.disciplina)
         if (cfg.exame !== 'Todos')      q = q.eq('exame', cfg.exame)
+        if (cfg.topico && cfg.topico !== 'Todos') q = q.eq('topico', cfg.topico)
         const { data } = await q.limit(qtd * 3)
 
         if (!data || data.length === 0) {
@@ -677,6 +703,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
         let q = supabase.from('oab_questoes').select('*')
         if (cfg.disciplina !== 'Todas') q = q.eq('disciplina', cfg.disciplina)
         if (cfg.exame !== 'Todos')      q = q.eq('exame', cfg.exame)
+        if (cfg.topico && cfg.topico !== 'Todos') q = q.eq('topico', cfg.topico)
         const { data } = await q.order('id', { ascending: false }).limit(qtd * 3)
 
         if (!data || data.length === 0) {
