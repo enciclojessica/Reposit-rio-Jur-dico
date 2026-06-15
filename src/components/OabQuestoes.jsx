@@ -362,10 +362,24 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
 }
 
 // ── Card de questão ─────────────────────────────────────────────
-function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, theme }) {
+function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, isAdmin, theme }) {
   const [selecionada, setSelecionada] = useState(respostaDada || null)
+  const [editando, setEditando]       = useState(false)
+  const [editDisc, setEditDisc]       = useState(questao.disciplina)
+  const [editTopico, setEditTopico]   = useState(questao.topico || '')
+  const [salvando, setSalvando]       = useState(false)
   const cor = DISC_COR[questao.disciplina] || '#6b7280'
   const alts = ['A','B','C','D']
+
+  async function salvarEdicao() {
+    setSalvando(true)
+    await supabase.from('oab_questoes').update({ disciplina: editDisc, topico: editTopico || null }).eq('id', questao.id)
+    setSalvando(false)
+    setEditando(false)
+    // Atualizar localmente
+    questao.disciplina = editDisc
+    questao.topico = editTopico || null
+  }
 
   // Sincronizar selecionada quando muda de questão
   useEffect(() => { setSelecionada(respostaDada || null) }, [questao.id, respostaDada])
@@ -387,13 +401,49 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
     <div style={{ background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:12, padding:'18px 16px' }}>
       {/* Header */}
       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14, flexWrap:'wrap' }}>
-        <span style={{ fontSize:10, fontWeight:600, color:cor, background:cor+'18', border:`1px solid ${cor}33`, borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
-          {questao.disciplina}
-        </span>
-        {questao.exame && (
-          <span style={{ fontSize:10, fontWeight:600, color:'#94a3b8', background:'#94a3b818', border:'1px solid #94a3b833', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
-            {`${questao.exame}º Exame`}{EXAME_ANO[questao.exame] ? ` · ${EXAME_ANO[questao.exame]}` : ''}
-          </span>
+        {editando ? (
+          <>
+            <select value={editDisc} onChange={e => setEditDisc(e.target.value)}
+              style={{ fontSize:11, background:'#1a0608', border:'1px solid #B8930A', borderRadius:6, color:'#F5F0E8', padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace' }}>
+              {Object.keys(DISC_COR).filter(d => d !== 'Simulado Geral').map(d =>
+                <option key={d} value={d}>{d}</option>
+              )}
+            </select>
+            <input value={editTopico} onChange={e => setEditTopico(e.target.value)}
+              placeholder="Tópico..."
+              style={{ fontSize:11, background:'#1a0608', border:'1px solid #B8930A', borderRadius:6, color:'#F5F0E8', padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace', width:160 }} />
+            <button onClick={salvarEdicao} disabled={salvando}
+              style={{ fontSize:10, background:'#B8930A', border:'none', borderRadius:5, color:'#000', padding:'3px 10px', cursor:'pointer', fontWeight:700 }}>
+              {salvando ? '...' : 'Salvar'}
+            </button>
+            <button onClick={() => setEditando(false)}
+              style={{ fontSize:10, background:'none', border:'1px solid #6b7280', borderRadius:5, color:'#6b7280', padding:'3px 8px', cursor:'pointer' }}>
+              Cancelar
+            </button>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize:10, fontWeight:600, color:cor, background:cor+'18', border:`1px solid ${cor}33`, borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+              {questao.disciplina}
+            </span>
+            {questao.topico && (
+              <span style={{ fontSize:10, color:'#94a3b8', background:'#94a3b810', border:'1px solid #94a3b822', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+                {questao.topico}
+              </span>
+            )}
+            {questao.exame && (
+              <span style={{ fontSize:10, fontWeight:600, color:'#94a3b8', background:'#94a3b818', border:'1px solid #94a3b833', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+                {`${questao.exame}º Exame`}{EXAME_ANO[questao.exame] ? ` · ${EXAME_ANO[questao.exame]}` : ''}
+              </span>
+            )}
+            {isAdmin && (
+              <button onClick={() => { setEditDisc(questao.disciplina); setEditTopico(questao.topico||''); setEditando(true) }}
+                title="Editar classificação"
+                style={{ fontSize:9, background:'none', border:'1px solid #6b728044', borderRadius:4, color:'#6b7280', padding:'2px 6px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace' }}>
+                ✏️ editar
+              </button>
+            )}
+          </>
         )}
         <span style={{ fontSize:10, color:theme.muted, fontFamily:'IBM Plex Mono, monospace', marginLeft:'auto' }}>
           {idx+1}/{total}
@@ -553,6 +603,16 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
   const [statsGerais, setStatsGerais] = useState({ total:0, acertos:0 })
   const [favoritas, setFavoritas] = useState(new Set())
   const [entradasSugeridas, setEntradasSugeridas] = useState([])
+  const [isAdmin, setIsAdmin]     = useState(false)
+
+  // Verificar se é admin
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase.from('membros').select('role').eq('user_id', user.id).single()
+        .then(({ data }) => { if (data?.role === 'admin') setIsAdmin(true) })
+    })
+  }, [])
 
   // Se veio do cronograma com disciplina pré-selecionada, iniciar direto
   useEffect(() => {
@@ -864,6 +924,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
             mostrarGabarito={config?.modo !== 'bloco' && config?.modo !== 'simulado'}
             favorita={favoritas.has(questaoAtual.id)}
             onFavoritar={toggleFavorita}
+            isAdmin={isAdmin}
             theme={theme}
           />
 
