@@ -422,7 +422,7 @@ function SessaoCard({ s, dados, onAtualizar, onPraticar, theme }) {
           {/* Botão Praticar */}
           {s.disciplina !== 'Simulado Geral' && onPraticar && (
             <button
-              onClick={() => onPraticar(s.disciplina)}
+              onClick={() => onPraticar(s.disciplina, s.topico)}
               style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: cor+'15', border: `1px solid ${cor}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: cor, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
               <BookOpen size={13} /> Praticar questões de {s.disciplina}
             </button>
@@ -440,6 +440,7 @@ export default function OabDashboard({ session }) {
   const [carregando, setCarregando] = useState(true)
   const [aba, setAba]         = useState('cronograma')
   const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
+  const [topicoFiltro, setTopicoFiltro]         = useState(null)
   const [fFase, setFFase]     = useState('Todas')
   const [fDisc, setFDisc]     = useState('Todas')
   const [fStatus, setFStatus] = useState('Todos')
@@ -569,7 +570,7 @@ export default function OabDashboard({ session }) {
                 <span style={{ fontSize: 12, color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.disciplina} — {s.topico}</span>
                 {s.disciplina !== 'Simulado Geral' && (
                   <button
-                    onClick={() => { setDisciplinaFiltro(s.disciplina); setAba('questoes') }}
+                    onClick={() => { setDisciplinaFiltro(s.disciplina); setTopicoFiltro(s.topico); setAba('questoes') }}
                     style={{ fontSize: 10, color: cor, background: cor+'15', border: `1px solid ${cor}33`, borderRadius: 5, padding: '3px 8px', cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0, whiteSpace: 'nowrap' }}>
                     Praticar ▶
                   </button>
@@ -618,14 +619,14 @@ export default function OabDashboard({ session }) {
 
           {/* Lista de sessões */}
           {filtradas.map(s => (
-            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc) => { setDisciplinaFiltro(disc); setAba('questoes') }} theme={theme} />
+            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => { setDisciplinaFiltro(disc); setTopicoFiltro(top||null); setAba('questoes') }} theme={theme} />
           ))}
         </>
       )}
 
       {/* ABA: Questões */}
       {aba === 'questoes' && (
-        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} onSair={() => { setDisciplinaFiltro(null); setAba('cronograma') }} />
+        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setAba('cronograma') }} />
       )}
 
       {/* ABA: Estatísticas */}

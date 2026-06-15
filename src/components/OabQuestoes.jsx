@@ -213,12 +213,12 @@ function PainelStats({ session, theme, onVoltar }) {
 }
 
 // ── Tela de configuração ────────────────────────────────────────
-function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicial, theme }) {
+function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicial, buscaInicial, theme }) {
   const [modo, setModo]         = useState('estudo')
   const [disciplina, setDisc]   = useState(disciplinaInicial || 'Todas')
   const [exame, setExame]       = useState('Todos')
   const [qtdCustom, setQtdCustom] = useState(10)
-  const [busca, setBusca]       = useState('')
+  const [busca, setBusca]       = useState(buscaInicial || '')
   const [topico, setTopico]     = useState('Todos')
   const [topicos, setTopicos]   = useState([])
 
@@ -611,7 +611,7 @@ function Resultado({ respostas, questoes, tempo, onReiniciar, onRevisao, theme }
 }
 
 // ── Componente principal ────────────────────────────────────────
-export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial }) {
+export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, topicoSessao }) {
   const { theme } = useTheme()
   const [tela, setTela]       = useState(() => { try { return localStorage.getItem('oab_tela') || 'config' } catch { return 'config' } })
   const [questoes, setQuestoes] = useState(() => { try { return JSON.parse(localStorage.getItem('oab_questoes') || '[]') } catch { return [] } })
@@ -637,10 +637,37 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
     })
   }, [])
 
+  // Extrair palavras-chave do tópico descritivo do cronograma
+  function extrairBusca(topicoDescritivo) {
+    if (!topicoDescritivo) return ''
+    // Remover referências a artigos (arts. X–Y, Lei XXXX/XX) e pegar os temas principais
+    const semArtigos = topicoDescritivo
+      .replace(/CC\/\d+\s+arts?\.\s*[\d–\-–]+[^:;,]*/gi, '')
+      .replace(/CF\/\d+\s+arts?\.\s*[\d§°–\-]+[^:;,]*/gi, '')
+      .replace(/CPC\/\d+\s+arts?\.\s*[\d–\-]+[^:;,]*/gi, '')
+      .replace(/CP\s+arts?\.\s*[\d–\-]+[^:;,]*/gi, '')
+      .replace(/CPP\s+arts?\.\s*[\d–\-]+[^:;,]*/gi, '')
+      .replace(/CLT\s+arts?\.\s*[\d–\-]+[^:;,]*/gi, '')
+      .replace(/Lei\s+[\d.]+\/\d+[^:;,]*/gi, '')
+      .replace(/Resolução\s+OAB[^:;,]*/gi, '')
+      .replace(/arts?\.\s*[\d§°–\-,\s]+/gi, '')
+      .replace(/Súmulas?\s+STJ\/STF/gi, '')
+      .replace(/Questões\s+FGV/gi, '')
+      .replace(/Lei\s+Seca/gi, '')
+    // Pegar a parte após ":" se existir (geralmente é o resumo do tema)
+    const partes = semArtigos.split(':')
+    const tema = (partes.length > 1 ? partes.slice(1).join(':') : partes[0])
+      .replace(/[—\-–]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+    // Pegar as 3 primeiras palavras significativas
+    const palavras = tema.split(/[,;]+/)[0].trim().split(' ').filter(p => p.length > 3).slice(0, 3)
+    return palavras.join(' ')
+  }
+
   // Se veio do cronograma com disciplina pré-selecionada, iniciar direto
   useEffect(() => {
     if (disciplinaInicial) {
-      // Limpar sessão anterior e ir para config com disciplina pré-selecionada
       setTela('config')
       setQuestoes([])
       setRespostas({})
@@ -904,6 +931,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial })
           onStats={() => setTela('stats')}
           stats={statsGerais}
           disciplinaInicial={disciplinaInicial}
+          buscaInicial={topicoSessao ? extrairBusca(topicoSessao) : ''}
           theme={theme}
         />
       )}
