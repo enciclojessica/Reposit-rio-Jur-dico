@@ -5,7 +5,7 @@ import {
   CheckCircle, XCircle, ChevronRight, RotateCcw,
   Timer, Trophy, BookOpen, Zap, RefreshCw,
   ChevronLeft, BarChart2, AlertCircle, Search,
-  History, Target, TrendingUp, Bookmark, BookmarkCheck
+  History, Target, TrendingUp, Bookmark, BookmarkCheck, Scissors
 } from 'lucide-react'
 
 const DISC_COR = {
@@ -364,6 +364,16 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
 // ── Card de questão ─────────────────────────────────────────────
 function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, isAdmin, theme }) {
   const [selecionada, setSelecionada] = useState(respostaDada || null)
+  const [eliminadas, setEliminadas]   = useState(new Set())
+
+  function toggleEliminar(alt) {
+    if (respondida) return
+    setEliminadas(prev => {
+      const novo = new Set(prev)
+      novo.has(alt) ? novo.delete(alt) : novo.add(alt)
+      return novo
+    })
+  }
   const [editando, setEditando]       = useState(false)
   const [editDisc, setEditDisc]       = useState(questao.disciplina)
   const [editTopico, setEditTopico]   = useState(questao.topico || '')
@@ -468,20 +478,33 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
           const isCorreta    = respondida && alt === questao.gabarito
           const isErrada     = respondida && alt === selecionada && alt !== questao.gabarito
           const isSelecionada = selecionada === alt
+          const isEliminada  = eliminadas.has(alt)
 
           let bg = theme.cardBg, border = theme.border, textCor = theme.text
           if (isCorreta)    { bg = '#0f2b1a'; border = '#10b981'; textCor = '#10b981' }
           else if (isErrada){ bg = '#2a0810'; border = '#ef4444'; textCor = '#ef4444' }
           else if (isSelecionada && !respondida) { bg = theme.gold+'11'; border = theme.gold+'66'; textCor = theme.gold }
+          else if (isEliminada && !respondida)   { bg = theme.raised; border = theme.border; textCor = theme.muted }
 
           return (
-            <button key={alt} onClick={() => escolher(alt)} disabled={respondida}
-              style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 12px', background:bg, border:`1px solid ${border}`, borderRadius:8, cursor: respondida ? 'default' : 'pointer', textAlign:'left', transition:'all .15s' }}>
-              <span style={{ width:22, height:22, borderRadius:'50%', background: isSelecionada||isCorreta||isErrada ? border : theme.border, color: isSelecionada||isCorreta||isErrada ? '#fff' : theme.muted, fontSize:11, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontFamily:'IBM Plex Mono, monospace' }}>
-                {isCorreta ? '✓' : isErrada ? '✗' : alt}
-              </span>
-              <span style={{ fontSize:13, color:textCor, fontFamily:'Georgia, serif', lineHeight:1.5 }}>{texto}</span>
-            </button>
+            <div key={alt} style={{ display:'flex', alignItems:'flex-start', gap:6 }}>
+              {/* Tesoura — só antes de responder */}
+              {!respondida && (
+                <button
+                  onClick={() => toggleEliminar(alt)}
+                  title={isEliminada ? 'Restaurar alternativa' : 'Eliminar alternativa'}
+                  style={{ flexShrink:0, marginTop:8, background:'none', border:'none', cursor:'pointer', color: isEliminada ? '#ef4444' : theme.muted, opacity: isEliminada ? 1 : 0.4, padding:'2px', transition:'all .15s' }}>
+                  <Scissors size={13} />
+                </button>
+              )}
+              <button onClick={() => !isEliminada && escolher(alt)} disabled={respondida || isEliminada}
+                style={{ flex:1, display:'flex', alignItems:'flex-start', gap:10, padding:'10px 12px', background:bg, border:`1px solid ${border}`, borderRadius:8, cursor: respondida || isEliminada ? 'default' : 'pointer', textAlign:'left', transition:'all .15s', opacity: isEliminada ? 0.45 : 1 }}>
+                <span style={{ width:22, height:22, borderRadius:'50%', background: isSelecionada||isCorreta||isErrada ? border : theme.border, color: isSelecionada||isCorreta||isErrada ? '#fff' : theme.muted, fontSize:11, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontFamily:'IBM Plex Mono, monospace' }}>
+                  {isCorreta ? '✓' : isErrada ? '✗' : alt}
+                </span>
+                <span style={{ fontSize:13, color:textCor, fontFamily:'Georgia, serif', lineHeight:1.5, textDecoration: isEliminada ? 'line-through' : 'none' }}>{texto}</span>
+              </button>
+            </div>
           )
         })}
       </div>
