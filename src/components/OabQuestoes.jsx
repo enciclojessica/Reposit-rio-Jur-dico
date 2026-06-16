@@ -146,12 +146,35 @@ function PainelStats({ session, theme, onVoltar }) {
         ))}
       </div>
 
-      {/* Por disciplina */}
+      {/* Por disciplina — com gráfico de barras */}
       {stats.length > 0 && (
         <>
           <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:10 }}>
             <TrendingUp size={11} style={{ marginRight:5, verticalAlign:'middle' }} />Por disciplina
           </div>
+
+          {/* Gráfico de barras SVG */}
+          <div style={{ background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:10, padding:'16px 14px', marginBottom:16, overflowX:'auto' }}>
+            <div style={{ fontSize:10, color:theme.muted, fontFamily:'IBM Plex Mono, monospace', marginBottom:10 }}>Aproveitamento por disciplina (%)</div>
+            <svg width="100%" height={Math.max(180, stats.length * 28)} viewBox={`0 0 320 ${Math.max(180, stats.length * 28)}`} preserveAspectRatio="xMidYMid meet">
+              {stats.map((s, i) => {
+                const cor = s.pct >= 70 ? '#10b981' : s.pct >= 50 ? '#f59e0b' : '#ef4444'
+                const barW = Math.max(2, (s.pct / 100) * 180)
+                const y = i * 28 + 4
+                const label = s.disc.replace('Direito ', 'D. ').replace('Processual ', 'Proc. ')
+                return (
+                  <g key={s.disc}>
+                    <text x={0} y={y + 13} fontSize={8} fill="#9b8b7a" fontFamily="IBM Plex Mono, monospace">{label.slice(0,18)}</text>
+                    <rect x={120} y={y + 4} width={barW} height={12} rx={3} fill={cor} opacity={0.85} />
+                    <rect x={120} y={y + 4} width={180} height={12} rx={3} fill="none" stroke="#2a2a2a" strokeWidth={0.5} />
+                    <text x={120 + barW + 4} y={y + 14} fontSize={8} fill={cor} fontFamily="IBM Plex Mono, monospace" fontWeight="bold">{s.pct}%</text>
+                  </g>
+                )
+              })}
+            </svg>
+          </div>
+
+          {/* Lista detalhada */}
           {stats.map(s => {
             const cor = DISC_COR[s.disc] || '#6b7280'
             return (
@@ -206,6 +229,36 @@ function PainelStats({ session, theme, onVoltar }) {
       {stats.length === 0 && (
         <div style={{ textAlign:'center', padding:40, color:theme.muted, fontFamily:'Inter, sans-serif', fontSize:13 }}>
           Nenhuma questão respondida ainda.
+        </div>
+      )}
+
+      {/* Exportar relatório */}
+      {stats.length > 0 && (
+        <div style={{ marginTop:20, paddingTop:16, borderTop:`1px solid ${theme.border}` }}>
+          <button onClick={async () => {
+            const { data } = await supabase
+              .from('oab_respostas')
+              .select('acertou, oab_questoes(enunciado, disciplina, gabarito, justificativa, alternativa_a, alternativa_b, alternativa_c, alternativa_d)')
+              .eq('user_id', session.user.id)
+              .eq('acertou', false)
+              .order('criado_em', { ascending: false })
+              .limit(50)
+            if (!data?.length) return alert('Nenhum erro registrado ainda.')
+            const linhas = data.map((r,i) => {
+              const q = r.oab_questoes
+              const sep = Array(61).join('─')
+              return (i+1)+'. ['+(q?.disciplina||'')+']\n'+(q?.enunciado||'')+'\n\nGabarito: '+(q?.gabarito||'')+(q?.justificativa ? '\nJustificativa: '+q.justificativa : '')+'\n'+sep
+            }).join('\n\n')
+            const cabecalho = 'RELATÓRIO DE ERROS — LEX.IA\nJéssica Farias Fusquiani\n'+new Date().toLocaleDateString('pt-BR')+'\n\n'+Array(61).join('═')+'\n\n'
+            const blob = new Blob([cabecalho+linhas], { type: 'text/plain; charset=utf-8' })
+            const a = document.createElement('a')
+            a.href = URL.createObjectURL(blob)
+            a.download = `erros_lexia_${new Date().toISOString().slice(0,10)}.txt`
+            a.click()
+          }}
+            style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'none', border:`1px solid ${theme.border}`, borderRadius:8, padding:'10px', fontSize:12, color:theme.muted, cursor:'pointer', fontFamily:'Inter, sans-serif' }}>
+            ↓ Exportar relatório de erros (.txt)
+          </button>
         </div>
       )}
     </div>
@@ -362,6 +415,35 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
 }
 
 // ── Card de questão ─────────────────────────────────────────────
+// ── Anotação por questão (localStorage) ─────────────────────────
+function AnotacaoQuestao({ questaoId, theme }) {
+  const key = `lexia_nota_${questaoId}`
+  const [nota, setNota] = useState(() => {
+    try { return localStorage.getItem(key) || '' } catch { return '' }
+  })
+  const [aberto, setAberto] = useState(false)
+
+  function salvar(v) {
+    setNota(v)
+    try { v ? localStorage.setItem(key, v) : localStorage.removeItem(key) } catch {}
+  }
+
+  return (
+    <div style={{ marginTop:10 }}>
+      <button onClick={() => setAberto(a => !a)}
+        style={{ fontSize:10, background:'none', border:`1px solid ${theme.border}`, borderRadius:6, color:nota ? theme.gold : theme.muted, padding:'4px 10px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:5 }}>
+        ✍️ {nota ? 'Ver anotação' : 'Adicionar anotação'}
+      </button>
+      {aberto && (
+        <textarea value={nota} onChange={e => salvar(e.target.value)}
+          placeholder="Sua anotação sobre esta questão..."
+          style={{ marginTop:6, width:'100%', minHeight:70, background:theme.raised, border:`1px solid ${nota ? theme.gold+'66' : theme.border}`, borderRadius:8, color:theme.text, fontSize:12, padding:'8px 10px', fontFamily:'Georgia, serif', lineHeight:1.5, resize:'vertical', outline:'none', boxSizing:'border-box' }}
+        />
+      )}
+    </div>
+  )
+}
+
 function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, isAdmin, theme }) {
   const [selecionada, setSelecionada] = useState(respostaDada || null)
   const [eliminadas, setEliminadas]   = useState(new Set())
@@ -378,6 +460,7 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
   const [editDisc, setEditDisc]       = useState(questao.disciplina)
   const [editTopico, setEditTopico]   = useState(questao.topico || '')
   const [salvando, setSalvando]       = useState(false)
+  const [sugerindo, setSugerindo]     = useState(false)
   const cor = DISC_COR[questao.disciplina] || '#6b7280'
   const alts = ['A','B','C','D']
 
@@ -386,9 +469,31 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
     await supabase.from('oab_questoes').update({ disciplina: editDisc, topico: editTopico || null }).eq('id', questao.id)
     setSalvando(false)
     setEditando(false)
-    // Atualizar localmente
     questao.disciplina = editDisc
     questao.topico = editTopico || null
+  }
+
+  async function sugerirClassificacao() {
+    setSugerindo(true)
+    try {
+      const res = await fetch('/api/busca', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 200,
+          messages: [{ role: 'user', content:
+            `Classifique esta questão jurídica OAB/FGV com a disciplina e tópico corretos.\n\nEnunciado: ${questao.enunciado.slice(0,500)}\n\nDisciplinas possíveis: ${Object.keys(DISC_COR).filter(d=>d!=='Simulado Geral').join(', ')}\n\nResponda SOMENTE com JSON: {"disciplina":"...","topico":"..."}` }]
+        })
+      })
+      const data = await res.json()
+      const txt = data.content?.[0]?.text || ''
+      const clean = txt.replace(/```json/g,'').replace(/```/g,'').trim()
+      const parsed = JSON.parse(clean)
+      if (parsed.disciplina) setEditDisc(parsed.disciplina)
+      if (parsed.topico)     setEditTopico(parsed.topico)
+    } catch { /* silencioso */ }
+    setSugerindo(false)
   }
 
   // Sincronizar selecionada quando muda de questão
@@ -422,6 +527,11 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
             <input value={editTopico} onChange={e => setEditTopico(e.target.value)}
               placeholder="Tópico..."
               style={{ fontSize:11, background:'#1a0608', border:'1px solid #B8930A', borderRadius:6, color:'#F5F0E8', padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace', width:160 }} />
+            <button onClick={sugerirClassificacao} disabled={sugerindo}
+              title="Deixar a IA sugerir a classificação correta"
+              style={{ fontSize:10, background:'#1a1a2e', border:'1px solid #7C3AED', borderRadius:5, color:'#7C3AED', padding:'3px 8px', cursor:'pointer' }}>
+              {sugerindo ? '...' : '✨ IA'}
+            </button>
             <button onClick={salvarEdicao} disabled={salvando}
               style={{ fontSize:10, background:'#B8930A', border:'none', borderRadius:5, color:'#000', padding:'3px 10px', cursor:'pointer', fontWeight:700 }}>
               {salvando ? '...' : 'Salvar'}
@@ -465,9 +575,18 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
         </button>
       </div>
 
-      {/* Enunciado */}
+      {/* Enunciado com highlight de busca */}
       <div style={{ fontSize:14, color:theme.text, fontFamily:'Georgia, serif', lineHeight:1.7, marginBottom:16 }}>
-        {questao.enunciado}
+        {questao._busca ? (() => {
+          const termos = questao._busca.split(/\s+/).filter(t => t.length > 2)
+          if (!termos.length) return questao.enunciado
+          const regex = new RegExp(`(${termos.map(t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\')).join('|')})`, 'gi')
+          const partes = questao.enunciado.split(regex)
+          return partes.map((p, i) => regex.test(p)
+            ? <mark key={i} style={{ background:'#B8930A33', color:theme.gold, borderRadius:2, padding:'0 2px' }}>{p}</mark>
+            : p
+          )
+        })() : questao.enunciado}
       </div>
 
       {/* Alternativas */}
@@ -538,6 +657,9 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
           )}
         </div>
       )}
+
+      {/* Anotação pessoal */}
+      {respondida && <AnotacaoQuestao questaoId={questao.id} theme={theme} />}
     </div>
   )
 }
@@ -785,10 +907,9 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
           return
         }
 
-        const { data: questoesErradas } = await supabase
-          .from('oab_questoes')
-          .select('*')
-          .in('id', idsErradas.slice(0, 200))
+        let qRev = supabase.from('oab_questoes').select('*').in('id', idsErradas.slice(0, 200))
+        if (cfg.disciplina && cfg.disciplina !== 'Todas') qRev = qRev.eq('disciplina', cfg.disciplina)
+        const { data: questoesErradas } = await qRev
 
         selecionadas = (questoesErradas || []).sort(() => Math.random() - 0.5).slice(0, qtd)
 
@@ -948,11 +1069,10 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
             <span style={{ fontSize:11, color:theme.muted, fontFamily:'IBM Plex Mono, monospace', flexShrink:0 }}>
               {idx+1}/{questoes.length}
             </span>
-            {config?.modo === 'simulado' && (
-              <span style={{ fontSize:13, fontWeight:700, color: tempo>4.5*3600 ? '#ef4444' : theme.gold, fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:4 }}>
-                <Timer size={13} /> {fmtTempo(tempo)}
-              </span>
-            )}
+            <span style={{ fontSize:13, fontWeight:700, color: config?.modo==='simulado' && tempo>4.5*3600 ? '#ef4444' : theme.gold, fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:4 }}
+              title={config?.modo==='simulado' ? 'Tempo restante' : 'Tempo de estudo'}>
+              <Timer size={13} /> {fmtTempo(tempo)}
+            </span>
             {config?.modo === 'revisao' && (
               <span style={{ fontSize:10, color:'#f59e0b', background:'#f59e0b18', border:'1px solid #f59e0b33', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
                 REVISÃO
