@@ -444,7 +444,7 @@ function AnotacaoQuestao({ questaoId, theme }) {
   )
 }
 
-function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, isAdmin, theme }) {
+function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, isAdmin, onReclassificar, theme }) {
   const [selecionada, setSelecionada] = useState(respostaDada || null)
   const [eliminadas, setEliminadas]   = useState(new Set())
 
@@ -469,8 +469,13 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
     await supabase.from('oab_questoes').update({ disciplina: editDisc, topico: editTopico || null }).eq('id', questao.id)
     setSalvando(false)
     setEditando(false)
+    const disciplinaOriginal = questao.disciplina
     questao.disciplina = editDisc
     questao.topico = editTopico || null
+    // Se a disciplina mudou, notificar o pai para remover da sessão atual
+    if (editDisc !== disciplinaOriginal && onReclassificar) {
+      onReclassificar(questao.id)
+    }
   }
 
   async function sugerirClassificacao() {
@@ -957,6 +962,23 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
     setCarregando(false)
   }
 
+  function handleReclassificar(questaoId) {
+    // Remove a questão da sessão atual e ajusta o índice
+    setQuestoes(prev => {
+      const novas = prev.filter(q => q.id !== questaoId)
+      // Ajustar idx se necessário
+      const novoIdx = Math.min(idx, Math.max(0, novas.length - 1))
+      setIdx(novoIdx)
+      return novas
+    })
+    // Remover a resposta dessa questão das stats (não conta)
+    setRespostas(prev => {
+      const novo = { ...prev }
+      delete novo[questaoId]
+      return novo
+    })
+  }
+
   async function registrarResposta(questaoId, alternativa) {
     const questao = questoes.find(q => q.id === questaoId)
     const acertou = alternativa === questao?.gabarito
@@ -1086,6 +1108,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
           </div>
 
           <QuestaoCard
+            key={questaoAtual.id}
             questao={questaoAtual}
             idx={idx}
             total={questoes.length}
@@ -1096,6 +1119,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
             favorita={favoritas.has(questaoAtual.id)}
             onFavoritar={toggleFavorita}
             isAdmin={isAdmin}
+            onReclassificar={handleReclassificar}
             theme={theme}
           />
 
