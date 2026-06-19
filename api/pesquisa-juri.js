@@ -49,7 +49,7 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: 3000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }],
       }),
@@ -62,14 +62,19 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
     }
 
     const data = await claudeRes.json()
-    const textBlock = data.content?.find(b => b.type === 'text')
+    const textBlocks = data.content?.filter(b => b.type === 'text') || []
+    const textBlock = textBlocks[textBlocks.length - 1]  // último bloco — após o web_search
     if (!textBlock?.text) {
       return res.status(500).json({ error: 'Resposta sem bloco de texto', resultados: [] })
     }
 
     let parsed
     try {
-      const clean = textBlock.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      let clean = textBlock.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      // Remover qualquer texto explicativo antes/depois do JSON
+      const inicioJson = clean.indexOf('{')
+      const fimJson = clean.lastIndexOf('}')
+      if (inicioJson >= 0 && fimJson > inicioJson) clean = clean.slice(inicioJson, fimJson + 1)
       parsed = JSON.parse(clean)
     } catch {
       console.error('[pesquisa-juri] JSON inválido:', textBlock.text.slice(0, 300))
