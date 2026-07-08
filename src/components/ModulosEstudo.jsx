@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
-import { BookOpen, Headphones, PresentationIcon, Download, Play, Pause, ChevronDown, ChevronUp, FileText } from 'lucide-react'
+import { BookOpen, Headphones, GalleryThumbnails, Download, Play, Pause, ChevronDown, ChevronUp, FileText } from 'lucide-react'
 
 const DISC_COR = {
   "Ética Profissional":                "#7c3aed",
