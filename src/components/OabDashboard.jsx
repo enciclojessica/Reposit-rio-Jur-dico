@@ -5,7 +5,7 @@ import { useTheme } from '../theme'
 import {
   Play, Pause, RotateCcw, CheckCircle, Clock, TrendingUp,
   Trophy, Target, Calendar, Download, ChevronDown, ChevronUp,
-  Star, Circle, Timer, Filter, BarChart2, RefreshCw, BookOpen
+  Star, Circle, Timer, Filter, BarChart2, RefreshCw, BookOpen, LibraryBig
 } from 'lucide-react'
 
 // ── Paleta das disciplinas ─────────────────────────────────────────────────────
@@ -584,9 +584,10 @@ export default function OabDashboard({ session }) {
       {/* Abas */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${theme.border}`, marginBottom: 16, gap: 0 }}>
         {[
-          { id: 'cronograma', label: 'Cronograma',  icon: Calendar  },
-          { id: 'questoes',   label: 'Questões',    icon: BookOpen  },
-          { id: 'stats',      label: 'Estatísticas',icon: BarChart2 },
+          { id: 'cronograma', label: 'Cronograma',  icon: Calendar    },
+          { id: 'questoes',   label: 'Questões',    icon: BookOpen    },
+          { id: 'materiais',  label: 'Materiais',   icon: LibraryBig  },
+          { id: 'stats',      label: 'Estatísticas',icon: BarChart2   },
         ].map(a => (
           <button key={a.id} onClick={() => setAba(a.id)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', cursor: 'pointer', fontSize: 13, fontFamily: 'Inter, sans-serif', fontWeight: aba === a.id ? 600 : 400, color: aba === a.id ? theme.gold : theme.muted, background: 'none', border: 'none', borderBottom: `2px solid ${aba === a.id ? theme.gold : 'transparent'}`, transition: 'all .15s' }}>
@@ -630,6 +631,10 @@ export default function OabDashboard({ session }) {
       )}
 
       {/* ABA: Estatísticas */}
+      {aba === 'materiais' && (
+        <ModulosEstudo theme={theme} />
+      )}
+
       {aba === 'stats' && (
         <div>
           {/* KPIs */}
