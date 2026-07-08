@@ -108,6 +108,34 @@ function SlideViewer({ url, titulo, theme }) {
   )
 }
 
+// ── Viewer de PDF inline ────────────────────────────────────────────────────
+function PDFViewer({ url, titulo, theme, cor }) {
+  const [aberto, setAberto] = useState(false)
+  const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true'
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <button onClick={function() { setAberto(function(a) { return !a }) }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>
+          <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+            {aberto ? '▲ Fechar manual' : '▶ Visualizar manual'}
+          </span>
+        </button>
+        <a href={url} target="_blank" rel="noopener noreferrer"
+          style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: theme.muted, background: 'none', border: '1px solid ' + theme.border, borderRadius: 8, padding: '8px 10px', textDecoration: 'none' }}>
+          <Download size={11} /> baixar
+        </a>
+      </div>
+      {aberto && (
+        <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44' }}>
+          <iframe src={viewerUrl} width="100%" height="500" frameBorder="0" title={titulo} style={{ display: 'block' }} />
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Card de material ────────────────────────────────────────────────────────
 function MaterialCard({ material, theme }) {
   const { bucket, path } = parseBucketPath(material.storage_path)
@@ -126,15 +154,10 @@ function MaterialCard({ material, theme }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{material.titulo}</div>
           <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
         </div>
-        {material.tipo === 'manual' && (
-          <a href={url} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: cor, background: cor + '15', border: '1px solid ' + cor + '33', borderRadius: 6, padding: '5px 10px', textDecoration: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-            <Download size={11} /> Abrir PDF
-          </a>
-        )}
       </div>
       {material.tipo === 'audio' && <AudioPlayer url={url} theme={theme} />}
       {material.tipo === 'slide' && <SlideViewer url={url} titulo={material.titulo} theme={theme} />}
+      {material.tipo === 'manual' && <PDFViewer url={url} titulo={material.titulo} theme={theme} cor={cor} />}
     </div>
   )
 }
