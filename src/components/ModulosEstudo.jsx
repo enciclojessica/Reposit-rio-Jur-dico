@@ -110,6 +110,40 @@ function AudioPlayer({ url, theme }) {
   )
 }
 
+// ── Viewer de slides inline (Office Online) ────────────────────────────────
+function SlideViewer({ url, titulo, theme }) {
+  const [aberto, setAberto] = useState(false)
+  const viewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`
+
+  return (
+    <div>
+      <button onClick={() => setAberto(a => !a)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#a78bfa18', border: '1px solid #a78bfa44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginBottom: aberto ? 8 : 0 }}>
+        <span style={{ fontSize: 12, color: '#a78bfa', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+          {aberto ? '▲ Fechar apresentação' : '▶ Visualizar slides'}
+        </span>
+        <a href={url} download onClick={e => e.stopPropagation()}
+          style={{ fontSize: 10, color: theme.muted, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Download size={10} /> baixar
+        </a>
+      </button>
+      {aberto && (
+        <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #a78bfa44' }}>
+          <iframe
+            src={viewerUrl}
+            width="100%"
+            height="420"
+            frameBorder="0"
+            title={titulo}
+            allowFullScreen
+            style={{ display: 'block' }}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Card de material individual ────────────────────────────────────────────
 function MaterialCard({ material, theme }) {
   const { bucket, path } = parseBucketPath(material.storage_path)
@@ -131,7 +165,7 @@ function MaterialCard({ material, theme }) {
   return (
     <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
       {/* Cabeçalho */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: material.tipo === 'audio' ? 12 : 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: (material.tipo === 'audio' || material.tipo === 'slide') ? 12 : 0 }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: cor + '18', border: `1px solid ${cor}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Icone size={15} color={cor} />
         </div>
@@ -139,24 +173,23 @@ function MaterialCard({ material, theme }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{material.titulo}</div>
           <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
         </div>
-        {material.tipo !== 'audio' && (
-          <a href={url} target="_blank" rel="noopener noreferrer" download
+        {material.tipo === 'manual' && (
+          <a href={url} target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: cor, background: cor + '15', border: `1px solid ${cor}33`, borderRadius: 6, padding: '5px 10px', textDecoration: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-            <Download size={11} /> Baixar
+            <Download size={11} /> Abrir PDF
           </a>
         )}
       </div>
 
       {/* Player de áudio inline */}
       {material.tipo === 'audio' && <AudioPlayer url={url} theme={theme} />}
+
+      {/* Viewer de slides inline */}
+      {material.tipo === 'slide' && <SlideViewer url={url} titulo={material.titulo} theme={theme} />}
     </div>
   )
 }
 
-// ── Card de módulo ──────────────────────────────────────────────────────────
-function ModuloCard({ modulo, materiais, theme }) {
-  const [aberto, setAberto] = useState(false)
-  const cor = DISC_COR[modulo.disciplina] || '#6b7280'
 
   return (
     <div style={{ border: `1px solid ${theme.border}`, borderRadius: 12, marginBottom: 12, overflow: 'hidden' }}>
