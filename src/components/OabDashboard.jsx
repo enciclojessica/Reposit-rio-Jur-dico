@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import OabQuestoes from './OabQuestoes'
+import ModulosEstudo from './ModulosEstudo'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import {
