@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
-import { BookOpen, Headphones, GalleryThumbnails, Download, Play, Pause, ChevronDown, ChevronUp, FileText } from 'lucide-react'
+import { BookOpen, Headphones, GalleryThumbnails, Play, Pause, ChevronDown, ChevronUp, FileText, Lock } from 'lucide-react'
 
 const DISC_COR = {
   "Ética Profissional": "#7c3aed", "Direito Civil": "#16a34a",
@@ -16,14 +16,39 @@ const DISC_COR = {
   "Direitos Humanos": "#0891b2", "Filosofia do Direito": "#78716c",
 }
 
-function getPublicUrl(bucket, path) {
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path)
-  return data?.publicUrl || ''
-}
-
 function parseBucketPath(storagePath) {
   const idx = storagePath.indexOf('/')
   return { bucket: storagePath.slice(0, idx), path: storagePath.slice(idx + 1) }
+}
+
+// ── URL assinada com expiração de 1h ────────────────────────────────────────
+async function getSignedUrl(bucket, path) {
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(path, 3600) // expira em 1 hora
+  if (error || !data?.signedUrl) {
+    // fallback para URL pública se signed falhar
+    const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path)
+    return pub?.publicUrl || ''
+  }
+  return data.signedUrl
+}
+
+// ── Proteção: bloqueia clique direito e atalhos de teclado ──────────────────
+const protecaoStyle = {
+  userSelect: 'none',
+  WebkitUserSelect: 'none',
+  MozUserSelect: 'none',
+}
+
+function onContextMenu(e) { e.preventDefault(); return false }
+function onKeyDown(e) {
+  // Bloquear Ctrl+S, Ctrl+U, F12, Ctrl+Shift+I
+  if ((e.ctrlKey && ['s','u','p'].includes(e.key.toLowerCase())) ||
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()))) {
+    e.preventDefault()
+  }
 }
 
 // ── Player de áudio ─────────────────────────────────────────────────────────
@@ -52,7 +77,8 @@ function AudioPlayer({ url, theme }) {
   }
 
   return (
-    <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 14px' }}>
+    <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 14px' }}
+      onContextMenu={onContextMenu} style2={protecaoStyle}>
       <audio ref={audioRef} src={url}
         onTimeUpdate={() => setProgresso(audioRef.current?.currentTime || 0)}
         onLoadedMetadata={e => setDuracao(e.target.duration)}
@@ -60,8 +86,9 @@ function AudioPlayer({ url, theme }) {
         onWaiting={() => setCarregando(true)}
         onCanPlay={() => setCarregando(false)}
         preload="metadata"
+        controlsList="nodownload"
       />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, ...protecaoStyle }}>
         <button onClick={togglePlay}
           style={{ width: 38, height: 38, borderRadius: '50%', background: theme.gold, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           {carregando ? <span style={{ fontSize: 10, color: '#000' }}>...</span>
@@ -82,54 +109,45 @@ function AudioPlayer({ url, theme }) {
   )
 }
 
-// ── Viewer de slides ────────────────────────────────────────────────────────
-function SlideViewer({ url, titulo, theme }) {
+// ── Viewer protegido (PDF e PPTX) ───────────────────────────────────────────
+function MaterialViewer({ url, titulo, tipo, cor, theme }) {
   const [aberto, setAberto] = useState(false)
-  const viewerUrl = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url)
+
+  const viewerUrl = tipo === 'manual'
+    ? 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true'
+    : 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url)
+
+  const labelAbrir = tipo === 'manual' ? '▶ Visualizar manual' : '▶ Visualizar slides'
+  const labelFechar = tipo === 'manual' ? '▲ Fechar manual' : '▲ Fechar apresentação'
 
   return (
     <div>
-      <button onClick={() => setAberto(function(a) { return !a })}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: '#a78bfa18', border: '1px solid #a78bfa44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginBottom: aberto ? 8 : 0 }}>
-        <span style={{ fontSize: 12, color: '#a78bfa', fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-          {aberto ? '▲ Fechar apresentação' : '▶ Visualizar slides'}
+      <button onClick={function() { setAberto(function(a) { return !a }) }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginTop: 4 }}>
+        <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+          {aberto ? labelFechar : labelAbrir}
         </span>
-        <a href={url} download onClick={function(e) { e.stopPropagation() }}
-          style={{ fontSize: 10, color: theme.muted, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Download size={10} /> baixar
-        </a>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
+          <Lock size={9} /> protegido
+        </span>
       </button>
       {aberto && (
-        <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #a78bfa44' }}>
-          <iframe src={viewerUrl} width="100%" height="420" frameBorder="0" title={titulo} allowFullScreen style={{ display: 'block' }} />
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── Viewer de PDF inline ────────────────────────────────────────────────────
-function PDFViewer({ url, titulo, theme, cor }) {
-  const [aberto, setAberto] = useState(false)
-  const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true'
-
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-        <button onClick={function() { setAberto(function(a) { return !a }) }}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>
-          <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-            {aberto ? '▲ Fechar manual' : '▶ Visualizar manual'}
-          </span>
-        </button>
-        <a href={url} target="_blank" rel="noopener noreferrer"
-          style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: theme.muted, background: 'none', border: '1px solid ' + theme.border, borderRadius: 8, padding: '8px 10px', textDecoration: 'none' }}>
-          <Download size={11} /> baixar
-        </a>
-      </div>
-      {aberto && (
-        <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44' }}>
-          <iframe src={viewerUrl} width="100%" height="500" frameBorder="0" title={titulo} style={{ display: 'block' }} />
+        <div
+          onContextMenu={onContextMenu}
+          onKeyDown={onKeyDown}
+          style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44', position: 'relative', ...protecaoStyle }}>
+          {/* Overlay transparente bloqueia clique direito no iframe */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, cursor: 'default' }}
+            onContextMenu={onContextMenu} />
+          <iframe
+            src={viewerUrl}
+            width="100%"
+            height={tipo === 'manual' ? '520' : '420'}
+            frameBorder="0"
+            title={titulo}
+            sandbox="allow-scripts allow-same-origin"
+            style={{ display: 'block', pointerEvents: 'auto' }}
+          />
         </div>
       )}
     </div>
@@ -137,16 +155,30 @@ function PDFViewer({ url, titulo, theme, cor }) {
 }
 
 // ── Card de material ────────────────────────────────────────────────────────
-function MaterialCard({ material, theme }) {
+function MaterialCard({ material, userEmail, theme }) {
   const { bucket, path } = parseBucketPath(material.storage_path)
-  const url = getPublicUrl(bucket, path)
+  const [url, setUrl] = useState('')
+
+  useEffect(function() {
+    getSignedUrl(bucket, path).then(setUrl)
+  }, [bucket, path])
+
   const cor = material.tipo === 'manual' ? theme.gold : material.tipo === 'audio' ? '#10b981' : '#a78bfa'
   const Icone = material.tipo === 'manual' ? FileText : material.tipo === 'audio' ? Headphones : GalleryThumbnails
   const label = material.tipo === 'manual' ? 'Manual PDF' : material.tipo === 'audio' ? 'Aula em Áudio' : 'Slides PPTX'
 
+  if (!url) {
+    return (
+      <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10, color: theme.muted, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+        Carregando material...
+      </div>
+    )
+  }
+
   return (
     <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: (material.tipo === 'audio' || material.tipo === 'slide') ? 12 : 0 }}>
+      {/* Cabeçalho */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: cor + '18', border: '1px solid ' + cor + '33', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Icone size={15} color={cor} />
         </div>
@@ -154,22 +186,30 @@ function MaterialCard({ material, theme }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{material.titulo}</div>
           <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
+          <Lock size={9} /> URL expira em 1h
+        </div>
       </div>
-      {material.tipo === 'audio' && <AudioPlayer url={url} theme={theme} />}
-      {material.tipo === 'slide' && <SlideViewer url={url} titulo={material.titulo} theme={theme} />}
-      {material.tipo === 'manual' && <PDFViewer url={url} titulo={material.titulo} theme={theme} cor={cor} />}
+
+      {/* Conteúdo por tipo */}
+      <div style={{ marginTop: 10 }}>
+        {material.tipo === 'audio' && <AudioPlayer url={url} theme={theme} />}
+        {(material.tipo === 'manual' || material.tipo === 'slide') && (
+          <MaterialViewer url={url} titulo={material.titulo} tipo={material.tipo} cor={cor} theme={theme} />
+        )}
+      </div>
     </div>
   )
 }
 
 // ── Card de módulo ──────────────────────────────────────────────────────────
-function ModuloCard({ modulo, materiais, theme }) {
+function ModuloCard({ modulo, materiais, userEmail, theme }) {
   const [aberto, setAberto] = useState(false)
   const cor = DISC_COR[modulo.disciplina] || '#6b7280'
 
   return (
     <div style={{ border: `1px solid ${theme.border}`, borderRadius: 12, marginBottom: 12, overflow: 'hidden' }}>
-      <button onClick={() => setAberto(function(a) { return !a })}
+      <button onClick={function() { setAberto(function(a) { return !a }) }}
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: theme.raised, border: 'none', cursor: 'pointer', textAlign: 'left' }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: cor, flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
@@ -192,7 +232,9 @@ function ModuloCard({ modulo, materiais, theme }) {
               {modulo.descricao}
             </div>
           )}
-          {materiais.map(function(m) { return <MaterialCard key={m.id} material={m} theme={theme} /> })}
+          {materiais.map(function(m) {
+            return <MaterialCard key={m.id} material={m} userEmail={userEmail} theme={theme} />
+          })}
         </div>
       )}
     </div>
@@ -200,11 +242,12 @@ function ModuloCard({ modulo, materiais, theme }) {
 }
 
 // ── Componente principal ────────────────────────────────────────────────────
-export default function ModulosEstudo({ theme }) {
+export default function ModulosEstudo({ theme, session }) {
   const [modulos, setModulos]     = useState([])
   const [materiais, setMateriais] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [filtro, setFiltro]       = useState('Todos')
+  const userEmail = session?.user?.email || ''
 
   useEffect(function() {
     async function carregar() {
@@ -231,7 +274,7 @@ export default function ModulosEstudo({ theme }) {
   }
 
   return (
-    <div>
+    <div onContextMenu={onContextMenu} onKeyDown={onKeyDown}>
       {disciplinas.length > 2 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           {disciplinas.map(function(d) {
@@ -252,6 +295,7 @@ export default function ModulosEstudo({ theme }) {
             key={m.id}
             modulo={m}
             materiais={materiais.filter(function(mat) { return mat.modulo_id === m.id })}
+            userEmail={userEmail}
             theme={theme}
           />
         )

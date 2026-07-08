@@ -633,7 +633,7 @@ export default function OabDashboard({ session }) {
 
       {/* ABA: Estatísticas */}
       {aba === 'materiais' && (
-        <ModulosEstudo theme={theme} />
+        <ModulosEstudo theme={theme} session={session} />
       )}
 
       {aba === 'stats' && (
