@@ -82,30 +82,19 @@ function AudioPlayer({ url, theme }) {
   )
 }
 
-// ── Viewer de PDF ───────────────────────────────────────────────────────────
+// ── Viewer de PDF — abre em nova aba ────────────────────────────────────────
 function PDFViewer({ url, cor, theme }) {
-  const [aberto, setAberto] = useState(false)
   return (
-    <div>
-      <button onClick={function() { setAberto(function(a) { return !a }) }}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginTop: 4 }}>
+    <div style={{ marginTop: 4 }}>
+      <button onClick={function() { window.open(url, '_blank', 'noopener') }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>
         <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-          {aberto ? '▲ Fechar manual' : '▶ Visualizar manual'}
+          ▶ Abrir manual (nova aba)
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
           <Lock size={9} /> protegido
         </span>
       </button>
-      {aberto && (
-        <div onContextMenu={onContextMenu}
-          style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44' }}>
-          <object data={url} type="application/pdf" width="100%" height="560" style={{ display: 'block' }}>
-            <div style={{ padding: 24, textAlign: 'center', color: theme.muted, fontSize: 12 }}>
-              Não foi possível visualizar o PDF neste navegador.
-            </div>
-          </object>
-        </div>
-      )}
     </div>
   )
 }
