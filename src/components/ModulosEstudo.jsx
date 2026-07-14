@@ -113,8 +113,10 @@ function AudioPlayer({ url, theme }) {
 function MaterialViewer({ url, titulo, tipo, cor, theme }) {
   const [aberto, setAberto] = useState(false)
 
+  // PDF: renderização nativa do browser (não depende de serviço externo)
+  // PPTX: Office Online (aceita URLs públicas/assinadas)
   const viewerUrl = tipo === 'manual'
-    ? 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true'
+    ? url  // PDF direto — o browser renderiza nativamente
     : 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url)
 
   const labelAbrir = tipo === 'manual' ? '▶ Visualizar manual' : '▶ Visualizar slides'
@@ -122,7 +124,7 @@ function MaterialViewer({ url, titulo, tipo, cor, theme }) {
 
   return (
     <div>
-      <button onClick={function() { setAberto(function(a) { return !a }) }}
+      <button onClick={toggleAberto}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginTop: 4 }}>
         <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
           {aberto ? labelFechar : labelAbrir}
@@ -139,15 +141,23 @@ function MaterialViewer({ url, titulo, tipo, cor, theme }) {
           {/* Overlay transparente bloqueia clique direito no iframe */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, cursor: 'default' }}
             onContextMenu={onContextMenu} />
-          <iframe
-            src={viewerUrl}
-            width="100%"
-            height={tipo === 'manual' ? '520' : '420'}
-            frameBorder="0"
-            title={titulo}
-            sandbox="allow-scripts allow-same-origin"
-            style={{ display: 'block', pointerEvents: 'auto' }}
-          />
+          {tipo === 'manual' ? (
+            <object data={viewerUrl} type="application/pdf" width="100%" height="560" style={{ display: 'block' }}>
+              <div style={{ padding: 24, textAlign: 'center', color: '#9b8b7a', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+                Navegador não suporta PDF inline.
+              </div>
+            </object>
+          ) : (
+            <iframe
+              src={viewerUrl}
+              width="100%"
+              height="420"
+              frameBorder="0"
+              title={titulo}
+              allowFullScreen
+              style={{ display: 'block', pointerEvents: 'auto' }}
+            />
+          )}
         </div>
       )}
     </div>
@@ -204,12 +214,22 @@ function MaterialCard({ material, userEmail, theme }) {
 
 // ── Card de módulo ──────────────────────────────────────────────────────────
 function ModuloCard({ modulo, materiais, userEmail, theme }) {
-  const [aberto, setAberto] = useState(false)
+  const storageKey = 'lexia_mod_' + modulo.id
+  const [aberto, setAberto] = useState(function() {
+    try { return localStorage.getItem(storageKey) === '1' } catch { return false }
+  })
   const cor = DISC_COR[modulo.disciplina] || '#6b7280'
+
+  function toggleAberto() {
+    setAberto(function(a) {
+      try { localStorage.setItem(storageKey, a ? '0' : '1') } catch {}
+      return !a
+    })
+  }
 
   return (
     <div style={{ border: `1px solid ${theme.border}`, borderRadius: 12, marginBottom: 12, overflow: 'hidden' }}>
-      <button onClick={function() { setAberto(function(a) { return !a }) }}
+      <button onClick={toggleAberto}
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: theme.raised, border: 'none', cursor: 'pointer', textAlign: 'left' }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: cor, flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
@@ -246,7 +266,14 @@ export default function ModulosEstudo({ theme, session }) {
   const [modulos, setModulos]     = useState([])
   const [materiais, setMateriais] = useState([])
   const [carregando, setCarregando] = useState(true)
-  const [filtro, setFiltro]       = useState('Todos')
+  const [filtro, setFiltro] = useState(function() {
+    try { return localStorage.getItem('lexia_mat_filtro') || 'Todos' } catch { return 'Todos' }
+  })
+
+  function setFiltroP(v) {
+    setFiltroP(v)
+    try { localStorage.setItem('lexia_mat_filtro', v) } catch {}
+  }
   const userEmail = session?.user?.email || ''
 
   useEffect(function() {
@@ -281,7 +308,7 @@ export default function ModulosEstudo({ theme, session }) {
             const cor = DISC_COR[d] || '#6b7280'
             const ativo = filtro === d
             return (
-              <button key={d} onClick={function() { setFiltro(d) }}
+              <button key={d} onClick={function() { setFiltroP(d) }}
                 style={{ fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', padding: '4px 10px', borderRadius: 6, cursor: 'pointer', border: '1px solid ' + (ativo ? cor : theme.border), background: ativo ? cor + '18' : 'none', color: ativo ? cor : theme.muted, fontWeight: ativo ? 700 : 400 }}>
                 {d}
               </button>

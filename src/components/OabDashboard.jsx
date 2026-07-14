@@ -439,7 +439,14 @@ export default function OabDashboard({ session }) {
   const { theme } = useTheme()
   const [dados, setDados]     = useState({})
   const [carregando, setCarregando] = useState(true)
-  const [aba, setAba]         = useState('cronograma')
+  const [aba, setAba] = useState(function() {
+    try { return localStorage.getItem('lexia_oab_aba') || 'cronograma' } catch { return 'cronograma' }
+  })
+
+  function setAbaP(v) {
+    setAbaP(v)
+    try { localStorage.setItem('lexia_oab_aba', v) } catch {}
+  }
   const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
   const [topicoFiltro, setTopicoFiltro]         = useState(null)
   const [fFase, setFFase]     = useState('Todas')
@@ -571,7 +578,7 @@ export default function OabDashboard({ session }) {
                 <span style={{ fontSize: 12, color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.disciplina} — {s.topico}</span>
                 {s.disciplina !== 'Simulado Geral' && (
                   <button
-                    onClick={() => { setDisciplinaFiltro(s.disciplina); setTopicoFiltro(s.topico); setAba('questoes') }}
+                    onClick={() => { setDisciplinaFiltro(s.disciplina); setTopicoFiltro(s.topico); setAbaP('questoes') }}
                     style={{ fontSize: 10, color: cor, background: cor+'15', border: `1px solid ${cor}33`, borderRadius: 5, padding: '3px 8px', cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0, whiteSpace: 'nowrap' }}>
                     Praticar ▶
                   </button>
@@ -590,7 +597,7 @@ export default function OabDashboard({ session }) {
           { id: 'materiais',  label: 'Materiais',   icon: LibraryBig  },
           { id: 'stats',      label: 'Estatísticas',icon: BarChart2   },
         ].map(a => (
-          <button key={a.id} onClick={() => setAba(a.id)}
+          <button key={a.id} onClick={() => setAbaP(a.id)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', cursor: 'pointer', fontSize: 13, fontFamily: 'Inter, sans-serif', fontWeight: aba === a.id ? 600 : 400, color: aba === a.id ? theme.gold : theme.muted, background: 'none', border: 'none', borderBottom: `2px solid ${aba === a.id ? theme.gold : 'transparent'}`, transition: 'all .15s' }}>
             <a.icon size={14} /> {a.label}
           </button>
@@ -621,14 +628,14 @@ export default function OabDashboard({ session }) {
 
           {/* Lista de sessões */}
           {filtradas.map(s => (
-            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => { setDisciplinaFiltro(disc); setTopicoFiltro(top||null); setAba('questoes') }} theme={theme} />
+            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => { setDisciplinaFiltro(disc); setTopicoFiltro(top||null); setAbaP('questoes') }} theme={theme} />
           ))}
         </>
       )}
 
       {/* ABA: Questões */}
       {aba === 'questoes' && (
-        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setAba('cronograma') }} />
+        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setAbaP('cronograma') }} />
       )}
 
       {/* ABA: Estatísticas */}
