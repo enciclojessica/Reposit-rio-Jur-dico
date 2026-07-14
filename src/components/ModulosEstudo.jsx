@@ -21,17 +21,10 @@ function parseBucketPath(storagePath) {
   return { bucket: storagePath.slice(0, idx), path: storagePath.slice(idx + 1) }
 }
 
-// ── URL assinada com expiração de 1h ────────────────────────────────────────
-async function getSignedUrl(bucket, path) {
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .createSignedUrl(path, 3600) // expira em 1 hora
-  if (error || !data?.signedUrl) {
-    // fallback para URL pública se signed falhar
-    const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path)
-    return pub?.publicUrl || ''
-  }
-  return data.signedUrl
+// ── URL pública direta (buckets são públicos, proteção via UI) ──────────────
+function getPublicUrlDirect(bucket, path) {
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path)
+  return data?.publicUrl || ''
 }
 
 // ── Proteção: bloqueia clique direito e atalhos de teclado ──────────────────
@@ -167,23 +160,11 @@ function MaterialViewer({ url, titulo, tipo, cor, theme }) {
 // ── Card de material ────────────────────────────────────────────────────────
 function MaterialCard({ material, userEmail, theme }) {
   const { bucket, path } = parseBucketPath(material.storage_path)
-  const [url, setUrl] = useState('')
-
-  useEffect(function() {
-    getSignedUrl(bucket, path).then(setUrl)
-  }, [bucket, path])
+  const url = getPublicUrlDirect(bucket, path)
 
   const cor = material.tipo === 'manual' ? theme.gold : material.tipo === 'audio' ? '#10b981' : '#a78bfa'
   const Icone = material.tipo === 'manual' ? FileText : material.tipo === 'audio' ? Headphones : GalleryThumbnails
   const label = material.tipo === 'manual' ? 'Manual PDF' : material.tipo === 'audio' ? 'Aula em Áudio' : 'Slides PPTX'
-
-  if (!url) {
-    return (
-      <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10, color: theme.muted, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
-        Carregando material...
-      </div>
-    )
-  }
 
   return (
     <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
@@ -196,9 +177,7 @@ function MaterialCard({ material, userEmail, theme }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{material.titulo}</div>
           <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
-          <Lock size={9} /> URL expira em 1h
-        </div>
+
       </div>
 
       {/* Conteúdo por tipo */}
