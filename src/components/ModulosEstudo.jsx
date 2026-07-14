@@ -250,7 +250,7 @@ export default function ModulosEstudo({ theme, session }) {
   })
 
   function setFiltroP(v) {
-    setFiltroP(v)
+    setFiltro(v)
     try { localStorage.setItem('lexia_mat_filtro', v) } catch {}
   }
   const userEmail = session?.user?.email || ''
