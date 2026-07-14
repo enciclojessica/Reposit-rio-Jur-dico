@@ -82,58 +82,12 @@ function AudioPlayer({ url, theme }) {
   )
 }
 
-// ── Viewer de PDF via canvas (pdfjs-dist) ───────────────────────────────────
+// ── Viewer de PDF via Google Drive Preview ──────────────────────────────────
 function PDFViewer({ url, cor, theme }) {
   const [aberto, setAberto] = useState(false)
-  const [paginas, setPaginas] = useState([])
-  const [carregando, setCarregando] = useState(false)
-  const [paginaAtual, setPaginaAtual] = useState(1)
-  const [totalPaginas, setTotalPaginas] = useState(0)
-  const canvasRef = useRef(null)
-  const pdfRef = useRef(null)
-
-  async function carregarPDF() {
-    if (pdfRef.current) return
-    setCarregando(true)
-    try {
-      const pdfjsLib = await import('pdfjs-dist')
-      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
-      const pdf = await pdfjsLib.getDocument(url).promise
-      pdfRef.current = pdf
-      setTotalPaginas(pdf.numPages)
-      await renderizarPagina(pdf, 1)
-    } catch (e) {
-      console.error('PDF erro:', e)
-    }
-    setCarregando(false)
-  }
-
-  async function renderizarPagina(pdf, num) {
-    const page = await pdf.getPage(num)
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const viewport = page.getViewport({ scale: 1.4 })
-    canvas.width = viewport.width
-    canvas.height = viewport.height
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise
-    setPaginaAtual(num)
-  }
-
-  async function irPagina(num) {
-    if (!pdfRef.current || num < 1 || num > totalPaginas) return
-    await renderizarPagina(pdfRef.current, num)
-  }
-
-  function abrirFechar() {
-    setAberto(function(a) {
-      if (!a) carregarPDF()
-      return !a
-    })
-  }
-
   return (
     <div style={{ marginTop: 4 }}>
-      <button onClick={abrirFechar}
+      <button onClick={function() { setAberto(function(a) { return !a }) }}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>
         <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
           {aberto ? '▲ Fechar manual' : '▶ Visualizar manual'}
@@ -144,30 +98,16 @@ function PDFViewer({ url, cor, theme }) {
       </button>
       {aberto && (
         <div onContextMenu={onContextMenu}
-          style={{ marginTop: 8, borderRadius: 8, border: '1px solid ' + cor + '44', overflow: 'hidden', background: '#1a1a1a' }}>
-          {carregando && (
-            <div style={{ padding: 32, textAlign: 'center', color: theme.muted, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
-              Carregando PDF...
-            </div>
-          )}
-          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 600 }}>
-            <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto', userSelect: 'none' }} />
-          </div>
-          {totalPaginas > 1 && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '8px 12px', background: '#111', borderTop: '1px solid ' + cor + '33' }}>
-              <button onClick={function() { irPagina(paginaAtual - 1) }} disabled={paginaAtual <= 1}
-                style={{ background: 'none', border: '1px solid ' + (paginaAtual > 1 ? cor : theme.border), borderRadius: 6, color: paginaAtual > 1 ? cor : theme.muted, padding: '4px 10px', cursor: paginaAtual > 1 ? 'pointer' : 'default', fontSize: 12 }}>
-                ‹ Anterior
-              </button>
-              <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
-                {paginaAtual} / {totalPaginas}
-              </span>
-              <button onClick={function() { irPagina(paginaAtual + 1) }} disabled={paginaAtual >= totalPaginas}
-                style={{ background: 'none', border: '1px solid ' + (paginaAtual < totalPaginas ? cor : theme.border), borderRadius: 6, color: paginaAtual < totalPaginas ? cor : theme.muted, padding: '4px 10px', cursor: paginaAtual < totalPaginas ? 'pointer' : 'default', fontSize: 12 }}>
-                Próxima ›
-              </button>
-            </div>
-          )}
+          style={{ marginTop: 8, borderRadius: 8, border: '1px solid ' + cor + '44', overflow: 'hidden' }}>
+          <iframe
+            src={url}
+            width="100%"
+            height="600"
+            frameBorder="0"
+            allow="autoplay"
+            title="Manual PDF"
+            style={{ display: 'block' }}
+          />
         </div>
       )}
     </div>
@@ -201,7 +141,11 @@ function SlideViewer({ url, titulo, cor, theme }) {
 // ── Card de material ────────────────────────────────────────────────────────
 function MaterialCard({ material, theme }) {
   const { bucket, path } = parseBucketPath(material.storage_path)
-  const url = getPublicUrl(bucket, path)
+  const storageUrl = getPublicUrl(bucket, path)
+  // PDF: usar Google Drive Preview (sem CORS) se drive_id disponível
+  const url = (material.tipo === 'manual' && material.drive_id)
+    ? 'https://drive.google.com/file/d/' + material.drive_id + '/preview'
+    : storageUrl
   const cor = material.tipo === 'manual' ? theme.gold : material.tipo === 'audio' ? '#10b981' : '#a78bfa'
   const Icone = material.tipo === 'manual' ? FileText : material.tipo === 'audio' ? Headphones : GalleryThumbnails
   const label = material.tipo === 'manual' ? 'Manual PDF' : material.tipo === 'audio' ? 'Aula em Áudio' : 'Slides PPTX'
@@ -296,7 +240,7 @@ export default function ModulosEstudo({ theme, session }) {
     async function carregar() {
       const [{ data: mods }, { data: mats }] = await Promise.all([
         supabase.from('modulos_estudo').select('*').order('disciplina').order('ordem'),
-        supabase.from('material_estudo').select('*').order('ordem'),
+        supabase.from('material_estudo').select('id,modulo_id,tipo,titulo,storage_path,drive_id,ordem').order('ordem'),
       ])
       setModulos(mods || [])
       setMateriais(mats || [])
