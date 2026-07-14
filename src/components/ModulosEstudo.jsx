@@ -21,28 +21,12 @@ function parseBucketPath(storagePath) {
   return { bucket: storagePath.slice(0, idx), path: storagePath.slice(idx + 1) }
 }
 
-// ── URL pública direta (buckets são públicos, proteção via UI) ──────────────
-function getPublicUrlDirect(bucket, path) {
+function getPublicUrl(bucket, path) {
   const { data } = supabase.storage.from(bucket).getPublicUrl(path)
   return data?.publicUrl || ''
 }
 
-// ── Proteção: bloqueia clique direito e atalhos de teclado ──────────────────
-const protecaoStyle = {
-  userSelect: 'none',
-  WebkitUserSelect: 'none',
-  MozUserSelect: 'none',
-}
-
-function onContextMenu(e) { e.preventDefault(); return false }
-function onKeyDown(e) {
-  // Bloquear Ctrl+S, Ctrl+U, F12, Ctrl+Shift+I
-  if ((e.ctrlKey && ['s','u','p'].includes(e.key.toLowerCase())) ||
-      e.key === 'F12' ||
-      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()))) {
-    e.preventDefault()
-  }
-}
+function onContextMenu(e) { e.preventDefault() }
 
 // ── Player de áudio ─────────────────────────────────────────────────────────
 function AudioPlayer({ url, theme }) {
@@ -50,7 +34,6 @@ function AudioPlayer({ url, theme }) {
   const [playing, setPlaying] = useState(false)
   const [progresso, setProgresso] = useState(0)
   const [duracao, setDuracao] = useState(0)
-  const [carregando, setCarregando] = useState(false)
 
   function fmt(s) {
     if (!s || isNaN(s)) return '0:00'
@@ -70,28 +53,25 @@ function AudioPlayer({ url, theme }) {
   }
 
   return (
-    <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 14px' }}
-      onContextMenu={onContextMenu} style2={protecaoStyle}>
+    <div style={{ background: theme.raised, border: '1px solid ' + theme.border, borderRadius: 10, padding: '12px 14px' }}>
       <audio ref={audioRef} src={url}
-        onTimeUpdate={() => setProgresso(audioRef.current?.currentTime || 0)}
-        onLoadedMetadata={e => setDuracao(e.target.duration)}
-        onEnded={() => setPlaying(false)}
-        onWaiting={() => setCarregando(true)}
-        onCanPlay={() => setCarregando(false)}
+        onTimeUpdate={function() { setProgresso(audioRef.current?.currentTime || 0) }}
+        onLoadedMetadata={function(e) { setDuracao(e.target.duration) }}
+        onEnded={function() { setPlaying(false) }}
         preload="metadata"
         controlsList="nodownload"
       />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, ...protecaoStyle }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={togglePlay}
           style={{ width: 38, height: 38, borderRadius: '50%', background: theme.gold, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          {carregando ? <span style={{ fontSize: 10, color: '#000' }}>...</span>
-            : playing ? <Pause size={16} color="#000" fill="#000" />
+          {playing
+            ? <Pause size={16} color="#000" fill="#000" />
             : <Play size={16} color="#000" fill="#000" />}
         </button>
         <div style={{ flex: 1 }}>
           <div onClick={onSeek}
             style={{ height: 4, background: theme.border, borderRadius: 2, cursor: 'pointer', marginBottom: 4, position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', borderRadius: 2, background: theme.gold, width: `${duracao ? (progresso / duracao) * 100 : 0}%` }} />
+            <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', borderRadius: 2, background: theme.gold, width: (duracao ? (progresso / duracao) * 100 : 0) + '%' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
             <span>{fmt(progresso)}</span><span>{fmt(duracao)}</span>
@@ -102,55 +82,52 @@ function AudioPlayer({ url, theme }) {
   )
 }
 
-// ── Viewer protegido (PDF e PPTX) ───────────────────────────────────────────
-function MaterialViewer({ url, titulo, tipo, cor, theme }) {
+// ── Viewer de PDF ───────────────────────────────────────────────────────────
+function PDFViewer({ url, cor, theme }) {
   const [aberto, setAberto] = useState(false)
-
-  // PDF: renderização nativa do browser (não depende de serviço externo)
-  // PPTX: Office Online (aceita URLs públicas/assinadas)
-  const viewerUrl = tipo === 'manual'
-    ? url  // PDF direto — o browser renderiza nativamente
-    : 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url)
-
-  const labelAbrir = tipo === 'manual' ? '▶ Visualizar manual' : '▶ Visualizar slides'
-  const labelFechar = tipo === 'manual' ? '▲ Fechar manual' : '▲ Fechar apresentação'
-
   return (
     <div>
-      <button onClick={toggleAberto}
+      <button onClick={function() { setAberto(function(a) { return !a }) }}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginTop: 4 }}>
         <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-          {aberto ? labelFechar : labelAbrir}
+          {aberto ? '▲ Fechar manual' : '▶ Visualizar manual'}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
           <Lock size={9} /> protegido
         </span>
       </button>
       {aberto && (
-        <div
-          onContextMenu={onContextMenu}
-          onKeyDown={onKeyDown}
-          style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44', position: 'relative', ...protecaoStyle }}>
-          {/* Overlay transparente bloqueia clique direito no iframe */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, cursor: 'default' }}
-            onContextMenu={onContextMenu} />
-          {tipo === 'manual' ? (
-            <object data={viewerUrl} type="application/pdf" width="100%" height="560" style={{ display: 'block' }}>
-              <div style={{ padding: 24, textAlign: 'center', color: '#9b8b7a', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
-                Navegador não suporta PDF inline.
-              </div>
-            </object>
-          ) : (
-            <iframe
-              src={viewerUrl}
-              width="100%"
-              height="420"
-              frameBorder="0"
-              title={titulo}
-              allowFullScreen
-              style={{ display: 'block', pointerEvents: 'auto' }}
-            />
-          )}
+        <div onContextMenu={onContextMenu}
+          style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44' }}>
+          <object data={url} type="application/pdf" width="100%" height="560" style={{ display: 'block' }}>
+            <div style={{ padding: 24, textAlign: 'center', color: theme.muted, fontSize: 12 }}>
+              Não foi possível visualizar o PDF neste navegador.
+            </div>
+          </object>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Viewer de slides ────────────────────────────────────────────────────────
+function SlideViewer({ url, titulo, cor, theme }) {
+  const [aberto, setAberto] = useState(false)
+  const viewerUrl = 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(url)
+  return (
+    <div>
+      <button onClick={function() { setAberto(function(a) { return !a }) }}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', marginTop: 4 }}>
+        <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+          {aberto ? '▲ Fechar apresentação' : '▶ Visualizar slides'}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
+          <Lock size={9} /> protegido
+        </span>
+      </button>
+      {aberto && (
+        <div style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44' }}>
+          <iframe src={viewerUrl} width="100%" height="420" frameBorder="0" title={titulo} allowFullScreen style={{ display: 'block' }} />
         </div>
       )}
     </div>
@@ -158,17 +135,15 @@ function MaterialViewer({ url, titulo, tipo, cor, theme }) {
 }
 
 // ── Card de material ────────────────────────────────────────────────────────
-function MaterialCard({ material, userEmail, theme }) {
+function MaterialCard({ material, theme }) {
   const { bucket, path } = parseBucketPath(material.storage_path)
-  const url = getPublicUrlDirect(bucket, path)
-
+  const url = getPublicUrl(bucket, path)
   const cor = material.tipo === 'manual' ? theme.gold : material.tipo === 'audio' ? '#10b981' : '#a78bfa'
   const Icone = material.tipo === 'manual' ? FileText : material.tipo === 'audio' ? Headphones : GalleryThumbnails
   const label = material.tipo === 'manual' ? 'Manual PDF' : material.tipo === 'audio' ? 'Aula em Áudio' : 'Slides PPTX'
 
   return (
-    <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
-      {/* Cabeçalho */}
+    <div style={{ background: theme.raised, border: '1px solid ' + theme.border, borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 32, height: 32, borderRadius: 8, background: cor + '18', border: '1px solid ' + cor + '33', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Icone size={15} color={cor} />
@@ -177,29 +152,25 @@ function MaterialCard({ material, userEmail, theme }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{material.titulo}</div>
           <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
         </div>
-
       </div>
-
-      {/* Conteúdo por tipo */}
       <div style={{ marginTop: 10 }}>
-        {material.tipo === 'audio' && <AudioPlayer url={url} theme={theme} />}
-        {(material.tipo === 'manual' || material.tipo === 'slide') && (
-          <MaterialViewer url={url} titulo={material.titulo} tipo={material.tipo} cor={cor} theme={theme} />
-        )}
+        {material.tipo === 'audio'  && <AudioPlayer url={url} theme={theme} />}
+        {material.tipo === 'manual' && <PDFViewer url={url} cor={cor} theme={theme} />}
+        {material.tipo === 'slide'  && <SlideViewer url={url} titulo={material.titulo} cor={cor} theme={theme} />}
       </div>
     </div>
   )
 }
 
 // ── Card de módulo ──────────────────────────────────────────────────────────
-function ModuloCard({ modulo, materiais, userEmail, theme }) {
+function ModuloCard({ modulo, materiais, theme }) {
   const storageKey = 'lexia_mod_' + modulo.id
   const [aberto, setAberto] = useState(function() {
     try { return localStorage.getItem(storageKey) === '1' } catch { return false }
   })
   const cor = DISC_COR[modulo.disciplina] || '#6b7280'
 
-  function toggleAberto() {
+  function toggle() {
     setAberto(function(a) {
       try { localStorage.setItem(storageKey, a ? '0' : '1') } catch {}
       return !a
@@ -207,8 +178,8 @@ function ModuloCard({ modulo, materiais, userEmail, theme }) {
   }
 
   return (
-    <div style={{ border: `1px solid ${theme.border}`, borderRadius: 12, marginBottom: 12, overflow: 'hidden' }}>
-      <button onClick={toggleAberto}
+    <div style={{ border: '1px solid ' + theme.border, borderRadius: 12, marginBottom: 12, overflow: 'hidden' }}>
+      <button onClick={toggle}
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: theme.raised, border: 'none', cursor: 'pointer', textAlign: 'left' }}>
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: cor, flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
@@ -225,15 +196,18 @@ function ModuloCard({ modulo, materiais, userEmail, theme }) {
         </div>
       </button>
       {aberto && (
-        <div style={{ padding: '12px 16px', background: theme.bg || theme.raised, borderTop: `1px solid ${theme.border}` }}>
+        <div style={{ padding: '12px 16px', background: theme.bg || theme.raised, borderTop: '1px solid ' + theme.border }}>
           {modulo.descricao && (
             <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Georgia, serif', lineHeight: 1.6, marginBottom: 12, fontStyle: 'italic' }}>
               {modulo.descricao}
             </div>
           )}
-          {materiais.map(function(m) {
-            return <MaterialCard key={m.id} material={m} userEmail={userEmail} theme={theme} />
-          })}
+          {materiais.length === 0 && (
+            <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', padding: '8px 0' }}>
+              Em breve — material ainda não disponível.
+            </div>
+          )}
+          {materiais.map(function(m) { return <MaterialCard key={m.id} material={m} theme={theme} /> })}
         </div>
       )}
     </div>
@@ -249,11 +223,10 @@ export default function ModulosEstudo({ theme, session }) {
     try { return localStorage.getItem('lexia_mat_filtro') || 'Todos' } catch { return 'Todos' }
   })
 
-  function setFiltroP(v) {
+  function mudarFiltro(v) {
     setFiltro(v)
     try { localStorage.setItem('lexia_mat_filtro', v) } catch {}
   }
-  const userEmail = session?.user?.email || ''
 
   useEffect(function() {
     async function carregar() {
@@ -271,23 +244,21 @@ export default function ModulosEstudo({ theme, session }) {
   const disciplinas = ['Todos', ...Array.from(new Set(modulos.map(function(m) { return m.disciplina })))]
   const modulosFiltrados = filtro === 'Todos' ? modulos : modulos.filter(function(m) { return m.disciplina === filtro })
 
-  if (carregando) {
-    return <div style={{ textAlign: 'center', padding: 60, color: theme.muted, fontFamily: 'Inter, sans-serif', fontSize: 13 }}>Carregando módulos...</div>
-  }
-
-  if (!modulos.length) {
-    return <div style={{ textAlign: 'center', padding: 60, color: theme.muted, fontFamily: 'Inter, sans-serif', fontSize: 13 }}>Nenhum módulo disponível ainda.</div>
-  }
+  if (carregando) return (
+    <div style={{ textAlign: 'center', padding: 60, color: theme.muted, fontFamily: 'Inter, sans-serif', fontSize: 13 }}>
+      Carregando módulos...
+    </div>
+  )
 
   return (
-    <div onContextMenu={onContextMenu} onKeyDown={onKeyDown}>
+    <div onContextMenu={onContextMenu}>
       {disciplinas.length > 2 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           {disciplinas.map(function(d) {
             const cor = DISC_COR[d] || '#6b7280'
             const ativo = filtro === d
             return (
-              <button key={d} onClick={function() { setFiltroP(d) }}
+              <button key={d} onClick={function() { mudarFiltro(d) }}
                 style={{ fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', padding: '4px 10px', borderRadius: 6, cursor: 'pointer', border: '1px solid ' + (ativo ? cor : theme.border), background: ativo ? cor + '18' : 'none', color: ativo ? cor : theme.muted, fontWeight: ativo ? 700 : 400 }}>
                 {d}
               </button>
@@ -301,7 +272,6 @@ export default function ModulosEstudo({ theme, session }) {
             key={m.id}
             modulo={m}
             materiais={materiais.filter(function(mat) { return mat.modulo_id === m.id })}
-            userEmail={userEmail}
             theme={theme}
           />
         )
