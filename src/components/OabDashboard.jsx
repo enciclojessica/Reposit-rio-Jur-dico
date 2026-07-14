@@ -444,7 +444,7 @@ export default function OabDashboard({ session }) {
   })
 
   function setAbaP(v) {
-    setAbaP(v)
+    setAba(v)
     try { localStorage.setItem('lexia_oab_aba', v) } catch {}
   }
   const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
