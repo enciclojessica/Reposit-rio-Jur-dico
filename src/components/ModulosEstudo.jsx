@@ -82,19 +82,36 @@ function AudioPlayer({ url, theme }) {
   )
 }
 
-// ── Viewer de PDF — abre em nova aba ────────────────────────────────────────
+// ── Viewer de PDF via PDF.js (Mozilla) ──────────────────────────────────────
 function PDFViewer({ url, cor, theme }) {
+  const [aberto, setAberto] = useState(false)
+  // PDF.js viewer hospedado no CDN — funciona em qualquer browser incluindo Edge
+  const pdfJsUrl = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(url)
+
   return (
     <div style={{ marginTop: 4 }}>
-      <button onClick={function() { window.open(url, '_blank', 'noopener') }}
+      <button onClick={function() { setAberto(function(a) { return !a }) }}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, background: cor + '18', border: '1px solid ' + cor + '44', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>
         <span style={{ fontSize: 12, color: cor, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
-          ▶ Abrir manual (nova aba)
+          {aberto ? '▲ Fechar manual' : '▶ Visualizar manual'}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
           <Lock size={9} /> protegido
         </span>
       </button>
+      {aberto && (
+        <div onContextMenu={onContextMenu}
+          style={{ marginTop: 8, borderRadius: 8, overflow: 'hidden', border: '1px solid ' + cor + '44' }}>
+          <iframe
+            src={pdfJsUrl}
+            width="100%"
+            height="600"
+            frameBorder="0"
+            title="Manual PDF"
+            style={{ display: 'block' }}
+          />
+        </div>
+      )}
     </div>
   )
 }
