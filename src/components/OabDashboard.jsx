@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import OabQuestoes from './OabQuestoes'
+import CronogramaWizard from './CronogramaWizard'
 import ModulosEstudo from './ModulosEstudo'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
@@ -148,8 +149,8 @@ const RAW = [
   { date:"2027-02-25", fase:"2ª Fase", disciplina:"Direito Constitucional", topico:"Véspera: revisão dos remédios constitucionais e estrutura da peça mais provável", metodos:["Peça Processual","Lei Seca"] },
 ]
 
-const SESSIONS = RAW.map((s, i) => ({ ...s, id: `s${i}` }))
-const DISCIPLINAS = [...new Set(SESSIONS.map(s => s.disciplina))]
+const SESSIONS_PADRAO = RAW.map((s, i) => ({ ...s, id: `s${i}` }))
+const DISCIPLINAS = [...new Set(SESSIONS_PADRAO.map(s => s.disciplina))]
 const MESES = [...new Set(SESSIONS.map(s => {
   const [y,m] = s.date.split('-')
   return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][+m-1] + '/' + y.slice(2)
@@ -475,6 +476,8 @@ export default function OabDashboard({ session }) {
   const { theme } = useTheme()
   const [dados, setDados]     = useState({})
   const [carregando, setCarregando] = useState(true)
+  const [mostrarWizard, setMostrarWizard] = useState(false)
+  const [sessoesDinamicas, setSessoesDinamicas] = useState(null) // null = usa SESSIONS_PADRAO
   const [aba, setAba] = useState(function() {
     try { return localStorage.getItem('lexia_oab_aba') || 'cronograma' } catch { return 'cronograma' }
   })
@@ -504,11 +507,14 @@ export default function OabDashboard({ session }) {
 
 
   async function resetCronograma() {
-    if (!window.confirm('Tem certeza? Isso vai apagar todo o progresso do cronograma e reiniciar do zero.')) return
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('oab_sessoes').delete().eq('criado_por', user.id)
+    setMostrarWizard(true)
+  }
+
+  async function onWizardConcluir(novasSessoes, config) {
+    setSessoesDinamicas(novasSessoes)
+    setMostrarWizard(false)
     setDados({})
-    carregar()
+    await carregar()
   }
 
   async function carregar() {
@@ -539,6 +545,7 @@ export default function OabDashboard({ session }) {
     }, { onConflict: 'user_id,session_id' })
   }, [dados, session])
 
+  const SESSIONS = sessoesDinamicas || SESSIONS_PADRAO
   const filtradas = useMemo(() => SESSIONS.filter(s => {
     if (fFase   !== 'Todas'  && s.fase       !== fFase)   return false
     if (fDisc   !== 'Todas'  && s.disciplina !== fDisc)   return false
@@ -802,6 +809,7 @@ export default function OabDashboard({ session }) {
       <div style={{ marginTop: 24, borderTop: `1px solid ${theme.border}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
         <span>Lex.IA · Inteligência Jurídica · Farias Fusquiani</span>
         <span>48º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
+      )}
       </div>
     </div>
   )
