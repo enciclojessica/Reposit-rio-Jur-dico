@@ -456,7 +456,33 @@ export default function OabDashboard({ session }) {
   const [exportando, setExportando] = useState(false)
 
   // Persistência no Supabase
-  useEffect(() => { if (session) carregar() }, [session])
+  useEffect(() => {
+    if (session) {
+      carregar()
+      // Solicitar permissão de notificação PWA
+      if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(() => Notification.requestPermission(), 3000)
+      }
+    }
+  }, [session])
+
+  // Notificação da sessão do dia
+  useEffect(() => {
+    if (!proximas || proximas.length === 0) return
+    if (!('Notification' in window) || Notification.permission !== 'granted') return
+    const hoje = new Date().toISOString().slice(0, 10)
+    const jaNotificou = localStorage.getItem('lexia_notif_' + hoje)
+    if (jaNotificou) return
+    const sessaoHoje = proximas.find(s => s.date === hoje)
+    if (!sessaoHoje) return
+    setTimeout(() => {
+      new Notification('Lex.IA — Sessão do dia 📚', {
+        body: `${sessaoHoje.disciplina}: ${sessaoHoje.topico.slice(0, 80)}`,
+        icon: '/icons/icon-192.png',
+      })
+      localStorage.setItem('lexia_notif_' + hoje, '1')
+    }, 2000)
+  }, [proximas])
 
   async function carregar() {
     setCarregando(true)
@@ -560,6 +586,39 @@ export default function OabDashboard({ session }) {
               para a 1ª Fase OAB (10/01/2027) · {stats.pct}% do cronograma concluído
             </span>
           </div>
+        </div>
+      )}
+
+      {/* Mini progresso por disciplina no cronograma */}
+      {stats.total > 0 && stats.pct > 0 && (
+        <div style={{ marginBottom: 16, background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1 }}>
+              Progresso por disciplina
+            </div>
+            <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
+              {stats.conc}/{stats.total} sessões · {stats.pct}% concluído
+            </div>
+          </div>
+          {Object.entries(stats.porDisc).filter(([,dp]) => dp.total > 0).map(([disc, dp]) => (
+            <div key={disc} style={{ marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: dp.cor, flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{disc}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  {dp.media > 0 && <span style={{ fontSize: 9, color: '#8b5cf6', fontFamily: 'IBM Plex Mono, monospace' }}>{dp.media}%✓</span>}
+                  <span style={{ fontSize: 9, color: dp.pct===100 ? '#10b981' : theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontWeight: dp.pct===100 ? 700 : 400 }}>
+                    {dp.conc}/{dp.total}
+                  </span>
+                </div>
+              </div>
+              <div style={{ height: 3, background: theme.border, borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${dp.pct}%`, background: dp.pct===100 ? '#10b981' : dp.cor, borderRadius: 2, transition: 'width .4s' }} />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

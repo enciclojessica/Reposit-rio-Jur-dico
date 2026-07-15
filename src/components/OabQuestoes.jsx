@@ -42,6 +42,7 @@ const MODOS  = [
   { id: 'revisao',   label: 'Revisão',   desc: 'Só questões que você errou antes' },
   { id: 'favoritas', label: 'Favoritas', desc: 'Questões que você marcou com ★' },
   { id: 'simulado',  label: 'Simulado',  desc: '80 questões cronometradas — condições reais' },
+  { id: 'rapida',    label: 'Revisão Rápida', desc: 'Só justificativas — leitura sem responder' },
 ]
 
 const EXAME_ANO = {
@@ -357,7 +358,7 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
         </div>
       </div>
 
-      {/* Filtros — ocultos no modo revisão, favoritas e simulado */}
+      {/* Filtros — ocultos no modo revisão e favoritas */}
       {modo !== 'revisao' && modo !== 'favoritas' && (
         <div>
           <div style={{ display:'flex', gap:10, marginBottom:16 }}>
@@ -390,6 +391,13 @@ function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, disciplinaInicia
         </div>
       )}
 
+
+      {/* Nota sobre o simulado */}
+      {modo === 'simulado' && (
+        <div style={{ marginBottom:12, padding:'8px 12px', background:'#B8930A11', border:'1px solid #B8930A33', borderRadius:8, fontSize:11, color:'#B8930A', fontFamily:'IBM Plex Mono, monospace' }}>
+          80 questões cronometradas. Use o filtro de disciplina acima para simular uma prova temática.
+        </div>
+      )}
 
       {/* Quantidade — só estudo e bloco */}
       {(modo === 'estudo' || modo === 'bloco') && (
@@ -1105,8 +1113,40 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
                 ★ FAVORITAS
               </span>
             )}
+            {config?.modo === 'rapida' && (
+              <span style={{ fontSize:10, color:'#a78bfa', background:'#a78bfa18', border:'1px solid #a78bfa33', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+                ⚡ RÁPIDA
+              </span>
+            )}
           </div>
 
+          {config?.modo === 'rapida' ? (
+            /* Modo revisão rápida — só justificativa, sem responder */
+            <div style={{ background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:14, padding:'18px 20px' }}>
+              <div style={{ fontSize:11, color:'#a78bfa', fontFamily:'IBM Plex Mono, monospace', textTransform:'uppercase', letterSpacing:1, marginBottom:10 }}>
+                {questaoAtual.disciplina} · {questaoAtual.topico}
+              </div>
+              <div style={{ fontSize:13.5, color:theme.text, fontFamily:'Georgia, serif', lineHeight:1.7, marginBottom:16 }}>
+                {questaoAtual.enunciado}
+              </div>
+              <div style={{ borderTop:`1px solid ${theme.border}`, paddingTop:14, marginTop:4 }}>
+                <div style={{ fontSize:10, color:'#10b981', fontFamily:'IBM Plex Mono, monospace', textTransform:'uppercase', letterSpacing:1, marginBottom:6 }}>
+                  Gabarito: {questaoAtual.gabarito}
+                </div>
+                {questaoAtual.justificativa && (
+                  <div style={{ fontSize:12.5, color:theme.muted, fontFamily:'Georgia, serif', lineHeight:1.7 }}>
+                    {questaoAtual.justificativa}
+                  </div>
+                )}
+              </div>
+              <div style={{ display:'flex', justifyContent:'flex-end', marginTop:16 }}>
+                <button onClick={() => setIdx(i => i + 1)}
+                  style={{ display:'flex', alignItems:'center', gap:6, background:theme.gold, border:'none', borderRadius:8, padding:'9px 18px', fontSize:13, fontWeight:700, color:'#0b0f1a', cursor:'pointer', fontFamily:'Inter, sans-serif' }}>
+                  Próxima →
+                </button>
+              </div>
+            </div>
+          ) : (
           <QuestaoCard
             key={questaoAtual.id}
             questao={questaoAtual}
@@ -1122,6 +1162,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
             onReclassificar={handleReclassificar}
             theme={theme}
           />
+          )}
 
           {/* Opção 2: Entradas sugeridas do repositório após erro */}
           {entradasSugeridas.length > 0 && (
