@@ -843,6 +843,18 @@ export default function OabDashboard({ session }) {
         <span>Lex.IA · Inteligência Jurídica · Farias Fusquiani</span>
         <span>48º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
       </div>
+
+      {/* Wizard de configuração do cronograma */}
+      {mostrarWizard && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#00000088', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: '#1a0608', border: '1px solid #3a1015', borderRadius: 16, padding: '24px', maxWidth: 580, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <CronogramaWizard session={session} theme={theme} onConcluir={onWizardConcluir} />
+            <button onClick={() => setMostrarWizard(false)}
+              style={{ marginTop: 12, width: '100%', background: 'none', border: '1px solid #3a1015', color: '#9b8b7a', borderRadius: 8, padding: '8px', cursor: 'pointer', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+              Cancelar
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )
