@@ -211,8 +211,8 @@ function Cronometro({ sessionId, onSalvar, theme }) {
         <div style={{
           fontSize: 28, fontWeight: 700, color: cor,
           fontFamily: 'IBM Plex Mono, monospace', minWidth: 90,
-          background: theme.cardBg, borderRadius: 8,
-          padding: '6px 12px', border: `1px solid ${theme.border}`,
+          background: theme.bg || theme.raised, borderRadius: 8,
+          padding: '6px 12px', border: '1px solid ' + theme.border,
           transition: 'color .3s',
         }}>
           {fmtTempo(seg)}
@@ -457,13 +457,21 @@ function SessaoCard({ s, dados, onAtualizar, onPraticar, theme }) {
           {/* Cronômetro */}
           <Cronometro sessionId={s.id} onSalvar={salvarTempo} theme={theme} />
 
-          {/* Botão Praticar */}
-          {s.disciplina !== 'Simulado Geral' && onPraticar && (
-            <button
-              onClick={() => onPraticar(s.disciplina, s.topico)}
-              style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: cor+'15', border: `1px solid ${cor}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: cor, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-              <BookOpen size={13} /> Praticar questões de {s.disciplina}
-            </button>
+          {/* Botão Praticar / Iniciar Simulado */}
+          {onPraticar && (
+            s.disciplina === 'Simulado Geral' ? (
+              <button
+                onClick={() => onPraticar('__simulado__', s.topico)}
+                style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: '#0891b215', border: '1px solid #0891b244', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: '#0891b2', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                <BookOpen size={13} /> Iniciar Simulado — 80 questões cronometradas
+              </button>
+            ) : (
+              <button
+                onClick={() => onPraticar(s.disciplina, s.topico)}
+                style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: cor+'15', border: `1px solid ${cor}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: cor, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                <BookOpen size={13} /> Praticar questões de {s.disciplina}
+              </button>
+            )
           )}
         </div>
       )}
@@ -488,6 +496,7 @@ export default function OabDashboard({ session }) {
   }
   const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
   const [topicoFiltro, setTopicoFiltro]         = useState(null)
+  const [modoSimulado, setModoSimulado]         = useState(false)
   const [fFase, setFFase]     = useState('Todas')
   const [fDisc, setFDisc]     = useState('Todas')
   const [fStatus, setFStatus] = useState('Todos')
@@ -744,14 +753,25 @@ export default function OabDashboard({ session }) {
 
           {/* Lista de sessões */}
           {filtradas.map(s => (
-            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => { setDisciplinaFiltro(disc); setTopicoFiltro(top||null); setAbaP('questoes') }} theme={theme} />
+            <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => {
+                  if (disc === '__simulado__') {
+                    setDisciplinaFiltro(null)
+                    setTopicoFiltro(null)
+                    setModoSimulado(true)
+                  } else {
+                    setDisciplinaFiltro(disc)
+                    setTopicoFiltro(top||null)
+                    setModoSimulado(false)
+                  }
+                  setAbaP('questoes')
+                }} theme={theme} />
           ))}
         </>
       )}
 
       {/* ABA: Questões */}
       {aba === 'questoes' && (
-        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setAbaP('cronograma') }} />
+        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} modoInicial={modoSimulado ? 'simulado' : null} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setModoSimulado(false); setAbaP('cronograma') }} />
       )}
 
       {/* ABA: Estatísticas */}
