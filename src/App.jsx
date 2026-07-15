@@ -74,11 +74,11 @@ function useIsMobile() {
 
 async function gerarPlanilhaTeses() {
   // Busca todas as entradas do repositório e gera planilha XLSX
-  const { data } = await (await import('./supabase')).supabase
+  const { data } = await supabase
     .from('entradas').select('area,tipo,tema,fonte,referencia,teses,tags,status').order('area')
   if (!data?.length) { alert('Nenhuma entrada no repositório.'); return }
 
-  const XLSX = await import('xlsx')
+  const XLSX = (await import('xlsx'))
   const linhas = []
   data.forEach(e => {
     const teses = Array.isArray(e.teses) ? e.teses : []

@@ -746,7 +746,7 @@ function Resultado({ respostas, questoes, tempo, onReiniciar, onRevisao, theme }
 }
 
 // ── Componente principal ────────────────────────────────────────
-export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, topicoSessao }) {
+export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, topicoSessao, modoInicial, onSair }) {
   const { theme } = useTheme()
   const [tela, setTela]       = useState(() => { try { return localStorage.getItem('oab_tela') || 'config' } catch { return 'config' } })
   const [questoes, setQuestoes] = useState(() => { try { return JSON.parse(localStorage.getItem('oab_questoes') || '[]') } catch { return [] } })
