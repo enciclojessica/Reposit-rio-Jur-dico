@@ -72,6 +72,40 @@ function useIsMobile() {
   return mobile
 }
 
+async function gerarPlanilhaTeses() {
+  // Busca todas as entradas do repositório e gera planilha XLSX
+  const { data } = await (await import('./supabase')).supabase
+    .from('entradas').select('area,tipo,tema,fonte,referencia,teses,tags,status').order('area')
+  if (!data?.length) { alert('Nenhuma entrada no repositório.'); return }
+
+  const XLSX = await import('xlsx')
+  const linhas = []
+  data.forEach(e => {
+    const teses = Array.isArray(e.teses) ? e.teses : []
+    if (teses.length === 0) {
+      linhas.push({ Área: e.area, Tipo: e.tipo, Tema: e.tema, Fonte: e.fonte,
+        Referência: e.referencia, Tese: '', Fundamento: '', Aplicação: '', Status: e.status,
+        Tags: (e.tags||[]).join(', ') })
+    } else {
+      teses.forEach(t => {
+        linhas.push({ Área: e.area, Tipo: e.tipo, Tema: e.tema, Fonte: e.fonte,
+          Referência: e.referencia,
+          Tese: t.tese_assunto || t.ratio_decidendi || '',
+          Fundamento: t.fundamentacao_legal || '',
+          Aplicação: t.aplicacao_pratica || '',
+          Status: e.status, Tags: (e.tags||[]).join(', ') })
+      })
+    }
+  })
+
+  const ws = XLSX.utils.json_to_sheet(linhas)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Teses')
+  // Largura das colunas
+  ws['!cols'] = [8,8,30,12,18,40,25,25,8,20].map(w => ({ wch: w }))
+  XLSX.writeFile(wb, `lexia_teses_${new Date().toISOString().slice(0,10)}.xlsx`)
+}
+
 export default function App() {
   const { theme, mode, isDark, toggle } = useTheme()
   const [session, setSession]       = useState(null)
@@ -208,6 +242,12 @@ export default function App() {
       if (editando) return
 
       // / — focar busca
+      // Ctrl+G ou Ctrl+Shift+G: gerar planilha de teses global
+      if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+        e.preventDefault()
+        gerarPlanilhaTeses()
+        return
+      }
       if (e.key === '/' && view === VIEWS.HOME) {
         e.preventDefault()
         document.querySelector('input[placeholder*="Buscar"]')?.focus()

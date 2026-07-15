@@ -65,5 +65,36 @@ export default async function handler(req, res) {
     else artigosSalvos++
   }
 
-  return res.status(200).json({ ok: true, meta: dados.meta, teses_salvas: tesesSalvas, artigos_salvos: artigosSalvos, erros })
+  // Salvar jurisprudências extraídas da peça (novas apenas)
+  let jurisSalvas = 0
+  for (const j of (dados.jurisprudencias || [])) {
+    if (!j.numero?.trim() || !j.tribunal) continue
+    // Verificar se já existe no repositório
+    const ref = `${j.tipo || ''} ${j.numero}`.trim()
+    const { data: existe } = await supabase.from('entradas')
+      .select('id').eq('referencia', ref).limit(1)
+    if (existe?.length > 0) continue // já existe, pular
+    const { error } = await supabase.from('entradas').insert({
+      area: j.area || 'Cível',
+      tipo: 'jurisprudência',
+      tema: `${j.tribunal} ${ref} — extraído de peça`,
+      fonte: j.tribunal,
+      referencia: ref,
+      url: '',
+      status: 'vigente',
+      tags: ['extraído-de-peça', 'jurisprudência', j.tribunal?.toLowerCase()].filter(Boolean),
+      teses: [{
+        tese_assunto: j.ementa || '',
+        fundamentacao_legal: j.fundamento || '',
+        precedente_sumula: ref,
+        ratio_decidendi: j.ementa || '',
+        aplicacao_pratica: `Citado em peça processual — ${origem}`,
+      }],
+      criado_por: user_id,
+    })
+    if (error) erros.push(`Juris ${ref}: ${error.message}`)
+    else jurisSalvas++
+  }
+
+  return res.status(200).json({ ok: true, meta: dados.meta, teses_salvas: tesesSalvas, artigos_salvos: artigosSalvos, juris_salvas: jurisSalvas, erros })
 }

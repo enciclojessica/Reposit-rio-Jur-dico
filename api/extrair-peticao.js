@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 REGRA ABSOLUTA: Jamais mencione fatos específicos do caso (partes, valores, eventos concretos). Todo conteúdo deve ser reutilizável em qualquer demanda futura.
 
 Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto antes ou depois:
-{"meta":{"tipo_peca":"string","numero_processo":"string ou null","resultado":"string ou null"},"teses":[{"area":"Cível","tipo":"jurisprudência","tema":"string","fonte":"string","referencia":"string","tese_assunto":"string","fundamentacao_legal":"string","precedente_sumula":"string","ratio_decidendi":"string","aplicacao_pratica":"string"}],"artigos":[{"codigo":"cpc","numero":300,"inciso":null,"paragrafo":null,"texto":"string","aplicacao_pratica":"string","contexto":"string"}]}`
+{"meta":{"tipo_peca":"string","numero_processo":"string ou null","resultado":"string ou null"},"teses":[{"area":"Cível","tipo":"jurisprudência","tema":"string","fonte":"string","referencia":"string","tese_assunto":"string","fundamentacao_legal":"string","precedente_sumula":"string","ratio_decidendi":"string","aplicacao_pratica":"string"}],"artigos":[{"codigo":"cpc","numero":300,"inciso":null,"paragrafo":null,"texto":"string","aplicacao_pratica":"string","contexto":"string"}],"jurisprudencias":[{"tribunal":"STJ","tipo":"REsp","numero":"1.234.567/SP","ementa":"string resumida","fundamento":"Art. X Lei Y","area":"Cível","tendencia":"favoravel"}]}`
 
   let userContent
   if (texto) {

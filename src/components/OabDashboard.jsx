@@ -241,49 +241,85 @@ function Cronometro({ sessionId, onSalvar, theme }) {
   )
 }
 
-// ── Exportação Google Calendar (ICS) ──────────────────────────────────────────
-function exportarICS(sessions, dados) {
+// ── Exportação Google Calendar — API direta + fallback ICS ───────────────────
+async function exportarCalendarOuICS(sessions, dados) {
+  const pendentes = sessions.filter(s => dados[s.id]?.status !== 'Concluído')
+
+  // Tentar Google Calendar API via OAuth popup
+  async function viaGoogleAPI() {
+    if (!window.google?.accounts?.oauth2) {
+      await new Promise((res, rej) => {
+        if (document.querySelector('script[src*="gsi/client"]')) { res(); return }
+        const sc = document.createElement('script')
+        sc.src = 'https://accounts.google.com/gsi/client'
+        sc.onload = res; sc.onerror = rej
+        document.head.appendChild(sc)
+      })
+      await new Promise(r => setTimeout(r, 800))
+    }
+    const CLIENT_ID = '236827786843-lexia.apps.googleusercontent.com'
+    const token = await new Promise((resolve, reject) => {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/calendar.events',
+        callback: r => r.error ? reject(new Error(r.error)) : resolve(r.access_token),
+      })
+      client.requestAccessToken()
+    })
+    let ok = 0
+    for (const s of pendentes) {
+      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          summary: `[OAB 48º] ${s.disciplina}`,
+          description: `${s.topico}\n\nMétodos: ${s.metodos.join(', ')}\n\nLex.IA`,
+          start: { date: s.date }, end: { date: s.date }, colorId: '3',
+        }),
+      })
+      if (res.ok) ok++
+      await new Promise(r => setTimeout(r, 100))
+    }
+    return ok
+  }
+
+  try {
+    const ok = await viaGoogleAPI()
+    alert('✅ ' + ok + ' eventos adicionados diretamente no seu Google Calendar!')
+    return
+  } catch (e) {
+    console.log('API Google indisponível:', e.message)
+  }
+
+  // Fallback: download .ics
   const linhas = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
+    'BEGIN:VCALENDAR','VERSION:2.0',
     'PRODID:-//LexIA//OAB Dashboard//PT',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'X-WR-CALNAME:Lex.IA — Estudos OAB 47° Exame',
+    'CALSCALE:GREGORIAN','METHOD:PUBLISH',
+    'X-WR-CALNAME:Lex.IA — Estudos OAB 48° Exame',
     'X-WR-TIMEZONE:America/Sao_Paulo',
   ]
-
   sessions.forEach(s => {
     const [y,m,d] = s.date.split('-')
     const dtstart = `${y}${m}${d}`
-    // Evento de dia inteiro
-    const metodos = s.metodos.join(', ')
     const status = dados[s.id]?.status || 'A Fazer'
-    const uid = `lexia-oab-${s.id}@lexiajur.com.br`
-
-    linhas.push(
-      'BEGIN:VEVENT',
-      `UID:${uid}`,
-      `DTSTART;VALUE=DATE:${dtstart}`,
-      `DTEND;VALUE=DATE:${dtstart}`,
+    linhas.push('BEGIN:VEVENT',
+      `UID:lexia-oab-${s.id}@lexiajur.com.br`,
+      `DTSTART;VALUE=DATE:${dtstart}`,`DTEND;VALUE=DATE:${dtstart}`,
       `SUMMARY:[OAB ${s.fase}] ${s.disciplina}`,
-      `DESCRIPTION:Tópico: ${s.topico}\\nMétodos: ${metodos}\\nStatus: ${status}\\n\\nLex.IA — Inteligência Jurídica`,
+      `DESCRIPTION:Tópico: ${s.topico}\\nMétodos: ${s.metodos.join(', ')}\\nStatus: ${status}\\n\\nLex.IA`,
       `CATEGORIES:OAB,${s.disciplina},${s.fase}`,
       `STATUS:${status === 'Concluído' ? 'CONFIRMED' : 'TENTATIVE'}`,
-      'END:VEVENT'
-    )
+      'END:VEVENT')
   })
-
   linhas.push('END:VCALENDAR')
-
   const blob = new Blob([linhas.join('\r\n')], { type: 'text/calendar;charset=utf-8' })
-  const url  = URL.createObjectURL(blob)
-  const a    = document.createElement('a')
-  a.href     = url
-  a.download = 'lexia_oab_cronograma.ics'
-  a.click()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = 'lexia_oab_cronograma.ics'; a.click()
   URL.revokeObjectURL(url)
 }
+
 
 // ── Card de sessão ─────────────────────────────────────────────────────────────
 function SessaoCard({ s, dados, onAtualizar, onPraticar, theme }) {
@@ -467,6 +503,14 @@ export default function OabDashboard({ session }) {
   }, [session])
 
 
+  async function resetCronograma() {
+    if (!window.confirm('Tem certeza? Isso vai apagar todo o progresso do cronograma e reiniciar do zero.')) return
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('oab_sessoes').delete().eq('criado_por', user.id)
+    setDados({})
+    carregar()
+  }
+
   async function carregar() {
     setCarregando(true)
     const { data } = await supabase
@@ -568,10 +612,15 @@ export default function OabDashboard({ session }) {
         </div>
         {/* Botão exportar Google Calendar */}
         <button
-          onClick={() => { exportarICS(SESSIONS, dados); setExportando(true); setTimeout(() => setExportando(false), 2000) }}
+          onClick={() => { exportarCalendarOuICS(SESSIONS, dados); setExportando(true); setTimeout(() => setExportando(false), 2000) }}
           style={{ display: 'flex', alignItems: 'center', gap: 7, background: exportando ? '#0f2b1a' : theme.raised, border: `1px solid ${exportando ? '#10b981' : theme.border}`, color: exportando ? '#10b981' : theme.text, borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all .2s' }}>
           {exportando ? <CheckCircle size={14} /> : <Calendar size={14} />}
           {exportando ? 'Exportado!' : 'Exportar para Google Calendar'}
+          </button>
+          <button onClick={resetCronograma}
+            title="Apagar progresso e recomeçar do zero"
+            style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, color:'#ef4444', background:'#ef444411', border:'1px solid #ef444433', borderRadius:8, padding:'7px 12px', cursor:'pointer', fontFamily:'Inter, sans-serif', fontWeight:600 }}>
+            <RotateCcw size={13} /> Recomeçar
         </button>
       </div>
 
