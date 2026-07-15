@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { ROLE_LABEL, ROLE_COR } from '../shared'
 
-const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
-const ROLE_COR   = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
 const ROLE_DESC  = {
   admin:  'Controle total: adiciona, edita, remove entradas e gerencia membros.',
   editor: 'Pode adicionar e editar as próprias entradas. Não gerencia membros.',

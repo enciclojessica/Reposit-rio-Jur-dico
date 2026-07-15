@@ -26,7 +26,7 @@ import { Lock, LogOut, Download, Trash2 } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
-import { AREAS } from './shared'
+import { AREAS, ROLE_COR, ROLE_LABEL } from './shared'
 import { TagPill } from './components/TagInput'
 
 class ErrorBoundary extends Component {
@@ -454,9 +454,7 @@ async function handleSave(entry) {
     setExportandoRepo(false)
   }
 
-    // Constantes de role — declaradas antes do useMemo para evitar TDZ
-  const ROLE_COR   = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
-  const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
+    // Constantes de role — importadas de shared.jsx (fonte única)
 
   // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
   const SidebarEl = useMemo(() => (

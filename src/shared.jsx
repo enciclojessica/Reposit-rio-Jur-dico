@@ -17,6 +17,9 @@ export const AREAS = {
 
 export const TIPOS = ['jurisprudência', 'doutrina', 'súmula', 'lei']
 
+export const ROLE_COR   = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
+export const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
+
 export const emptyEntry = () => ({
   area: 'Cível',
   tema: '',
