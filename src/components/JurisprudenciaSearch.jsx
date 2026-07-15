@@ -254,8 +254,10 @@ export default function JurisprudenciaSearch({ session, theme }) {
             <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1 }}>
               {resultados.length} resultado{resultados.length !== 1 ? 's' : ''} para "{pesquisado}"
             </div>
-            <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
-              {salvos.size > 0 ? `${salvos.size} salvo${salvos.size > 1 ? 's' : ''} no repositório` : 'Clique em 🔖 para salvar'}
+            <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 4 }}>
+              {salvos.size > 0
+                ? `${salvos.size} salvo${salvos.size > 1 ? 's' : ''} no repositório`
+                : <>Clique em <BookmarkPlus size={11} /> para salvar</>}
             </div>
           </div>
           {resultados.map((r, i) => {

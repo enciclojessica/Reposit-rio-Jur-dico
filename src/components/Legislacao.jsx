@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Download } from 'lucide-react'
+import { Download, FileText, Search } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 
@@ -91,8 +91,8 @@ function ArtigoModal({ artigo, onFechar }) {
                 </div>
               )}
               {artigo.origem && (
-                <div style={{ background: theme.raised, borderRadius: 8, padding: '10px 14px', fontSize: 12, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
-                  📄 Extraído de: {artigo.origem}
+                <div style={{ background: theme.raised, borderRadius: 8, padding: '10px 14px', fontSize: 12, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FileText size={13} /> Extraído de: {artigo.origem}
                 </div>
               )}
             </div>
@@ -329,7 +329,7 @@ export default function Legislacao() {
 
           {/* Busca */}
           <div style={{ position: 'relative', marginBottom: 16 }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted, pointerEvents: 'none' }}>🔍</span>
+            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted, pointerEvents: 'none', display: 'flex' }}><Search size={14} /></span>
             <input value={busca} onChange={e => setBusca(e.target.value)}
               placeholder="Número do artigo (ex: 300) ou termo (ex: tutela urgência)..."
               style={{ paddingLeft: 38 }} />

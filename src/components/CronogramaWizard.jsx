@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
-import { Calendar, Clock, BookOpen, ChevronRight, ChevronLeft, Check, RotateCcw, Zap } from 'lucide-react'
+import { Calendar, Clock, BookOpen, ChevronRight, ChevronLeft, Check, RotateCcw, Zap, Lightbulb } from 'lucide-react'
 
 const TODAS_DISCIPLINAS = [
   { id: 'etica',    nome: 'Ética Profissional',   peso: 10, cor: '#7c3aed' },
@@ -325,8 +325,8 @@ export default function CronogramaWizard({ session, theme, onConcluir }) {
               </button>
             ))}
           </div>
-          <div style={{ marginTop: 16, padding: '10px 14px', background: theme.gold + '11', border: `1px solid ${theme.gold}33`, borderRadius: 8, fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
-            💡 Com {config.diasSemana.length} dia{config.diasSemana.length !== 1 ? 's' : ''}/semana × {config.horasPorDia}h = <strong style={{ color: theme.gold }}>{config.diasSemana.length * config.horasPorDia}h de estudo por semana</strong>
+          <div style={{ marginTop: 16, padding: '10px 14px', background: theme.gold + '11', border: `1px solid ${theme.gold}33`, borderRadius: 8, fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Lightbulb size={14} color={theme.gold} /> Com {config.diasSemana.length} dia{config.diasSemana.length !== 1 ? 's' : ''}/semana × {config.horasPorDia}h = <strong style={{ color: theme.gold }}>{config.diasSemana.length * config.horasPorDia}h de estudo por semana</strong>
           </div>
         </div>
       )}

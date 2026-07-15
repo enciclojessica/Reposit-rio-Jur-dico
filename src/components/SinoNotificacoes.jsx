@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { Bell, Megaphone, ClipboardList, Info, Sparkles } from 'lucide-react'
 
-const TIPO_ICONE = { alerta: '🔔', informativo: '📋', sistema: 'ℹ', auto: '✦' }
+const TIPO_ICONE = { alerta: Megaphone, informativo: ClipboardList, sistema: Info, auto: Sparkles }
 const TIPO_COR   = { alerta: '#f59e0b', informativo: '#10b981', sistema: '#6b7fa3', auto: '#c9a452' }
 
 export default function SinoNotificacoes({ session, onNavegar }) {
@@ -123,7 +124,7 @@ export default function SinoNotificacoes({ session, onNavegar }) {
         }}
         title="Notificações"
       >
-        <span style={{ fontSize: 20 }}>🔔</span>
+        <Bell size={18} color={theme.text} />
         {naoLidas > 0 && (
           <span style={{
             position: 'absolute', top: 0, right: 0,
@@ -170,13 +171,13 @@ export default function SinoNotificacoes({ session, onNavegar }) {
             )}
             {!loading && notifs.length === 0 && (
               <div style={{ padding: '40px 16px', textAlign: 'center' }}>
-                <div style={{ fontSize: 32, marginBottom: 8, opacity: 0.3 }}>🔔</div>
+                <div style={{ marginBottom: 8, opacity: 0.3, display: 'flex', justifyContent: 'center' }}><Bell size={32} color={theme.muted} /></div>
                 <div style={{ fontSize: 13, color: theme.muted }}>Nenhuma notificação ainda.</div>
               </div>
             )}
             {notifs.map(n => {
               const cor  = TIPO_COR[n.tipo]  || theme.muted
-              const icon = TIPO_ICONE[n.tipo] || '•'
+              const Icon = TIPO_ICONE[n.tipo] || Info
               return (
                 <div key={n.id}
                   onClick={() => handleClick(n)}
@@ -192,7 +193,7 @@ export default function SinoNotificacoes({ session, onNavegar }) {
                 >
                   {/* Ícone + indicador não-lida */}
                   <div style={{ position: 'relative', flexShrink: 0, marginTop: 1 }}>
-                    <span style={{ fontSize: 18 }}>{icon}</span>
+                    <Icon size={16} color={cor} />
                     {!n.lida && (
                       <div style={{ position: 'absolute', top: -2, right: -2, width: 7, height: 7, borderRadius: '50%', background: '#ef4444', border: `1px solid ${theme.surface}` }} />
                     )}

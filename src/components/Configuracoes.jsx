@@ -287,7 +287,7 @@ function TabBackup({ session }) {
       setUltimo(agora)
 
       setStatus('ok')
-      setMsg(`✅ Backup concluído! ${totalRegistros} registros exportados para ${nomeArquivo}. Salve o arquivo no seu Google Drive.`)
+      setMsg(`Backup concluído! ${totalRegistros} registros exportados para ${nomeArquivo}. Salve o arquivo no seu Google Drive.`)
     } catch (err) {
       setStatus('erro')
       setMsg(`Erro ao gerar backup: ${err.message}`)
@@ -339,7 +339,10 @@ function TabBackup({ session }) {
           background: status === 'erro' ? theme.toastErr : status === 'ok' ? theme.toastOk : theme.raised,
           color: status === 'erro' ? theme.error : status === 'ok' ? theme.success : theme.muted,
           border: `1px solid ${status === 'erro' ? theme.error + '44' : status === 'ok' ? theme.success + '44' : theme.border}`,
+          display: 'flex', alignItems: 'center', gap: 8,
         }}>
+          {status === 'ok' && <Check size={14} />}
+          {status === 'erro' && <AlertCircle size={14} />}
           {msg}
         </div>
       )}

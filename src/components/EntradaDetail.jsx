@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Check, Link2 } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META } from '../shared'
 import { supabase } from '../supabase'
@@ -186,8 +186,8 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
           )}
         </div>
 
-        <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.muted }}>
-          {linkCopiado ? '✓ Copiado' : '🔗 Compartilhar'}
+        <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
+          {linkCopiado ? <><Check size={13} /> Copiado</> : <><Link2 size={13} /> Compartilhar</>}
         </button>
 
         {!readOnly && (

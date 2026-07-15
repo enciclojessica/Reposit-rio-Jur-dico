@@ -286,7 +286,7 @@ async function exportarCalendarOuICS(sessions, dados) {
 
   try {
     const ok = await viaGoogleAPI()
-    alert('✅ ' + ok + ' eventos adicionados diretamente no seu Google Calendar!')
+    alert(ok + ' eventos adicionados diretamente no seu Google Calendar!')
     return
   } catch (e) {
     console.log('Google API indisponível, gerando .ics:', e.message)
@@ -604,7 +604,7 @@ export default function OabDashboard({ session }) {
       const sessaoHoje = proximas.find(s => s.date === hoje2)
       if (sessaoHoje) {
         setTimeout(() => {
-          new Notification('Lex.IA — Sessão do dia 📚', {
+          new Notification('Lex.IA — Sessão do dia', {
             body: sessaoHoje.disciplina + ': ' + sessaoHoje.topico.slice(0, 80),
             icon: '/icons/icon-192.png',
           })

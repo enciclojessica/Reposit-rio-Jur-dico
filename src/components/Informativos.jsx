@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AREAS } from '../shared'
 import { TagPill } from './TagInput'
+import { Lock } from 'lucide-react'
 
 const TRIBUNAIS = [
   { id: 'STF', label: 'STF', sub: 'Supremo Tribunal Federal' },
@@ -293,8 +294,8 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
 
           {/* Aviso para não-editores */}
           {!isEditor && (
-            <div style={{ background: mode === 'dark' ? '#1a1a0a' : '#fffbf0', border: `1px solid ${theme.gold}44`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: theme.muted }}>
-              🔒 Faça login como editor para importar decisões para o repositório.
+            <div style={{ background: mode === 'dark' ? '#1a1a0a' : '#fffbf0', border: `1px solid ${theme.gold}44`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: theme.muted, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Lock size={13} /> Faça login como editor para importar decisões para o repositório.
             </div>
           )}
 

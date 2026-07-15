@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import * as XLSX from 'xlsx'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { ScrollText } from 'lucide-react'
 
 export default function ImportarLegislacao() {
   const { theme, mode } = useTheme()
@@ -125,7 +126,7 @@ export default function ImportarLegislacao() {
       {etapa === 'upload' && (
         <>
           <div style={{ ...card, borderStyle: 'dashed', textAlign: 'center', padding: 40 }}>
-            <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.4 }}>📜</div>
+            <div style={{ marginBottom: 12, opacity: 0.4, display: 'flex', justifyContent: 'center' }}><ScrollText size={40} color={theme.muted} /></div>
             <div style={{ fontSize: 14, color: theme.text, marginBottom: 8 }}>
               Selecione a planilha de legislação (.xlsx)
             </div>

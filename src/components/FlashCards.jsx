@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from '../theme'
 import { AREAS, STATUS_META } from '../shared'
 import { TagPill } from './TagInput'
+import { Trophy, Dumbbell, BookOpen, Shuffle } from 'lucide-react'
 
 // ── Embaralhar array ───────────────────────────────────────────────────────
 function embaralhar(arr) {
@@ -180,8 +181,8 @@ function Resumo({ stats, total, onReiniciar, onVoltar }) {
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>
-        {pct(stats.facil) >= 70 ? '🏆' : pct(stats.errei) >= 50 ? '💪' : '📚'}
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+        {pct(stats.facil) >= 70 ? <Trophy size={44} color={theme.gold} /> : pct(stats.errei) >= 50 ? <Dumbbell size={44} color={theme.muted} /> : <BookOpen size={44} color={theme.muted} />}
       </div>
       <div style={{ fontSize: 22, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 6 }}>
         Sessão concluída!
@@ -215,8 +216,8 @@ function Resumo({ stats, total, onReiniciar, onVoltar }) {
           ← Configurar
         </button>
         <button onClick={onReiniciar}
-          style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
-          🔀 Novo deck
+          style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Shuffle size={14} /> Novo deck
         </button>
       </div>
     </div>

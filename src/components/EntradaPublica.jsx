@@ -3,6 +3,8 @@ import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { AREAS, STATUS_META } from '../shared'
 import { TagPill } from './TagInput'
+import SeletorTema from './SeletorTema'
+import { Lock } from 'lucide-react'
 
 function gerarABNT(entry) {
   const fonte  = (entry.fonte || '').toUpperCase()
@@ -18,7 +20,7 @@ function gerarABNT(entry) {
 }
 
 export default function EntradaPublica({ entradaId, onFechar }) {
-  const { theme, mode, toggle } = useTheme()
+  const { theme, mode } = useTheme()
   const [entry, setEntry]   = useState(null)
   const [loading, setLoading] = useState(true)
   const [erro, setErro]     = useState('')
@@ -86,9 +88,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
           <div style={{ fontSize: 11, color: theme.muted }}>Repositório Jurídico · entrada compartilhada</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={toggle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}>
-            {mode === 'dark' ? '☀️' : '🌙'}
-          </button>
+          <SeletorTema compact />
           {onFechar && (
             <button onClick={onFechar} style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: theme.muted, fontSize: 12, cursor: 'pointer' }}>
               ← Voltar ao repositório
@@ -107,7 +107,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
 
         {erro && (
           <div style={{ textAlign: 'center', padding: '80px 0' }}>
-            <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.3 }}>🔒</div>
+            <div style={{ marginBottom: 12, opacity: 0.3, display: 'flex', justifyContent: 'center' }}><Lock size={40} /></div>
             <div style={{ fontSize: 16, color: theme.error }}>{erro}</div>
           </div>
         )}

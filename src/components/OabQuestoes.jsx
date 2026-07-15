@@ -5,7 +5,8 @@ import {
   CheckCircle, XCircle, ChevronRight, RotateCcw,
   Timer, Trophy, BookOpen, Zap, RefreshCw,
   ChevronLeft, BarChart2, AlertCircle, Search,
-  History, Target, TrendingUp, Bookmark, BookmarkCheck, Scissors
+  History, Target, TrendingUp, Bookmark, BookmarkCheck, Scissors,
+  PenLine, Sparkles, Pencil
 } from 'lucide-react'
 
 const DISC_COR = {
@@ -440,7 +441,7 @@ function AnotacaoQuestao({ questaoId, theme }) {
     <div style={{ marginTop:10 }}>
       <button onClick={() => setAberto(a => !a)}
         style={{ fontSize:10, background:'none', border:`1px solid ${theme.border}`, borderRadius:6, color:nota ? theme.gold : theme.muted, padding:'4px 10px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:5 }}>
-        ✍️ {nota ? 'Ver anotação' : 'Adicionar anotação'}
+        <PenLine size={11} /> {nota ? 'Ver anotação' : 'Adicionar anotação'}
       </button>
       {aberto && (
         <textarea value={nota} onChange={e => salvar(e.target.value)}
@@ -542,8 +543,8 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
               style={{ fontSize:11, background:'#1a0608', border:'1px solid #B8930A', borderRadius:6, color:'#F5F0E8', padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace', width:160 }} />
             <button onClick={sugerirClassificacao} disabled={sugerindo}
               title="Deixar a IA sugerir a classificação correta"
-              style={{ fontSize:10, background:'#1a1a2e', border:'1px solid #7C3AED', borderRadius:5, color:'#7C3AED', padding:'3px 8px', cursor:'pointer' }}>
-              {sugerindo ? '...' : '✨ IA'}
+              style={{ fontSize:10, background:'#1a1a2e', border:'1px solid #7C3AED', borderRadius:5, color:'#7C3AED', padding:'3px 8px', cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+              {sugerindo ? '...' : <><Sparkles size={11} /> IA</>}
             </button>
             <button onClick={salvarEdicao} disabled={salvando}
               style={{ fontSize:10, background:'#B8930A', border:'none', borderRadius:5, color:'#000', padding:'3px 10px', cursor:'pointer', fontWeight:700 }}>
@@ -572,8 +573,8 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
             {isAdmin && (
               <button onClick={() => { setEditDisc(questao.disciplina); setEditTopico(questao.topico||''); setEditando(true) }}
                 title="Editar classificação"
-                style={{ fontSize:9, background:'none', border:'1px solid #6b728044', borderRadius:4, color:'#6b7280', padding:'2px 6px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace' }}>
-                ✏️ editar
+                style={{ fontSize:9, background:'none', border:'1px solid #6b728044', borderRadius:4, color:'#6b7280', padding:'2px 6px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:3 }}>
+                <Pencil size={10} /> editar
               </button>
             )}
           </>
@@ -1117,8 +1118,8 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
               </span>
             )}
             {config?.modo === 'rapida' && (
-              <span style={{ fontSize:10, color:'#a78bfa', background:'#a78bfa18', border:'1px solid #a78bfa33', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
-                ⚡ RÁPIDA
+              <span style={{ fontSize:10, color:'#a78bfa', background:'#a78bfa18', border:'1px solid #a78bfa33', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace', display:'inline-flex', alignItems:'center', gap:4 }}>
+                <Zap size={10} /> RÁPIDA
               </span>
             )}
           </div>
@@ -1170,8 +1171,8 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
           {/* Opção 2: Entradas sugeridas do repositório após erro */}
           {entradasSugeridas.length > 0 && (
             <div style={{ marginTop: 12, padding: '12px 14px', background: theme.raised, border: `1px solid ${theme.gold}44`, borderRadius: 10 }}>
-              <div style={{ fontSize: 11, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-                📚 No seu repositório sobre este tema:
+              <div style={{ fontSize: 11, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <BookOpen size={12} /> No seu repositório sobre este tema:
               </div>
               {entradasSugeridas.map(e => (
                 <div key={e.id}
