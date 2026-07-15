@@ -536,7 +536,7 @@ export default function OabDashboard({ session }) {
             Estudos OAB — 48º Exame
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
-            1ª Fase: 11/01/2027 · 2ª Fase: 29/03/2027
+            1ª Fase: 10/01/2027 · 2ª Fase: 28/02/2027
           </div>
         </div>
         {/* Botão exportar Google Calendar */}
@@ -557,7 +557,7 @@ export default function OabDashboard({ session }) {
               {diasAte('2027-01-10')} dias
             </span>
             <span style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', marginLeft: 8 }}>
-              para a 1ª Fase OAB (11/01/2027) · {stats.pct}% do cronograma concluído
+              para a 1ª Fase OAB (10/01/2027) · {stats.pct}% do cronograma concluído
             </span>
           </div>
         </div>
@@ -692,7 +692,7 @@ export default function OabDashboard({ session }) {
       {/* Footer */}
       <div style={{ marginTop: 24, borderTop: `1px solid ${theme.border}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
         <span>Lex.IA · Inteligência Jurídica · Farias Fusquiani</span>
-        <span>48º Exame OAB · FGV · 1ª Fase 11/01/2027 · 2ª Fase 29/03/2027</span>
+        <span>48º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
       </div>
     </div>
   )
