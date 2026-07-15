@@ -93,17 +93,6 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Sessao expirada. Faca login novamente.')
 
-      const keyRes = await fetch('/api/get-anthropic-config?t=' + Date.now(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-        body: JSON.stringify({ user_id: session.user.id }),
-      })
-      const keyRaw = await keyRes.text()
-      if (!keyRaw || !keyRaw.trim()) throw new Error('Configuracao da API indisponivel.')
-      const keyJson = JSON.parse(keyRaw)
-      if (!keyRes.ok || keyJson.error) throw new Error(keyJson.error || 'Erro ao obter configuracao.')
-      const apiKey = keyJson.key
-
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload  = () => resolve(reader.result.split(',')[1])
@@ -130,18 +119,16 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
         '"teses":[{"tese_assunto":"","ratio_decidendi":"","aplicacao_pratica":""}]}',
       ].join('\n')
 
-      const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+      const claudeRes = await fetch('/api/busca', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-beta': 'pdfs-2024-09-25',
-          'anthropic-dangerous-direct-browser-access': 'true',
+          'Authorization': 'Bearer ' + session.access_token,
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 4000,
+          beta: 'pdfs-2024-09-25',
           system: systemPrompt,
           messages: [{ role: 'user', content: [
             { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },

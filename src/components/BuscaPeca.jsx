@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTheme } from '../theme'
 import { STATUS_META } from '../shared'
+import { supabase } from '../supabase'
 
 export default function BuscaPeca({ entradas }) {
   const { theme, mode } = useTheme()
@@ -16,6 +17,9 @@ export default function BuscaPeca({ entradas }) {
     setResult('')
     setError('')
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente.')
+
       const ctx = JSON.stringify(entradas.map(e => ({
         area: e.area, tema: e.tema, tipo: e.tipo,
         fonte: e.fonte, referencia: e.referencia, teses: e.teses,
@@ -23,7 +27,10 @@ export default function BuscaPeca({ entradas }) {
 
       const res = await fetch('/api/busca', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 1500,

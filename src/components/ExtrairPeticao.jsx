@@ -99,22 +99,6 @@ export default function ExtrairPeticao() {
         setEtapa('erro'); return
       }
 
-      // ── 2. API key via endpoint seguro ─────────────────────────────────
-      setProgresso('Obtendo configuração da API...')
-      let apiKey
-      try {
-        const keyJson = await fetchSeguro('/api/get-anthropic-config?t=' + Date.now(), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store' },
-          body: JSON.stringify({ user_id: session.user.id }),
-        })
-        apiKey = keyJson.key
-        if (!apiKey) throw new Error('Chave não retornada pelo servidor.')
-      } catch (e) {
-        setErro('Falha ao obter configuração: ' + e.message)
-        setEtapa('erro'); return
-      }
-
       // ── 3. Preparar conteúdo do arquivo ────────────────────────────────
       const ext    = arquivo.name.split('.').pop().toLowerCase()
       const isDocx = ext === 'docx' || ext === 'doc'
@@ -175,22 +159,20 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         setProgresso('PDF pronto. Enviando para análise — pode levar até 40 segundos...')
       }
 
-      // ── 4. Chamar Claude diretamente no browser ────────────────────────
-      console.log('[ExtrairPeticao] Chamando api.anthropic.com...')
+      // ── 4. Chamar Claude via proxy autenticado (chave nunca sai do servidor) ──
+      console.log('[ExtrairPeticao] Chamando /api/busca...')
       let claudeJson
       try {
-        const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+        const claudeRes = await fetch('/api/busca', {
           method: 'POST',
           headers: {
-            'Content-Type':                              'application/json',
-            'x-api-key':                                 apiKey,
-            'anthropic-version':                         '2023-06-01',
-            'anthropic-beta':                            'pdfs-2024-09-25',
-            'anthropic-dangerous-direct-browser-access': 'true',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
           },
           body: JSON.stringify({
-            model:      'claude-sonnet-4-20250514',
+            model:      'claude-sonnet-4-6',
             max_tokens: 8000,
+            ...(isDocx ? {} : { beta: 'pdfs-2024-09-25' }),
             system:     SYSTEM,
             messages:   [{ role: 'user', content: userContent }],
           }),

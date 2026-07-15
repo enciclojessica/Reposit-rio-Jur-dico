@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AREAS } from '../shared'
 import { exportarDocx } from '../utils/exportarDocx'
+import { supabase } from '../supabase'
 import {
   Copy, Check, Download, FileText, X, Sparkles,
   RotateCcw, BookOpen, ChevronDown, Save
@@ -78,13 +79,20 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
     if (!trecho.trim()) return
     setSugerindo(true); setSugestoes([]); setErro('')
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada.')
+
       const ctx = JSON.stringify(entradas.map(e => ({
         id: e.id, tema: e.tema, fonte: e.fonte, tipo: e.tipo,
         teses: (e.teses || []).map(t => t.tese_assunto),
       })))
       const ritoCtx = rito ? `Rito processual: ${rito}. ` : ''
       const res  = await fetch('/api/busca', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6', max_tokens: 600,
           system: `Você é assistente de prática jurídica. ${ritoCtx}Dado o trecho de peça e o repositório de teses, retorne APENAS um array JSON com os IDs mais relevantes (máx 5), ordenados por relevância: ["id1","id2",...]. Sem texto adicional.`,
