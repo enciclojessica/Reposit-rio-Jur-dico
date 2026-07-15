@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, Component, useMemo } from 'react'
+import { useEffect, useState, useCallback, Component } from 'react'
 import { supabase } from './supabase'
 import { useTheme } from './theme'
 import Auth from './components/Auth'
@@ -28,6 +28,8 @@ import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
 import { AREAS, ROLE_COR, ROLE_LABEL } from './shared'
 import { TagPill } from './components/TagInput'
+import { VIEWS } from './data/views'
+import Sidebar from './components/Sidebar'
 
 class ErrorBoundary extends Component {
   constructor(p) { super(p); this.state = { error: null } }
@@ -47,20 +49,8 @@ class ErrorBoundary extends Component {
   }
 }
 
-const VIEWS = {
-  ALERTAS: 'alertas',
-  EDITOR:     'editor',
-  DASHBOARD: 'dashboard',
-  IMPORTAR:   'importar',
-  LEGISLACAO:    'legislacao',
-  LEG_VIEW:      'leg_view',
-  EXTRAIR:       'extrair',
-  FLASHCARDS:   'flashcards',
-  HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
-  BUSCA: 'busca', MEMBROS: 'membros', JURISPRUDENCIA: 'jurisprudencia',
-  CONFIG: 'config',
-  OAB: 'oab',
-}
+// VIEWS importado de ./data/views.js
+
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(window.innerWidth < 768)
@@ -282,7 +272,6 @@ export default function App() {
     return () => supabase.removeChannel(channel)
   }, [authLoading, loadEntradas])
 
-  // exportarRepo e notify movidos para antes do useMemo — evitar TDZ
 
   async function buscarSemantico() {
     if (!search.trim() || buscandoSem) return
@@ -432,7 +421,6 @@ async function handleSave(entry) {
     notify('Complete as teses e salve.')
   }
 
-  // ── Funções declaradas ANTES do useMemo — evitar TDZ ─────────────────────
   function notify(msg, type = 'ok') {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3500)
@@ -453,106 +441,6 @@ async function handleSave(entry) {
     catch (e) { console.error(e); notify('Erro ao exportar.', 'err') }
     setExportandoRepo(false)
   }
-
-    // Constantes de role — importadas de shared.jsx (fonte única)
-
-  // ── Sidebar (useMemo ANTES dos early returns — React rule of hooks) ────────
-  const SidebarEl = useMemo(() => (
-    <div style={{
-      width: 220, background: theme.surface,
-      borderRight: `1px solid ${theme.border}`,
-      display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
-    }}>
-      {/* Logo Lexia — Têmis */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
-          border: '2px solid #C5A059',
-          background: '#800020',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden',
-          boxShadow: '0 2px 12px #80002044',
-          position: 'relative',
-        }}>
-          <img
-            src="/logo-temis.png"
-            alt="Lexia"
-            onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
-            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
-            style={{ width: '100%', height: '100%', cursor: 'pointer', objectFit: 'cover', display: 'block' }}
-          />
-          <span style={{
-            display: 'none', position: 'absolute', inset: 0,
-            alignItems: 'center', justifyContent: 'center',
-            color: '#ffffff', fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 18,
-          }}>FF</span>
-        </div>
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
-            Lex.IA
-          </div>
-          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, marginTop: 2 }}>
-            Inteligência Jurídica
-          </div>
-        </div>
-      </div>
-
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-        {[
-          { id: 'home',   label: 'Início',          action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
-          { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
-          { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
-          { id: 'juri',   label: 'Jurisprudência',   action: () => setView(VIEWS.JURISPRUDENCIA), active: view === VIEWS.JURISPRUDENCIA },
-          { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
-          { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
-          { id: 'oab',    label: 'Estudos OAB',      action: () => setView(VIEWS.OAB),       active: view === VIEWS.OAB },
-    { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
-        ].map(n => (
-          <button key={n.id} onClick={n.action} style={{
-            width: '100%', background: n.active ? theme.gold + '12' : 'none',
-            border: 'none', borderLeft: `3px solid ${n.active ? theme.gold : 'transparent'}`,
-            padding: '11px 20px', display: 'flex', alignItems: 'center', gap: 10,
-            cursor: 'pointer', color: n.active ? theme.text : theme.muted,
-            fontSize: 13, textAlign: 'left', transition: 'all .15s',
-            fontFamily: 'Inter, sans-serif',
-          }}>
-            {n.label}
-          </button>
-        ))}
-
-        {isAdmin && (
-          <button onClick={() => setView(VIEWS.MEMBROS)} style={{
-            width: '100%', background: view === VIEWS.MEMBROS ? theme.gold + '12' : 'none',
-            border: 'none', borderLeft: `3px solid ${view === VIEWS.MEMBROS ? theme.gold : 'transparent'}`,
-            padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
-            color: view === VIEWS.MEMBROS ? theme.text : theme.muted, fontSize: 13,
-            fontFamily: 'Inter, sans-serif', transition: 'all .15s',
-          }}>Membros</button>
-        )}
-
-        {isEditor && (
-          <>
-            <div style={{ margin: '8px 16px', borderTop: `1px solid ${theme.border}` }}/>
-            <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }} style={{
-              width: '100%', background: view === VIEWS.ADD ? theme.gold + '12' : 'none',
-              border: 'none', borderLeft: `3px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
-              padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
-              color: view === VIEWS.ADD ? theme.gold : theme.gold, fontSize: 13,
-              fontFamily: 'Inter, sans-serif', fontWeight: 600, transition: 'all .15s',
-            }}>+ Nova Entrada</button>
-          </>
-        )}
-      </div>
-
-      {/* Footer — apenas o bloco de assinatura, conforme especificação */}
-      <div style={{ padding: '14px 20px', borderTop: `1px solid ${theme.border}` }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 2 }}>Plataforma e Curadoria</div>
-          <div style={{ fontSize: 11, color: theme.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 3, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
-        </div>
-      </div>
-    </div>
-  ), [theme, view, areaFilter, isAdmin, isEditor])
 
   // ── Loading states ─────────────────────────────────────────────────────
   // Vista pública de entrada compartilhada — sem autenticação
@@ -980,7 +868,13 @@ case VIEWS.JURISPRUDENCIA:
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: theme.bg }}>
-      {!isMobile && SidebarEl}
+      {!isMobile && (
+        <Sidebar
+          theme={theme} view={view} setView={setView}
+          setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter}
+          isAdmin={isAdmin} isEditor={isEditor} setPrefillEntry={setPrefillEntry}
+        />
+      )}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar desktop */}
         {!isMobile && (
