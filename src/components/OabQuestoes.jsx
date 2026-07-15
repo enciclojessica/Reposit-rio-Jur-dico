@@ -869,7 +869,10 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
     setCarregando(true)
     setErro(null)
 
-    const qtd = cfg.modo === 'simulado' ? 80 : (cfg.qtdCustom || 10)
+    // Simulado geral = 80 questões; simulado temático (com disciplina) = todas da disciplina
+    const qtd = cfg.modo === 'simulado'
+      ? (cfg.disciplina ? 9999 : 80)
+      : (cfg.qtdCustom || 10)
     let selecionadas = []
 
     try {

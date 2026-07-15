@@ -463,14 +463,21 @@ function SessaoCard({ s, dados, onAtualizar, onPraticar, theme }) {
               <button
                 onClick={() => onPraticar('__simulado__', s.topico)}
                 style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: '#0891b215', border: '1px solid #0891b244', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: '#0891b2', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                <BookOpen size={13} /> Iniciar Simulado — 80 questões cronometradas
+                <BookOpen size={13} /> Iniciar Simulado Geral — 80 questões cronometradas
               </button>
             ) : (
-              <button
-                onClick={() => onPraticar(s.disciplina, s.topico)}
-                style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: cor+'15', border: `1px solid ${cor}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: cor, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                <BookOpen size={13} /> Praticar questões de {s.disciplina}
-              </button>
+              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <button
+                  onClick={() => onPraticar(s.disciplina, s.topico)}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: cor+'15', border: `1px solid ${cor}44`, borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: cor, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  <BookOpen size={13} /> Praticar questões
+                </button>
+                <button
+                  onClick={() => onPraticar('__simulado_disc__' + s.disciplina, s.topico)}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: '#0891b215', border: '1px solid #0891b244', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: '#0891b2', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  <BookOpen size={13} /> Simular tudo
+                </button>
+              </div>
             )
           )}
         </div>
@@ -755,7 +762,13 @@ export default function OabDashboard({ session }) {
           {filtradas.map(s => (
             <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => {
                   if (disc === '__simulado__') {
+                    // Simulado geral — 80 questões todas as disciplinas
                     setDisciplinaFiltro(null)
+                    setTopicoFiltro(null)
+                    setModoSimulado(true)
+                  } else if (disc.startsWith('__simulado_disc__')) {
+                    // Simulado temático — todas as questões da disciplina
+                    setDisciplinaFiltro(disc.replace('__simulado_disc__', ''))
                     setTopicoFiltro(null)
                     setModoSimulado(true)
                   } else {
