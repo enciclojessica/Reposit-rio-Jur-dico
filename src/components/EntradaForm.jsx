@@ -4,6 +4,7 @@ import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted }
 import TagInput from './TagInput'
 import { useTheme } from '../theme'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
+import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
 
 const MAX_PDF_MB = 10
 const IA_FIELDS = ['ratio_decidendi', 'aplicacao_pratica']
@@ -126,7 +127,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
           'Authorization': 'Bearer ' + session.access_token,
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
+          model: ANTHROPIC_MODEL,
           max_tokens: 4000,
           beta: 'pdfs-2024-09-25',
           system: systemPrompt,

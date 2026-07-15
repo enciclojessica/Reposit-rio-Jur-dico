@@ -1,6 +1,7 @@
 // api/pesquisa-juri.js — Lex.IA
 // Pesquisa jurisprudencial via Claude + web_search
 // Retorna array de resultados com: tribunal, tipo, numero, relator, data, ementa, area, url
+import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
@@ -55,7 +56,7 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: ANTHROPIC_MODEL,
         max_tokens: 3000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }],

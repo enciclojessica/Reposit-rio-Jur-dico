@@ -3,6 +3,7 @@ import { useTheme } from '../theme'
 import { AREAS } from '../shared'
 import { exportarDocx } from '../utils/exportarDocx'
 import { supabase } from '../supabase'
+import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
 import {
   Copy, Check, Download, FileText, X, Sparkles,
   RotateCcw, BookOpen, ChevronDown, Save
@@ -94,7 +95,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
           'Authorization': 'Bearer ' + session.access_token,
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6', max_tokens: 600,
+          model: ANTHROPIC_MODEL, max_tokens: 600,
           system: `Você é assistente de prática jurídica. ${ritoCtx}Dado o trecho de peça e o repositório de teses, retorne APENAS um array JSON com os IDs mais relevantes (máx 5), ordenados por relevância: ["id1","id2",...]. Sem texto adicional.`,
           messages: [{ role: 'user', content: `Trecho: "${trecho}"\n\nRepositório: ${ctx}` }],
         }),

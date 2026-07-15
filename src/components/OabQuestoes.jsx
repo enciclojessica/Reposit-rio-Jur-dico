@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { DISC_COR } from '../data/disciplinas'
+import { ANTHROPIC_MODEL_RAPIDO } from '../../lib/anthropicModel'
 import {
   CheckCircle, XCircle, ChevronRight, RotateCcw,
   Timer, Trophy, BookOpen, Zap, RefreshCw,
@@ -470,7 +471,7 @@ function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponde
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
+          model: ANTHROPIC_MODEL_RAPIDO,
           max_tokens: 200,
           messages: [{ role: 'user', content:
             `Classifique esta questão jurídica OAB/FGV com a disciplina e tópico corretos.\n\nEnunciado: ${questao.enunciado.slice(0,500)}\n\nDisciplinas possíveis: ${Object.keys(DISC_COR).filter(d=>d!=='Simulado Geral').join(', ')}\n\nResponda SOMENTE com JSON: {"disciplina":"...","topico":"..."}` }]

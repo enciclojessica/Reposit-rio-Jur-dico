@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTheme } from '../theme'
 import { STATUS_META } from '../shared'
 import { supabase } from '../supabase'
+import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
 
 export default function BuscaPeca({ entradas }) {
   const { theme, mode } = useTheme()
@@ -32,7 +33,7 @@ export default function BuscaPeca({ entradas }) {
           'Authorization': 'Bearer ' + session.access_token,
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
+          model: ANTHROPIC_MODEL,
           max_tokens: 1500,
           system: 'Você é um assistente de prática jurídica. Dado um repositório de teses em JSON, selecione as mais relevantes para a peça indicada. Para cada tese: (1) tese/assunto, (2) fundamentação legal, (3) precedente, (4) como aplicar especificamente na peça. Técnico e objetivo. Formate em markdown. Se faltar cobertura no repositório, aponte as lacunas.',
           messages: [{ role: 'user', content: `Repositório:\n${ctx}\n\nPeça: ${query}` }],

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import { Upload, FileText, Check, AlertCircle, RotateCcw } from 'lucide-react'
+import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
 
 // Extrair texto de .docx no browser via JSZip + parse de XML
 async function extrairTextoDocx(file) {
@@ -170,7 +171,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             'Authorization': 'Bearer ' + session.access_token,
           },
           body: JSON.stringify({
-            model:      'claude-sonnet-4-6',
+            model:      ANTHROPIC_MODEL,
             max_tokens: 8000,
             ...(isDocx ? {} : { beta: 'pdfs-2024-09-25' }),
             system:     SYSTEM,

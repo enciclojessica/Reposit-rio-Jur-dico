@@ -1,6 +1,7 @@
 // api/informativos.js — Lex.IA
 // Busca informativos jurisprudenciais do STF e STJ
 // Query params: tribunal (STF|STJ), edicao (opcional)
+import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Método não permitido' })
@@ -53,7 +54,7 @@ Responda SOMENTE com JSON válido no formato:
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: ANTHROPIC_MODEL,
         max_tokens: 4000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }],

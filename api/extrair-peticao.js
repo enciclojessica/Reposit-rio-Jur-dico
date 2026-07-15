@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 
 // Plano Hobby: max 10s. Para docx enviamos texto puro (rápido).
 // Para PDF enviamos base64 — documentos simples ficam abaixo de 10s.
@@ -54,7 +55,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         'anthropic-beta': 'pdfs-2024-09-25',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: ANTHROPIC_MODEL,
         max_tokens: 8000,
         system: SYSTEM,
         messages: [{ role: 'user', content: userContent }],

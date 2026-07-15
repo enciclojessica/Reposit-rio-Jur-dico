@@ -1,4 +1,6 @@
 // Busca semântica — Anthropic (precisão na comparação de conceitos jurídicos)
+import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
@@ -24,7 +26,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: ANTHROPIC_MODEL,
         max_tokens: 800,
         system: `Você é um sistema de busca semântica jurídica.
 Dado um repositório de teses e uma consulta em linguagem natural, identifique as entradas mais relevantes semanticamente — mesmo que não compartilhem as mesmas palavras exatas.

@@ -3,6 +3,7 @@
 // relevantes que ainda não estão no repositório como novas entradas
 
 import { createClient } from '@supabase/supabase-js'
+import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -83,7 +84,7 @@ Responda SOMENTE com JSON válido:
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: ANTHROPIC_MODEL,
         max_tokens: 5000,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }],
