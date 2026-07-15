@@ -46,7 +46,7 @@ const METODO_COR = {
   "Discursiva":      { bg:"#fffbeb", text:"#b45309" },
 }
 
-// ── Cronograma completo (47º Exame OAB — Jun/2026 a Fev/2027) ─────────────────
+// ── Cronograma completo (48º Exame OAB — Jun/2026 a Mar/2027) ─────────────────
 const RAW = [
   { date:"2026-06-07", fase:"1ª Fase", disciplina:"Ética Profissional", topico:"Lei 8.906/94: deveres, incompatibilidades, impedimentos, infrações e sanções disciplinares", metodos:["Questões FGV","Lei Seca"] },
   { date:"2026-06-13", fase:"1ª Fase", disciplina:"Ética Profissional", topico:"CED (Resolução OAB 02/2015): relações com cliente, sigilo, publicidade, honorários", metodos:["Questões FGV","Lei Seca"] },
@@ -533,10 +533,10 @@ export default function OabDashboard({ session }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 2 }}>
-            Estudos OAB — 47º Exame
+            Estudos OAB — 48º Exame
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
-            1ª Fase: 10/01/2027 · 2ª Fase: 28/02/2027
+            1ª Fase: 11/01/2027 · 2ª Fase: 29/03/2027
           </div>
         </div>
         {/* Botão exportar Google Calendar */}
@@ -557,7 +557,7 @@ export default function OabDashboard({ session }) {
               {diasAte('2027-01-10')} dias
             </span>
             <span style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', marginLeft: 8 }}>
-              para a 1ª Fase OAB (10/01/2027) · {stats.pct}% do cronograma concluído
+              para a 1ª Fase OAB (11/01/2027) · {stats.pct}% do cronograma concluído
             </span>
           </div>
         </div>
@@ -692,7 +692,7 @@ export default function OabDashboard({ session }) {
       {/* Footer */}
       <div style={{ marginTop: 24, borderTop: `1px solid ${theme.border}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
         <span>Lex.IA · Inteligência Jurídica · Farias Fusquiani</span>
-        <span>47º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
+        <span>48º Exame OAB · FGV · 1ª Fase 11/01/2027 · 2ª Fase 29/03/2027</span>
       </div>
     </div>
   )
