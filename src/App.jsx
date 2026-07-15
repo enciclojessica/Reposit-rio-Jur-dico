@@ -721,7 +721,14 @@ async function handleSave(entry) {
           ? <div className="fade-up"><Membros session={session} /></div>
           : null
 
-case VIEWS.FLASHCARDS:
+case VIEWS.JURISPRUDENCIA:
+        return (
+          <div className="fade-up" style={{ padding: '20px 24px' }}>
+            <JurisprudenciaSearch session={session} theme={theme} />
+          </div>
+        )
+
+      case VIEWS.FLASHCARDS:
         return <div className="fade-up"><FlashCards entradas={entradas} /></div>
 
 
