@@ -11,8 +11,15 @@ export default async function handler(req, res) {
 
   if (!anthropicKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
 
-  const { pdf_base64, texto, filename, user_id } = req.body
-  if (!user_id) return res.status(400).json({ error: 'user_id obrigatório.' })
+  // ── Autenticar via JWT do Supabase enviado no header ──────────────────
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) return res.status(401).json({ error: 'Não autenticado.' })
+
+  const supabaseAuth = createClient(supabaseUrl, serviceKey)
+  const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(token)
+  if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+
+  const { pdf_base64, texto, filename } = req.body
   if (!pdf_base64 && !texto) return res.status(400).json({ error: 'Arquivo ou texto obrigatório.' })
 
   // ── Montar conteúdo para o Claude ────────────────────────────────────
@@ -79,7 +86,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
   }
 
   // ── Salvar no Supabase ────────────────────────────────────────────────
-  const supabase = createClient(supabaseUrl, serviceKey)
+  const supabase = supabaseAuth
   const origem   = filename || dados.meta?.tipo_peca || 'Documento importado'
   let tesesSalvas = 0, artigosSalvos = 0
   const erros = []
@@ -102,7 +109,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         ratio_decidendi:     t.ratio_decidendi     || '',
         aplicacao_pratica:   t.aplicacao_pratica   || '',
       }],
-      criado_por: user_id,
+      criado_por: user.id,
     })
     if (error) erros.push(`Tese "${t.tema}": ${error.message}`)
     else tesesSalvas++

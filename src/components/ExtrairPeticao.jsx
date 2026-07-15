@@ -228,8 +228,11 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
       try {
         saveJson = await fetchSeguro('/api/salvar-extracao', {
           method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ dados, filename: arquivo.name, user_id: session.user.id }),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+          },
+          body:    JSON.stringify({ dados, filename: arquivo.name }),
         })
       } catch (e) {
         setErro('Falha ao salvar no repositório: ' + e.message)

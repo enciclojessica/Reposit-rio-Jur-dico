@@ -9,11 +9,18 @@ export default async function handler(req, res) {
   const supabaseUrl = process.env.SUPABASE_URL
   if (!serviceKey) return res.status(500).json({ error: 'SUPABASE_SERVICE_KEY não configurada.' })
 
-  const { dados, filename, user_id } = req.body
-  if (!dados || !user_id) return res.status(400).json({ error: 'Dados ou user_id ausentes.' })
+  // ── Autenticar via JWT do Supabase enviado no header ──────────────────
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) return res.status(401).json({ error: 'Não autenticado.' })
 
   const supabase = createClient(supabaseUrl, serviceKey)
-  const origem   = filename || dados.meta?.tipo_peca || 'Documento importado'
+  const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
+  if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+
+  const { dados, filename } = req.body
+  if (!dados) return res.status(400).json({ error: 'Dados ausentes.' })
+
+  const origem = filename || dados.meta?.tipo_peca || 'Documento importado'
 
   let tesesSalvas = 0, artigosSalvos = 0
   const erros = []
@@ -36,7 +43,7 @@ export default async function handler(req, res) {
         ratio_decidendi:     t.ratio_decidendi     || '',
         aplicacao_pratica:   t.aplicacao_pratica   || '',
       }],
-      criado_por: user_id,
+      criado_por: user.id,
     })
     if (error) erros.push(`Tese "${t.tema}": ${error.message}`)
     else tesesSalvas++
@@ -118,7 +125,7 @@ export default async function handler(req, res) {
           ratio_decidendi: j.ementa || '',
           aplicacao_pratica: novaAplicacao,
         }],
-        criado_por: user_id,
+        criado_por: user.id,
       })
       if (error) erros.push(`Juris ${ref}: ${error.message}`)
       else jurisSalvas++
