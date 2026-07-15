@@ -18,6 +18,7 @@ import Legislacao from './components/Legislacao'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
+import JurisprudenciaSearch from './components/JurisprudenciaSearch'
 import Configuracoes from './components/Configuracoes'
 import OabDashboard from './components/OabDashboard'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
@@ -56,7 +57,7 @@ const VIEWS = {
   EXTRAIR:       'extrair',
   FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
-  BUSCA: 'busca', MEMBROS: 'membros',
+  BUSCA: 'busca', MEMBROS: 'membros', JURISPRUDENCIA: 'jurisprudencia',
   CONFIG: 'config',
   OAB: 'oab',
 }
@@ -463,6 +464,7 @@ async function handleSave(entry) {
           { id: 'home',   label: 'Início',          action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
           { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
           { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
+          { id: 'juri',   label: 'Jurisprudência',   action: () => setView(VIEWS.JURISPRUDENCIA), active: view === VIEWS.JURISPRUDENCIA },
           { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
           { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
           { id: 'oab',    label: 'Estudos OAB',      action: () => setView(VIEWS.OAB),       active: view === VIEWS.OAB },
@@ -629,7 +631,8 @@ async function handleSave(entry) {
   // Itens no menu "mais"
   const navMais = [
     { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
-    { v: VIEWS.LEG_VIEW,    label: 'Legislação' },
+    { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
+    { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
     { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
