@@ -22,7 +22,7 @@ import JurisprudenciaSearch from './components/JurisprudenciaSearch'
 import Configuracoes from './components/Configuracoes'
 import OabDashboard from './components/OabDashboard'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
-import { Lock } from 'lucide-react'
+import { Lock, LogOut, Download, Trash2 } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
@@ -546,44 +546,15 @@ async function handleSave(entry) {
         )}
       </div>
 
-      {/* Footer */}
+      {/* Footer — apenas o bloco de assinatura, conforme especificação */}
       <div style={{ padding: '14px 20px', borderTop: `1px solid ${theme.border}` }}>
-        <div style={{ textAlign: 'center', marginBottom: 10, paddingBottom: 10, borderBottom: `1px solid ${theme.border}` }}>
+        <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 2 }}>Plataforma e Curadoria</div>
           <div style={{ fontSize: 11, color: theme.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 3, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 10, color: theme.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {session ? session.user.email : 'Acesso público'}
-            </div>
-            {role && (
-              <div style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1, marginTop: 2 }}>
-                {ROLE_LABEL[role]}
-              </div>
-            )}
-          </div>
-        </div>
-        {isOwner && entradas.length > 0 && (
-          <button onClick={exportarTesesPlanilha} disabled={exportandoTeses}
-            style={{ width: '100%', background: theme.raised, border: '1px solid ' + theme.border, borderRadius: 6, padding: 7, color: exportandoTeses ? theme.muted : theme.gold, fontSize: 11, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
-            {exportandoTeses ? 'Exportando...' : 'Exportar planilha'}
-          </button>
-        )}
-        {isAdmin && (
-          <button onClick={() => setConfirmLimpar(true)}
-            style={{ width: '100%', background: '#1a0808', border: '1px solid #3a1010', borderRadius: 6, padding: 7, color: '#c0504d', fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-            Limpar repositorio
-          </button>
-        )}
-        {session
-          ? <button onClick={() => supabase.auth.signOut()} style={{ width: '100%', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: 7, color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
-          : <button onClick={() => setShowLogin(true)} style={{ width: '100%', background: `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, border: 'none', borderRadius: 6, padding: 7, color: '#0b0f1a', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-              <Lock size={11} /> Acesso Interno</button>
-        }
       </div>
     </div>
-  ), [theme, view, areaFilter, isAdmin, isEditor, session, role, entradas, confirmLimpar])
+  ), [theme, view, areaFilter, isAdmin, isEditor])
 
   // ── Loading states ─────────────────────────────────────────────────────
   // Vista pública de entrada compartilhada — sem autenticação
@@ -1022,6 +993,18 @@ case VIEWS.JURISPRUDENCIA:
           }}>
             {session ? (
               <>
+                {isOwner && entradas.length > 0 && (
+                  <button onClick={exportarTesesPlanilha} disabled={exportandoTeses} title="Exportar planilha"
+                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Download size={13} /> {exportandoTeses ? 'Exportando...' : 'Exportar'}
+                  </button>
+                )}
+                {isAdmin && (
+                  <button onClick={() => setConfirmLimpar(true)} title="Limpar repositório"
+                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: theme.error, cursor: 'pointer', fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Trash2 size={13} />
+                  </button>
+                )}
                 <SeletorTema compact />
                 <div style={{ width: 1, height: 20, background: theme.border }} />
                 <SinoNotificacoes
@@ -1040,10 +1023,21 @@ case VIEWS.JURISPRUDENCIA:
                       </span>
                     </div>
                   )}
-                  <span style={{ fontSize: 13, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
-                    {membro?.nome || session.user.email?.split('@')[0] || ''}
-                  </span>
+                  <div>
+                    <div style={{ fontSize: 13, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.2 }}>
+                      {membro?.nome || session.user.email?.split('@')[0] || ''}
+                    </div>
+                    {role && (
+                      <div style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>
+                        {ROLE_LABEL[role]}
+                      </div>
+                    )}
+                  </div>
                 </div>
+                <button onClick={() => supabase.auth.signOut()} title="Sair"
+                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <LogOut size={14} /> Sair
+                </button>
               </>
             ) : (
               <button onClick={() => setShowLogin(true)} style={{
