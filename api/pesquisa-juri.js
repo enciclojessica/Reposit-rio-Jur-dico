@@ -22,6 +22,11 @@ ${tribunalFiltro}
 IMPORTANTE: Use a ferramenta de busca para encontrar decisões REAIS com dados verdadeiros.
 Traga entre 3 e 6 resultados relevantes.
 
+Para cada decisão, classifique "tendencia" como:
+- "favoravel": reconhece o direito, protege parte vulnerável, aplica CDC/CLT/princípios protetivos
+- "contrario": nega o direito, restringe a pretensão, exige requisitos adicionais
+- "neutro": interpreta norma sem favorecer parte, ou depende do caso concreto
+
 Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
 {
   "resultados": [
@@ -33,6 +38,8 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
       "data": "2024-03-15",
       "ementa": "Resumo da tese/ementa em até 3 linhas...",
       "area": "Cível",
+      "tendencia": "favoravel",
+      "fundamentacao": "Art. X, Lei Y",
       "url": "https://..."
     }
   ],

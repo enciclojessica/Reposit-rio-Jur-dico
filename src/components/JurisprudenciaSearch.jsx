@@ -4,12 +4,12 @@ import { Search, Scale, BookmarkPlus, Check, AlertCircle, Minus } from 'lucide-r
 
 const TRIBUNAIS = ['Todos', 'STF', 'STJ', 'TST', 'TRFs', 'TJSP', 'TJRJ', 'TJMG']
 
-function badgeConfig(tendencia) {
-  if (!tendencia) return { label: 'Neutro', bg: '#6b728022', color: '#6b7280', border: '#6b728044' }
-  const t = tendencia.toLowerCase()
-  if (t.includes('favorável') || t.includes('favoravel'))
+function badgeConfig(tendencia, area) {
+  // Verifica campo tendencia primeiro, depois tenta inferir da area/ementa
+  const t = (tendencia || area || '').toLowerCase()
+  if (t.includes('favorável') || t.includes('favoravel') || t === 'favoravel')
     return { label: 'Favorável', bg: '#10b98122', color: '#10b981', border: '#10b98155' }
-  if (t.includes('contrário') || t.includes('contrario') || t.includes('desfavorável'))
+  if (t.includes('contrário') || t.includes('contrario') || t.includes('desfavorável') || t === 'contrario')
     return { label: 'Contrário', bg: '#ef444422', color: '#ef4444', border: '#ef444455' }
   return { label: 'Neutro', bg: '#6b728022', color: '#6b7280', border: '#6b728044' }
 }
@@ -31,7 +31,7 @@ function RelevanciaBar({ pct, cor }) {
 }
 
 function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
-  const badge = badgeConfig(r.tendencia || r.area)
+  const badge = badgeConfig(r.tendencia, r.area)
   const cor = badge.color
   const pct = r.relevancia || Math.floor(75 + Math.random() * 20)
 
@@ -107,7 +107,11 @@ export default function JurisprudenciaSearch({ session, theme }) {
       const res = await fetch('/api/pesquisa-juri', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: busca.trim(), tribunal: tribunal === 'Todos' ? null : tribunal }),
+        body: JSON.stringify({ 
+        query: busca.trim(), 
+        tribunal: tribunal === 'Todos' ? null : tribunal,
+        contexto: 'Classifique cada decisão como: favoravel (reconhece o direito, protege a parte mais fraca, aplica princípios protetivos), contrario (nega o direito, restringe a pretensão) ou neutro (apenas interpreta norma sem favorecer parte). Use o campo tendencia com esses valores exatos.'
+      }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
