@@ -151,7 +151,7 @@ const RAW = [
 
 const SESSIONS_PADRAO = RAW.map((s, i) => ({ ...s, id: `s${i}` }))
 const DISCIPLINAS = [...new Set(SESSIONS_PADRAO.map(s => s.disciplina))]
-const MESES = [...new Set(SESSIONS.map(s => {
+const MESES = [...new Set(SESSIONS_PADRAO.map(s => {
   const [y,m] = s.date.split('-')
   return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][+m-1] + '/' + y.slice(2)
 }))]
