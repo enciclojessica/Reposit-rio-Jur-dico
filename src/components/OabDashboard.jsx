@@ -846,11 +846,11 @@ export default function OabDashboard({ session }) {
 
       {/* Wizard de configuração do cronograma */}
       {mostrarWizard && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#00000088', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div style={{ background: '#1a0608', border: '1px solid #3a1015', borderRadius: 16, padding: '24px', maxWidth: 580, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#00000066', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div style={{ background: theme.bg || theme.raised, border: `1px solid ${theme.border}`, borderRadius: 16, padding: '24px', maxWidth: 580, width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px #00000044' }}>
             <CronogramaWizard session={session} theme={theme} onConcluir={onWizardConcluir} />
             <button onClick={() => setMostrarWizard(false)}
-              style={{ marginTop: 12, width: '100%', background: 'none', border: '1px solid #3a1015', color: '#9b8b7a', borderRadius: 8, padding: '8px', cursor: 'pointer', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+              style={{ marginTop: 12, width: '100%', background: 'none', border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '8px', cursor: 'pointer', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
               Cancelar
             </button>
           </div>
