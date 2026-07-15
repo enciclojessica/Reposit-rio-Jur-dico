@@ -1,20 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../supabase'
 import { BookOpen, Headphones, GalleryThumbnails, Play, Pause, ChevronDown, ChevronUp, FileText, Lock } from 'lucide-react'
-
-const DISC_COR = {
-  "Ética Profissional": "#7c3aed", "Direito Civil": "#16a34a",
-  "Direito Constitucional": "#0284c7", "Direito Penal": "#e11d48",
-  "Direito Processual Penal": "#a21caf", "Direito Processual Civil": "#2563eb",
-  "Direito do Trabalho": "#d97706", "Direito Processual do Trabalho": "#b45309",
-  "Direito Tributário": "#ea580c", "Direito Administrativo": "#be185d",
-  "Direito Empresarial": "#64748b", "Direito Ambiental": "#15803d",
-  "Direito Eleitoral": "#6d28d9", "Direito Previdenciário": "#0369a1",
-  "Direito do Consumidor": "#047857", "Direito Internacional": "#1d4ed8",
-  "Direito da Criança e do Adolescente": "#db2777",
-  "Direito Financeiro": "#92400e", "Direito Digital e LGPD": "#4338ca",
-  "Direitos Humanos": "#0891b2", "Filosofia do Direito": "#78716c",
-}
+import { DISC_COR } from '../data/disciplinas'
 
 function parseBucketPath(storagePath) {
   const idx = storagePath.indexOf('/')

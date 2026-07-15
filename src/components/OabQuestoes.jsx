@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { DISC_COR } from '../data/disciplinas'
 import {
   CheckCircle, XCircle, ChevronRight, RotateCcw,
   Timer, Trophy, BookOpen, Zap, RefreshCw,
@@ -9,33 +10,8 @@ import {
   PenLine, Sparkles, Pencil
 } from 'lucide-react'
 
-const DISC_COR = {
-  "Ética Profissional":     "#7c3aed",
-  "Direito Civil":          "#16a34a",
-  "Processo Civil":         "#2563eb",
-  "Direito Constitucional": "#0284c7",
-  "Direito Penal":          "#e11d48",
-  "Processo Penal":         "#a21caf",
-  "Direito do Trabalho":    "#d97706",
-  "Direito Tributário":     "#ea580c",
-  "Direito Administrativo": "#be185d",
-  "Direito Empresarial":    "#64748b",
-  "Direito Ambiental":      "#15803d",
-  "Direito Internacional":  "#0369a1",
-  "Direitos Humanos":       "#b45309",
-  "Direito Financeiro":     "#7e22ce",
-  "Direito Eleitoral":      "#be123c",
-  "Direito Digital e LGPD": "#0f766e",
-  "Filosofia do Direito":   "#92400e",
-  "Direito Previdenciário": "#1d4ed8",
-  "Direito Processual Civil":  "#2563eb",
-  "Direito Processual Penal":  "#a21caf",
-  "Direito Processual do Trabalho": "#d97706",
-  "Direito do Consumidor":          "#047857",
-  "Direito da Criança e do Adolescente": "#db2777",
-}
-
-const DISCIPLINAS = Object.keys(DISC_COR)
+// "Simulado Geral" é tipo de sessão de estudo, não disciplina classificável
+const DISCIPLINAS = Object.keys(DISC_COR).filter(d => d !== 'Simulado Geral')
 const EXAMES = ['Todos','38','39','40','41','42','43','44','45']
 const MODOS  = [
   { id: 'estudo',    label: 'Estudo',    desc: 'Uma por vez com feedback imediato' },
