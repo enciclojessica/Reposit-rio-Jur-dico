@@ -65,36 +65,65 @@ export default async function handler(req, res) {
     else artigosSalvos++
   }
 
-  // Salvar jurisprudências extraídas da peça (novas apenas)
-  let jurisSalvas = 0
+  // Salvar jurisprudências extraídas da peça
+  // — se já existe: adiciona novo contexto nas teses existentes (sem duplicar)
+  // — se não existe: cria entrada nova
+  let jurisSalvas = 0, jurisAtualizadas = 0
   for (const j of (dados.jurisprudencias || [])) {
     if (!j.numero?.trim() || !j.tribunal) continue
-    // Verificar se já existe no repositório
     const ref = `${j.tipo || ''} ${j.numero}`.trim()
-    const { data: existe } = await supabase.from('entradas')
-      .select('id').eq('referencia', ref).limit(1)
-    if (existe?.length > 0) continue // já existe, pular
-    const { error } = await supabase.from('entradas').insert({
-      area: j.area || 'Cível',
-      tipo: 'jurisprudência',
-      tema: `${j.tribunal} ${ref} — extraído de peça`,
-      fonte: j.tribunal,
-      referencia: ref,
-      url: '',
-      status: 'vigente',
-      tags: ['extraído-de-peça', 'jurisprudência', j.tribunal?.toLowerCase()].filter(Boolean),
-      teses: [{
-        tese_assunto: j.ementa || '',
+    const novaAplicacao = `Citado em peça processual — ${origem}`
+
+    const { data: existentes } = await supabase.from('entradas')
+      .select('id, teses').eq('referencia', ref).limit(1)
+
+    if (existentes?.length > 0) {
+      // Já existe — verificar se o contexto atual já foi registrado
+      const entrada = existentes[0]
+      const tesesTodas = Array.isArray(entrada.teses) ? entrada.teses : []
+      const jaTemContexto = tesesTodas.some(t =>
+        (t.aplicacao_pratica || '').includes(origem) ||
+        (t.ratio_decidendi || '') === (j.ementa || '')
+      )
+      if (jaTemContexto) continue // contexto idêntico, pular
+
+      // Adicionar novo contexto como nova tese dentro da entrada
+      const novasTeses = [...tesesTodas, {
+        tese_assunto: j.ementa ? j.ementa.slice(0, 120) + '...' : ref,
         fundamentacao_legal: j.fundamento || '',
         precedente_sumula: ref,
         ratio_decidendi: j.ementa || '',
-        aplicacao_pratica: `Citado em peça processual — ${origem}`,
-      }],
-      criado_por: user_id,
-    })
-    if (error) erros.push(`Juris ${ref}: ${error.message}`)
-    else jurisSalvas++
+        aplicacao_pratica: novaAplicacao,
+      }]
+      const { error } = await supabase.from('entradas')
+        .update({ teses: novasTeses })
+        .eq('id', entrada.id)
+      if (error) erros.push(`Juris ${ref} (atualizar): ${error.message}`)
+      else jurisAtualizadas++
+    } else {
+      // Não existe — criar entrada nova
+      const { error } = await supabase.from('entradas').insert({
+        area: j.area || 'Cível',
+        tipo: 'jurisprudência',
+        tema: `${j.tribunal} ${ref}`,
+        fonte: j.tribunal,
+        referencia: ref,
+        url: '',
+        status: 'vigente',
+        tags: ['extraído-de-peça', 'jurisprudência', j.tribunal?.toLowerCase()].filter(Boolean),
+        teses: [{
+          tese_assunto: j.ementa || '',
+          fundamentacao_legal: j.fundamento || '',
+          precedente_sumula: ref,
+          ratio_decidendi: j.ementa || '',
+          aplicacao_pratica: novaAplicacao,
+        }],
+        criado_por: user_id,
+      })
+      if (error) erros.push(`Juris ${ref}: ${error.message}`)
+      else jurisSalvas++
+    }
   }
 
-  return res.status(200).json({ ok: true, meta: dados.meta, teses_salvas: tesesSalvas, artigos_salvos: artigosSalvos, juris_salvas: jurisSalvas, erros })
+  return res.status(200).json({ ok: true, meta: dados.meta, teses_salvas: tesesSalvas, artigos_salvos: artigosSalvos, juris_salvas: jurisSalvas, juris_atualizadas: jurisAtualizadas, erros })
 }

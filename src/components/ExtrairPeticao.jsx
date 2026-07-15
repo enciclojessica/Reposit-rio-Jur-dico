@@ -364,19 +364,30 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
               <span style={{ color: theme.muted }}>Tipo: </span>{resultado.meta.tipo_peca}
             </div>
           )}
-          <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-            <div style={{ flex: 1, background: theme.raised, border: `1px solid ${theme.success}44`, borderLeft: `3px solid ${theme.success}`, borderRadius: 8, padding: '12px 16px' }}>
+          <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: `1px solid ${theme.success}44`, borderLeft: `3px solid ${theme.success}`, borderRadius: 8, padding: '12px 16px' }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: theme.success, fontFamily: 'Inter, sans-serif' }}>
                 {resultado.teses_salvas ?? 0}
               </div>
-              <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>tese(s) no repositório</div>
+              <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>tese(s) adicionadas</div>
             </div>
-            <div style={{ flex: 1, background: theme.raised, border: '1px solid #0ea5e944', borderLeft: '3px solid #0ea5e9', borderRadius: 8, padding: '12px 16px' }}>
+            <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: '1px solid #0ea5e944', borderLeft: '3px solid #0ea5e9', borderRadius: 8, padding: '12px 16px' }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: '#0ea5e9', fontFamily: 'Inter, sans-serif' }}>
                 {resultado.artigos_salvos ?? 0}
               </div>
               <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>artigo(s) na legislação</div>
             </div>
+            {((resultado.juris_salvas ?? 0) + (resultado.juris_atualizadas ?? 0)) > 0 && (
+              <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: '1px solid #a78bfa44', borderLeft: '3px solid #a78bfa', borderRadius: 8, padding: '12px 16px' }}>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#a78bfa', fontFamily: 'Inter, sans-serif' }}>
+                  {(resultado.juris_salvas ?? 0) + (resultado.juris_atualizadas ?? 0)}
+                </div>
+                <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
+                  jurisprudência(s)
+                  {resultado.juris_atualizadas > 0 && ` (${resultado.juris_atualizadas} com novo contexto)`}
+                </div>
+              </div>
+            )}
           </div>
           {resultado.erros?.length > 0 && (
             <div style={{ background: '#fff7ed', border: '1px solid #f59e0b44', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 11, color: '#92400e', fontFamily: 'Inter, sans-serif' }}>
