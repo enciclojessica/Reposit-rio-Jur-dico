@@ -466,23 +466,6 @@ export default function OabDashboard({ session }) {
     }
   }, [session])
 
-  // Notificação da sessão do dia
-  useEffect(() => {
-    if (!proximas || proximas.length === 0) return
-    if (!('Notification' in window) || Notification.permission !== 'granted') return
-    const hoje = new Date().toISOString().slice(0, 10)
-    const jaNotificou = localStorage.getItem('lexia_notif_' + hoje)
-    if (jaNotificou) return
-    const sessaoHoje = proximas.find(s => s.date === hoje)
-    if (!sessaoHoje) return
-    setTimeout(() => {
-      new Notification('Lex.IA — Sessão do dia 📚', {
-        body: `${sessaoHoje.disciplina}: ${sessaoHoje.topico.slice(0, 80)}`,
-        icon: '/icons/icon-192.png',
-      })
-      localStorage.setItem('lexia_notif_' + hoje, '1')
-    }, 2000)
-  }, [proximas])
 
   async function carregar() {
     setCarregando(true)
@@ -545,6 +528,24 @@ export default function OabDashboard({ session }) {
 
   const hoje    = new Date().toISOString().split('T')[0]
   const proximas = SESSIONS.filter(s => s.date >= hoje && dados[s.id]?.status !== 'Concluído').slice(0,3)
+
+  // Notificação da sessão do dia (após proximas estar disponível)
+  if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' && proximas.length > 0) {
+    const hoje2 = new Date().toISOString().slice(0, 10)
+    const jaNotificou = localStorage.getItem('lexia_notif_' + hoje2)
+    if (!jaNotificou) {
+      const sessaoHoje = proximas.find(s => s.date === hoje2)
+      if (sessaoHoje) {
+        setTimeout(() => {
+          new Notification('Lex.IA — Sessão do dia 📚', {
+            body: sessaoHoje.disciplina + ': ' + sessaoHoje.topico.slice(0, 80),
+            icon: '/icons/icon-192.png',
+          })
+          localStorage.setItem('lexia_notif_' + hoje2, '1')
+        }, 2000)
+      }
+    }
+  }
 
   if (carregando) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, color: theme.gold, gap: 10 }}>
