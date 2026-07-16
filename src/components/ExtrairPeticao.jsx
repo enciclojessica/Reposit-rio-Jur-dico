@@ -109,8 +109,15 @@ export default function ExtrairPeticao() {
 
 REGRA ABSOLUTA: Jamais mencione fatos específicos do caso (partes, valores, eventos concretos). Todo conteúdo deve ser reutilizável em qualquer demanda futura.
 
+CLASSIFICAÇÃO DO CAMPO "tipo" — analise o conteúdo de cada tese e escolha o tipo correto, não repita sempre o mesmo valor:
+- "lei": a tese é fundamentalmente a interpretação de um artigo/dispositivo legal (ex: distribuição do ônus da prova pelo art. 373 do CPC), sem depender de um julgado específico para sustentá-la.
+- "jurisprudência": a tese deriva de uma decisão judicial concreta (acórdão, sentença) citada no documento, com tribunal/número identificáveis.
+- "súmula": a tese é o enunciado de uma súmula (STF, STJ ou de tribunal), citada explicitamente por número.
+- "doutrina": a tese é uma explicação teórica/conceitual atribuída a autor(es) ou a entendimento doutrinário, sem base em julgado nem em dispositivo legal específico.
+Quando o "fundamentacao_legal" apontar só para um artigo de lei e não houver julgado nem doutrinador citado, classifique como "lei" — não como "jurisprudência".
+
 Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto antes ou depois:
-{"meta":{"tipo_peca":"string","numero_processo":"string ou null","resultado":"string ou null"},"teses":[{"area":"Cível","tipo":"jurisprudência","tema":"string","fonte":"string","referencia":"string","tese_assunto":"string","fundamentacao_legal":"string","precedente_sumula":"string","ratio_decidendi":"string","aplicacao_pratica":"string"}],"artigos":[{"codigo":"cpc","numero":300,"inciso":null,"paragrafo":null,"texto":"string","aplicacao_pratica":"string","contexto":"string"}]}`
+{"meta":{"tipo_peca":"string","numero_processo":"string ou null","resultado":"string ou null"},"teses":[{"area":"Cível","tipo":"lei|jurisprudência|súmula|doutrina — escolha conforme as regras acima","tema":"string","fonte":"string","referencia":"string","tese_assunto":"string","fundamentacao_legal":"string","precedente_sumula":"string","ratio_decidendi":"string","aplicacao_pratica":"string"}],"artigos":[{"codigo":"cpc","numero":300,"inciso":null,"paragrafo":null,"texto":"string","aplicacao_pratica":"string","contexto":"string"}]}`
 
       if (isDocx) {
         setProgresso('Lendo o arquivo Word...')
