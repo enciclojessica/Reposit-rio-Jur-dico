@@ -467,7 +467,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
               </button>
             ) : (
               <button onClick={finalizarSessao}
-                style={{ display:'flex', alignItems:'center', gap:6, background:'#0f2b1a', border:'1px solid #10b981', color:'#10b981', borderRadius:8, padding:'10px 20px', fontSize:12, fontWeight:700, cursor:'pointer', fontFamily:'Inter, sans-serif', marginLeft:'auto' }}>
+                style={{ display:'flex', alignItems:'center', gap:6, background:theme.toastOk, border:`1px solid ${theme.success}`, color:theme.success, borderRadius:8, padding:'10px 20px', fontSize:12, fontWeight:700, cursor:'pointer', fontFamily:'Inter, sans-serif', marginLeft:'auto' }}>
                 <CheckCircle size={14} /> Ver resultado
               </button>
             )}

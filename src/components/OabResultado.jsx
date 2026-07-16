@@ -19,9 +19,9 @@ export default function Resultado({ respostas, questoes, tempo, onReiniciar, onR
 
   return (
     <div>
-      <div style={{ background: aprovado ? '#0f2b1a' : '#2a0810', border:`1px solid ${aprovado ? '#10b981' : '#ef4444'}`, borderRadius:12, padding:'20px', marginBottom:20, textAlign:'center' }}>
-        {aprovado ? <Trophy size={32} color="#10b981" style={{ marginBottom:10 }} /> : <XCircle size={32} color="#ef4444" style={{ marginBottom:10 }} />}
-        <div style={{ fontSize:42, fontWeight:700, color: aprovado ? '#10b981' : '#ef4444', fontFamily:'IBM Plex Mono, monospace' }}>{pct}%</div>
+      <div style={{ background: aprovado ? theme.toastOk : theme.toastErr, border:`1px solid ${aprovado ? theme.success : theme.error}`, borderRadius:12, padding:'20px', marginBottom:20, textAlign:'center' }}>
+        {aprovado ? <Trophy size={32} color={theme.success} style={{ marginBottom:10 }} /> : <XCircle size={32} color={theme.error} style={{ marginBottom:10 }} />}
+        <div style={{ fontSize:42, fontWeight:700, color: aprovado ? theme.success : theme.error, fontFamily:'IBM Plex Mono, monospace' }}>{pct}%</div>
         <div style={{ fontSize:14, color:theme.text, fontFamily:'Inter, sans-serif', marginTop:4 }}>
           {acertos} de {total} questões corretas
         </div>

@@ -14,13 +14,13 @@ function badgeConfig(tendencia, area) {
   return { label: 'Neutro', bg: '#6b728022', color: '#6b7280', border: '#6b728044' }
 }
 
-function RelevanciaBar({ pct, cor }) {
+function RelevanciaBar({ pct, cor, theme }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-      <span style={{ fontSize: 9, color: '#6b7280', fontFamily: 'IBM Plex Mono, monospace', letterSpacing: 1, textTransform: 'uppercase', flexShrink: 0 }}>
+      <span style={{ fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', letterSpacing: 1, textTransform: 'uppercase', flexShrink: 0 }}>
         Relevância
       </span>
-      <div style={{ flex: 1, height: 4, background: '#2a2a2a', borderRadius: 2 }}>
+      <div style={{ flex: 1, height: 4, background: theme.border, borderRadius: 2 }}>
         <div style={{ height: '100%', width: pct + '%', background: cor, borderRadius: 2, transition: 'width .6s' }} />
       </div>
       <span style={{ fontSize: 10, color: cor, fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, flexShrink: 0 }}>
@@ -81,7 +81,7 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
         {r.ementa}
       </div>
 
-      <RelevanciaBar pct={pct} cor={cor} />
+      <RelevanciaBar pct={pct} cor={cor} theme={theme} />
     </div>
   )
 }

@@ -107,9 +107,9 @@ export default function PainelStats({ session, theme, onVoltar }) {
                 const label = s.disc.replace('Direito ', 'D. ').replace('Processual ', 'Proc. ')
                 return (
                   <g key={s.disc}>
-                    <text x={0} y={y + 13} fontSize={8} fill="#9b8b7a" fontFamily="IBM Plex Mono, monospace">{label.slice(0,18)}</text>
+                    <text x={0} y={y + 13} fontSize={8} fill={theme.muted} fontFamily="IBM Plex Mono, monospace">{label.slice(0,18)}</text>
                     <rect x={120} y={y + 4} width={barW} height={12} rx={3} fill={cor} opacity={0.85} />
-                    <rect x={120} y={y + 4} width={180} height={12} rx={3} fill="none" stroke="#2a2a2a" strokeWidth={0.5} />
+                    <rect x={120} y={y + 4} width={180} height={12} rx={3} fill="none" stroke={theme.border} strokeWidth={0.5} />
                     <text x={120 + barW + 4} y={y + 14} fontSize={8} fill={cor} fontFamily="IBM Plex Mono, monospace" fontWeight="bold">{s.pct}%</text>
                   </g>
                 )

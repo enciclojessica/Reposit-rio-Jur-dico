@@ -47,7 +47,7 @@ export default function Cronometro({ sessionId, onSalvar, theme }) {
           {fmtTempo(seg)}
         </div>
         <button onClick={() => setRodando(r => !r)}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: rodando ? '#2a1800' : theme.gold, color: rodando ? '#f59e0b' : '#0b0f1a', border: `1px solid ${rodando ? '#f59e0b' : 'transparent'}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+          style={{ display: 'flex', alignItems: 'center', gap: 6, background: rodando ? (theme.isDark ? '#2a1800' : '#fef3c7') : theme.gold, color: rodando ? (theme.isDark ? '#f59e0b' : '#b45309') : '#0b0f1a', border: `1px solid ${rodando ? '#f59e0b' : 'transparent'}`, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
           {rodando ? <Pause size={14} /> : <Play size={14} />}
           {rodando ? 'Pausar' : 'Iniciar'}
         </button>
@@ -57,7 +57,7 @@ export default function Cronometro({ sessionId, onSalvar, theme }) {
         </button>
         {seg >= 60 && (
           <button onClick={salvar}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#0f2b1a', border: '1px solid #10b981', color: '#10b981', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: theme.toastOk, border: `1px solid ${theme.success}`, color: theme.success, borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
             <CheckCircle size={13} /> Salvar tempo
           </button>
         )}

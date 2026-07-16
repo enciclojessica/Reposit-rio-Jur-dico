@@ -171,8 +171,8 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
           const isEliminada  = eliminadas.has(alt)
 
           let bg = theme.cardBg, border = theme.border, textCor = theme.text
-          if (isCorreta)    { bg = '#0f2b1a'; border = '#10b981'; textCor = '#10b981' }
-          else if (isErrada){ bg = '#2a0810'; border = '#ef4444'; textCor = '#ef4444' }
+          if (isCorreta)    { bg = theme.toastOk; border = theme.success; textCor = theme.success }
+          else if (isErrada){ bg = theme.toastErr; border = theme.error; textCor = theme.error }
           else if (isSelecionada && !respondida) { bg = theme.gold+'11'; border = theme.gold+'66'; textCor = theme.gold }
           else if (isEliminada && !respondida)   { bg = theme.raised; border = theme.border; textCor = theme.muted }
 
@@ -183,7 +183,7 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
                 <button
                   onClick={() => toggleEliminar(alt)}
                   title={isEliminada ? 'Restaurar alternativa' : 'Eliminar alternativa'}
-                  style={{ flexShrink:0, marginTop:8, background:'none', border:'none', cursor:'pointer', color: isEliminada ? '#ef4444' : theme.muted, opacity: isEliminada ? 1 : 0.4, padding:'2px', transition:'all .15s' }}>
+                  style={{ flexShrink:0, marginTop:8, background:'none', border:'none', cursor:'pointer', color: isEliminada ? theme.error : theme.muted, opacity: isEliminada ? 1 : 0.4, padding:'2px', transition:'all .15s' }}>
                   <Scissors size={13} />
                 </button>
               )}
@@ -209,10 +209,10 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
 
       {/* Feedback */}
       {respondida && (
-        <div style={{ marginTop:12, padding:'12px 14px', background: acertou ? '#0f2b1a' : '#2a0810', border:`1px solid ${acertou ? '#10b981' : '#ef4444'}`, borderRadius:8 }}>
+        <div style={{ marginTop:12, padding:'12px 14px', background: acertou ? theme.toastOk : theme.toastErr, border:`1px solid ${acertou ? theme.success : theme.error}`, borderRadius:8 }}>
           <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom: questao.justificativa ? 8 : 0 }}>
-            {acertou ? <CheckCircle size={15} color="#10b981" /> : <XCircle size={15} color="#ef4444" />}
-            <span style={{ fontSize:13, fontWeight:700, color: acertou ? '#10b981' : '#ef4444', fontFamily:'Inter, sans-serif' }}>
+            {acertou ? <CheckCircle size={15} color={theme.success} /> : <XCircle size={15} color={theme.error} />}
+            <span style={{ fontSize:13, fontWeight:700, color: acertou ? theme.success : theme.error, fontFamily:'Inter, sans-serif' }}>
               {acertou ? 'Correto!' : `Errado — Gabarito: ${questao.gabarito}`}
             </span>
           </div>

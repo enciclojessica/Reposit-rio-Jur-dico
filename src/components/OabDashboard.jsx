@@ -163,7 +163,7 @@ export default function OabDashboard({ session }) {
         {/* Botão exportar Google Calendar */}
         <button
           onClick={() => { exportarCalendarOuICS(SESSIONS, dados); setExportando(true); setTimeout(() => setExportando(false), 2000) }}
-          style={{ display: 'flex', alignItems: 'center', gap: 7, background: exportando ? '#0f2b1a' : theme.raised, border: `1px solid ${exportando ? '#10b981' : theme.border}`, color: exportando ? '#10b981' : theme.text, borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all .2s' }}>
+          style={{ display: 'flex', alignItems: 'center', gap: 7, background: exportando ? theme.toastOk : theme.raised, border: `1px solid ${exportando ? theme.success : theme.border}`, color: exportando ? theme.success : theme.text, borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all .2s' }}>
           {exportando ? <CheckCircle size={14} /> : <Calendar size={14} />}
           {exportando ? 'Exportado!' : 'Exportar para Google Calendar'}
           </button>

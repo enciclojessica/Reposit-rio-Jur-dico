@@ -127,7 +127,6 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
           setEtapa('erro'); return
         }
 
-        console.log('[ExtrairPeticao] DOCX extraído:', texto.length, 'chars. Início:', texto.slice(0, 100))
         userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
         setProgresso('Texto extraído (' + texto.length + ' chars). Analisando com IA...')
 
@@ -152,7 +151,6 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
           setEtapa('erro'); return
         }
 
-        console.log('[ExtrairPeticao] PDF convertido para base64:', base64Data.length, 'chars')
         userContent = [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } },
           { type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.` },
@@ -161,7 +159,6 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
       }
 
       // ── 4. Chamar Claude via proxy autenticado (chave nunca sai do servidor) ──
-      console.log('[ExtrairPeticao] Chamando /api/busca...')
       let claudeJson
       try {
         const claudeRes = await fetch('/api/busca', {
@@ -181,7 +178,6 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
         setProgresso('Processando resposta da IA...')
         const claudeRaw = await claudeRes.text()
-        console.log('[ExtrairPeticao] Claude HTTP', claudeRes.status, '— resposta:', claudeRaw.length, 'chars. Início:', claudeRaw.slice(0, 200))
 
         if (!claudeRes.ok) {
           let detalhe = claudeRaw.slice(0, 300)
@@ -204,7 +200,6 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
       // ── 5. Extrair JSON do texto retornado ─────────────────────────────
       setProgresso('Interpretando resultado...')
       const rawText = (claudeJson.content || []).filter(b => b.type === 'text').map(b => b.text).join('')
-      console.log('[ExtrairPeticao] Texto bruto do Claude:', rawText.length, 'chars. Início:', rawText.slice(0, 200))
 
       let dados
       try {
@@ -240,7 +235,6 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         setEtapa('erro'); return
       }
 
-      console.log('[ExtrairPeticao] Salvo com sucesso:', saveJson)
       setResultado(saveJson)
       setEtapa('concluido')
 
