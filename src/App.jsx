@@ -512,7 +512,7 @@ case VIEWS.JURISPRUDENCIA:
         )
 
       case VIEWS.FLASHCARDS:
-        return <div className="fade-up"><FlashCards entradas={entradas} /></div>
+        return <div className="fade-up"><FlashCards entradas={entradas} session={session} /></div>
 
 
 

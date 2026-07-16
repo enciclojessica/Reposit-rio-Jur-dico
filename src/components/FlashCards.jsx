@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from '../theme'
 import { AREAS, STATUS_META } from '../shared'
 import { TagPill } from './TagInput'
-import { Trophy, Dumbbell, BookOpen, Shuffle } from 'lucide-react'
+import { supabase } from '../supabase'
+import { calcularProximaRevisao, estaPendente } from '../utils/spacedRepetition'
+import { Trophy, Dumbbell, BookOpen, Shuffle, Clock } from 'lucide-react'
 
 // ── Embaralhar array ───────────────────────────────────────────────────────
 function embaralhar(arr) {
@@ -15,12 +17,13 @@ function embaralhar(arr) {
 }
 
 // ── Construir deck de cartas a partir das entradas ─────────────────────────
-function buildDeck(entradas, filtros) {
+function buildDeck(entradas, filtros, revisaoMap, soPendentes) {
   const cartas = []
   for (const entry of entradas) {
     if (filtros.area !== 'all' && entry.area !== filtros.area) continue
     if (filtros.status !== 'all' && entry.status !== filtros.status) continue
     if (filtros.tipo !== 'all' && entry.tipo !== filtros.tipo) continue
+    if (soPendentes && !estaPendente(revisaoMap?.[entry.id])) continue
 
     for (const tese of (entry.teses || [])) {
       if (!tese.tese_assunto?.trim()) continue
@@ -113,11 +116,13 @@ function Carta({ carta, virada, onVirar }) {
 }
 
 // ── Tela de configuração ───────────────────────────────────────────────────
-function Configurar({ entradas, onIniciar }) {
+function Configurar({ entradas, revisaoMap, onIniciar }) {
   const { theme } = useTheme()
   const [filtros, setFiltros] = useState({ area: 'all', tipo: 'all', status: 'all' })
+  const [soPendentes, setSoPendentes] = useState(false)
 
-  const previewCount = buildDeck(entradas, filtros).length
+  const previewCount = buildDeck(entradas, filtros, revisaoMap, soPendentes).length
+  const pendentesCount = buildDeck(entradas, filtros, revisaoMap, true).length
 
   const sel = (campo, opcoes) => (
     <select value={filtros[campo]} onChange={e => setFiltros(f => ({ ...f, [campo]: e.target.value }))}
@@ -129,7 +134,7 @@ function Configurar({ entradas, onIniciar }) {
   return (
     <div style={{ maxWidth: 520, margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>🃏</div>
+        <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}><BookOpen size={40} color={theme.gold} /></div>
         <div style={{ fontSize: 22, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 6 }}>
           Modo Flashcard
         </div>
@@ -137,6 +142,26 @@ function Configurar({ entradas, onIniciar }) {
           Revise as teses do repositório. As cartas mostram o tema na frente e a tese completa no verso.
         </div>
       </div>
+
+      {pendentesCount > 0 && (
+        <div onClick={() => setSoPendentes(v => !v)} style={{
+          display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+          background: soPendentes ? theme.gold + '15' : theme.raised,
+          border: `1px solid ${soPendentes ? theme.gold + '66' : theme.border}`,
+          borderRadius: 10, padding: '12px 16px', marginBottom: 16,
+        }}>
+          <Clock size={16} color={soPendentes ? theme.gold : theme.muted} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, color: soPendentes ? theme.gold : theme.text, fontWeight: 600 }}>
+              {pendentesCount} carta{pendentesCount !== 1 ? 's' : ''} pendente{pendentesCount !== 1 ? 's' : ''} de revisão
+            </div>
+            <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>
+              {soPendentes ? 'Revisando só as pendentes (repetição espaçada)' : 'Toque para revisar só essas primeiro'}
+            </div>
+          </div>
+          <div style={{ width: 18, height: 18, borderRadius: 5, border: `2px solid ${soPendentes ? theme.gold : theme.border}`, background: soPendentes ? theme.gold : 'transparent' }} />
+        </div>
+      )}
 
       <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 14, padding: 24, marginBottom: 20 }}>
         <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, fontFamily: 'IBM Plex Mono, monospace' }}>
@@ -164,7 +189,7 @@ function Configurar({ entradas, onIniciar }) {
             ? 'Nenhuma tese encontrada com esses filtros.'
             : `${previewCount} tese${previewCount !== 1 ? 's' : ''} no deck`}
         </div>
-        <button onClick={() => previewCount > 0 && onIniciar(filtros)}
+        <button onClick={() => previewCount > 0 && onIniciar(filtros, soPendentes)}
           disabled={previewCount === 0}
           style={{ background: previewCount === 0 ? theme.border : theme.gold, color: previewCount === 0 ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 10, padding: '12px 36px', fontSize: 14, fontWeight: 700, cursor: previewCount === 0 ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>
           Começar sessão →
@@ -225,7 +250,7 @@ function Resumo({ stats, total, onReiniciar, onVoltar }) {
 }
 
 // ── FlashCards principal ───────────────────────────────────────────────────
-export default function FlashCards({ entradas }) {
+export default function FlashCards({ entradas, session }) {
   const { theme } = useTheme()
   const [etapa, setEtapa]   = useState('config')   // config | sessao | resumo
   const [deck, setDeck]     = useState([])
@@ -233,10 +258,25 @@ export default function FlashCards({ entradas }) {
   const [virada, setVirada] = useState(false)
   const [stats, setStats]   = useState({ facil: 0, dificil: 0, errei: 0 })
   const [filtros, setFiltros] = useState(null)
+  const [soPendentes, setSoPendentes] = useState(false)
+  const [revisaoMap, setRevisaoMap] = useState({}) // entrada_id -> { nivel, proxima_revisao }
 
-  function iniciar(f) {
-    const d = buildDeck(entradas, f)
+  // Carregar estado de repetição espaçada do usuário
+  useEffect(() => {
+    if (!session) return
+    supabase.from('flashcards').select('entrada_id, nivel, proxima_revisao').eq('user_id', session.user.id)
+      .then(({ data }) => {
+        if (!data) return
+        const mapa = {}
+        data.forEach(r => { mapa[r.entrada_id] = r })
+        setRevisaoMap(mapa)
+      })
+  }, [session])
+
+  function iniciar(f, pendentes) {
+    const d = buildDeck(entradas, f, revisaoMap, pendentes)
     setFiltros(f)
+    setSoPendentes(pendentes)
     setDeck(d)
     setIdx(0)
     setVirada(false)
@@ -244,8 +284,25 @@ export default function FlashCards({ entradas }) {
     setEtapa('sessao')
   }
 
-  function avaliar(resultado) {
+  async function avaliar(resultado) {
     setStats(s => ({ ...s, [resultado]: s[resultado] + 1 }))
+
+    // Persistir repetição espaçada (se logada) — não bloqueia a navegação
+    const carta = deck[idx]
+    if (session && carta) {
+      const nivelAtual = revisaoMap[carta.entry.id]?.nivel || 0
+      const { nivel, proximaRevisao } = calcularProximaRevisao(nivelAtual, resultado)
+      setRevisaoMap(m => ({ ...m, [carta.entry.id]: { nivel, proxima_revisao: proximaRevisao } }))
+      supabase.from('flashcards').upsert({
+        user_id: session.user.id,
+        entrada_id: carta.entry.id,
+        frente: carta.entry.tema,
+        verso: carta.tese.tese_assunto,
+        nivel,
+        proxima_revisao: proximaRevisao,
+      }, { onConflict: 'user_id,entrada_id' }).then(() => {})
+    }
+
     const proximo = idx + 1
     if (proximo >= deck.length) {
       setEtapa('resumo')
@@ -272,7 +329,7 @@ export default function FlashCards({ entradas }) {
 
   if (etapa === 'config') return (
     <div style={{ paddingBottom: 40 }}>
-      <Configurar entradas={entradas} onIniciar={iniciar} />
+      <Configurar entradas={entradas} revisaoMap={revisaoMap} onIniciar={iniciar} />
     </div>
   )
 
@@ -280,7 +337,7 @@ export default function FlashCards({ entradas }) {
     <div style={{ paddingBottom: 40 }}>
       <Resumo
         stats={stats} total={deck.length}
-        onReiniciar={() => iniciar(filtros)}
+        onReiniciar={() => iniciar(filtros, soPendentes)}
         onVoltar={() => setEtapa('config')}
       />
     </div>
