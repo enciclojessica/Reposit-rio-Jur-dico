@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { NOME_CODIGO, detectarCodigoNoTexto } from '../data/legislacaoNomes'
+import { NOME_CODIGO, detectarCodigoNoTexto, DISCIPLINA_CODIGO } from '../data/legislacaoNomes'
 
 describe('NOME_CODIGO', () => {
   it('tem um nome completo para cada código usado no editor', () => {
@@ -31,5 +31,17 @@ describe('detectarCodigoNoTexto', () => {
 
   it('retorna null quando nenhum diploma é mencionado', () => {
     expect(detectarCodigoNoTexto('o autor sustenta que houve dano moral')).toBe(null)
+  })
+})
+
+describe('DISCIPLINA_CODIGO', () => {
+  it('cada código mapeado existe em NOME_CODIGO', () => {
+    for (const codigo of Object.values(DISCIPLINA_CODIGO)) {
+      expect(NOME_CODIGO, `código "${codigo}" sem nome completo`).toHaveProperty(codigo)
+    }
+  })
+
+  it('não inventa mapeamento para disciplinas sem legislação própria cadastrada (ex: Ética Profissional)', () => {
+    expect(DISCIPLINA_CODIGO['Ética Profissional']).toBeUndefined()
   })
 })

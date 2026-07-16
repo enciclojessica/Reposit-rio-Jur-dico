@@ -3,6 +3,7 @@ import { supabase } from '../supabase'
 import { DISC_COR } from '../data/disciplinas'
 import { fmtData } from '../data/oabQuestoesConstants'
 import { ChevronLeft, RefreshCw, TrendingUp, History } from 'lucide-react'
+import OabPontosFracos from './OabPontosFracos'
 
 // ── Painel de Estatísticas Persistentes ─────────────────────────
 export default function PainelStats({ session, theme, onVoltar }) {
@@ -92,6 +93,7 @@ export default function PainelStats({ session, theme, onVoltar }) {
       {/* Por disciplina — com gráfico de barras */}
       {stats.length > 0 && (
         <>
+          <OabPontosFracos stats={stats} theme={theme} />
           <div style={{ fontSize:11, color:theme.muted, textTransform:'uppercase', letterSpacing:1, fontFamily:'IBM Plex Mono, monospace', marginBottom:10 }}>
             <TrendingUp size={11} style={{ marginRight:5, verticalAlign:'middle' }} />Por disciplina
           </div>

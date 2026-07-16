@@ -32,3 +32,15 @@ export function detectarCodigoNoTexto(janela) {
   }
   return null
 }
+
+// Mapeamento direto disciplina OAB -> código de legislação, só onde existe
+// correspondência 1:1 real (ex: "Ética Profissional" não mapeia pra nenhum
+// código aqui — é regida pelo Estatuto da OAB, que ainda não está no banco;
+// evita sugerir uma "Lei Seca" que não existe de verdade).
+export const DISCIPLINA_CODIGO = {
+  'Direito Civil':             'cc',
+  'Direito Constitucional':    'cf',
+  'Direito Processual Civil':  'cpc',
+  'Direito Processual Penal':  'cpp',
+  'Direito do Consumidor':     'cdc',
+}
