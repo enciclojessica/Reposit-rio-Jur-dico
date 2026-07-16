@@ -30,6 +30,8 @@ import { AREAS, ROLE_COR, ROLE_LABEL } from './shared'
 import { TagPill } from './components/TagInput'
 import { VIEWS } from './data/views'
 import Sidebar from './components/Sidebar'
+import MobileHeader from './components/MobileHeader'
+import MobileNav from './components/MobileNav'
 
 class ErrorBoundary extends Component {
   constructor(p) { super(p); this.state = { error: null } }
@@ -486,129 +488,7 @@ async function handleSave(entry) {
 
   // ── Sidebar ────────────────────────────────────────────────────────────
 
-  // ── Mobile header ──────────────────────────────────────────────────────
-  const MobileHeader = () => (
-    <div style={{ background: theme.surface, borderBottom: `1px solid ${theme.borderGold}`, padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: '50%',
-          background: '#800020', border: '2px solid #C5A059',
-          overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <img src="/logo-temis.png" alt="Lexia"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
-            onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
-            onError={e => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:14px">FF</span>' }}
-          />
-        </div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Lex.IA</div>
-          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>Inteligência Jurídica</div>
-        </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {role && <span style={{ fontSize: 9, color: ROLE_COR[role], textTransform: 'uppercase', letterSpacing: 1 }}>{ROLE_LABEL[role]}</span>}
-        <SeletorTema compact />
-        {session
-          ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}>Sair</button>
-          : <button onClick={() => setShowLogin(true)} style={{ background: theme.gold, border: 'none', borderRadius: 6, padding: '5px 14px', color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5 }}><Lock size={11} /> Acesso Interno</button>
-        }
-      </div>
-    </div>
-  )
-
-  // ── Mobile bottom nav ──────────────────────────────────────────────────
-  // Itens fixos no mobile nav
-  const navFixos = [
-    { v: VIEWS.HOME,   label: 'Início',  icon: 'home' },
-    { v: VIEWS.BUSCA,  label: 'Busca IA', icon: '*' },
-    { v: VIEWS.EDITOR, label: 'Editor',   icon: 'edit' },
-    ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova' }] : []),
-  ]
-  // Itens no menu "mais"
-  const navMais = [
-    { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
-    { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
-    { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },
-    { v: VIEWS.ALERTAS,     label: 'Alertas' },
-    { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
-    ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
-    ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
-    ...(session  ? [{ v: VIEWS.OAB,     label: 'Estudos OAB'   }] : []),
-    ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
-    ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
-  ]
-  const maisAtivo = navMais.some(n => n.v === view)
-
-  const MobileNav = () => (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }}>
-      {/* Drawer do menu "mais" */}
-      {maisAberto && (
-        <div
-          onClick={() => setMaisAberto(false)}
-          style={{ position: 'fixed', inset: 0, background: '#00000055', zIndex: 49 }}
-        />
-      )}
-      {maisAberto && (
-        <div style={{
-          position: 'absolute', bottom: '100%', left: 0, right: 0,
-          background: theme.surface, borderTop: `1px solid ${theme.borderGold}`,
-          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-          padding: '12px 8px', gap: 4, zIndex: 51,
-          boxShadow: '0 -8px 32px #00000033',
-        }}>
-          {navMais.map(item => (
-            <button key={item.v}
-              onClick={() => { if (item.action) { item.action(); setMaisAberto(false) } else { setView(item.v); setMaisAberto(false) } }}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: '10px 4px', background: view === item.v ? theme.gold + '22' : 'none',
-                border: `1px solid ${view === item.v ? theme.gold + '44' : 'transparent'}`,
-                borderRadius: 8,
-                color: view === item.v ? theme.gold : theme.muted,
-                cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
-              }}>
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Barra principal */}
-      <div style={{
-        background: theme.surface, borderTop: `1px solid ${theme.borderGold}`,
-        display: 'flex', paddingBottom: 'env(safe-area-inset-bottom)',
-      }}>
-        {navFixos.map(item => (
-          <button key={item.v}
-            onClick={() => { setView(item.v); setMaisAberto(false) }}
-            style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-              padding: '10px 4px', background: 'none', border: 'none',
-              color: view === item.v ? theme.gold : theme.muted,
-              cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
-              borderTop: view === item.v ? `2px solid ${theme.gold}` : '2px solid transparent',
-            }}>
-            <span style={{ fontSize: item.icon === '+' ? 20 : 16, lineHeight: 1, marginBottom: 2 }}>{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
-        {/* Botão "mais" */}
-        <button
-          onClick={() => setMaisAberto(m => !m)}
-          style={{
-            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-            padding: '10px 4px', background: 'none', border: 'none',
-            color: maisAtivo ? theme.gold : theme.muted,
-            cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
-            borderTop: maisAtivo ? `2px solid ${theme.gold}` : '2px solid transparent',
-          }}>
-          <span style={{ fontSize: 16, lineHeight: 1, marginBottom: 2 }}>⋯</span>
-          Mais
-        </button>
-      </div>
-    </div>
-  )
+  // MobileHeader e MobileNav extraídos para src/components/
 
   // ── Conteúdo ───────────────────────────────────────────────────────────
   function renderContent() {
@@ -943,11 +823,23 @@ case VIEWS.JURISPRUDENCIA:
             )}
           </div>
         )}
-        {isMobile && <MobileHeader/>}
+        {isMobile && (
+          <MobileHeader
+            theme={theme} role={role} session={session} setShowLogin={setShowLogin}
+            setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter} setView={setView}
+          />
+        )}
         <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '16px 16px 80px' : 28 }}>
           {renderContent()}
         </div>
-        {isMobile && <MobileNav/>}
+        {isMobile && (
+          <MobileNav
+            theme={theme} view={view} setView={setView}
+            maisAberto={maisAberto} setMaisAberto={setMaisAberto}
+            isEditor={isEditor} isAdmin={isAdmin} session={session}
+            entradas={entradas} isOwner={isOwner} exportarTesesPlanilha={exportarTesesPlanilha}
+          />
+        )}
       </div>
 
       <InstalarApp />
