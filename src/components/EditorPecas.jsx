@@ -4,10 +4,11 @@ import { AREAS } from '../shared'
 import { exportarDocx } from '../utils/exportarDocx'
 import { supabase } from '../supabase'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
+import { NOME_CODIGO, detectarCodigoNoTexto } from '../data/legislacaoNomes'
 import ModalModelos from './ModalModelos'
 import {
   Copy, Check, Download, FileText, X, Sparkles,
-  RotateCcw, BookOpen, ChevronDown, Save, LayoutTemplate
+  RotateCcw, BookOpen, ChevronDown, Save, LayoutTemplate, ScrollText
 } from 'lucide-react'
 
 // ── Citações ─────────────────────────────────────────────────────────────────
@@ -274,6 +275,11 @@ export default function EditorPecas({ entradas }) {
   const [slashOpts, setSlashOpts]           = useState([])
   const [slashLoading, setSlashLoading]     = useState(false)
 
+  // ── Autocompletar de artigo (digitação natural, ex: "art. 927 do CC") ──
+  const [artigoSugestao, setArtigoSugestao] = useState(null) // { codigo, numero, artigos, textoAberto }
+  const artigoTimeoutRef = useRef(null)
+  useEffect(() => () => clearTimeout(artigoTimeoutRef.current), [])
+
   // ── Auto-save ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!conteudo.trim() && !titulo.trim()) return
@@ -302,7 +308,7 @@ export default function EditorPecas({ entradas }) {
     const match = texto.slice(0, posicaoCursor).match(/\/([a-z0-9]+)(?:\s+(\S+))?$/)
     if (!match) { setSlashCmd(''); setSlashOpts([]); return }
     const [, cmd, arg] = match
-    const CODIGOS = ['cpc', 'cdc', 'cc', 'cpp', 'cf', 'lei9099', 'leg']
+    const CODIGOS = ['cpc', 'cdc', 'cc', 'cpp', 'cf', 'ctb', 'lei9099', 'leg']
     if (!CODIGOS.includes(cmd)) { setSlashCmd(''); setSlashOpts([]); return }
     setSlashCmd(cmd)
     if (!arg || arg.length < 1) return
@@ -331,6 +337,53 @@ export default function EditorPecas({ entradas }) {
       return prev.slice(0, pos - match[0].length) + texto + '\n\n' + prev.slice(pos)
     })
     setSlashCmd(''); setSlashOpts([])
+  }
+
+  // ── Autocompletar de artigo mencionado em texto corrido ────────────────
+  // Ex: ao digitar "...conforme o art. 927 do Código Civil", sugere
+  // completar a citação e mostrar o texto do artigo — sem exigir slash
+  // command. Só dispara quando um número de artigo E um diploma conhecido
+  // aparecem próximos um do outro.
+  function handleArtigoNatural(texto, posicaoCursor) {
+    const janela = texto.slice(Math.max(0, posicaoCursor - 90), posicaoCursor)
+    const m = janela.match(/\bart(?:igo)?s?\.?\s*(\d{1,4})\s*º?\s*$/i)
+    if (!m) { setArtigoSugestao(null); return }
+    const numero = m[1]
+    const codigo = detectarCodigoNoTexto(janela)
+    if (!codigo) { setArtigoSugestao(null); return }
+
+    setArtigoSugestao(prev =>
+      prev && prev.codigo === codigo && prev.numero === numero ? prev : { codigo, numero, artigos: null, textoAberto: false }
+    )
+    clearTimeout(artigoTimeoutRef.current)
+    artigoTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res  = await fetch(`/api/legislacao?codigo=${codigo}&numero=${numero}`)
+        const json = await res.json()
+        setArtigoSugestao(prev => (prev && prev.codigo === codigo && prev.numero === numero)
+          ? { ...prev, artigos: json.artigos || [] } : prev)
+      } catch {
+        setArtigoSugestao(prev => (prev && prev.codigo === codigo && prev.numero === numero)
+          ? { ...prev, artigos: [] } : prev)
+      }
+    }, 300)
+  }
+
+  // Completa "art. 927" -> "art. 927 do Código Civil (Lei 10.406/2002)"
+  function completarCitacaoArtigo() {
+    if (!artigoSugestao) return
+    const el = editorRef.current
+    const nomeCompleto = NOME_CODIGO[artigoSugestao.codigo] || ''
+    setConteudo(prev => {
+      const pos = el ? el.selectionStart : prev.length
+      // só completa se o cursor ainda está logo após o número do artigo
+      const antes = prev.slice(0, pos)
+      if (!/\bart(?:igo)?s?\.?\s*\d{1,4}\s*º?\s*$/i.test(antes)) return prev
+      const jaTemDo = /\bdo\s*$|\bda\s*$/i.test(antes)
+      const emenda = (jaTemDo ? '' : ' do ') + nomeCompleto
+      return prev.slice(0, pos) + emenda + prev.slice(pos)
+    })
+    setArtigoSugestao(null)
   }
 
   // ── Ações do editor ───────────────────────────────────────────────────
@@ -476,9 +529,58 @@ export default function EditorPecas({ entradas }) {
             </div>
           )}
 
+          {/* Sugestão de autocompletar artigo (digitação natural) */}
+          {!slashCmd && artigoSugestao && (
+            <div style={{
+              position: 'absolute', bottom: 44, right: painelAberto ? 316 : 16,
+              maxWidth: 300, background: theme.surface, border: `1px solid ${theme.gold}66`,
+              borderRadius: 10, boxShadow: theme.shadow, zIndex: 50, padding: 12,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>
+                  <ScrollText size={13} /> Art. {artigoSugestao.numero}
+                </div>
+                <button onClick={() => setArtigoSugestao(null)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer' }} aria-label="Dispensar sugestão">
+                  <X size={13} />
+                </button>
+              </div>
+
+              {artigoSugestao.artigos === null ? (
+                <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>Verificando no Repositório...</div>
+              ) : artigoSugestao.artigos.length === 0 ? (
+                <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
+                  Artigo não encontrado no banco de legislação ainda.
+                </div>
+              ) : (
+                <>
+                  <div style={{ fontSize: 11, color: theme.muted, marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>
+                    {NOME_CODIGO[artigoSugestao.codigo]}
+                  </div>
+                  <button onClick={completarCitacaoArtigo}
+                    style={{ width: '100%', background: theme.gold, border: 'none', color: theme.isDark ? '#0f0a0b' : '#fff', borderRadius: 6, padding: '7px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
+                    Completar citação
+                  </button>
+                  <button onClick={() => setArtigoSugestao(s => ({ ...s, textoAberto: !s.textoAberto }))}
+                    style={{ width: '100%', background: 'none', border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 6, padding: '6px 10px', fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                    {artigoSugestao.textoAberto ? 'Ocultar texto' : 'Ver texto do artigo'}
+                  </button>
+                  {artigoSugestao.textoAberto && (
+                    <div style={{ marginTop: 8, fontSize: 11, color: theme.text, lineHeight: 1.6, fontFamily: 'Georgia, serif', maxHeight: 140, overflowY: 'auto' }}>
+                      {artigoSugestao.artigos.map((a, i) => (
+                        <p key={i} style={{ marginBottom: 8 }}>
+                          {a.inciso ? `${a.inciso}: ` : ''}{a.texto}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
           <textarea ref={editorRef} value={conteudo} onChange={e => setConteudo(e.target.value)}
-            onKeyUp={e => handleSlashInput(e.target.value, e.target.selectionStart)}
-            placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "Sugerir para este trecho" para receber teses do repositório.\n• Use /cpc 300, /cdc 14, /lei9099 3 para inserir artigos direto do banco.\n• Use ## para seções e **negrito** — o .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
+            onKeyUp={e => { handleSlashInput(e.target.value, e.target.selectionStart); handleArtigoNatural(e.target.value, e.target.selectionStart) }}
+            placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "Sugerir para este trecho" para receber teses do repositório.\n• Use /cpc 300, /cdc 14, /lei9099 3 para inserir artigos direto do banco.\n• Ao escrever "art. 927 do Código Civil", uma sugestão de autocompletar aparece automaticamente.\n• Use ## para seções e **negrito** — o .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
             style={{ flex: 1, border: 'none', background: theme.cardBg, padding: '20px', color: theme.text, fontSize: 14, lineHeight: 1.9, resize: 'none', outline: 'none', fontFamily: 'Georgia, serif', boxSizing: 'border-box', width: '100%' }}
             spellCheck />
 
