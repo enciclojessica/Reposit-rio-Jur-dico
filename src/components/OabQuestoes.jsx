@@ -11,7 +11,7 @@ import ConfigurarSessao from './OabConfigurarSessao'
 import QuestaoCard from './OabQuestaoCard'
 import Resultado from './OabResultado'
 
-export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, topicoSessao, modoInicial, onSair }) {
+export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, topicoSessao, modoInicial, simuladoAuto, onSair }) {
   const { theme } = useTheme()
   const [tela, setTela]       = useState(() => { try { return localStorage.getItem('oab_tela') || 'config' } catch { return 'config' } })
   const [questoes, setQuestoes] = useState(() => { try { return JSON.parse(localStorage.getItem('oab_questoes') || '[]') } catch { return [] } })
@@ -75,6 +75,23 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
     }
   }, [disciplinaInicial])
 
+  // Simulado disparado direto do card do cronograma — pula a tela de
+  // configuração e já busca com a quantidade/disciplinas do tópico.
+  useEffect(() => {
+    if (simuladoAuto) {
+      iniciarSessao({
+        modo: 'simulado',
+        disciplina: 'Todas',
+        disciplinas: simuladoAuto.disciplinas,
+        qtdSimulado: simuladoAuto.quantidade,
+        exame: 'Todos',
+        topico: 'Todos',
+        busca: '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [simuladoAuto])
+
   useEffect(() => { if (session) { carregarStats(); carregarFavoritas() } }, [session])
 
   useEffect(() => {
@@ -134,9 +151,10 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
     setCarregando(true)
     setErro(null)
 
-    // Simulado geral = 80 questões; simulado temático (com disciplina) = todas da disciplina
+    // Simulado geral = 80 questões (ou qtdSimulado, se vier do cronograma);
+    // simulado temático (com disciplina) = todas da disciplina
     const qtd = cfg.modo === 'simulado'
-      ? (cfg.disciplina ? 9999 : 80)
+      ? (cfg.qtdSimulado || (cfg.disciplina && cfg.disciplina !== 'Todas' ? 9999 : 80))
       : (cfg.qtdCustom || 10)
     let selecionadas = []
 
@@ -213,7 +231,8 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
       // ── Modo normal ──
       } else {
         let q = supabase.from('oab_questoes').select('*')
-        if (cfg.disciplina !== 'Todas') q = q.eq('disciplina', cfg.disciplina)
+        if (cfg.disciplinas?.length)        q = q.in('disciplina', cfg.disciplinas)
+        else if (cfg.disciplina !== 'Todas') q = q.eq('disciplina', cfg.disciplina)
         if (cfg.exame !== 'Todos')      q = q.eq('exame', cfg.exame)
         if (cfg.topico && cfg.topico !== 'Todos') q = q.eq('topico', cfg.topico)
         const { data } = await q.order('id', { ascending: false }).limit(qtd * 3)

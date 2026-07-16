@@ -9,6 +9,7 @@ import { SESSIONS_PADRAO } from '../data/oabCronograma'
 import { DISC_COR } from '../data/disciplinas'
 import { DISCIPLINAS, MESES, fmt, getMes, diasAte, fmtTempo } from '../data/oabDashboardHelpers'
 import { exportarCalendarOuICS } from '../utils/exportarCalendarOuICS'
+import { parseSimuladoTopico } from '../utils/parseSimuladoTopico'
 import {
   CheckCircle, Target, Calendar,
   Filter, BarChart2, RefreshCw, BookOpen, LibraryBig, RotateCcw,
@@ -31,6 +32,7 @@ export default function OabDashboard({ session }) {
   const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
   const [topicoFiltro, setTopicoFiltro]         = useState(null)
   const [modoSimulado, setModoSimulado]         = useState(false)
+  const [simuladoAuto, setSimuladoAuto]         = useState(null) // { quantidade, disciplinas } do tópico do cronograma
   const [fFase, setFFase]     = useState('Todas')
   const [fDisc, setFDisc]     = useState('Todas')
   const [fStatus, setFStatus] = useState('Todos')
@@ -289,19 +291,23 @@ export default function OabDashboard({ session }) {
           {filtradas.map(s => (
             <SessaoCard key={s.id} s={s} dados={dados} onAtualizar={atualizar} onPraticar={(disc, top) => {
                   if (disc === '__simulado__') {
-                    // Simulado geral — 80 questões todas as disciplinas
+                    // Simulado do cronograma — quantidade e disciplinas vêm do
+                    // texto do próprio tópico (ex: "30 questões — Ética + Civil")
                     setDisciplinaFiltro(null)
                     setTopicoFiltro(null)
                     setModoSimulado(true)
+                    setSimuladoAuto(parseSimuladoTopico(top))
                   } else if (disc.startsWith('__simulado_disc__')) {
                     // Simulado temático — todas as questões da disciplina
                     setDisciplinaFiltro(disc.replace('__simulado_disc__', ''))
                     setTopicoFiltro(null)
                     setModoSimulado(true)
+                    setSimuladoAuto(null)
                   } else {
                     setDisciplinaFiltro(disc)
                     setTopicoFiltro(top||null)
                     setModoSimulado(false)
+                    setSimuladoAuto(null)
                   }
                   setAbaP('questoes')
                 }} theme={theme} />
@@ -311,7 +317,7 @@ export default function OabDashboard({ session }) {
 
       {/* ABA: Questões */}
       {aba === 'questoes' && (
-        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} modoInicial={modoSimulado ? 'simulado' : null} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setModoSimulado(false); setAbaP('cronograma') }} />
+        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} modoInicial={modoSimulado ? 'simulado' : null} simuladoAuto={simuladoAuto} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setModoSimulado(false); setSimuladoAuto(null); setAbaP('cronograma') }} />
       )}
 
       {/* ABA: Estatísticas */}

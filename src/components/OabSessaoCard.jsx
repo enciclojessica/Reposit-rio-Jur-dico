@@ -3,6 +3,7 @@ import { CheckCircle, Clock, Circle, Timer, ChevronDown, ChevronUp, BookOpen } f
 import { DISC_COR } from '../data/disciplinas'
 import { METODO_COR, fmt, diasAte, fmtTempo } from '../data/oabDashboardHelpers'
 import { parseLeiSeca } from '../utils/parseLeiSeca'
+import { parseSimuladoTopico } from '../utils/parseSimuladoTopico'
 import Cronometro from './OabCronometro'
 import OabLeiSecaCard from './OabLeiSecaCard'
 
@@ -149,13 +150,19 @@ export default function SessaoCard({ s, dados, onAtualizar, onPraticar, theme })
 
           {/* Botão Praticar / Iniciar Simulado */}
           {onPraticar && (
-            s.disciplina === 'Simulado Geral' ? (
-              <button
-                onClick={() => onPraticar('__simulado__', s.topico)}
-                style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: '#0891b215', border: '1px solid #0891b244', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: '#0891b2', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                <BookOpen size={13} /> Iniciar Simulado Geral — 80 questões cronometradas
-              </button>
-            ) : (
+            s.disciplina === 'Simulado Geral' ? (() => {
+              const { quantidade, disciplinas } = parseSimuladoTopico(s.topico)
+              const rotuloDisciplinas = disciplinas.length
+                ? disciplinas.map(d => d.replace('Direito ', '')).join(', ')
+                : 'todas as disciplinas'
+              return (
+                <button
+                  onClick={() => onPraticar('__simulado__', s.topico)}
+                  style={{ marginTop: 10, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: '#0891b215', border: '1px solid #0891b244', borderRadius: 8, padding: '9px', fontSize: 12, fontWeight: 600, color: '#0891b2', cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  <BookOpen size={13} /> Iniciar Simulado — {quantidade} questões ({rotuloDisciplinas})
+                </button>
+              )
+            })() : (
               <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
                 <button
                   onClick={() => onPraticar(s.disciplina, s.topico)}
