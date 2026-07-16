@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { CheckCircle, Clock, Circle, Timer, ChevronDown, ChevronUp, BookOpen } from 'lucide-react'
 import { DISC_COR } from '../data/disciplinas'
 import { METODO_COR, fmt, diasAte, fmtTempo } from '../data/oabDashboardHelpers'
+import { parseLeiSeca } from '../utils/parseLeiSeca'
 import Cronometro from './OabCronometro'
+import OabLeiSecaCard from './OabLeiSecaCard'
 
 // ── Card de sessão ─────────────────────────────────────────────────────────────
 export default function SessaoCard({ s, dados, onAtualizar, onPraticar, theme }) {
   const [aberto, setAberto] = useState(false)
   const d = dados[s.id] || {}
+  const temLeiSeca = (s.metodos || []).includes('Lei Seca')
+  const rangesLeiSeca = useMemo(() => temLeiSeca ? parseLeiSeca(s.topico) : [], [temLeiSeca, s.topico])
   const status = d.status || 'A Fazer'
   const cor    = DISC_COR[s.disciplina] || '#6b7280'
   const dias   = diasAte(s.date)
@@ -138,6 +142,10 @@ export default function SessaoCard({ s, dados, onAtualizar, onPraticar, theme })
 
           {/* Cronômetro */}
           <Cronometro sessionId={s.id} onSalvar={salvarTempo} theme={theme} />
+
+          {rangesLeiSeca.length > 0 && (
+            <OabLeiSecaCard ranges={rangesLeiSeca} theme={theme} />
+          )}
 
           {/* Botão Praticar / Iniciar Simulado */}
           {onPraticar && (
