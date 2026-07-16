@@ -1,4 +1,5 @@
 import { VIEWS } from '../data/views'
+import { Home, Sparkles, PenLine, Plus, MoreHorizontal } from 'lucide-react'
 
 export default function MobileNav({
   theme, view, setView, maisAberto, setMaisAberto,
@@ -6,10 +7,10 @@ export default function MobileNav({
 }) {
   // Itens fixos no mobile nav
   const navFixos = [
-    { v: VIEWS.HOME,   label: 'Início',  icon: 'home' },
-    { v: VIEWS.BUSCA,  label: 'Busca IA', icon: '*' },
-    { v: VIEWS.EDITOR, label: 'Editor',   icon: 'edit' },
-    ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova' }] : []),
+    { v: VIEWS.HOME,   label: 'Início',   Icone: Home },
+    { v: VIEWS.BUSCA,  label: 'Busca IA', Icone: Sparkles },
+    { v: VIEWS.EDITOR, label: 'Editor',   Icone: PenLine },
+    ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova', Icone: Plus }] : []),
   ]
   // Itens no menu "mais"
   const navMais = [
@@ -75,7 +76,7 @@ export default function MobileNav({
               cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
               borderTop: view === item.v ? `2px solid ${theme.gold}` : '2px solid transparent',
             }}>
-            <span style={{ fontSize: item.icon === '+' ? 20 : 16, lineHeight: 1, marginBottom: 2 }}>{item.icon}</span>
+            <item.Icone size={18} style={{ marginBottom: 2 }} />
             {item.label}
           </button>
         ))}
@@ -89,7 +90,7 @@ export default function MobileNav({
             cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
             borderTop: maisAtivo ? `2px solid ${theme.gold}` : '2px solid transparent',
           }}>
-          <span style={{ fontSize: 16, lineHeight: 1, marginBottom: 2 }}>⋯</span>
+          <MoreHorizontal size={18} style={{ marginBottom: 2 }} />
           Mais
         </button>
       </div>
