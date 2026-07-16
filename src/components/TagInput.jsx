@@ -1,19 +1,21 @@
 import { useState, useRef } from 'react'
 import { useTheme } from '../theme'
 
-// Paleta de cores cíclica para tags
-const TAG_CORES = [
-  '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
-  '#a855f7', '#06b6d4', '#f97316', '#ec4899',
-]
-function corParaTag(tag) {
+// Paleta cíclica para tags — versões mais escuras no tema claro (senão
+// cores como ciano/amarelo ficam claras demais sobre fundo branco).
+const TAG_CORES_ESCURO = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#a855f7', '#06b6d4', '#f97316', '#ec4899']
+const TAG_CORES_CLARO  = ['#1d4ed8', '#047857', '#b45309', '#b91c1c', '#7e22ce', '#0e7490', '#c2410c', '#be185d']
+
+function corParaTag(tag, isDark) {
   let hash = 0
   for (const c of tag) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff
-  return TAG_CORES[Math.abs(hash) % TAG_CORES.length]
+  const paleta = isDark ? TAG_CORES_ESCURO : TAG_CORES_CLARO
+  return paleta[Math.abs(hash) % paleta.length]
 }
 
 export function TagPill({ tag, onRemove, pequena }) {
-  const cor = corParaTag(tag)
+  const { isDark } = useTheme()
+  const cor = corParaTag(tag, isDark)
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
