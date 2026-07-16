@@ -37,6 +37,10 @@ export default function Alertas({ session, membro }) {
 
   async function dispararRadarAgora() {
     setDisparando(true)
+    const timeoutId = setTimeout(() => {
+      setDisparando(false)
+      notify('A verificação pode ter concluído do lado do servidor mesmo sem resposta aqui — confira seu e-mail ou recarregue a página.', 'err')
+    }, 25000)
     try {
       const { data: { session: s } } = await supabase.auth.getSession()
       const res = await fetch('/api/verificar-alertas', {
@@ -45,8 +49,10 @@ export default function Alertas({ session, membro }) {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Falha ao disparar o radar.')
+      clearTimeout(timeoutId)
       notify(`Radar verificado — ${json.enviados} e-mail(s) enviado(s).`)
     } catch (e) {
+      clearTimeout(timeoutId)
       notify(e.message, 'err')
     }
     setDisparando(false)
