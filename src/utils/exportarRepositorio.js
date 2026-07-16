@@ -162,7 +162,7 @@ export async function exportarRepositorioDocx(entradas) {
   // ── Rodapé ───────────────────────────────────────────────────────────
   const rodape = new Footer({
     children: [paragrafo([
-      txt(`Síntese Jurídica · Farias Fusquiani · ${data}`, { size: 16, color: 'aaaaaa' }),
+      txt(`Lex.IA · Farias Fusquiani · ${data}`, { size: 16, color: 'aaaaaa' }),
     ], { alignment: AlignmentType.CENTER })],
   })
 
