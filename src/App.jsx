@@ -552,7 +552,7 @@ case VIEWS.JURISPRUDENCIA:
 
       case VIEWS.ALERTAS:
         return (
-          <div className="fade-up"><Alertas session={session} /></div>
+          <div className="fade-up"><Alertas session={session} membro={membro} /></div>
         )
 
       case VIEWS.ADD:
