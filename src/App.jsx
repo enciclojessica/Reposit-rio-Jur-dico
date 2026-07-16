@@ -287,9 +287,15 @@ export default function App() {
       return nova
     })
     try {
+      const { data: { session: sessaoAtual } } = await supabase.auth.getSession()
+      if (!sessaoAtual) throw new Error('Sessão expirada. Faça login novamente.')
+
       const res = await fetch('/api/busca-semantica', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + sessaoAtual.access_token,
+        },
         body: JSON.stringify({ query: search, entradas }),
       })
       const json = await res.json()

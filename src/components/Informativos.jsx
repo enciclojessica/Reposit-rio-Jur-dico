@@ -3,6 +3,7 @@ import { useTheme } from '../theme'
 import { AREAS } from '../shared'
 import { TagPill } from './TagInput'
 import { Lock } from 'lucide-react'
+import { supabase } from '../supabase'
 
 const TRIBUNAIS = [
   { id: 'STF', label: 'STF', sub: 'Supremo Tribunal Federal' },
@@ -96,13 +97,17 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
     setAutoImportando(true)
     setAutoResultado(null)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente.')
       const res = await fetch('/api/auto-importar-informativos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+        },
         body: JSON.stringify({
           tribunal,
           entradas: todasEntradas || [],
-          user_id: userId,
           modo: 'manual',
         }),
       })
@@ -125,9 +130,13 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
     setErro('')
     setImportadas(new Set())
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente.')
       const params = new URLSearchParams({ tribunal })
       if (edicao.trim()) params.set('edicao', edicao.trim())
-      const res  = await fetch(`/api/informativos?${params}`)
+      const res  = await fetch(`/api/informativos?${params}`, {
+        headers: { 'Authorization': 'Bearer ' + session.access_token },
+      })
       const json = await res.json()
       if (json.error) throw new Error(json.error)
       setDados(json)

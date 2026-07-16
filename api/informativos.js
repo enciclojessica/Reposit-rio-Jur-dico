@@ -1,13 +1,26 @@
 // api/informativos.js — Lex.IA
 // Busca informativos jurisprudenciais do STF e STJ
 // Query params: tribunal (STF|STJ), edicao (opcional)
+import { createClient } from '@supabase/supabase-js'
 import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Método não permitido' })
 
   const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
   if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
+
+  // ── Autenticar via JWT do Supabase enviado no header ──────────────────
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) return res.status(401).json({ error: 'Não autenticado.' })
+
+  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
+  const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
+  if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+
+  const { permitido } = await checarRateLimit(supabase, user.id, 'informativos', { limite: 15, janelaMs: 60_000 })
+  if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
   const tribunal = (req.query.tribunal || 'STF').toUpperCase()
   const edicao   = req.query.edicao?.trim() || ''

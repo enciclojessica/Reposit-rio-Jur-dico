@@ -1,6 +1,7 @@
 // Proxy Anthropic — usado por Busca para Peça, Editor, Busca Semântica e Extração de Documentos
 // A chave da Anthropic NUNCA sai do servidor. O cliente autentica com o JWT do Supabase.
 import { createClient } from '@supabase/supabase-js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -15,6 +16,9 @@ export default async function handler(req, res) {
   )
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+
+  const { permitido } = await checarRateLimit(supabase, user.id, 'busca', { limite: 30, janelaMs: 5 * 60_000 })
+  if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde alguns minutos e tente novamente.' })
 
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })

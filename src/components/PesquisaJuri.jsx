@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTheme } from '../theme'
 import { AREAS, Badge } from '../shared'
+import { supabase } from '../supabase'
 
 const TRIBUNAIS = [
   { id: 'todos',  label: 'Todos' },
@@ -46,9 +47,14 @@ export default function PesquisaJuri({ onImportar }) {
     }, 3000)
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Sessão expirada. Faça login novamente.')
       const res = await fetch('/api/pesquisa-juri', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+        },
         body: JSON.stringify({ query, tribunal }),
       })
       const json = await res.json()

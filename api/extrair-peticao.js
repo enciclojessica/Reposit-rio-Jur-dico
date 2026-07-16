@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 // Plano Hobby: max 10s. Para docx enviamos texto puro (rápido).
 // Para PDF enviamos base64 — documentos simples ficam abaixo de 10s.
@@ -19,6 +20,9 @@ export default async function handler(req, res) {
   const supabaseAuth = createClient(supabaseUrl, serviceKey)
   const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+
+  const { permitido } = await checarRateLimit(supabaseAuth, user.id, 'extrair-peticao', { limite: 10, janelaMs: 5 * 60_000 })
+  if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde alguns minutos e tente novamente.' })
 
   const { pdf_base64, texto, filename } = req.body
   if (!pdf_base64 && !texto) return res.status(400).json({ error: 'Arquivo ou texto obrigatório.' })

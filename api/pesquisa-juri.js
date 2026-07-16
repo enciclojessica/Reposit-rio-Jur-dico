@@ -1,13 +1,29 @@
 // api/pesquisa-juri.js — Lex.IA
 // Pesquisa jurisprudencial via Claude + web_search
 // Retorna array de resultados com: tribunal, tipo, numero, relator, data, ementa, area, url
+import { createClient } from '@supabase/supabase-js'
 import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
 
   const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
   if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
+
+  // ── Autenticar: CRON_SECRET (radar automático) OU JWT de usuário ──────
+  const authHeader = req.headers.authorization?.replace('Bearer ', '')
+  const isCron = process.env.CRON_SECRET && authHeader === process.env.CRON_SECRET
+
+  if (!isCron) {
+    if (!authHeader) return res.status(401).json({ error: 'Não autenticado.' })
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader)
+    if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+
+    const { permitido } = await checarRateLimit(supabase, user.id, 'pesquisa-juri', { limite: 15, janelaMs: 60_000 })
+    if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
+  }
 
   const { query, tribunal } = req.body || {}
   if (!query?.trim()) return res.status(400).json({ error: 'query obrigatória' })
