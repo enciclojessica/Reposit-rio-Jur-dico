@@ -35,4 +35,25 @@ describe('tagsVisiveis', () => {
     expect(tagsVisiveis({ tipo: 'lei', tema: 'x', tags: [] })).toEqual([])
     expect(tagsVisiveis({ tipo: 'lei', tema: 'x' })).toEqual([])
   })
+
+  it('esconde siglas de código/diploma (cpc, cpp, cf, cp, cc, cdc, ctb, lei9099)', () => {
+    const entry = { tipo: 'doutrina', tema: 'Crime impossível: ineficácia absoluta do meio', tags: ['cp'] }
+    expect(tagsVisiveis(entry)).toEqual([])
+  })
+
+  it('esconde padrão "lei NNNN" mesmo com pontuação/nº', () => {
+    const casos = ['lei 10.826', 'lei nº 9.099', 'lei n° 8.078', 'Lei 13.105']
+    for (const tag of casos) {
+      expect(tagsVisiveis({ tipo: 'doutrina', tema: 'x', tags: [tag] }), `falhou para "${tag}"`).toEqual([])
+    }
+  })
+
+  it('exemplo real: card de doutrina penal some com todas as tags de código', () => {
+    const entry = {
+      tipo: 'doutrina',
+      tema: 'Crimes de perigo abstrato: consumação pela mera conduta sem necessidade de resultado naturalístico',
+      tags: ['cp', 'lei 10.826'],
+    }
+    expect(tagsVisiveis(entry)).toEqual([])
+  })
 })
