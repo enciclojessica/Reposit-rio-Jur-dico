@@ -127,32 +127,10 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── Auto-importar informativos relevantes (STF e STJ) ──────────────────
-  try {
-    const { data: todasEntradas } = await supabase.from('entradas').select('area,tema,fonte,teses,tags').limit(80)
-    const { data: admins } = await supabase.from('membros').select('user_id').eq('role', 'admin').limit(1)
-    const adminId = admins?.[0]?.user_id
-
-    if (adminId && todasEntradas?.length) {
-      for (const tribunal of ['STF', 'STJ']) {
-        await fetch(`${baseUrl}/api/auto-importar-informativos`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.CRON_SECRET}`,
-          },
-          body: JSON.stringify({
-            tribunal,
-            entradas: todasEntradas,
-            user_id: adminId,
-            modo: 'cron',
-          }),
-        })
-      }
-    }
-  } catch (err) {
-    erros.push({ cron: 'auto-importar', err: err.message })
-  }
+  // ── Importação de informativos NÃO faz mais parte do disparo automático ──
+  // Decisão de custo (16/07/2026): rodava toda semana sem necessariamente
+  // ter novidade relevante, gastando 2 chamadas de IA com busca na web por
+  // disparo. Continua disponível manualmente em Importar > Informativos.
 
   console.log(`[verificar-alertas] Concluído — ${enviados} e-mail(s) enviado(s), ${erros.length} erro(s).`)
   return res.status(200).json({ ok: true, enviados, erros })

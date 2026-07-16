@@ -60,7 +60,7 @@ ETAPA 2: Das decisões encontradas, selecione apenas as que NÃO estejam já cob
 
 Para cada decisão selecionada, estruture uma entrada do repositório.
 
-Responda SOMENTE com JSON válido:
+Responda SOMENTE com JSON válido, sem nenhum texto antes ou depois, sem markdown, sem crases — a resposta inteira deve poder ser processada diretamente por JSON.parse():
 {
   "edicao": "número do informativo",
   "tribunal": "${tribunal}",
