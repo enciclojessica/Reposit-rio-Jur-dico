@@ -4,9 +4,10 @@ import { AREAS } from '../shared'
 import { exportarDocx } from '../utils/exportarDocx'
 import { supabase } from '../supabase'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
+import ModalModelos from './ModalModelos'
 import {
   Copy, Check, Download, FileText, X, Sparkles,
-  RotateCcw, BookOpen, ChevronDown, Save
+  RotateCcw, BookOpen, ChevronDown, Save, LayoutTemplate
 } from 'lucide-react'
 
 // ── Citações ─────────────────────────────────────────────────────────────────
@@ -257,6 +258,7 @@ export default function EditorPecas({ entradas }) {
   const [exportando, setExportando]         = useState(false)
   const [painelAberto, setPainelAberto]     = useState(true)
   const [mostrarRascunhos, setMostrarRascunhos] = useState(false)
+  const [mostrarModelos, setMostrarModelos]     = useState(false)
   const [autoSalvo, setAutoSalvo]           = useState(false)
   const [isMobile, setIsMobile]             = useState(window.innerWidth < 768)
   const [painelMobileAberto, setPainelMobileAberto] = useState(false)
@@ -358,6 +360,15 @@ export default function EditorPecas({ entradas }) {
     setTitulo(''); setConteudo(''); setRito(''); setRascunhoAtualId(null); setMostrarRascunhos(false)
   }
 
+  function usarModelo(modelo) {
+    if (conteudo.trim() && !confirm('Carregar este modelo? O rascunho atual continua salvo no histórico.')) return
+    setTitulo(modelo.titulo)
+    setConteudo(modelo.conteudo)
+    setRito(modelo.rito || '')
+    setRascunhoAtualId(null)
+    setMostrarModelos(false)
+  }
+
   function carregarRascunho(r) {
     setTitulo(r.titulo || ''); setConteudo(r.conteudo || '')
     setRascunhoAtualId(r.id); setMostrarRascunhos(false)
@@ -390,6 +401,9 @@ export default function EditorPecas({ entradas }) {
           <button onClick={() => setMostrarRascunhos(true)} style={btnBase}>
             <BookOpen size={13} /> Rascunhos
             <span style={{ background: theme.border, borderRadius: 10, padding: '1px 6px', fontSize: 9 }}>{rascunhos.length}</span>
+          </button>
+          <button onClick={() => setMostrarModelos(true)} style={btnBase}>
+            <LayoutTemplate size={13} /> Modelos
           </button>
           <button onClick={() => isMobile ? setPainelMobileAberto(p => !p) : setPainelAberto(p => !p)}
             style={{ ...btnBase,
@@ -513,6 +527,11 @@ export default function EditorPecas({ entradas }) {
         <ModalRascunhos rascunhos={rascunhos} atualId={rascunhoAtualId}
           onCarregar={carregarRascunho} onNovo={novoRascunho}
           onExcluir={excluirRascunho} onFechar={() => setMostrarRascunhos(false)} />
+      )}
+
+      {/* Modal modelos */}
+      {mostrarModelos && (
+        <ModalModelos onUsar={usarModelo} onFechar={() => setMostrarModelos(false)} />
       )}
     </div>
   )
