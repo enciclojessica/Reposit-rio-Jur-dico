@@ -24,6 +24,8 @@ export default async function handler(req, res) {
 
   let tesesSalvas = 0, artigosSalvos = 0
   const erros = []
+  const detalheTeses = []
+  const detalheArtigos = []
 
   for (const t of (dados.teses || [])) {
     if (!t.tema?.trim()) continue
@@ -46,19 +48,22 @@ export default async function handler(req, res) {
       criado_por: user.id,
     })
     if (error) erros.push(`Tese "${t.tema}": ${error.message}`)
-    else tesesSalvas++
+    else { tesesSalvas++; detalheTeses.push({ tema: t.tema, area: t.area || 'Cível', tipo: t.tipo || 'jurisprudência', status: 'novo' }) }
   }
 
   for (const a of (dados.artigos || [])) {
     if (!a.codigo?.trim() || !a.numero) continue
-    await supabase.from('legislacao')
-      .delete()
-      .eq('codigo', a.codigo.toLowerCase())
-      .eq('numero', parseInt(a.numero))
+    const codigo = a.codigo.toLowerCase()
+    const numero = parseInt(a.numero)
+
+    const { data: existiaAntes } = await supabase.from('legislacao')
+      .select('id').eq('codigo', codigo).eq('numero', numero).limit(1)
+    const jaExistia = (existiaAntes?.length || 0) > 0
+
+    await supabase.from('legislacao').delete().eq('codigo', codigo).eq('numero', numero)
 
     const { error } = await supabase.from('legislacao').insert({
-      codigo:            a.codigo.toLowerCase(),
-      numero:            parseInt(a.numero),
+      codigo, numero,
       inciso:            a.inciso    || null,
       paragrafo:         a.paragrafo || null,
       texto:             a.texto     || '',
@@ -69,13 +74,14 @@ export default async function handler(req, res) {
       vigente:           true,
     })
     if (error) erros.push(`Art. ${a.numero} ${a.codigo}: ${error.message}`)
-    else artigosSalvos++
+    else { artigosSalvos++; detalheArtigos.push({ codigo, numero, status: jaExistia ? 'atualizado' : 'novo' }) }
   }
 
   // Salvar jurisprudências extraídas da peça
   // — se já existe: adiciona novo contexto nas teses existentes (sem duplicar)
   // — se não existe: cria entrada nova
   let jurisSalvas = 0, jurisAtualizadas = 0
+  const detalheJuris = []
   for (const j of (dados.jurisprudencias || [])) {
     if (!j.numero?.trim() || !j.tribunal) continue
     const ref = `${j.tipo || ''} ${j.numero}`.trim()
@@ -106,7 +112,7 @@ export default async function handler(req, res) {
         .update({ teses: novasTeses })
         .eq('id', entrada.id)
       if (error) erros.push(`Juris ${ref} (atualizar): ${error.message}`)
-      else jurisAtualizadas++
+      else { jurisAtualizadas++; detalheJuris.push({ ref, tribunal: j.tribunal, status: 'atualizado' }) }
     } else {
       // Não existe — criar entrada nova
       const { error } = await supabase.from('entradas').insert({
@@ -128,9 +134,15 @@ export default async function handler(req, res) {
         criado_por: user.id,
       })
       if (error) erros.push(`Juris ${ref}: ${error.message}`)
-      else jurisSalvas++
+      else { jurisSalvas++; detalheJuris.push({ ref, tribunal: j.tribunal, status: 'novo' }) }
     }
   }
 
-  return res.status(200).json({ ok: true, meta: dados.meta, teses_salvas: tesesSalvas, artigos_salvos: artigosSalvos, juris_salvas: jurisSalvas, juris_atualizadas: jurisAtualizadas, erros })
+  return res.status(200).json({
+    ok: true, meta: dados.meta,
+    teses_salvas: tesesSalvas, artigos_salvos: artigosSalvos,
+    juris_salvas: jurisSalvas, juris_atualizadas: jurisAtualizadas,
+    detalhes: { teses: detalheTeses, artigos: detalheArtigos, juris: detalheJuris },
+    erros,
+  })
 }

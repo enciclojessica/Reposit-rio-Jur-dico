@@ -370,8 +370,78 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             )}
           </div>
           {resultado.erros?.length > 0 && (
-            <div style={{ background: '#fff7ed', border: '1px solid #f59e0b44', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 11, color: '#92400e', fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ background: theme.gold + '11', border: `1px solid ${theme.gold}44`, borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 11, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>
               {resultado.erros.slice(0, 3).map((e, i) => <div key={i}>{e}</div>)}
+            </div>
+          )}
+
+          {/* Detalhamento item a item */}
+          {resultado.detalhes && (
+            <div style={{ marginBottom: 20 }}>
+              {resultado.detalhes.teses?.length > 0 && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
+                    Teses / Doutrina / Jurisprudência do Repositório
+                  </div>
+                  {resultado.detalhes.teses.map((t, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: theme.raised, borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: theme.success, background: theme.success + '18', borderRadius: 4, padding: '1px 6px', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0 }}>
+                        NOVO
+                      </span>
+                      <span style={{ color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {t.tema}
+                      </span>
+                      <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0 }}>
+                        {t.area} · {t.tipo}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {resultado.detalhes.artigos?.length > 0 && (
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
+                    Artigos de Legislação
+                  </div>
+                  {resultado.detalhes.artigos.map((a, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: theme.raised, borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '1px 6px', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0,
+                        color: a.status === 'novo' ? theme.success : '#0ea5e9',
+                        background: (a.status === 'novo' ? theme.success : '#0ea5e9') + '18',
+                      }}>
+                        {a.status === 'novo' ? 'NOVO' : 'ATUALIZADO'}
+                      </span>
+                      <span style={{ color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1 }}>
+                        Art. {a.numero} — {a.codigo.toUpperCase()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {resultado.detalhes.juris?.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
+                    Jurisprudência citada na peça
+                  </div>
+                  {resultado.detalhes.juris.map((j, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: theme.raised, borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '1px 6px', fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0,
+                        color: j.status === 'novo' ? theme.success : '#a78bfa',
+                        background: (j.status === 'novo' ? theme.success : '#a78bfa') + '18',
+                      }}>
+                        {j.status === 'novo' ? 'NOVO' : 'CONTEXTO NOVO'}
+                      </span>
+                      <span style={{ color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1 }}>
+                        {j.tribunal} — {j.ref}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           <button onClick={reiniciar}
