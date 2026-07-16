@@ -4,7 +4,7 @@ import { useTheme } from '../theme'
 // Paleta cíclica para tags — versões mais escuras no tema claro (senão
 // cores como ciano/amarelo ficam claras demais sobre fundo branco).
 const TAG_CORES_ESCURO = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#a855f7', '#06b6d4', '#f97316', '#ec4899']
-const TAG_CORES_CLARO  = ['#1d4ed8', '#047857', '#b45309', '#b91c1c', '#7e22ce', '#0e7490', '#c2410c', '#be185d']
+const TAG_CORES_CLARO  = ['#1e3a8a', '#065f46', '#92400e', '#991b1b', '#6b21a8', '#155e75', '#9a3412', '#9d174d']
 
 function corParaTag(tag, isDark) {
   let hash = 0
@@ -19,8 +19,8 @@ export function TagPill({ tag, onRemove, pequena }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
-      background: cor + '22', color: cor,
-      border: `1px solid ${cor}44`,
+      background: cor + '1a', color: cor, fontWeight: 700,
+      border: `1px solid ${cor}55`,
       borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
       fontSize: pequena ? 10 : 11,
       fontFamily: 'IBM Plex Mono, monospace',
