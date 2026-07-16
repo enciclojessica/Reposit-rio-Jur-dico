@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AREAS, corDaArea } from '../shared'
 import { TagPill } from './TagInput'
+import { tagsVisiveis } from '../utils/tagsVisiveis'
 import { useTheme } from '../theme'
 import { Trash2, Square, CheckSquare, AlertTriangle, CheckCircle } from 'lucide-react'
 
@@ -188,7 +189,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     <span style={{ background: theme.muted + '18', color: theme.muted, border: '1px solid ' + theme.border, borderRadius: 4, padding: '2px 7px', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}>{e.tipo}</span>
                     {e.tribunal && <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{e.tribunal}</span>}
                     <IaStatusBadge status={e.ia_status} theme={theme} />
-                    {e.tags && e.tags.map && e.tags.map(t => <TagPill key={t} tag={t} pequena />)}
+                    {tagsVisiveis(e).map(t => <TagPill key={t} tag={t} pequena />)}
                   </div>
                   <div style={{ fontSize: 15, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.4, marginBottom: 4 }}>{e.tema}</div>
                   {e.ementa && (
