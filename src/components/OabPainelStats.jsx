@@ -67,7 +67,7 @@ export default function PainelStats({ session, theme, onVoltar }) {
   return (
     <div>
       <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:20 }}>
-        <button onClick={onVoltar} style={{ background:'none', border:'none', color:theme.muted, cursor:'pointer', padding:0 }}>
+        <button onClick={onVoltar} aria-label="Voltar" style={{ background:'none', border:'none', color:theme.muted, cursor:'pointer', padding:0 }}>
           <ChevronLeft size={18} />
         </button>
         <div style={{ fontSize:16, fontWeight:700, color:theme.gold, fontFamily:'Playfair Display, serif' }}>

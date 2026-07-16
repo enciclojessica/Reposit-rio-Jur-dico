@@ -51,7 +51,7 @@ export default function Cronometro({ sessionId, onSalvar, theme }) {
           {rodando ? <Pause size={14} /> : <Play size={14} />}
           {rodando ? 'Pausar' : 'Iniciar'}
         </button>
-        <button onClick={resetar}
+        <button onClick={resetar} aria-label="Zerar cronômetro"
           style={{ background: 'none', border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '8px 10px', cursor: 'pointer' }}>
           <RotateCcw size={14} />
         </button>

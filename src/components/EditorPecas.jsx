@@ -207,7 +207,7 @@ function ModalRascunhos({ rascunhos, atualId, onCarregar, onNovo, onExcluir, onF
           <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Rascunhos</div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onNovo} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>+ Novo</button>
-            <button onClick={onFechar} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer' }}><X size={18} /></button>
+            <button onClick={onFechar} aria-label="Fechar" style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer' }}><X size={18} /></button>
           </div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: 12 }}>
@@ -233,7 +233,7 @@ function ModalRascunhos({ rascunhos, atualId, onCarregar, onNovo, onExcluir, onF
                   </div>
                   <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>{palavras} palavras · {data}</div>
                 </div>
-                <button onClick={e => { e.stopPropagation(); onExcluir(r.id) }} style={{ background: 'none', border: 'none', color: theme.error, cursor: 'pointer' }}><X size={14} /></button>
+                <button onClick={e => { e.stopPropagation(); onExcluir(r.id) }} aria-label="Excluir rascunho" style={{ background: 'none', border: 'none', color: theme.error, cursor: 'pointer' }}><X size={14} /></button>
               </div>
             )
           })}
