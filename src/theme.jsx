@@ -74,6 +74,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('sintese_tema', isDark ? 'escuro' : 'claro')
+    document.body.setAttribute('data-dark', isDark ? 'true' : 'false')
   }, [isDark])
 
   const theme = isDark ? TEMAS.escuro : TEMAS.claro

@@ -618,7 +618,7 @@ case VIEWS.JURISPRUDENCIA:
                   onFocus={() => setShowHistorico(true)}
                   onBlur={() => setTimeout(() => setShowHistorico(false), 150)}
                   placeholder={modoSemantico ? 'Descreva o que procura em linguagem natural...' : 'Buscar por tema, fonte, referência...'}
-                  style={{ paddingLeft: 38, paddingRight: modoSemantico ? 100 : 12 }}
+                  style={{ paddingLeft: 38, paddingRight: modoSemantico ? 100 : 12, background: theme.raised, color: theme.text, borderColor: theme.border }}
                 />
                 {showHistorico && !search && historicoBusca.length > 0 && (
                   <div style={{
