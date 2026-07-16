@@ -50,6 +50,7 @@ export default async function handler(req, res) {
   const erros  = []
 
   for (const [email, temasDoUsuario] of Object.entries(porEmail)) {
+    console.log(`[verificar-alertas] Processando ${temasDoUsuario.length} tema(s) para ${email}...`)
     try {
       const resultadosPorTema = []
 
@@ -77,7 +78,10 @@ export default async function handler(req, res) {
           .eq('id', alerta.id)
       }
 
-      if (!resultadosPorTema.length) continue
+      if (!resultadosPorTema.length) {
+        console.log(`[verificar-alertas] ${email}: nenhum resultado novo para os temas monitorados.`)
+        continue
+      }
 
       const html = montarEmail(resultadosPorTema)
 
@@ -96,6 +100,7 @@ export default async function handler(req, res) {
       })
 
       if (envio.ok) {
+        console.log(`[verificar-alertas] E-mail enviado com sucesso para ${email}.`)
         enviados++
         const resumoTemas = resultadosPorTema.map(t => t.tema).join(', ')
         const totalDecisoes = resultadosPorTema.reduce((s, t) => s + t.resultados.length, 0)
@@ -113,6 +118,7 @@ export default async function handler(req, res) {
         }
       } else {
         const erroTexto = await envio.text().catch(() => '')
+        console.error(`[verificar-alertas] Resend recusou o envio para ${email}: HTTP ${envio.status} — ${erroTexto.slice(0, 500)}`)
         erros.push({ email, status: envio.status, detalhe: erroTexto.slice(0, 300) })
       }
 
@@ -148,6 +154,7 @@ export default async function handler(req, res) {
     erros.push({ cron: 'auto-importar', err: err.message })
   }
 
+  console.log(`[verificar-alertas] Concluído — ${enviados} e-mail(s) enviado(s), ${erros.length} erro(s).`)
   return res.status(200).json({ ok: true, enviados, erros })
 }
 
