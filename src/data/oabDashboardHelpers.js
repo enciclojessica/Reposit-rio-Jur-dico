@@ -31,3 +31,11 @@ export function fmtTempo(s) {
   if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
   return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`
 }
+
+// Ritmo real: sessões que já deveriam ter acontecido (data <= hoje) vs
+// quantas dessas de fato foram concluídas.
+export function calcularRitmo(sessions, dados, hojeStr = new Date().toISOString().split('T')[0]) {
+  const esperadas = sessions.filter(s => s.date <= hojeStr).length
+  const concEsperadas = sessions.filter(s => s.date <= hojeStr && dados[s.id]?.status === 'Concluído').length
+  return { esperadas, concEsperadas, atraso: esperadas - concEsperadas }
+}

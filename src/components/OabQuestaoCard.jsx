@@ -7,7 +7,7 @@ import {
   CheckCircle, XCircle, Sparkles, Pencil,
   BookmarkCheck, Bookmark, Scissors,
 } from 'lucide-react'
-import AnotacaoQuestao from './OabAnotacaoQuestao'
+import AnotacaoPessoal from './AnotacaoPessoal'
 
 // ── Card de questão ─────────────────────────────────────────────
 export default function QuestaoCard({ questao, idx, total, respondida, respostaDada, onResponder, mostrarGabarito, favorita, onFavoritar, isAdmin, onReclassificar, theme }) {
@@ -230,7 +230,7 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
       )}
 
       {/* Anotação pessoal */}
-      {respondida && <AnotacaoQuestao questaoId={questao.id} theme={theme} />}
+      {respondida && <AnotacaoPessoal itemId={questao.id} namespace="questao" theme={theme} placeholder="Sua anotação sobre esta questão..." />}
     </div>
   )
 }

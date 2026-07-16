@@ -7,7 +7,7 @@ import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { SESSIONS_PADRAO } from '../data/oabCronograma'
 import { DISC_COR } from '../data/disciplinas'
-import { DISCIPLINAS, MESES, fmt, getMes, diasAte, fmtTempo } from '../data/oabDashboardHelpers'
+import { DISCIPLINAS, MESES, fmt, getMes, diasAte, fmtTempo, calcularRitmo } from '../data/oabDashboardHelpers'
 import { exportarCalendarOuICS } from '../utils/exportarCalendarOuICS'
 import { parseSimuladoTopico } from '../utils/parseSimuladoTopico'
 import {
@@ -119,7 +119,11 @@ export default function OabDashboard({ session }) {
         cor: DISC_COR[d] || '#6b7280',
       }
     })
-    return { total, conc, em, media, pct: Math.round(conc/total*100), tempoTotal, porDisc }
+    // Ritmo real: sessões que já deveriam ter acontecido (data <= hoje) vs
+    // quantas dessas de fato foram concluídas. Não é o mesmo que "% do
+    // cronograma inteiro concluído" — aqui é "estou no prazo até agora?"
+    const { esperadas, concEsperadas, atraso } = calcularRitmo(SESSIONS, dados)
+    return { total, conc, em, media, pct: Math.round(conc/total*100), tempoTotal, porDisc, esperadas, concEsperadas, atraso }
   }, [dados])
 
   const hoje    = new Date().toISOString().split('T')[0]
@@ -178,7 +182,7 @@ export default function OabDashboard({ session }) {
 
       {/* Countdown 1ª Fase */}
       {diasAte('2027-01-10') > 0 && (
-        <div style={{ background: theme.raised, border: `1px solid ${theme.gold}44`, borderRadius: 10, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ background: theme.raised, border: `1px solid ${theme.gold}44`, borderRadius: 10, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <Target size={18} color={theme.gold} />
           <div>
             <span style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace' }}>
@@ -188,6 +192,19 @@ export default function OabDashboard({ session }) {
               para a 1ª Fase OAB (10/01/2027) · {stats.pct}% do cronograma concluído
             </span>
           </div>
+          {stats.esperadas > 0 && (
+            <span style={{
+              marginLeft: 'auto', fontSize: 11, fontWeight: 600, fontFamily: 'IBM Plex Mono, monospace',
+              padding: '4px 10px', borderRadius: 20,
+              color: stats.atraso <= 0 ? theme.success : stats.atraso > 3 ? theme.error : theme.gold,
+              background: (stats.atraso <= 0 ? theme.success : stats.atraso > 3 ? theme.error : theme.gold) + '18',
+              border: `1px solid ${(stats.atraso <= 0 ? theme.success : stats.atraso > 3 ? theme.error : theme.gold)}44`,
+            }}>
+              {stats.atraso <= 0
+                ? '✓ Em dia com o cronograma'
+                : `${stats.atraso} sessão${stats.atraso > 1 ? 'ões' : ''} atrasada${stats.atraso > 1 ? 's' : ''}`}
+            </span>
+          )}
         </div>
       )}
 

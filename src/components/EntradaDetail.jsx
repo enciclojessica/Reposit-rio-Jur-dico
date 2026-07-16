@@ -4,6 +4,7 @@ import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META } from '../shared'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
+import AnotacaoPessoal from './AnotacaoPessoal'
 
 // Garante string segura
 const s = (v) => (v == null ? '' : String(v))
@@ -246,6 +247,14 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
       {entry.teses.length === 0 && (
         <div style={{ color: theme.muted, fontSize: 13, padding: '20px 0' }}>Nenhuma tese cadastrada.</div>
       )}
+
+      {/* Minha Anotação — estudo ativo */}
+      <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 16, marginTop: 8 }}>
+        <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6, fontFamily: 'IBM Plex Mono, monospace' }}>
+          Minha Anotação
+        </div>
+        <AnotacaoPessoal itemId={entry.id} namespace="entrada" theme={theme} placeholder="Anote aqui o que você aprendeu, uma dúvida, ou como pretende usar isso numa peça..." />
+      </div>
 
       {/* Histórico */}
       {entry.historico.length > 0 && (
