@@ -26,12 +26,30 @@ export default function Alertas({ session, membro }) {
   // Boletim
   const [boletim, setBoletim]       = useState(membro?.receber_boletim !== false)
   const [salvandoBoletim, setSalvandoBoletim] = useState(false)
+  const [disparando, setDisparando] = useState(false)
 
   const [toast, setToast]           = useState(null)
 
   function notify(msg, type = 'ok') {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3000)
+  }
+
+  async function dispararRadarAgora() {
+    setDisparando(true)
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession()
+      const res = await fetch('/api/verificar-alertas', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + s.access_token },
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Falha ao disparar o radar.')
+      notify(`Radar verificado — ${json.enviados} e-mail(s) enviado(s).`)
+    } catch (e) {
+      notify(e.message, 'err')
+    }
+    setDisparando(false)
   }
 
   // ── Carregar entradas dos últimos 7 dias ────────────────────────────────
@@ -164,6 +182,23 @@ export default function Alertas({ session, membro }) {
           <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: boletim ? 23 : 3, transition: 'left .2s', boxShadow: '0 1px 4px #00000033' }} />
         </button>
       </div>
+
+      {/* Disparo manual (admin) */}
+      {membro?.role === 'admin' && (
+        <div style={{ ...card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: 'Inter, sans-serif', marginBottom: 2 }}>Disparar radar agora (admin)</div>
+            <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
+              Roda a verificação e envio de e-mails na hora, sem esperar a segunda-feira.
+            </div>
+          </div>
+          <button onClick={dispararRadarAgora} disabled={disparando}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: disparando ? theme.border : theme.gold, border: 'none', color: disparando ? theme.muted : '#0b0f1a', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: disparando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0 }}>
+            <RefreshCw size={13} style={{ animation: disparando ? 'spin 1s linear infinite' : 'none' }} />
+            {disparando ? 'Verificando...' : 'Disparar agora'}
+          </button>
+        </div>
+      )}
 
       {/* Abas */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${theme.border}`, marginBottom: 20 }}>

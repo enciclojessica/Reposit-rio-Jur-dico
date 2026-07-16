@@ -1,21 +1,36 @@
+// api/verificar-alertas.js — Lex.IA
+// Radar de Atualizações: varre os alertas ativos, pesquisa jurisprudência
+// nova via /api/pesquisa-juri e envia um e-mail semanal por usuário via
+// Resend. Disparado pelo Vercel Cron (ver vercel.json) — protegido por
+// CRON_SECRET, não é chamável publicamente sem o segredo.
 import { createClient } from '@supabase/supabase-js'
 
-// Vercel chama este endpoint via cron — protegido por CRON_SECRET
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  // Verificar secret do cron
+  // Autenticação: CRON_SECRET (disparo automático) OU admin logado (teste manual)
   const secret = req.headers['authorization']?.replace('Bearer ', '')
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
-    return res.status(401).json({ error: 'Não autorizado.' })
-  }
+  const isCron = process.env.CRON_SECRET && secret === process.env.CRON_SECRET
 
   const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_KEY
   )
+
+  if (!isCron) {
+    if (!secret) return res.status(401).json({ error: 'Não autorizado.' })
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(secret)
+    if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+    const { data: membro } = await supabase.from('membros').select('role').eq('user_id', user.id).single()
+    if (membro?.role !== 'admin') return res.status(403).json({ error: 'Somente administradores podem disparar o radar manualmente.' })
+  }
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(500).json({ error: 'RESEND_API_KEY não configurada.' })
+  }
+
+  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
 
   // Buscar todos os alertas ativos
   const { data: alertas, error } = await supabase
@@ -36,13 +51,15 @@ export default async function handler(req, res) {
 
   for (const [email, temasDoUsuario] of Object.entries(porEmail)) {
     try {
-      // Pesquisar cada tema via Claude com web search
       const resultadosPorTema = []
 
       for (const alerta of temasDoUsuario) {
-        const res2 = await fetch(`${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000'}/api/pesquisa-juri`, {
+        const res2 = await fetch(`${baseUrl}/api/pesquisa-juri`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+          },
           body: JSON.stringify({ query: alerta.tema, tribunal: alerta.tribunal }),
         })
         const json = await res2.json()
@@ -55,7 +72,6 @@ export default async function handler(req, res) {
           })
         }
 
-        // Atualizar ultima_verificacao
         await supabase.from('alertas')
           .update({ ultima_verificacao: new Date().toISOString() })
           .eq('id', alerta.id)
@@ -63,10 +79,8 @@ export default async function handler(req, res) {
 
       if (!resultadosPorTema.length) continue
 
-      // Montar HTML do e-mail
-      const html = montarEmail(email, resultadosPorTema)
+      const html = montarEmail(resultadosPorTema)
 
-      // Enviar via Resend
       const envio = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -74,19 +88,17 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Repositório Jurídico <alertas@repositoriojuridico.com.br>',
+          from: 'Lex.IA <alertas@lexiajur.com.br>',
           to: [email],
-          subject: `📋 Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`,
+          subject: `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`,
           html,
         }),
       })
 
       if (envio.ok) {
         enviados++
-        // Criar notificação in-app para cada usuário
         const resumoTemas = resultadosPorTema.map(t => t.tema).join(', ')
         const totalDecisoes = resultadosPorTema.reduce((s, t) => s + t.resultados.length, 0)
-        // Descobrir user_id pelo e-mail
         const { data: alertasUsuario } = await supabase
           .from('alertas').select('user_id').eq('email', email).limit(1)
         const uid = alertasUsuario?.[0]?.user_id
@@ -99,21 +111,19 @@ export default async function handler(req, res) {
             dados: { temas: resultadosPorTema.map(t => t.tema), total: totalDecisoes },
           })
         }
-      } else erros.push({ email, status: envio.status })
+      } else {
+        const erroTexto = await envio.text().catch(() => '')
+        erros.push({ email, status: envio.status, detalhe: erroTexto.slice(0, 300) })
+      }
 
     } catch (err) {
       erros.push({ email, err: err.message })
     }
   }
 
-  // ── Auto-importar informativos relevantes ──────────────────────────────
+  // ── Auto-importar informativos relevantes (STF e STJ) ──────────────────
   try {
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
-    
-    // Buscar todas as entradas para contexto
     const { data: todasEntradas } = await supabase.from('entradas').select('area,tema,fonte,teses,tags').limit(80)
-    
-    // Descobrir admin para atribuir as entradas auto-importadas
     const { data: admins } = await supabase.from('membros').select('user_id').eq('role', 'admin').limit(1)
     const adminId = admins?.[0]?.user_id
 
@@ -141,7 +151,7 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, enviados, erros })
 }
 
-function montarEmail(email, resultadosPorTema) {
+function montarEmail(resultadosPorTema) {
   const linhasTemas = resultadosPorTema.map(({ tema, tribunal, resultados }) => {
     const linhasResultados = resultados.map(r => `
       <div style="border-left:3px solid #c9a452;padding:10px 14px;margin-bottom:10px;background:#1a2236;border-radius:0 6px 6px 0;">
@@ -152,7 +162,7 @@ function montarEmail(email, resultadosPorTema) {
         <div style="font-size:13px;color:#e8dfc8;line-height:1.6;margin-bottom:6px;">
           ${r.ementa?.slice(0, 300)}${r.ementa?.length > 300 ? '...' : ''}
         </div>
-        ${r.url ? `<a href="${r.url}" style="font-size:11px;color:#c9a452;text-decoration:none;">↗ Acessar decisão</a>` : ''}
+        ${r.url ? `<a href="${r.url}" style="font-size:11px;color:#c9a452;text-decoration:none;">Acessar decisão &rarr;</a>` : ''}
       </div>
     `).join('')
 
@@ -176,18 +186,16 @@ function montarEmail(email, resultadosPorTema) {
     <body style="margin:0;padding:0;background:#0b0f1a;font-family:'IBM Plex Mono',monospace;">
       <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
 
-        <!-- Cabeçalho -->
         <div style="text-align:center;margin-bottom:32px;">
           <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;
                       font-weight:700;color:#c9a452;margin-bottom:4px;">
-            Repositório Jurídico
+            Lex.IA
           </div>
           <div style="font-size:11px;color:#6b7fa3;text-transform:uppercase;letter-spacing:2px;">
-            Atualização Semanal · ${new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
+            Radar de Atualizações · ${new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
           </div>
         </div>
 
-        <!-- Intro -->
         <div style="font-size:13px;color:#6b7fa3;margin-bottom:24px;line-height:1.6;
                     padding:14px;background:#111827;border-radius:8px;
                     border-left:3px solid #c9a452;">
@@ -195,15 +203,13 @@ function montarEmail(email, resultadosPorTema) {
           Revise, importe para o repositório ou descarte conforme necessário.
         </div>
 
-        <!-- Resultados por tema -->
         ${linhasTemas}
 
-        <!-- Rodapé -->
         <div style="border-top:1px solid #1e2d45;padding-top:20px;margin-top:8px;
                     font-size:11px;color:#6b7fa3;text-align:center;line-height:1.7;">
-          Você recebe este e-mail porque cadastrou alertas no Repositório Jurídico.<br>
-          <a href="https://reposit-rio-jur-dico.vercel.app" style="color:#c9a452;text-decoration:none;">
-            Acessar o repositório
+          Você recebe este e-mail porque cadastrou alertas no Lex.IA.<br>
+          <a href="https://lexiajur.com.br" style="color:#c9a452;text-decoration:none;">
+            Acessar o Lex.IA
           </a>
         </div>
       </div>
