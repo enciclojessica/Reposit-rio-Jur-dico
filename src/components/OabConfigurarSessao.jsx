@@ -131,7 +131,7 @@ export default function ConfigurarSessao({ onIniciar, onZerar, onStats, stats, d
 
       {/* Nota sobre o simulado */}
       {modo === 'simulado' && (
-        <div style={{ marginBottom:12, padding:'8px 12px', background:'#B8930A11', border:'1px solid #B8930A33', borderRadius:8, fontSize:11, color:'#B8930A', fontFamily:'IBM Plex Mono, monospace' }}>
+        <div style={{ marginBottom:12, padding:'8px 12px', background:theme.gold+'11', border:`1px solid ${theme.gold}33`, borderRadius:8, fontSize:11, color:theme.gold, fontFamily:'IBM Plex Mono, monospace' }}>
           80 questões cronometradas. Use o filtro de disciplina acima para simular uma prova temática.
         </div>
       )}

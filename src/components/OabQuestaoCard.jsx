@@ -90,25 +90,25 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
         {editando ? (
           <>
             <select value={editDisc} onChange={e => setEditDisc(e.target.value)}
-              style={{ fontSize:11, background:'#1a0608', border:'1px solid #B8930A', borderRadius:6, color:'#F5F0E8', padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace' }}>
+              style={{ fontSize:11, background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:6, color:theme.text, padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace' }}>
               {Object.keys(DISC_COR).filter(d => d !== 'Simulado Geral').map(d =>
                 <option key={d} value={d}>{d}</option>
               )}
             </select>
             <input value={editTopico} onChange={e => setEditTopico(e.target.value)}
               placeholder="Tópico..."
-              style={{ fontSize:11, background:'#1a0608', border:'1px solid #B8930A', borderRadius:6, color:'#F5F0E8', padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace', width:160 }} />
+              style={{ fontSize:11, background:theme.raised, border:`1px solid ${theme.border}`, borderRadius:6, color:theme.text, padding:'3px 8px', fontFamily:'IBM Plex Mono, monospace', width:160 }} />
             <button onClick={sugerirClassificacao} disabled={sugerindo}
               title="Deixar a IA sugerir a classificação correta"
-              style={{ fontSize:10, background:'#1a1a2e', border:'1px solid #7C3AED', borderRadius:5, color:'#7C3AED', padding:'3px 8px', cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+              style={{ fontSize:10, background:theme.raised, border:'1px solid #7C3AED', borderRadius:5, color:'#7C3AED', padding:'3px 8px', cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
               {sugerindo ? '...' : <><Sparkles size={11} /> IA</>}
             </button>
             <button onClick={salvarEdicao} disabled={salvando}
-              style={{ fontSize:10, background:'#B8930A', border:'none', borderRadius:5, color:'#000', padding:'3px 10px', cursor:'pointer', fontWeight:700 }}>
+              style={{ fontSize:10, background:theme.gold, border:'none', borderRadius:5, color:'#0b0f1a', padding:'3px 10px', cursor:'pointer', fontWeight:700 }}>
               {salvando ? '...' : 'Salvar'}
             </button>
             <button onClick={() => setEditando(false)}
-              style={{ fontSize:10, background:'none', border:'1px solid #6b7280', borderRadius:5, color:'#6b7280', padding:'3px 8px', cursor:'pointer' }}>
+              style={{ fontSize:10, background:'none', border:`1px solid ${theme.muted}`, borderRadius:5, color:theme.muted, padding:'3px 8px', cursor:'pointer' }}>
               Cancelar
             </button>
           </>
@@ -118,19 +118,19 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
               {questao.disciplina}
             </span>
             {questao.topico && (
-              <span style={{ fontSize:10, color:'#94a3b8', background:'#94a3b810', border:'1px solid #94a3b822', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+              <span style={{ fontSize:10, color:theme.muted, background:theme.muted+'10', border:`1px solid ${theme.muted}22`, borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
                 {questao.topico}
               </span>
             )}
             {questao.exame && (
-              <span style={{ fontSize:10, fontWeight:600, color:'#94a3b8', background:'#94a3b818', border:'1px solid #94a3b833', borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
+              <span style={{ fontSize:10, fontWeight:600, color:theme.muted, background:theme.muted+'18', border:`1px solid ${theme.muted}33`, borderRadius:4, padding:'2px 7px', fontFamily:'IBM Plex Mono, monospace' }}>
                 {`${questao.exame}º Exame`}{EXAME_ANO[questao.exame] ? ` · ${EXAME_ANO[questao.exame]}` : ''}
               </span>
             )}
             {isAdmin && (
               <button onClick={() => { setEditDisc(questao.disciplina); setEditTopico(questao.topico||''); setEditando(true) }}
                 title="Editar classificação"
-                style={{ fontSize:9, background:'none', border:'1px solid #6b728044', borderRadius:4, color:'#6b7280', padding:'2px 6px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:3 }}>
+                style={{ fontSize:9, background:'none', border:`1px solid ${theme.muted}44`, borderRadius:4, color:theme.muted, padding:'2px 6px', cursor:'pointer', fontFamily:'IBM Plex Mono, monospace', display:'flex', alignItems:'center', gap:3 }}>
                 <Pencil size={10} /> editar
               </button>
             )}
@@ -154,7 +154,7 @@ export default function QuestaoCard({ questao, idx, total, respondida, respostaD
           const regex = new RegExp(`(${termos.map(t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\')).join('|')})`, 'gi')
           const partes = questao.enunciado.split(regex)
           return partes.map((p, i) => regex.test(p)
-            ? <mark key={i} style={{ background:'#B8930A33', color:theme.gold, borderRadius:2, padding:'0 2px' }}>{p}</mark>
+            ? <mark key={i} style={{ background:theme.gold+'33', color:theme.gold, borderRadius:2, padding:'0 2px' }}>{p}</mark>
             : p
           )
         })() : questao.enunciado}
