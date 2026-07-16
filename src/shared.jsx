@@ -17,6 +17,17 @@ export const AREAS = {
 
 export const TIPOS = ['jurisprudência', 'doutrina', 'súmula', 'lei']
 
+// Resolve a cor de uma área mesmo quando o valor salvo é composto
+// (ex: "Cível / Consumidor / Bancário", comum em entradas importadas de
+// pesquisa de jurisprudência) — usa o primeiro segmento antes da barra
+// como fallback, em vez de cair num cinza neutro sem contraste.
+export function corDaArea(area, theme) {
+  if (!area) return theme?.muted || '#6b7280'
+  if (AREAS[area]) return AREAS[area].color
+  const base = area.split('/')[0].trim()
+  return AREAS[base]?.color || theme?.gold || '#c9a452'
+}
+
 export const ROLE_COR   = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
 export const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
 

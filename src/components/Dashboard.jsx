@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useTheme } from '../theme'
-import { AREAS } from '../shared'
+import { AREAS, corDaArea } from '../shared'
 
 // ── SVG Bar Chart ─────────────────────────────────────────────────────────
 function BarChart({ dados, cor, altura = 120, label }) {
@@ -291,7 +291,7 @@ export default function Dashboard({ entradas, countLegislacao = 0 }) {
             <div style={secLabel}>Mais citadas em peças</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {stats.maisUsadas.map(e => {
-                const cor = AREAS[e.area]?.color || theme.muted
+                const cor = corDaArea(e.area, theme)
                 const pct = Math.max(16, (e.uso_count / stats.maisUsadas[0].uso_count) * 80)
                 return (
                   <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -318,7 +318,7 @@ export default function Dashboard({ entradas, countLegislacao = 0 }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {stats.recentes.map(e => {
-                const cor = AREAS[e.area]?.color || theme.muted
+                const cor = corDaArea(e.area, theme)
                 return (
                   <div key={e.id} style={{
                     padding: '8px 12px', background: theme.raised,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../theme'
-import { AREAS } from '../shared'
+import { AREAS, corDaArea } from '../shared'
 import { TagPill } from './TagInput'
 import { Lock } from 'lucide-react'
 import { supabase } from '../supabase'
@@ -12,7 +12,7 @@ const TRIBUNAIS = [
 
 function DecisaoCard({ decisao, onImportar, importada }) {
   const { theme } = useTheme()
-  const cor = AREAS[decisao.area]?.color || theme.muted
+  const cor = corDaArea(decisao.area, theme)
 
   return (
     <div style={{

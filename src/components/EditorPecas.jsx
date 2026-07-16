@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../theme'
-import { AREAS } from '../shared'
+import { AREAS, corDaArea } from '../shared'
 import { exportarDocx } from '../utils/exportarDocx'
 import { supabase } from '../supabase'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
@@ -166,7 +166,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
             {busca ? 'Nenhuma entrada.' : 'Repositório vazio.'}
           </div>
         ) : lista.map(entry => {
-          const cor = AREAS[entry.area]?.color || theme.muted
+          const cor = corDaArea(entry.area, theme)
           return (
             <div key={entry.id} style={{ borderBottom: `1px solid ${theme.border}`, padding: '10px 14px' }}>
               <div style={{ fontSize: 12, color: theme.text, marginBottom: 6, lineHeight: 1.4, fontFamily: 'Georgia, serif' }}>

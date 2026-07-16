@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AREAS } from '../shared'
+import { AREAS, corDaArea } from '../shared'
 import { TagPill } from './TagInput'
 import { useTheme } from '../theme'
 import { Trash2, Square, CheckSquare, AlertTriangle, CheckCircle } from 'lucide-react'
@@ -141,9 +141,8 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
             </thead>
             <tbody>
               {entradas.map(e => {
-                const area    = AREAS[e.area] || {}
                 const checked = selecionados.has(e.id)
-                const cor     = area.color || area.cor || theme.muted
+                const cor     = corDaArea(e.area, theme)
                 return (
                   <tr key={e.id} onClick={() => onSelect(e)}
                     style={{ borderBottom: '1px solid ' + theme.border + '55', cursor: 'pointer', background: checked ? theme.gold + '08' : 'transparent', transition: 'background .1s' }}>
@@ -170,9 +169,8 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {entradas.map(e => {
-            const area    = AREAS[e.area] || {}
-            const checked = selecionados.has(e.id)
-            const cor     = area.color || area.cor || theme.border
+                const checked = selecionados.has(e.id)
+                const cor     = corDaArea(e.area, theme)
             return (
               <div key={e.id}
                 onClick={() => onSelect(e)}

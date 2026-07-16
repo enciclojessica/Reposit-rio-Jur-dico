@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from '../theme'
-import { AREAS, STATUS_META } from '../shared'
+import { AREAS, STATUS_META, corDaArea } from '../shared'
 import { TagPill } from './TagInput'
 import { supabase } from '../supabase'
 import { calcularProximaRevisao, estaPendente } from '../utils/spacedRepetition'
@@ -37,7 +37,7 @@ function buildDeck(entradas, filtros, revisaoMap, soPendentes) {
 function Carta({ carta, virada, onVirar }) {
   const { theme } = useTheme()
   const { entry, tese } = carta
-  const am = AREAS[entry.area] || { color: theme.muted }
+  const am = { color: corDaArea(entry.area, theme) }
   const s  = STATUS_META[entry.status || 'vigente']
 
   return (

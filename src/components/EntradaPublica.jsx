@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AREAS, STATUS_META } from '../shared'
+import { AREAS, STATUS_META, corDaArea } from '../shared'
 import { TagPill } from './TagInput'
 import SeletorTema from './SeletorTema'
 import { Lock } from 'lucide-react'
@@ -68,7 +68,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
     setTimeout(() => setCopiadoABNT(false), 2000)
   }
 
-  const am     = entry ? (AREAS[entry.area] || { color: theme.muted }) : {}
+  const am     = entry ? { color: corDaArea(entry.area, theme) } : {}
   const status = entry ? (STATUS_META[entry.status] || STATUS_META['vigente']) : null
 
   return (

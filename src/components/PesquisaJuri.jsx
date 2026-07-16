@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '../theme'
-import { AREAS, Badge } from '../shared'
+import { AREAS, Badge, corDaArea } from '../shared'
 import { supabase } from '../supabase'
 
 const TRIBUNAIS = [
@@ -192,7 +192,7 @@ export default function PesquisaJuri({ onImportar }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {resultados.map((r, i) => {
-              const areaColor = AREAS[r.area]?.color || AREAS['Cível'].color
+              const areaColor = corDaArea(r.area, theme)
               const chave = r.url || r.numero || i
               const jaImportado = importados.has(chave)
               return (

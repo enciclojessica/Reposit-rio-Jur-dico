@@ -3,7 +3,7 @@ import { Upload, Download, Check, X, AlertCircle, RotateCcw } from 'lucide-react
 import * as XLSX from 'xlsx'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AREAS, TIPOS, STATUS_META } from '../shared'
+import { AREAS, TIPOS, STATUS_META, corDaArea } from '../shared'
 
 // ── Colunas esperadas e mapeamento flexível ───────────────────────────────
 const COLUNAS = {
@@ -315,7 +315,7 @@ export default function ImportacaoLote({ session }) {
                         <td style={{ padding: '8px 12px', color: temErro ? theme.error : theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>
                           {temErro ? <X size={11} color={theme.error} /> : <Check size={11} color={theme.success} />} {idx + 1}
                         </td>
-                        <td style={{ padding: '8px 12px', color: AREAS[parsed.area]?.color || theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.area}</td>
+                        <td style={{ padding: '8px 12px', color: corDaArea(parsed.area, theme), borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.area}</td>
                         <td style={{ padding: '8px 12px', color: theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.tipo}</td>
                         <td style={{ padding: '8px 12px', color: theme.text, borderBottom: `1px solid ${theme.border}22`, maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {parsed.tema || <span style={{ color: theme.error }}>— sem tema —</span>}

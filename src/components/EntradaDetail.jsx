@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AlertTriangle, Check, Link2 } from 'lucide-react'
 import { useTheme } from '../theme'
-import { AREAS, Badge, STATUS_META } from '../shared'
+import { AREAS, Badge, STATUS_META, corDaArea } from '../shared'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
 import AnotacaoPessoal from './AnotacaoPessoal'
@@ -63,7 +63,7 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
   const [showPreviewAbnt, setShowPreviewAbnt] = useState(false)
   const [salvandoStatus, setSalvandoStatus] = useState(false)
 
-  const am = AREAS[entry.area] || { color: theme.muted }
+  const am = { color: corDaArea(entry.area, theme) }
   const abnt = gerarABNT(entry)
 
   async function alterarStatus(novo) {
