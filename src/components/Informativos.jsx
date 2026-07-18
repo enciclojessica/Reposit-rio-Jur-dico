@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AREAS, corDaArea } from '../shared'
-import { TagPill } from './TagInput'
 import { Lock } from 'lucide-react'
 import { supabase } from '../supabase'
 

@@ -4,6 +4,7 @@ import { AREAS, STATUS_META, corDaArea } from '../shared'
 import { TagPill } from './TagInput'
 import { supabase } from '../supabase'
 import { calcularProximaRevisao, estaPendente } from '../utils/spacedRepetition'
+import { tagsVisiveis } from '../utils/tagsVisiveis'
 import { Trophy, Dumbbell, BookOpen, Shuffle, Clock } from 'lucide-react'
 
 // ── Embaralhar array ───────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ function Carta({ carta, virada, onVirar }) {
         {entry.status && entry.status !== 'vigente' && (
           <span style={{ background: s.cor + '22', color: s.cor, border: `1px solid ${s.cor}44`, borderRadius: 20, padding: '1px 8px', fontSize: 10 }}>{s.icon} {s.label}</span>
         )}
-        {(entry.tags || []).map(t => <TagPill key={t} tag={t} pequena />)}
+        {tagsVisiveis(entry).map(t => <TagPill key={t} tag={t} pequena />)}
       </div>
 
       {/* FRENTE: tema */}
