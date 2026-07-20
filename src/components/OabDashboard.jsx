@@ -137,7 +137,7 @@ export default function OabDashboard({ session }) {
       const sessaoHoje = proximas.find(s => s.date === hoje2)
       if (sessaoHoje) {
         setTimeout(() => {
-          new Notification('Lex.IA — Sessão do dia', {
+          new Notification('Themis Jur — Sessão do dia', {
             body: sessaoHoje.disciplina + ': ' + sessaoHoje.topico.slice(0, 80),
             icon: '/icons/icon-192.png',
           })
@@ -390,7 +390,7 @@ export default function OabDashboard({ session }) {
 
       {/* Footer */}
       <div style={{ marginTop: 24, borderTop: `1px solid ${theme.border}`, paddingTop: 12, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
-        <span>Lex.IA · Inteligência Jurídica · Farias Fusquiani</span>
+        <span>Themis Jur · Inteligência Jurídica · Farias Fusquiani</span>
         <span>48º Exame OAB · FGV · 1ª Fase 10/01/2027 · 2ª Fase 28/02/2027</span>
       </div>
 

@@ -28,7 +28,7 @@ function renderSidebar(props = {}) {
 describe('Sidebar', () => {
   it('renderiza sem quebrar e mostra a navegação básica', () => {
     renderSidebar()
-    expect(screen.getByText('Lex.IA')).toBeInTheDocument()
+    expect(screen.getByText('Themis Jur')).toBeInTheDocument()
     expect(screen.getByText('Início')).toBeInTheDocument()
     expect(screen.getByText('Editor de Peças')).toBeInTheDocument()
     expect(screen.getByText('Alertas')).toBeInTheDocument()

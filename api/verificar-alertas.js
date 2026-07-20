@@ -1,4 +1,4 @@
-// api/verificar-alertas.js — Lex.IA
+// api/verificar-alertas.js — Themis Jur
 // Radar de Atualizações: varre os alertas ativos, pesquisa jurisprudência
 // nova via /api/pesquisa-juri e envia um e-mail semanal por usuário via
 // Resend. Disparado pelo Vercel Cron (ver vercel.json) — protegido por
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Lex.IA <alertas@lexiajur.com.br>',
+          from: 'Themis Jur <alertas@themisjur.com.br>',
           to: [email],
           subject: `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`,
           html,
@@ -174,7 +174,7 @@ function montarEmail(resultadosPorTema) {
         <div style="text-align:center;margin-bottom:32px;">
           <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;
                       font-weight:700;color:#c9a452;margin-bottom:4px;">
-            Lex.IA
+            Themis Jur
           </div>
           <div style="font-size:11px;color:#6b7fa3;text-transform:uppercase;letter-spacing:2px;">
             Radar de Atualizações · ${new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
@@ -192,9 +192,9 @@ function montarEmail(resultadosPorTema) {
 
         <div style="border-top:1px solid #1e2d45;padding-top:20px;margin-top:8px;
                     font-size:11px;color:#6b7fa3;text-align:center;line-height:1.7;">
-          Você recebe este e-mail porque cadastrou alertas no Lex.IA.<br>
-          <a href="https://lexiajur.com.br" style="color:#c9a452;text-decoration:none;">
-            Acessar o Lex.IA
+          Você recebe este e-mail porque cadastrou alertas no Themis Jur.<br>
+          <a href="https://themisjur.com.br" style="color:#c9a452;text-decoration:none;">
+            Acessar o Themis Jur
           </a>
         </div>
       </div>

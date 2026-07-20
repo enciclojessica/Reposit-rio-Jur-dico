@@ -151,7 +151,7 @@ export default function JurisprudenciaSearch({ session, theme }) {
           fundamentacao_legal: r.fundamentacao || '',
           precedente_sumula: `${r.tipo} ${r.numero}`,
           ratio_decidendi: r.ementa || '',
-          aplicacao_pratica: `Decisão do ${r.tribunal} pesquisada em ${new Date().toLocaleDateString('pt-BR')} via Lex.IA`,
+          aplicacao_pratica: `Decisão do ${r.tribunal} pesquisada em ${new Date().toLocaleDateString('pt-BR')} via Themis Jur`,
         }],
         criado_por: user.id,
       }

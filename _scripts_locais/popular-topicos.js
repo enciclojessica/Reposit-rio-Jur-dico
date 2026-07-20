@@ -1,4 +1,4 @@
-// api/popular-topicos.js — Lex.IA (endpoint temporário, admin only)
+// api/popular-topicos.js — Themis Jur (endpoint temporário, admin only)
 // Classifica e salva tópicos das questões OAB sem tópico
 // POST /api/popular-topicos { user_id, lote_inicio?, lote_tamanho? }
 

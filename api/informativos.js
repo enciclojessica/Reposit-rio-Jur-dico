@@ -1,4 +1,4 @@
-// api/informativos.js — Lex.IA
+// api/informativos.js — Themis Jur
 // Busca informativos jurisprudenciais do STF e STJ
 // Query params: tribunal (STF|STJ), edicao (opcional)
 import { createClient } from '@supabase/supabase-js'

@@ -1,5 +1,5 @@
 // api/radar-informativos.js
-// Versão corrigida — Jessica / Lex.IA — 07/06/2026
+// Versão corrigida — Jessica / Themis Jur — 07/06/2026
 //
 // CORREÇÕES NESTA VERSÃO:
 // 1. Tratamento explícito de erro antes de .json() (evita SyntaxError se a API retorna HTML/texto de erro)

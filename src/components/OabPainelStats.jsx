@@ -198,7 +198,7 @@ export default function PainelStats({ session, theme, onVoltar }) {
             const blob = new Blob([cabecalho+linhas], { type: 'text/plain; charset=utf-8' })
             const a = document.createElement('a')
             a.href = URL.createObjectURL(blob)
-            a.download = `erros_lexia_${new Date().toISOString().slice(0,10)}.txt`
+            a.download = `erros_themisjur_${new Date().toISOString().slice(0,10)}.txt`
             a.click()
           }}
             style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'none', border:`1px solid ${theme.border}`, borderRadius:8, padding:'10px', fontSize:12, color:theme.muted, cursor:'pointer', fontFamily:'Inter, sans-serif' }}>

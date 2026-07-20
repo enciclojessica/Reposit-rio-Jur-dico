@@ -30,7 +30,7 @@ export async function exportarCalendarOuICS(sessions, dados) {
         headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           summary: `[OAB 48º] ${s.disciplina}`,
-          description: `${s.topico}\n\nMétodos: ${s.metodos.join(', ')}\n\nLex.IA`,
+          description: `${s.topico}\n\nMétodos: ${s.metodos.join(', ')}\n\nThemis Jur`,
           start: { date: s.date }, end: { date: s.date }, colorId: '3',
         }),
       })
@@ -51,9 +51,9 @@ export async function exportarCalendarOuICS(sessions, dados) {
   // Fallback: download .ics
   const linhas = [
     'BEGIN:VCALENDAR','VERSION:2.0',
-    'PRODID:-//LexIA//OAB Dashboard//PT',
+    'PRODID:-//ThemisJur//OAB Dashboard//PT',
     'CALSCALE:GREGORIAN','METHOD:PUBLISH',
-    'X-WR-CALNAME:Lex.IA — Estudos OAB 48° Exame',
+    'X-WR-CALNAME:Themis Jur — Estudos OAB 48° Exame',
     'X-WR-TIMEZONE:America/Sao_Paulo',
   ]
   sessions.forEach(s => {
@@ -61,10 +61,10 @@ export async function exportarCalendarOuICS(sessions, dados) {
     const dtstart = `${y}${m}${d}`
     const status = dados[s.id]?.status || 'A Fazer'
     linhas.push('BEGIN:VEVENT',
-      `UID:lexia-oab-${s.id}@lexiajur.com.br`,
+      `UID:themisjur-oab-${s.id}@themisjur.com.br`,
       `DTSTART;VALUE=DATE:${dtstart}`,`DTEND;VALUE=DATE:${dtstart}`,
       `SUMMARY:[OAB ${s.fase}] ${s.disciplina}`,
-      `DESCRIPTION:Tópico: ${s.topico}\\nMétodos: ${s.metodos.join(', ')}\\nStatus: ${status}\\n\\nLex.IA`,
+      `DESCRIPTION:Tópico: ${s.topico}\\nMétodos: ${s.metodos.join(', ')}\\nStatus: ${status}\\n\\nThemis Jur`,
       `CATEGORIES:OAB,${s.disciplina},${s.fase}`,
       `STATUS:${status === 'Concluído' ? 'CONFIRMED' : 'TENTATIVE'}`,
       'END:VEVENT')

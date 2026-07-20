@@ -1,4 +1,4 @@
-// api/pesquisa-juri.js — Lex.IA
+// api/pesquisa-juri.js — Themis Jur
 // Pesquisa jurisprudencial via Claude + web_search
 // Retorna array de resultados com: tribunal, tipo, numero, relator, data, ementa, area, url
 import { createClient } from '@supabase/supabase-js'

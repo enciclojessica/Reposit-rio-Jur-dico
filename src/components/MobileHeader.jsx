@@ -16,14 +16,14 @@ export default function MobileHeader({
           background: '#800020', border: '2px solid #C5A059',
           overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <img src="/logo-temis.png" alt="Lexia"
+          <img src="/logo-temis.png" alt="Themis Jur"
             style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
             onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
             onError={e => { e.target.style.display = 'none'; e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:14px">FF</span>' }}
           />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Lex.IA</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Themis Jur</div>
           <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>Inteligência Jurídica</div>
         </div>
       </div>

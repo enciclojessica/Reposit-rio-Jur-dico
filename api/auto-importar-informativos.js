@@ -1,4 +1,4 @@
-// api/auto-importar-informativos.js — Lex.IA
+// api/auto-importar-informativos.js — Themis Jur
 // Busca o informativo mais recente do tribunal e salva as decisões
 // relevantes que ainda não estão no repositório como novas entradas
 

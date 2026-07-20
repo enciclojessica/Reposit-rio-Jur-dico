@@ -67,7 +67,7 @@ export default function InstalarApp() {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
-          Instalar Lex.IA no iPhone
+          Instalar Themis Jur no iPhone
         </div>
         <button onClick={() => setShowIOSGuia(false)}
           style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>
@@ -99,10 +99,10 @@ export default function InstalarApp() {
       boxShadow: theme.shadow, animation: 'fadeUp .3s ease',
       display: 'flex', alignItems: 'center', gap: 14,
     }}>
-      <img src="/icon-72.png" alt="Lexia" style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }} />
+      <img src="/icon-72.png" alt="Themis Jur" style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, marginBottom: 2 }}>
-          Instalar Lex.IA
+          Instalar Themis Jur
         </div>
         <div style={{ fontSize: 11, color: theme.muted }}>
           Acesso rápido, carregamento instantâneo, funciona offline.

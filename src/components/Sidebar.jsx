@@ -12,7 +12,7 @@ export default function Sidebar({
       borderRight: `1px solid ${theme.border}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo Lexia — Têmis */}
+      {/* Logo Themis Jur — Têmis */}
       <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{
           width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
@@ -25,7 +25,7 @@ export default function Sidebar({
         }}>
           <img
             src="/logo-temis.png"
-            alt="Lexia"
+            alt="Themis Jur"
             onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
             style={{ width: '100%', height: '100%', cursor: 'pointer', objectFit: 'cover', display: 'block' }}
@@ -38,7 +38,7 @@ export default function Sidebar({
         </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
-            Lex.IA
+            Themis Jur
           </div>
           <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, marginTop: 2 }}>
             Inteligência Jurídica

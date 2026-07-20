@@ -356,7 +356,7 @@ function TabBackup({ session }) {
           '1. Clique em "Gerar backup agora"',
           '2. O arquivo JSON será baixado automaticamente',
           '3. Acesse drive.google.com',
-          '4. Faça upload do arquivo na pasta Lex.IA',
+          '4. Faça upload do arquivo na pasta Themis Jur',
           '5. Recomendado: toda segunda-feira',
         ].map((s, i) => (
           <div key={i} style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>{s}</div>
