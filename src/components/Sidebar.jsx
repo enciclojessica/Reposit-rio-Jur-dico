@@ -98,7 +98,7 @@ export default function Sidebar({
       <div style={{ padding: '14px 20px', borderTop: `1px solid ${theme.border}` }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 2 }}>Plataforma e Curadoria</div>
-          <div style={{ fontSize: 11, color: theme.gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 3, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
+          <div style={{ fontSize: 11, color: theme.goldDark, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 3, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
         </div>
       </div>
     </div>
