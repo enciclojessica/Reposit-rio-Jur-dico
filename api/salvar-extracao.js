@@ -17,10 +17,14 @@ export default async function handler(req, res) {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
 
-  const { dados, filename } = req.body
+  const { dados } = req.body
   if (!dados) return res.status(400).json({ error: 'Dados ausentes.' })
 
-  const origem = filename || dados.meta?.tipo_peca || 'Documento importado'
+  // LGPD: nunca usar o nome do arquivo como origem — o nome do arquivo de
+  // uma petição real quase sempre contém nome de cliente/parte contrária
+  // (ex: "PETIÇÃO - Fulano x Empresa.docx"). Usa só o tipo de peça, que é
+  // informação genérica e reaproveitável.
+  const origem = dados.meta?.tipo_peca ? `Extraído de ${dados.meta.tipo_peca}` : 'Extraído de petição processual'
 
   let tesesSalvas = 0, artigosSalvos = 0
   const erros = []

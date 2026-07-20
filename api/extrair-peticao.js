@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   const { permitido } = await checarRateLimit(supabaseAuth, user.id, 'extrair-peticao', { limite: 10, janelaMs: 5 * 60_000 })
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde alguns minutos e tente novamente.' })
 
-  const { pdf_base64, texto, filename } = req.body
+  const { pdf_base64, texto } = req.body
   if (!pdf_base64 && !texto) return res.status(400).json({ error: 'Arquivo ou texto obrigatório.' })
 
   // ── Montar conteúdo para o Claude ────────────────────────────────────
@@ -38,12 +38,12 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
   let userContent
   if (texto) {
     // Docx: texto extraído no browser
-    userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça${filename ? ` (${filename})` : ''}. Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
+    userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça. Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
   } else {
     // PDF: base64
     userContent = [
       { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdf_base64 } },
-      { type: 'text', text: `Extraia o conhecimento jurídico desta peça${filename ? ` (${filename})` : ''}. Retorne APENAS o JSON.` },
+      { type: 'text', text: 'Extraia o conhecimento jurídico desta peça. Retorne APENAS o JSON.' },
     ]
   }
 
@@ -92,7 +92,8 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
   // ── Salvar no Supabase ────────────────────────────────────────────────
   const supabase = supabaseAuth
-  const origem   = filename || dados.meta?.tipo_peca || 'Documento importado'
+  // LGPD: nunca usar o nome do arquivo como origem (ver salvar-extracao.js)
+  const origem   = dados.meta?.tipo_peca ? `Extraído de ${dados.meta.tipo_peca}` : 'Extraído de petição processual'
   let tesesSalvas = 0, artigosSalvos = 0
   const erros = []
 

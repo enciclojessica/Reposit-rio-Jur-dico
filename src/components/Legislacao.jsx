@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Download, FileText, Search } from 'lucide-react'
+import { Download, Search } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 
@@ -69,7 +69,7 @@ function ArtigoModal({ artigo, onFechar }) {
             {artigo.texto}
           </div>
 
-          {(artigo.contexto || artigo.aplicacao_pratica || artigo.resultado || artigo.origem) && (
+          {(artigo.contexto || artigo.aplicacao_pratica || artigo.resultado) && (
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'IBM Plex Mono, monospace' }}>Experiência prática</div>
               {artigo.contexto && (
@@ -88,11 +88,6 @@ function ArtigoModal({ artigo, onFechar }) {
                 <div>
                   <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Resultado</div>
                   <div style={{ fontSize: 13, color: theme.success, fontWeight: 700 }}>{artigo.resultado}</div>
-                </div>
-              )}
-              {artigo.origem && (
-                <div style={{ background: theme.raised, borderRadius: 8, padding: '10px 14px', fontSize: 12, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <FileText size={13} /> Extraído de: {artigo.origem}
                 </div>
               )}
             </div>

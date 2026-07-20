@@ -134,7 +134,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
           setEtapa('erro'); return
         }
 
-        userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
+        userContent = [{ type: 'text', text: `Extraia o conhecimento jurídico desta peça. Retorne APENAS o JSON.\n\n${texto.slice(0, 40000)}` }]
         setProgresso('Texto extraído (' + texto.length + ' chars). Analisando com IA...')
 
       } else {
@@ -160,7 +160,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
         userContent = [
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } },
-          { type: 'text', text: `Extraia o conhecimento jurídico desta peça (${arquivo.name}). Retorne APENAS o JSON.` },
+          { type: 'text', text: 'Extraia o conhecimento jurídico desta peça. Retorne APENAS o JSON.' },
         ]
         setProgresso('PDF pronto. Enviando para análise — pode levar até 40 segundos...')
       }
@@ -235,7 +235,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + session.access_token,
           },
-          body:    JSON.stringify({ dados, filename: arquivo.name }),
+          body:    JSON.stringify({ dados }),
         })
       } catch (e) {
         setErro('Falha ao salvar no repositório: ' + e.message)
