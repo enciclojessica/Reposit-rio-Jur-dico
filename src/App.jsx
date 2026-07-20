@@ -95,7 +95,7 @@ async function gerarPlanilhaTeses() {
   XLSX.utils.book_append_sheet(wb, ws, 'Teses')
   // Largura das colunas
   ws['!cols'] = [8,8,30,12,18,40,25,25,8,20].map(w => ({ wch: w }))
-  XLSX.writeFile(wb, `lexia_teses_${new Date().toISOString().slice(0,10)}.xlsx`)
+  XLSX.writeFile(wb, `themisjur_teses_${new Date().toISOString().slice(0,10)}.xlsx`)
 }
 
 export default function App() {

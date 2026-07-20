@@ -73,6 +73,6 @@ export async function exportarCalendarOuICS(sessions, dados) {
   const blob = new Blob([linhas.join('\r\n')], { type: 'text/calendar;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  a.href = url; a.download = 'lexia_oab_cronograma.ics'; a.click()
+  a.href = url; a.download = 'themisjur_oab_cronograma.ics'; a.click()
   URL.revokeObjectURL(url)
 }

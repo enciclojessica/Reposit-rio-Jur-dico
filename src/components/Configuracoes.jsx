@@ -273,7 +273,7 @@ function TabBackup({ session }) {
 
       // 3. Baixar localmente (fallback sempre disponível)
       const dataStr = new Date().toISOString().split('T')[0]
-      const nomeArquivo = `lexia_backup_${dataStr}.json`
+      const nomeArquivo = `themisjur_backup_${dataStr}.json`
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url

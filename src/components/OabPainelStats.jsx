@@ -194,7 +194,7 @@ export default function PainelStats({ session, theme, onVoltar }) {
               const sep = Array(61).join('─')
               return (i+1)+'. ['+(q?.disciplina||'')+']\n'+(q?.enunciado||'')+'\n\nGabarito: '+(q?.gabarito||'')+(q?.justificativa ? '\nJustificativa: '+q.justificativa : '')+'\n'+sep
             }).join('\n\n')
-            const cabecalho = 'RELATÓRIO DE ERROS — LEX.IA\nJéssica Farias Fusquiani\n'+new Date().toLocaleDateString('pt-BR')+'\n\n'+Array(61).join('═')+'\n\n'
+            const cabecalho = 'RELATÓRIO DE ERROS — THEMIS JUR\nJéssica Farias Fusquiani\n'+new Date().toLocaleDateString('pt-BR')+'\n\n'+Array(61).join('═')+'\n\n'
             const blob = new Blob([cabecalho+linhas], { type: 'text/plain; charset=utf-8' })
             const a = document.createElement('a')
             a.href = URL.createObjectURL(blob)
