@@ -56,10 +56,14 @@ export default function TagInput({ tags = [], onChange, todasAsTags = [] }) {
     .filter(t => !tags.includes(t) && t.toLowerCase().includes(input.toLowerCase()))
     .slice(0, 8)
 
-  function adicionar(tag) {
-    const limpa = tag.trim().replace(/[^a-zA-Z0-9À-ÿ\-_.]/g, '')
-    if (!limpa || tags.includes(limpa) || tags.length >= 10) return
-    onChange([...tags, limpa])
+  function adicionar(tagDigitada) {
+    const limpa = tagDigitada.trim().replace(/[^a-zA-Z0-9À-ÿ\-_.]/g, '')
+    if (!limpa || tags.length >= 10) return
+    // Evita duplicar por causa de maiúsculas/minúsculas (ex: "CDC" vs "cdc"
+    // virarem duas tags "iguais" só com grafia diferente).
+    if (tags.some(t => t.toLowerCase() === limpa.toLowerCase())) return
+    const jaSugerida = [...TAGS_SUGERIDAS, ...todasAsTags].find(t => t.toLowerCase() === limpa.toLowerCase())
+    onChange([...tags, jaSugerida || limpa])
     setInput('')
   }
 
@@ -121,7 +125,7 @@ export default function TagInput({ tags = [], onChange, todasAsTags = [] }) {
             </div>
           )}
           {/* Criar nova */}
-          {input.trim() && !tags.includes(input.trim().toLowerCase()) && (
+          {input.trim() && !tags.some(t => t.toLowerCase() === input.trim().toLowerCase()) && (
             <div
               onMouseDown={() => adicionar(input)}
               style={{
