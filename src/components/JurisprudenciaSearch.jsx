@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
+import { AREAS } from '../shared'
 import { Search, Scale, BookmarkPlus, Check, AlertCircle, Minus } from 'lucide-react'
 
 const TRIBUNAIS = ['Todos', 'STF', 'STJ', 'TST', 'TRFs', 'TJSP', 'TJRJ', 'TJMG']
@@ -138,7 +139,7 @@ export default function JurisprudenciaSearch({ session, theme }) {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       const entry = {
-        area: r.area || 'Cível',
+        area: AREAS[r.area] ? r.area : 'Cível',
         tipo: 'jurisprudência',
         tema: `${r.tribunal} ${r.tipo} ${r.numero} — ${pesquisado}`,
         fonte: r.tribunal,

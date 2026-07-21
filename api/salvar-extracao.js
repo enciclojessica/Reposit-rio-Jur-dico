@@ -126,7 +126,7 @@ const AREAS_VALIDAS = [
     } else {
       // Não existe — criar entrada nova
       const { error } = await supabase.from('entradas').insert({
-        area: j.area || 'Cível',
+        area: AREAS_VALIDAS.includes(j.area) ? j.area : 'Cível',
         tipo: 'jurisprudência',
         tema: `${j.tribunal} ${ref}`,
         fonte: j.tribunal,
