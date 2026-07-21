@@ -7,13 +7,14 @@ export default function MobileNav({
 }) {
   // Itens fixos no mobile nav
   const navFixos = [
-    { v: VIEWS.HOME,   label: 'Início',   Icone: Home },
+    { v: VIEWS.HOJE,   label: 'Início',   Icone: Home },
     { v: VIEWS.BUSCA,  label: 'Busca IA', Icone: Sparkles },
     { v: VIEWS.EDITOR, label: 'Editor',   Icone: PenLine },
     ...(isEditor ? [{ v: VIEWS.ADD, label: 'Nova', Icone: Plus }] : []),
   ]
   // Itens no menu "mais"
   const navMais = [
+    { v: VIEWS.HOME,        label: 'Repositório' },
     { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
     { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
     { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },

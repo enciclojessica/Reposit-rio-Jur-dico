@@ -10,6 +10,7 @@ import Membros from './components/Membros'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
+import Hoje from './components/Hoje'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
@@ -105,7 +106,7 @@ export default function App() {
   const [membro, setMembro]         = useState(null)   // { role, nome, email }
   const [membroLoading, setMembroLoading] = useState(false)
   const [entradas, setEntradas]     = useState([])
-  const [view, setView]             = useState(VIEWS.HOME)
+  const [view, setView]             = useState(VIEWS.HOJE)
   const [areaFilter, setAreaFilter] = useState('all')
   const [tipoFilter, setTipoFilter]   = useState('all')
   const [importarAba, setImportarAba]   = useState('planilha')
@@ -539,6 +540,13 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.LEGISLACAO:
       case VIEWS.IMPORTAR:
         return <ImportarHub key="importar-hub" session={session} initialTab={importarAba} onAbaChange={setImportarAba} setView={setView} theme={theme} onImportar={handleImportarPesquisa} isEditor={isEditor} todasEntradas={entradas} onAtualizar={loadEntradas} />
+
+      case VIEWS.HOJE:
+        return <div className="fade-up"><Hoje entradas={entradas} session={session}
+          onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}
+          onIrParaOab={() => setView(VIEWS.OAB)}
+          onSelectEntrada={e => { setSelected(e); setView(VIEWS.DETAIL) }}
+        /></div>
 
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session} onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}/></div>

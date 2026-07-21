@@ -26,7 +26,7 @@ export default function Sidebar({
           <img
             src="/logo-temis.png"
             alt="Themis Jur"
-            onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
+            onClick={() => setView(VIEWS.HOJE)}
             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
             style={{ width: '100%', height: '100%', cursor: 'pointer', objectFit: 'cover', display: 'block' }}
           />
@@ -48,7 +48,8 @@ export default function Sidebar({
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
         {[
-          { id: 'home',   label: 'Início',          action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
+          { id: 'hoje',   label: 'Início',          action: () => setView(VIEWS.HOJE), active: view === VIEWS.HOJE },
+          { id: 'home',   label: 'Repositório',     action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
           { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
           { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
           { id: 'juri',   label: 'Jurisprudência',   action: () => setView(VIEWS.JURISPRUDENCIA), active: view === VIEWS.JURISPRUDENCIA },

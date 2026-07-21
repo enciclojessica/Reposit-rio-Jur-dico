@@ -54,6 +54,6 @@ describe('MobileNav', () => {
   it('navega ao clicar em "Início"', () => {
     const { setView } = renderNav()
     fireEvent.click(screen.getByText('Início'))
-    expect(setView).toHaveBeenCalledWith(VIEWS.HOME)
+    expect(setView).toHaveBeenCalledWith(VIEWS.HOJE)
   })
 })

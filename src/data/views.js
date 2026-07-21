@@ -3,6 +3,7 @@
 // circular com App.jsx.
 export const VIEWS = {
   ALERTAS: 'alertas',
+  HOJE: 'hoje',
   EDITOR:     'editor',
   DASHBOARD: 'dashboard',
   IMPORTAR:   'importar',
