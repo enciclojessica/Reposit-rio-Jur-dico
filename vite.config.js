@@ -7,7 +7,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      selfDestroying: true, // temporario: desregistra SW em todos os clientes
+      // registerType 'autoUpdate' + skipWaiting/clientsClaim (abaixo) já
+      // garantem que a versão nova do SW assume imediatamente a cada deploy,
+      // sem precisar de self-destruct manual. selfDestroying ficou ligado
+      // aqui antes (provavelmente pra limpar um cache travado) e nunca foi
+      // desligado — isso fazia o app nunca funcionar offline de verdade,
+      // apesar da tela "Instalar" prometer isso.
       includeAssets: ['logo.png', 'icon-*.png'],
       manifest: {
         name: 'Themis Jur',
