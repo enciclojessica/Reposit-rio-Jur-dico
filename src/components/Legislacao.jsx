@@ -215,7 +215,7 @@ export default function Legislacao() {
     if (busca.trim()) {
       const num = parseInt(busca)
       if (!isNaN(num)) q = q.eq('numero', num)
-      else              q = q.ilike('texto', `%${busca}%`)
+      else              q = q.textSearch('texto', busca, { type: 'websearch', config: 'portuguese' })
     }
 
     const { data } = await q
