@@ -126,6 +126,7 @@ export default function App() {
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
   const [prefillEntry, setPrefillEntry] = useState(null)
+  const [temaAlertaPrefill, setTemaAlertaPrefill] = useState(null)
   const [entradaPublicaId, setEntradaPublicaId] = useState(null)
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
@@ -549,7 +550,9 @@ case VIEWS.JURISPRUDENCIA:
         /></div>
 
       case VIEWS.DASHBOARD:
-        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session} onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}/></div>
+        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session} onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}
+          onCriarAlerta={area => { setTemaAlertaPrefill(area); setView(VIEWS.ALERTAS) }}
+        /></div>
 
       case VIEWS.EDITOR:
         return (
@@ -560,7 +563,9 @@ case VIEWS.JURISPRUDENCIA:
 
       case VIEWS.ALERTAS:
         return (
-          <div className="fade-up"><Alertas session={session} membro={membro} /></div>
+          <div className="fade-up"><Alertas session={session} membro={membro}
+            temaPrefill={temaAlertaPrefill} onTemaPrefillConsumido={() => setTemaAlertaPrefill(null)}
+          /></div>
         )
 
       case VIEWS.ADD:

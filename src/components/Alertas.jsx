@@ -7,13 +7,13 @@ import { Bell, BellOff, Trash2, RefreshCw, Clock, CheckCircle } from 'lucide-rea
 // Lê entradas criadas nos últimos 7 dias no próprio banco de dados.
 // O cron semanal lê receber_boletim: true para disparar e-mails.
 
-export default function Alertas({ session, membro }) {
+export default function Alertas({ session, membro, temaPrefill, onTemaPrefillConsumido }) {
   const { theme, mode } = useTheme()
 
   // Estado de alertas (monitoramento externo, mantido para compatibilidade)
   const [alertas, setAlertas]       = useState([])
   const [loadingAlertas, setLoadingAlertas] = useState(true)
-  const [tema, setTema]             = useState('')
+  const [tema, setTema]             = useState(temaPrefill || '')
   const [tribunal, setTribunal]     = useState('todos')
   const [email, setEmail]           = useState(session?.user?.email || '')
   const [salvando, setSalvando]     = useState(false)
@@ -21,12 +21,18 @@ export default function Alertas({ session, membro }) {
   // Estado do radar — entradas recentes do banco interno
   const [recentes, setRecentes]     = useState([])
   const [loadingRecentes, setLoadingRecentes] = useState(true)
-  const [abaAtiva, setAbaAtiva]     = useState('radar')
+  const [abaAtiva, setAbaAtiva]     = useState(temaPrefill ? 'alertas' : 'radar')
 
   // Boletim
   const [boletim, setBoletim]       = useState(membro?.receber_boletim !== false)
   const [salvandoBoletim, setSalvandoBoletim] = useState(false)
   const [disparando, setDisparando] = useState(false)
+
+  // Consumir o tema pré-preenchido (vindo do card "Lacunas de cobertura" do
+  // Dashboard) só uma vez, pra não sobrescrever o que a pessoa digitar depois.
+  useEffect(() => {
+    if (temaPrefill) onTemaPrefillConsumido?.()
+  }, [])
 
   const [toast, setToast]           = useState(null)
 

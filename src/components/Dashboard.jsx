@@ -113,7 +113,7 @@ function StatCard({ label, valor, cor, sub }) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────
-export default function Dashboard({ entradas, countLegislacao = 0, session, onIrParaFlashcards }) {
+export default function Dashboard({ entradas, countLegislacao = 0, session, onIrParaFlashcards, onCriarAlerta }) {
   const { theme } = useTheme()
   const [revisaoMap, setRevisaoMap] = useState(null) // null = ainda carregando
 
@@ -316,14 +316,25 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onIr
                 <div key={l.label} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '8px 12px', background: theme.raised,
-                  border: `1px solid ${l.cor}33`, borderRadius: 8,
+                  border: `1px solid ${l.cor}33`, borderRadius: 8, gap: 8, flexWrap: 'wrap',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: l.cor }} />
                     <div style={{ fontSize: 12, color: theme.text, fontFamily: 'IBM Plex Mono, monospace' }}>{l.label}</div>
                   </div>
-                  <div style={{ fontSize: 11, color: l.valor === 0 ? theme.error : '#f59e0b', fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {l.valor === 0 ? 'vazio' : `${l.valor} entrada${l.valor !== 1 ? 's' : ''}`}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontSize: 11, color: l.valor === 0 ? theme.error : '#f59e0b', fontFamily: 'IBM Plex Mono, monospace' }}>
+                      {l.valor === 0 ? 'vazio' : `${l.valor} entrada${l.valor !== 1 ? 's' : ''}`}
+                    </div>
+                    {onCriarAlerta && (
+                      <button onClick={() => onCriarAlerta(l.label)} style={{
+                        background: 'none', border: `1px solid ${theme.border}`, color: theme.muted,
+                        borderRadius: 5, padding: '3px 9px', fontSize: 10, cursor: 'pointer',
+                        fontFamily: 'Inter, sans-serif',
+                      }}>
+                        Criar alerta
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
