@@ -39,6 +39,7 @@ const TABELAS = [
   'oab_favoritas',
   'material_estudo',
   'pecas_rascunhos',
+  'oab_cronograma_config',
 ]
 
 async function exportarTabela(nome) {

@@ -27,7 +27,7 @@ const DIAS_SEMANA = [
 ]
 
 // Gera as sessões dinamicamente com base nas preferências
-function gerarSessoes(config) {
+export function gerarSessoes(config) {
   const { dataInicio, diasSemana, horasPorDia, disciplinasPrioridade, dataFimFase1, dataFimFase2 } = config
 
   const inicio = new Date(dataInicio + 'T12:00:00')
@@ -179,19 +179,20 @@ export default function CronogramaWizard({ session, theme, onConcluir }) {
     try {
       const { data: { user } } = await supabase.auth.getUser()
 
-      // Apagar sessões antigas
-      await supabase.from('oab_sessoes').delete().eq('criado_por', user.id)
+      // Apagar progresso das sessões antigas (os ids são recalculados a cada
+      // geração, então progresso antigo ficaria órfão referenciando sessões
+      // que não existem mais no novo cronograma)
+      const { error: delErr } = await supabase.from('oab_sessoes').delete().eq('user_id', user.id)
+      if (delErr) throw new Error('Erro ao limpar progresso antigo: ' + delErr.message)
 
-      // Apagar eventos antigos do Google Calendar (se tiver token)
-      // (feito no cliente ao confirmar)
-
-      // Salvar configuração do cronograma
-      await supabase.from('oab_sessoes').upsert({
-        sessao_id: '__config__',
-        criado_por: user.id,
-        status: 'config',
-        nota: JSON.stringify(config),
-      })
+      // Salvar a configuração do cronograma (usada pra reconstruir o
+      // cronograma personalizado sempre que o app é reaberto)
+      const { error: cfgErr } = await supabase.from('oab_cronograma_config').upsert({
+        user_id: user.id,
+        config,
+        atualizado_em: new Date().toISOString(),
+      }, { onConflict: 'user_id' })
+      if (cfgErr) throw new Error('Erro ao salvar configuração: ' + cfgErr.message)
 
       onConcluir(preview, config)
     } catch (e) {

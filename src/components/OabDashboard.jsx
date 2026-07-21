@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import OabQuestoes from './OabQuestoes'
-import CronogramaWizard from './CronogramaWizard'
+import CronogramaWizard, { gerarSessoes } from './CronogramaWizard'
 import ModulosEstudo from './ModulosEstudo'
 import SessaoCard from './OabSessaoCard'
 import { supabase } from '../supabase'
@@ -64,6 +64,14 @@ export default function OabDashboard({ session }) {
 
   async function carregar() {
     setCarregando(true)
+
+    // Reconstruir o cronograma personalizado, se houver um salvo (sem isso,
+    // sessoesDinamicas ficava sempre null e caía no padrão genérico a cada
+    // reload — era o bug real por trás do cronograma "sumir").
+    const { data: cfgRow } = await supabase
+      .from('oab_cronograma_config').select('config').eq('user_id', session.user.id).maybeSingle()
+    if (cfgRow?.config) setSessoesDinamicas(gerarSessoes(cfgRow.config))
+
     const { data } = await supabase
       .from('oab_sessoes')
       .select('session_id, status, acertos, anotacao, tempo_total')
