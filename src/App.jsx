@@ -11,6 +11,7 @@ import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import Hoje from './components/Hoje'
+import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
@@ -127,6 +128,7 @@ export default function App() {
   const [showLogin, setShowLogin]   = useState(false)
   const [prefillEntry, setPrefillEntry] = useState(null)
   const [temaAlertaPrefill, setTemaAlertaPrefill] = useState(null)
+  const [recuperandoSenha, setRecuperandoSenha] = useState(false)
   const [entradaPublicaId, setEntradaPublicaId] = useState(null)
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
@@ -173,9 +175,10 @@ export default function App() {
       setSession(session)
       setAuthLoading(false)
     })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s)
-      if (s) setShowLogin(false)
+      if (event === 'PASSWORD_RECOVERY') setRecuperandoSenha(true)
+      else if (s) setShowLogin(false)
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -465,6 +468,10 @@ async function handleSave(entry) {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
       Carregando...
     </div>
+  )
+
+  if (recuperandoSenha) return (
+    <RedefinirSenha onConcluido={() => { setRecuperandoSenha(false); notify('Senha atualizada. Você já pode continuar.') }} />
   )
 
   if (aceitandoConvite) return (
