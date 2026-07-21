@@ -177,15 +177,15 @@ export default async function handler(req, res) {
 function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {}) {
   const linhasTemas = resultadosPorTema.map(({ tema, tribunal, resultados }) => {
     const linhasResultados = resultados.map(r => `
-      <div style="border-left:3px solid #c9a452;padding:10px 14px;margin-bottom:10px;background:#1a2236;border-radius:0 6px 6px 0;">
-        <div style="font-size:11px;color:#6b7fa3;margin-bottom:4px;font-family:monospace;">
+      <div style="border-left:3px solid #c9a452;padding:10px 14px;margin-bottom:10px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #c9a452;border-radius:0 6px 6px 0;">
+        <div style="font-size:11px;color:#736b62;margin-bottom:4px;font-family:monospace;">
           ${r.tribunal || ''} ${r.numero ? '· ' + r.numero : ''} ${r.data ? '· ' + r.data : ''}
           ${r.relator ? '· Rel. ' + r.relator : ''}
         </div>
-        <div style="font-size:13px;color:#e8dfc8;line-height:1.6;margin-bottom:6px;">
+        <div style="font-size:13px;color:#2c241b;line-height:1.6;margin-bottom:6px;">
           ${r.ementa?.slice(0, 300)}${r.ementa?.length > 300 ? '...' : ''}
         </div>
-        ${r.url ? `<a href="${r.url}" style="font-size:11px;color:#c9a452;text-decoration:none;">Acessar decisão &rarr;</a>` : ''}
+        ${r.url ? `<a href="${r.url}" style="font-size:11px;color:#800020;text-decoration:none;">Acessar decisão &rarr;</a>` : ''}
       </div>
     `).join('')
 
@@ -193,9 +193,9 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
     const filtro = tribunais.length && !tribunais.includes('todos') ? ` · Filtro: ${tribunais.join(', ')}` : ''
     return `
       <div style="margin-bottom:28px;">
-        <div style="font-size:13px;font-weight:700;color:#c9a452;font-family:'IBM Plex Mono',monospace;
+        <div style="font-size:13px;font-weight:700;color:#800020;font-family:'IBM Plex Mono',monospace;
                     text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
-                    border-bottom:1px solid #1e2d45;padding-bottom:8px;">
+                    border-bottom:1px solid #e8e3dc;padding-bottom:8px;">
           ${tema}${filtro}
         </div>
         ${linhasResultados}
@@ -205,13 +205,13 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
 
   const secaoPendencias = cardsPendentes > 0 ? `
     <div style="margin-bottom:28px;">
-      <div style="font-size:13px;font-weight:700;color:#c9a452;font-family:'IBM Plex Mono',monospace;
+      <div style="font-size:13px;font-weight:700;color:#800020;font-family:'IBM Plex Mono',monospace;
                   text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
-                  border-bottom:1px solid #1e2d45;padding-bottom:8px;">
+                  border-bottom:1px solid #e8e3dc;padding-bottom:8px;">
         Pendências desta semana
       </div>
-      <div style="border-left:3px solid #c9a452;padding:10px 14px;background:#1a2236;border-radius:0 6px 6px 0;">
-        <div style="font-size:13px;color:#e8dfc8;line-height:1.6;">
+      <div style="border-left:3px solid #c9a452;padding:10px 14px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #c9a452;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;color:#2c241b;line-height:1.6;">
           ${cardsPendentes} card${cardsPendentes !== 1 ? 's' : ''} de flashcard${cardsPendentes !== 1 ? 's' : ''} pendente${cardsPendentes !== 1 ? 's' : ''} de revisão, gerado${cardsPendentes !== 1 ? 's' : ''} a partir das teses do seu repositório.
         </div>
       </div>
@@ -220,14 +220,14 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
 
   const secaoLacunas = lacunas.length > 0 ? `
     <div style="margin-bottom:28px;">
-      <div style="font-size:13px;font-weight:700;color:#c9a452;font-family:'IBM Plex Mono',monospace;
+      <div style="font-size:13px;font-weight:700;color:#800020;font-family:'IBM Plex Mono',monospace;
                   text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
-                  border-bottom:1px solid #1e2d45;padding-bottom:8px;">
+                  border-bottom:1px solid #e8e3dc;padding-bottom:8px;">
         Lacunas de cobertura
       </div>
-      <div style="border-left:3px solid #f59e0b;padding:10px 14px;background:#1a2236;border-radius:0 6px 6px 0;">
-        <div style="font-size:13px;color:#e8dfc8;line-height:1.8;">
-          ${lacunas.map(l => `${l.area} <span style="color:#6b7fa3;">(${l.valor} entrada${l.valor !== 1 ? 's' : ''})</span>`).join('<br>')}
+      <div style="border-left:3px solid #b45309;padding:10px 14px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #b45309;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;color:#2c241b;line-height:1.8;">
+          ${lacunas.map(l => `${l.area} <span style="color:#736b62;">(${l.valor} entrada${l.valor !== 1 ? 's' : ''})</span>`).join('<br>')}
         </div>
       </div>
     </div>
@@ -237,22 +237,22 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
     <!DOCTYPE html>
     <html>
     <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-    <body style="margin:0;padding:0;background:#0b0f1a;font-family:'IBM Plex Mono',monospace;">
+    <body style="margin:0;padding:0;background:#f5f1ea;font-family:'IBM Plex Mono',monospace;">
       <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
 
         <div style="text-align:center;margin-bottom:32px;">
           <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;
-                      font-weight:700;color:#c9a452;margin-bottom:4px;">
+                      font-weight:700;color:#800020;margin-bottom:4px;">
             Themis Jur
           </div>
-          <div style="font-size:11px;color:#6b7fa3;text-transform:uppercase;letter-spacing:2px;">
+          <div style="font-size:11px;color:#736b62;text-transform:uppercase;letter-spacing:2px;">
             Boletim Semanal · ${new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
           </div>
         </div>
 
-        <div style="font-size:13px;color:#6b7fa3;margin-bottom:24px;line-height:1.6;
-                    padding:14px;background:#111827;border-radius:8px;
-                    border-left:3px solid #c9a452;">
+        <div style="font-size:13px;color:#4a3f35;margin-bottom:24px;line-height:1.6;
+                    padding:14px;background:#ffffff;border:1px solid #e8e3dc;border-radius:8px;
+                    border-left:3px solid #800020;">
           ${resultadosPorTema.length
             ? 'Encontramos novas decisões relevantes para os temas que você monitora. Revise, importe para o repositório ou descarte conforme necessário.'
             : 'Nenhuma decisão nova esta semana para os temas monitorados, mas veja o que está pendente abaixo.'}
@@ -262,10 +262,10 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
         ${secaoLacunas}
         ${linhasTemas}
 
-        <div style="border-top:1px solid #1e2d45;padding-top:20px;margin-top:8px;
-                    font-size:11px;color:#6b7fa3;text-align:center;line-height:1.7;">
+        <div style="border-top:1px solid #e8e3dc;padding-top:20px;margin-top:8px;
+                    font-size:11px;color:#736b62;text-align:center;line-height:1.7;">
           Você recebe este e-mail porque cadastrou alertas no Themis Jur.<br>
-          <a href="https://themisjur.com.br" style="color:#c9a452;text-decoration:none;">
+          <a href="https://themisjur.com.br" style="color:#800020;text-decoration:none;">
             Acessar o Themis Jur
           </a>
         </div>
