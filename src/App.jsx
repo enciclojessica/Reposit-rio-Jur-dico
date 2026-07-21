@@ -378,11 +378,19 @@ async function handleSave(entry) {
       teses: entry.teses, criado_por: session.user.id,
       ia_status: entry.ia_status || 'manual',
     }
+    const autor = membro?.nome || session.user.email
     if (view === VIEWS.ADD) {
+      payload.historico = [{ data: new Date().toISOString(), descricao: `Criada por ${autor}` }]
       const { error } = await supabase.from('entradas').insert(payload)
       if (error) notify('Erro ao salvar.', 'err')
       else { notify('Entrada salva.'); setPrefillEntry(null); setView(VIEWS.HOME) }
     } else {
+      const CAMPOS = { area: 'Área', tema: 'Tema', tipo: 'Tipo', fonte: 'Fonte', referencia: 'Referência', url: 'URL' }
+      const alterados = Object.keys(CAMPOS).filter(c => (selected?.[c] || '') !== (entry[c] || '')).map(c => CAMPOS[c])
+      if (JSON.stringify(selected?.teses || []) !== JSON.stringify(entry.teses || [])) alterados.push('Teses')
+      const descricao = alterados.length ? `${alterados.join(', ')} alterado(s) por ${autor}` : `Editada por ${autor}`
+      payload.historico = [...(selected?.historico || []), { data: new Date().toISOString(), descricao }]
+
       const { error } = await supabase.from('entradas').update(payload).eq('id', selected.id)
       if (error) notify('Erro ao editar.', 'err')
       else { notify('Entrada atualizada.'); setView(VIEWS.DETAIL) }
