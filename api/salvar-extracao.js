@@ -31,10 +31,16 @@ export default async function handler(req, res) {
   const detalheTeses = []
   const detalheArtigos = []
 
+const AREAS_VALIDAS = [
+  'Cível', 'Penal', 'Constitucional', 'Trabalhista', 'Tributário',
+  'Administrativo', 'Consumidor', 'Família', 'Previdenciário',
+  'Ambiental', 'Internacional', 'Digital',
+]
+
   for (const t of (dados.teses || [])) {
     if (!t.tema?.trim()) continue
     const { error } = await supabase.from('entradas').insert({
-      area:       ['Cível','Penal','Doutrina','Legislação'].includes(t.area) ? t.area : 'Cível',
+      area:       AREAS_VALIDAS.includes(t.area) ? t.area : 'Cível',
       tipo:       t.tipo || 'jurisprudência',
       tema:       t.tema,
       fonte:      t.fonte || '',

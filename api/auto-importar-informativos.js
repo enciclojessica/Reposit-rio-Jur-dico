@@ -67,7 +67,7 @@ Responda SOMENTE com JSON válido, sem nenhum texto antes ou depois, sem markdow
   "total_analisadas": número,
   "entradas": [
     {
-      "area": "Cível|Penal|Trabalhista|Tributário|Constitucional|Administrativo|Empresarial",
+      "area": "Cível|Penal|Constitucional|Trabalhista|Tributário|Administrativo|Consumidor|Família|Previdenciário|Ambiental|Internacional|Digital",
       "tipo": "jurisprudência",
       "tema": "Título conciso da tese (máx 80 chars)",
       "fonte": "${tribunal}",
@@ -134,9 +134,16 @@ Responda SOMENTE com JSON válido, sem nenhum texto antes ou depois, sem markdow
       })
     }
 
+    const AREAS_VALIDAS = [
+      'Cível', 'Penal', 'Constitucional', 'Trabalhista', 'Tributário',
+      'Administrativo', 'Consumidor', 'Família', 'Previdenciário',
+      'Ambiental', 'Internacional', 'Digital',
+    ]
+
     // Salvar no Supabase
     const payload = parsed.entradas.map(e => ({
       ...e,
+      area: AREAS_VALIDAS.includes(e.area) ? e.area : 'Informativo',
       criado_por: userId,
       criado_em: new Date().toISOString(),
     }))
