@@ -28,8 +28,9 @@ export default async function handler(req, res) {
   const { query, tribunal } = req.body || {}
   if (!query?.trim()) return res.status(400).json({ error: 'query obrigatória' })
 
-  const tribunalFiltro = tribunal && tribunal !== 'todos'
-    ? `Foque apenas no tribunal: ${tribunal}.`
+  const tribunais = Array.isArray(tribunal) ? tribunal : (tribunal ? [tribunal] : [])
+  const tribunalFiltro = tribunais.length && !tribunais.includes('todos')
+    ? `Foque apenas n${tribunais.length > 1 ? 'os tribunais' : 'o tribunal'}: ${tribunais.join(', ')}.`
     : 'Busque no STJ e STF prioritariamente. Se não encontrar, inclua TRFs e TST.'
 
   const prompt = `Você é um assistente jurídico especializado em jurisprudência brasileira.

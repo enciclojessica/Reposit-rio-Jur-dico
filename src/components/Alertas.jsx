@@ -14,7 +14,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
   const [alertas, setAlertas]       = useState([])
   const [loadingAlertas, setLoadingAlertas] = useState(true)
   const [tema, setTema]             = useState(temaPrefill || '')
-  const [tribunal, setTribunal]     = useState('todos')
+  const [tribunais, setTribunais]   = useState(['todos'])
   const [email, setEmail]           = useState(session?.user?.email || '')
   const [salvando, setSalvando]     = useState(false)
 
@@ -107,11 +107,11 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
     const res = await fetch('/api/alertas', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tema: tema.trim(), tribunal, email: email.trim() }),
+      body: JSON.stringify({ tema: tema.trim(), tribunal: tribunais, email: email.trim() }),
     })
     const json = await res.json()
     if (json.error) notify(json.error, 'err')
-    else { notify('Alerta cadastrado.'); setTema(''); carregarAlertas() }
+    else { notify('Alerta cadastrado.'); setTema(''); setTribunais(['todos']); carregarAlertas() }
     setSalvando(false)
   }
 
@@ -165,6 +165,16 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
     { id: 'STF', label: 'STF' }, { id: 'TST', label: 'TST' },
     { id: 'TRF', label: 'TRFs' }, { id: 'TJSP', label: 'TJSP' }, { id: 'TJRJ', label: 'TJRJ' },
   ]
+
+  function alternarTribunal(id) {
+    if (id === 'todos') { setTribunais(['todos']); return }
+    setTribunais(prev => {
+      const semTodos = prev.filter(t => t !== 'todos')
+      const jaSelecionado = semTodos.includes(id)
+      const novo = jaSelecionado ? semTodos.filter(t => t !== id) : [...semTodos, id]
+      return novo.length ? novo : ['todos']
+    })
+  }
 
   return (
     <div style={{ paddingBottom: 40, maxWidth: 720 }}>
@@ -292,17 +302,28 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
             <input value={tema} onChange={e => setTema(e.target.value)} onKeyDown={e => e.key === 'Enter' && adicionar()}
               placeholder="Ex: dano moral plano de saúde, responsabilidade civil bancária"
               style={{ marginBottom: 12, fontFamily: 'Inter, sans-serif' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
-              <div>
-                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Tribunal</div>
-                <select value={tribunal} onChange={e => setTribunal(e.target.value)} style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {TRIBUNAIS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
-                </select>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>Tribunais</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {TRIBUNAIS.map(t => {
+                  const ativo = tribunais.includes(t.id)
+                  return (
+                    <button key={t.id} type="button" onClick={() => alternarTribunal(t.id)} style={{
+                      background: ativo ? theme.gold + '22' : 'none',
+                      border: `1px solid ${ativo ? theme.gold : theme.border}`,
+                      color: ativo ? theme.gold : theme.muted,
+                      borderRadius: 20, padding: '6px 14px', fontSize: 12, cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif', fontWeight: ativo ? 600 : 400,
+                    }}>
+                      {t.label}
+                    </button>
+                  )
+                })}
               </div>
-              <div>
-                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Receber em</div>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: 'Inter, sans-serif' }} />
-              </div>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Receber em</div>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: 'Inter, sans-serif', maxWidth: 320 }} />
             </div>
             <button onClick={adicionar} disabled={salvando || !tema.trim() || !email.trim()} style={{
               background: salvando || !tema.trim() || !email.trim() ? theme.border : theme.gold,
@@ -337,7 +358,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                       {a.tema}
                     </div>
                     <div style={{ fontSize: 11, color: theme.muted, display: 'flex', gap: 8, flexWrap: 'wrap', fontFamily: 'Inter, sans-serif' }}>
-                      <span>{a.tribunal === 'todos' ? 'Todos os tribunais' : a.tribunal}</span>
+                      <span>{(Array.isArray(a.tribunal) ? a.tribunal : [a.tribunal]).includes('todos') ? 'Todos os tribunais' : (Array.isArray(a.tribunal) ? a.tribunal.join(', ') : a.tribunal)}</span>
                       <span>·</span>
                       <span>{a.email}</span>
                       {a.ultima_verificacao && (

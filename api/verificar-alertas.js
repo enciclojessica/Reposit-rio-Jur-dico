@@ -151,7 +151,8 @@ function montarEmail(resultadosPorTema) {
       </div>
     `).join('')
 
-    const filtro = tribunal !== 'todos' ? ` · Filtro: ${tribunal}` : ''
+    const tribunais = Array.isArray(tribunal) ? tribunal : (tribunal ? [tribunal] : ['todos'])
+    const filtro = tribunais.length && !tribunais.includes('todos') ? ` · Filtro: ${tribunais.join(', ')}` : ''
     return `
       <div style="margin-bottom:28px;">
         <div style="font-size:13px;font-weight:700;color:#c9a452;font-family:'IBM Plex Mono',monospace;

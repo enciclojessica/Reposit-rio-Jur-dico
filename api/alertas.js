@@ -26,8 +26,9 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { tema, tribunal, email } = req.body
     if (!tema || !email) return res.status(400).json({ error: 'tema e email são obrigatórios.' })
+    const tribunais = Array.isArray(tribunal) && tribunal.length ? tribunal : ['todos']
     const { data, error } = await supabase.from('alertas').insert({
-      user_id: user.id, tema, tribunal: tribunal || 'todos', email,
+      user_id: user.id, tema, tribunal: tribunais, email,
     }).select().single()
     if (error) return res.status(500).json({ error: error.message })
     return res.status(201).json({ alerta: data })
