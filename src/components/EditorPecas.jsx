@@ -43,7 +43,6 @@ function inserirNoCursor(ref, conteudo, setConteudo, texto) {
 // Registrar uso da tese (fire-and-forget)
 async function registrarUsoTese(entryId) {
   try {
-    const { supabase } = await import('../supabase')
     const { data } = await supabase.from('entradas').select('uso_count').eq('id', entryId).single()
     await supabase.from('entradas').update({ uso_count: (data?.uso_count || 0) + 1 }).eq('id', entryId)
   } catch {}
