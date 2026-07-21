@@ -1,0 +1,26 @@
+name: Backup semanal do banco
+
+on:
+  schedule:
+    # Toda segunda-feira às 06:00 UTC (03:00 BRT)
+    - cron: '0 6 * * 1'
+  workflow_dispatch: {} # permite rodar manualmente pela aba Actions do GitHub
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências mínimas
+        run: npm install @supabase/supabase-js --no-save
+
+      - name: Rodar backup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/backup-db.mjs
