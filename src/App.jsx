@@ -541,7 +541,7 @@ case VIEWS.JURISPRUDENCIA:
         return <ImportarHub key="importar-hub" session={session} initialTab={importarAba} onAbaChange={setImportarAba} setView={setView} theme={theme} onImportar={handleImportarPesquisa} isEditor={isEditor} todasEntradas={entradas} onAtualizar={loadEntradas} />
 
       case VIEWS.DASHBOARD:
-        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao}/></div>
+        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session} onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}/></div>
 
       case VIEWS.EDITOR:
         return (

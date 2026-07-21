@@ -1,6 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AREAS, corDaArea } from '../shared'
+import { supabase } from '../supabase'
+import { estaPendente } from '../utils/spacedRepetition'
+import { Dumbbell } from 'lucide-react'
 
 // ── SVG Bar Chart ─────────────────────────────────────────────────────────
 function BarChart({ dados, cor, altura = 120, label }) {
@@ -110,8 +113,25 @@ function StatCard({ label, valor, cor, sub }) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────
-export default function Dashboard({ entradas, countLegislacao = 0 }) {
+export default function Dashboard({ entradas, countLegislacao = 0, session, onIrParaFlashcards }) {
   const { theme } = useTheme()
+  const [revisaoMap, setRevisaoMap] = useState(null) // null = ainda carregando
+
+  useEffect(() => {
+    if (!session) { setRevisaoMap({}); return }
+    supabase.from('flashcards').select('entrada_id, proxima_revisao').eq('user_id', session.user.id)
+      .then(({ data }) => {
+        const mapa = {}
+        ;(data || []).forEach(r => { mapa[r.entrada_id] = r })
+        setRevisaoMap(mapa)
+      })
+  }, [session])
+
+  const cardsElegiveis = useMemo(() => entradas.filter(e => (e.teses || []).some(t => t.tese_assunto?.trim())), [entradas])
+  const cardsPendentes = useMemo(() => {
+    if (!revisaoMap) return 0
+    return cardsElegiveis.filter(e => estaPendente(revisaoMap[e.id])).length
+  }, [cardsElegiveis, revisaoMap])
 
   const stats = useMemo(() => {
     const total   = entradas.length
@@ -184,6 +204,35 @@ export default function Dashboard({ entradas, countLegislacao = 0 }) {
           Visão geral do repositório · atualizado em tempo real
         </div>
       </div>
+
+      {/* ── Nudge Flashcards ──────────────────────────────────────────── */}
+      {revisaoMap !== null && cardsElegiveis.length > 0 && cardsPendentes > 0 && (
+        <div style={{
+          ...card, marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          borderLeft: `3px solid ${theme.gold}`, flexWrap: 'wrap', gap: 12,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Dumbbell size={20} color={theme.gold} />
+            <div>
+              <div style={{ fontSize: 13, color: theme.text, fontFamily: 'IBM Plex Mono, monospace', fontWeight: 600 }}>
+                {cardsPendentes} card{cardsPendentes !== 1 ? 's' : ''} pendente{cardsPendentes !== 1 ? 's' : ''} de revisão
+              </div>
+              <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>
+                Gerados automaticamente a partir das teses do seu repositório.
+              </div>
+            </div>
+          </div>
+          {onIrParaFlashcards && (
+            <button onClick={onIrParaFlashcards} style={{
+              background: theme.gold, color: '#0b0f1a', border: 'none', borderRadius: 8,
+              padding: '9px 18px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif', flexShrink: 0,
+            }}>
+              Revisar agora
+            </button>
+          )}
+        </div>
+      )}
 
       {/* ── Stats cards ───────────────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -325,8 +374,13 @@ export default function Dashboard({ entradas, countLegislacao = 0 }) {
                     border: `1px solid ${theme.border}`,
                     borderLeft: `3px solid ${cor}`, borderRadius: 8,
                   }}>
-                    <div style={{ fontSize: 12, color: theme.text, fontFamily: 'IBM Plex Mono, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {e.tema}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {e.area === 'Informativo' && (
+                        <span style={{ fontSize: 8, color: '#10b981', border: '1px solid #10b98155', borderRadius: 3, padding: '1px 5px', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'IBM Plex Mono, monospace', flexShrink: 0 }}>novo</span>
+                      )}
+                      <div style={{ fontSize: 12, color: theme.text, fontFamily: 'IBM Plex Mono, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {e.tema}
+                      </div>
                     </div>
                     <div style={{ fontSize: 10, color: theme.muted, marginTop: 3 }}>
                       {e.fonte && `${e.fonte} · `}
