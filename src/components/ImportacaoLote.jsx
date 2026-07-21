@@ -156,11 +156,14 @@ export default function ImportacaoLote({ session }) {
       const l = validas[i]
       const payload = { ...l.parsed, criado_por: session.user.id }
 
-      // Verificar se já existe entrada com o mesmo tema (case-insensitive)
+      // Verificar se já existe entrada com o mesmo tema NA MESMA ÁREA
+      // (só por tema seria falso positivo: "Dano moral" existe em Cível E
+      // em Consumidor, por exemplo — mesclar as duas seria perda de dados)
       const { data: existentes } = await supabase
         .from('entradas')
         .select('id')
         .ilike('tema', payload.tema.trim())
+        .eq('area', payload.area)
         .limit(1)
 
       if (existentes && existentes.length > 0) {
