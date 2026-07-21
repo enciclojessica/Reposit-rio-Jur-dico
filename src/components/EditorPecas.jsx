@@ -48,11 +48,33 @@ async function registrarUsoTese(entryId) {
   } catch {}
 }
 
-// Rascunhos no localStorage
+// Rascunhos — migrados de localStorage para Supabase (tabela pecas_rascunhos)
+// em 21/07/2026. As funções de localStorage abaixo só servem hoje para:
+// (1) fallback se por algum motivo não houver sessão, e (2) migração
+// automática e única de rascunhos antigos que ainda estejam só no navegador.
 const DRAFTS_KEY = 'sintese_drafts_v1'
-function carregarRascunhos() { try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) || '[]') } catch { return [] } }
-function salvarRascunhos(lista) { localStorage.setItem(DRAFTS_KEY, JSON.stringify(lista)) }
+function carregarRascunhosLegado() { try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) || '[]') } catch { return [] } }
+function salvarRascunhosLegado(lista) { localStorage.setItem(DRAFTS_KEY, JSON.stringify(lista)) }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }
+
+async function buscarRascunhosSupabase(userId) {
+  const { data, error } = await supabase.from('pecas_rascunhos').select('*').eq('user_id', userId).order('atualizado_em', { ascending: false })
+  if (error) return []
+  return data
+}
+
+// Migração única: se houver rascunhos antigos só no localStorage, sobem pro
+// Supabase e o localStorage é limpo (não duplica em cargas futuras).
+async function migrarRascunhosLegadoSeNecessario(userId) {
+  const legado = carregarRascunhosLegado()
+  if (!legado.length) return
+  const linhas = legado.map(r => ({
+    user_id: userId, titulo: r.titulo || '', conteudo: r.conteudo || '',
+    criado_em: r.criado_em || new Date().toISOString(), atualizado_em: r.atualizado_em || new Date().toISOString(),
+  }))
+  const { error } = await supabase.from('pecas_rascunhos').insert(linhas)
+  if (!error) localStorage.removeItem(DRAFTS_KEY)
+}
 
 // ── Painel de citações ────────────────────────────────────────────────────────
 function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
@@ -244,7 +266,7 @@ function ModalRascunhos({ rascunhos, atualId, onCarregar, onNovo, onExcluir, onF
 }
 
 // ── Editor principal ──────────────────────────────────────────────────────────
-export default function EditorPecas({ entradas }) {
+export default function EditorPecas({ entradas, session }) {
   const { theme } = useTheme()
   const editorRef = useRef()
 
@@ -253,7 +275,7 @@ export default function EditorPecas({ entradas }) {
   const [titulo, setTitulo]                 = useState('')
   const [rito, setRito]                     = useState('')
   const [rascunhoAtualId, setRascunhoAtualId] = useState(null)
-  const [rascunhos, setRascunhos]           = useState(carregarRascunhos)
+  const [rascunhos, setRascunhos]           = useState([])
   const [copiado, setCopiado]               = useState(false)
   const [exportando, setExportando]         = useState(false)
   const [painelAberto, setPainelAberto]     = useState(true)
@@ -269,6 +291,15 @@ export default function EditorPecas({ entradas }) {
     return () => window.removeEventListener('resize', fn)
   }, [])
 
+  // Carregar rascunhos do Supabase (com migração automática do localStorage antigo)
+  useEffect(() => {
+    if (!session) { setRascunhos(carregarRascunhosLegado()); return }
+    (async () => {
+      await migrarRascunhosLegadoSeNecessario(session.user.id)
+      setRascunhos(await buscarRascunhosSupabase(session.user.id))
+    })()
+  }, [session])
+
   // ── Estado dos slash commands ─────────────────────────────────────────
   const [slashCmd, setSlashCmd]             = useState('')
   const [slashOpts, setSlashOpts]           = useState([])
@@ -282,25 +313,41 @@ export default function EditorPecas({ entradas }) {
   // ── Auto-save ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!conteudo.trim() && !titulo.trim()) return
-    const timeout = setTimeout(() => {
-      setRascunhos(prev => {
-        const agora = new Date().toISOString()
-        let lista
-        if (rascunhoAtualId) {
-          lista = prev.map(r => r.id === rascunhoAtualId ? { ...r, titulo, conteudo, atualizado_em: agora } : r)
-        } else {
-          const novoId = uid()
-          setRascunhoAtualId(novoId)
-          lista = [{ id: novoId, titulo, conteudo, criado_em: agora, atualizado_em: agora }, ...prev]
+    const timeout = setTimeout(async () => {
+      const agora = new Date().toISOString()
+
+      if (!session) {
+        // Sem sessão (caso raro): mantém o comportamento antigo, só no navegador
+        setRascunhos(prev => {
+          let lista
+          if (rascunhoAtualId) {
+            lista = prev.map(r => r.id === rascunhoAtualId ? { ...r, titulo, conteudo, rito, atualizado_em: agora } : r)
+          } else {
+            const novoId = uid()
+            setRascunhoAtualId(novoId)
+            lista = [{ id: novoId, titulo, conteudo, rito, criado_em: agora, atualizado_em: agora }, ...prev]
+          }
+          salvarRascunhosLegado(lista)
+          return lista
+        })
+      } else if (rascunhoAtualId) {
+        await supabase.from('pecas_rascunhos').update({ titulo, conteudo, rito, atualizado_em: agora }).eq('id', rascunhoAtualId)
+        setRascunhos(prev => prev.map(r => r.id === rascunhoAtualId ? { ...r, titulo, conteudo, rito, atualizado_em: agora } : r))
+      } else {
+        const { data, error } = await supabase.from('pecas_rascunhos')
+          .insert({ user_id: session.user.id, titulo, conteudo, rito, criado_em: agora, atualizado_em: agora })
+          .select().single()
+        if (!error && data) {
+          setRascunhoAtualId(data.id)
+          setRascunhos(prev => [data, ...prev])
         }
-        salvarRascunhos(lista)
-        return lista
-      })
+      }
+
       setAutoSalvo(true)
       setTimeout(() => setAutoSalvo(false), 2000)
     }, 1000)
     return () => clearTimeout(timeout)
-  }, [titulo, conteudo, rascunhoAtualId])
+  }, [titulo, conteudo, rito, rascunhoAtualId, session])
 
   // ── Slash commands ────────────────────────────────────────────────────
   async function handleSlashInput(texto, posicaoCursor) {
@@ -422,14 +469,16 @@ export default function EditorPecas({ entradas }) {
   }
 
   function carregarRascunho(r) {
-    setTitulo(r.titulo || ''); setConteudo(r.conteudo || '')
+    setTitulo(r.titulo || ''); setConteudo(r.conteudo || ''); setRito(r.rito || '')
     setRascunhoAtualId(r.id); setMostrarRascunhos(false)
   }
 
-  function excluirRascunho(id) {
+  async function excluirRascunho(id) {
     if (!confirm('Excluir este rascunho?')) return
-    setRascunhos(prev => { const l = prev.filter(r => r.id !== id); salvarRascunhos(l); return l })
-    if (rascunhoAtualId === id) { setTitulo(''); setConteudo(''); setRascunhoAtualId(null) }
+    setRascunhos(prev => prev.filter(r => r.id !== id))
+    if (session) await supabase.from('pecas_rascunhos').delete().eq('id', id)
+    else salvarRascunhosLegado(rascunhos.filter(r => r.id !== id))
+    if (rascunhoAtualId === id) { setTitulo(''); setConteudo(''); setRito(''); setRascunhoAtualId(null) }
   }
 
   const palavras = conteudo.trim() ? conteudo.trim().split(/\s+/).length : 0

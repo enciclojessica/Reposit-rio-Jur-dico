@@ -554,7 +554,7 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.EDITOR:
         return (
           <div className="fade-up" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <EditorPecas entradas={entradas}/>
+            <EditorPecas entradas={entradas} session={session}/>
           </div>
         )
 

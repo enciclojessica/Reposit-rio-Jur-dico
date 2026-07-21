@@ -37,7 +37,7 @@ function citacaoABNT(entry) {
   return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
 }
 
-function parseLinha(linha) {
+export function parseLinha(linha) {
   const trim = linha.trim()
   if (trim.startsWith('## '))
     return new Paragraph({

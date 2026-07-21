@@ -38,6 +38,7 @@ const TABELAS = [
   'oab_sessoes',
   'oab_favoritas',
   'material_estudo',
+  'pecas_rascunhos',
 ]
 
 async function exportarTabela(nome) {

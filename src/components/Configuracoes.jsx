@@ -250,6 +250,22 @@ function TabBackup({ session, entradas }) {
   })
   const [statusNotas, setStatusNotas] = useState(null) // null | 'carregando' | 'ok' | 'erro'
   const [msgNotas, setMsgNotas]       = useState('')
+  const [statusRascunhos, setStatusRascunhos] = useState(null)
+  const [msgRascunhos, setMsgRascunhos]       = useState('')
+
+  async function exportarRascunhos() {
+    setStatusRascunhos('carregando')
+    setMsgRascunhos('Reunindo seus rascunhos...')
+    try {
+      const { exportarRascunhosDocx } = await import('../utils/exportarRascunhos')
+      const total = await exportarRascunhosDocx(session)
+      setStatusRascunhos('ok')
+      setMsgRascunhos(`${total} rascunho(s) exportado(s) para o Word.`)
+    } catch (err) {
+      setStatusRascunhos('erro')
+      setMsgRascunhos(err.message || 'Erro ao exportar rascunhos.')
+    }
+  }
 
   async function exportarNotas() {
     setStatusNotas('carregando')
@@ -271,7 +287,7 @@ function TabBackup({ session, entradas }) {
 
     try {
       // 1. Buscar todas as tabelas
-      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'oab_questoes', 'flashcards']
+      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'oab_questoes', 'flashcards', 'pecas_rascunhos']
       const backup = { gerado_em: new Date().toISOString(), tabelas: {} }
 
       for (const tabela of tabelas) {
@@ -386,6 +402,49 @@ function TabBackup({ session, entradas }) {
             {statusNotas === 'ok' && <Check size={14} />}
             {statusNotas === 'erro' && <AlertCircle size={14} />}
             {msgNotas}
+          </div>
+        )}
+      </div>
+
+      {/* Card: Rascunhos de Peças */}
+      <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '20px 20px', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <Download size={18} color={theme.gold} />
+          <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
+            Rascunhos de Peças
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
+          Exporta todos os rascunhos salvos no Editor de Peças em um único documento Word. Desde 21/07/2026 os rascunhos ficam salvos no banco (não mais só no navegador), então já entram automaticamente no backup semanal.
+        </div>
+
+        <button
+          onClick={exportarRascunhos}
+          disabled={statusRascunhos === 'carregando'}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: statusRascunhos === 'carregando' ? theme.border : theme.gold,
+            color: statusRascunhos === 'carregando' ? theme.muted : '#0b0f1a',
+            border: 'none', borderRadius: 8, padding: '10px 20px',
+            fontSize: 13, fontWeight: 600, cursor: statusRascunhos === 'carregando' ? 'not-allowed' : 'pointer',
+            fontFamily: 'Inter, sans-serif',
+          }}>
+          <Download size={14} />
+          {statusRascunhos === 'carregando' ? 'Gerando documento...' : 'Exportar rascunhos (.docx)'}
+        </button>
+
+        {msgRascunhos && (
+          <div style={{
+            marginTop: 14, padding: '12px 14px', borderRadius: 8, fontSize: 12,
+            fontFamily: 'Inter, sans-serif', lineHeight: 1.6,
+            background: statusRascunhos === 'erro' ? theme.toastErr : statusRascunhos === 'ok' ? theme.toastOk : theme.raised,
+            color: statusRascunhos === 'erro' ? theme.error : statusRascunhos === 'ok' ? theme.success : theme.muted,
+            border: `1px solid ${statusRascunhos === 'erro' ? theme.error + '44' : statusRascunhos === 'ok' ? theme.success + '44' : theme.border}`,
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            {statusRascunhos === 'ok' && <Check size={14} />}
+            {statusRascunhos === 'erro' && <AlertCircle size={14} />}
+            {msgRascunhos}
           </div>
         )}
       </div>
