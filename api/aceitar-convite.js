@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   // 2. Verificar se usuário já é membro
   const { data: existente } = await supabase
     .from('membros')
-    .select('id')
+    .select('id, role')
     .eq('user_id', user_id)
     .single()
 
