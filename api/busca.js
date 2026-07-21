@@ -2,6 +2,10 @@
 // A chave da Anthropic NUNCA sai do servidor. O cliente autentica com o JWT do Supabase.
 import { createClient } from '@supabase/supabase-js'
 import { checarRateLimit } from '../lib/rateLimit.js'
+import { ANTHROPIC_MODEL, ANTHROPIC_MODEL_RAPIDO } from '../lib/anthropicModel.js'
+
+const MODELOS_PERMITIDOS = [ANTHROPIC_MODEL, ANTHROPIC_MODEL_RAPIDO]
+const MAX_TOKENS_TETO = 10000 // maior uso legítimo hoje é 8000 (ExtrairPeticao); dá folga sem deixar em aberto
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -25,6 +29,13 @@ export default async function handler(req, res) {
 
   // 'beta' é um campo de controle nosso, não vai no corpo enviado à Anthropic
   const { beta, ...body } = req.body || {}
+
+  if (!MODELOS_PERMITIDOS.includes(body.model)) {
+    return res.status(400).json({ error: 'Modelo não permitido.' })
+  }
+  if (typeof body.max_tokens === 'number' && body.max_tokens > MAX_TOKENS_TETO) {
+    body.max_tokens = MAX_TOKENS_TETO
+  }
 
   const headers = {
     'Content-Type': 'application/json',
