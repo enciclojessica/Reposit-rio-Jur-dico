@@ -39,6 +39,19 @@ export default async function handler(req, res) {
   if (error) return res.status(500).json({ error: error.message })
   if (!alertas?.length) return res.status(200).json({ ok: true, processados: 0 })
 
+  // Lacunas de cobertura — mesma lógica do card "Lacunas de cobertura" do
+  // Dashboard (áreas com menos de 5 entradas). Calculado uma vez só, é dado
+  // compartilhado do repositório, não muda por usuário.
+  const AREAS_LISTA = [
+    'Cível', 'Penal', 'Constitucional', 'Trabalhista', 'Tributário',
+    'Administrativo', 'Consumidor', 'Família', 'Previdenciário',
+    'Ambiental', 'Internacional', 'Digital',
+  ]
+  const { data: todasEntradas } = await supabase.from('entradas').select('area, teses, criado_por')
+  const lacunas = AREAS_LISTA
+    .map(area => ({ area, valor: (todasEntradas || []).filter(e => e.area === area).length }))
+    .filter(l => l.valor < 5)
+
   // Agrupar por email para enviar um único e-mail por usuário
   const porEmail = {}
   for (const a of alertas) {
@@ -52,6 +65,7 @@ export default async function handler(req, res) {
   for (const [email, temasDoUsuario] of Object.entries(porEmail)) {
     console.log(`[verificar-alertas] Processando ${temasDoUsuario.length} tema(s) para ${email}...`)
     try {
+      const userId = temasDoUsuario[0]?.user_id
       const resultadosPorTema = []
 
       for (const alerta of temasDoUsuario) {
@@ -78,12 +92,30 @@ export default async function handler(req, res) {
           .eq('id', alerta.id)
       }
 
-      if (!resultadosPorTema.length) {
-        console.log(`[verificar-alertas] ${email}: nenhum resultado novo para os temas monitorados.`)
+      // Flashcards pendentes de revisão — mesma lógica da tela Hoje/Dashboard
+      let cardsPendentes = 0
+      if (userId) {
+        const { data: flashcardsUsuario } = await supabase
+          .from('flashcards').select('entrada_id, proxima_revisao').eq('user_id', userId)
+        const revisaoMap = {}
+        ;(flashcardsUsuario || []).forEach(r => { revisaoMap[r.entrada_id] = r })
+        const agora = new Date()
+        cardsPendentes = (todasEntradas || [])
+          .filter(e => (e.teses || []).some(t => t.tese_assunto?.trim()))
+          .filter(e => {
+            const r = revisaoMap[e.id]
+            return !r || new Date(r.proxima_revisao) <= agora
+          }).length
+      }
+
+      // Só envia se houver algo de fato novo/pendente — lacunas sozinhas não
+      // disparam e-mail toda semana (é dado estático, viraria spam).
+      if (!resultadosPorTema.length && !cardsPendentes) {
+        console.log(`[verificar-alertas] ${email}: nada novo nem pendente esta semana.`)
         continue
       }
 
-      const html = montarEmail(resultadosPorTema)
+      const html = montarEmail(resultadosPorTema, { cardsPendentes, lacunas })
 
       const envio = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -94,7 +126,9 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'Themis Jur <alertas@themisjur.com.br>',
           to: [email],
-          subject: `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`,
+          subject: resultadosPorTema.length
+            ? `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`
+            : `Boletim semanal Themis Jur — ${new Date().toLocaleDateString('pt-BR')}`,
           html,
         }),
       })
@@ -104,16 +138,20 @@ export default async function handler(req, res) {
         enviados++
         const resumoTemas = resultadosPorTema.map(t => t.tema).join(', ')
         const totalDecisoes = resultadosPorTema.reduce((s, t) => s + t.resultados.length, 0)
-        const { data: alertasUsuario } = await supabase
-          .from('alertas').select('user_id').eq('email', email).limit(1)
-        const uid = alertasUsuario?.[0]?.user_id
+        const titulo = totalDecisoes > 0
+          ? `${totalDecisoes} nova(s) decisão(ões) para seus alertas`
+          : `Boletim semanal: ${cardsPendentes} card(s) de flashcard pendente(s)`
+        const corpo = totalDecisoes > 0
+          ? `Temas monitorados com novidades: ${resumoTemas}`
+          : 'Sem decisão nova esta semana, mas você tem flashcards pendentes de revisão.'
+        const uid = userId
         if (uid) {
           await supabase.from('notificacoes').insert({
             user_id: uid,
             tipo: 'alerta',
-            titulo: `${totalDecisoes} nova(s) decisão(ões) para seus alertas`,
-            corpo: `Temas monitorados com novidades: ${resumoTemas}`,
-            dados: { temas: resultadosPorTema.map(t => t.tema), total: totalDecisoes },
+            titulo,
+            corpo,
+            dados: { temas: resultadosPorTema.map(t => t.tema), total: totalDecisoes, cardsPendentes },
           })
         }
       } else {
@@ -136,7 +174,7 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, enviados, erros })
 }
 
-function montarEmail(resultadosPorTema) {
+function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {}) {
   const linhasTemas = resultadosPorTema.map(({ tema, tribunal, resultados }) => {
     const linhasResultados = resultados.map(r => `
       <div style="border-left:3px solid #c9a452;padding:10px 14px;margin-bottom:10px;background:#1a2236;border-radius:0 6px 6px 0;">
@@ -165,6 +203,36 @@ function montarEmail(resultadosPorTema) {
     `
   }).join('')
 
+  const secaoPendencias = cardsPendentes > 0 ? `
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#c9a452;font-family:'IBM Plex Mono',monospace;
+                  text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
+                  border-bottom:1px solid #1e2d45;padding-bottom:8px;">
+        Pendências desta semana
+      </div>
+      <div style="border-left:3px solid #c9a452;padding:10px 14px;background:#1a2236;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;color:#e8dfc8;line-height:1.6;">
+          ${cardsPendentes} card${cardsPendentes !== 1 ? 's' : ''} de flashcard${cardsPendentes !== 1 ? 's' : ''} pendente${cardsPendentes !== 1 ? 's' : ''} de revisão, gerado${cardsPendentes !== 1 ? 's' : ''} a partir das teses do seu repositório.
+        </div>
+      </div>
+    </div>
+  ` : ''
+
+  const secaoLacunas = lacunas.length > 0 ? `
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#c9a452;font-family:'IBM Plex Mono',monospace;
+                  text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
+                  border-bottom:1px solid #1e2d45;padding-bottom:8px;">
+        Lacunas de cobertura
+      </div>
+      <div style="border-left:3px solid #f59e0b;padding:10px 14px;background:#1a2236;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;color:#e8dfc8;line-height:1.8;">
+          ${lacunas.map(l => `${l.area} <span style="color:#6b7fa3;">(${l.valor} entrada${l.valor !== 1 ? 's' : ''})</span>`).join('<br>')}
+        </div>
+      </div>
+    </div>
+  ` : ''
+
   return `
     <!DOCTYPE html>
     <html>
@@ -178,17 +246,20 @@ function montarEmail(resultadosPorTema) {
             Themis Jur
           </div>
           <div style="font-size:11px;color:#6b7fa3;text-transform:uppercase;letter-spacing:2px;">
-            Radar de Atualizações · ${new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
+            Boletim Semanal · ${new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}
           </div>
         </div>
 
         <div style="font-size:13px;color:#6b7fa3;margin-bottom:24px;line-height:1.6;
                     padding:14px;background:#111827;border-radius:8px;
                     border-left:3px solid #c9a452;">
-          Encontramos novas decisões relevantes para os temas que você monitora.
-          Revise, importe para o repositório ou descarte conforme necessário.
+          ${resultadosPorTema.length
+            ? 'Encontramos novas decisões relevantes para os temas que você monitora. Revise, importe para o repositório ou descarte conforme necessário.'
+            : 'Nenhuma decisão nova esta semana para os temas monitorados, mas veja o que está pendente abaixo.'}
         </div>
 
+        ${secaoPendencias}
+        ${secaoLacunas}
         ${linhasTemas}
 
         <div style="border-top:1px solid #1e2d45;padding-top:20px;margin-top:8px;
