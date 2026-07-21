@@ -1,24 +1,21 @@
 import { useState } from 'react'
 import { useTheme } from '../theme'
-import { Lock, Upload, BookOpen, FileSearch, Search, Newspaper } from 'lucide-react'
+import { Lock, Upload, BookOpen, FileSearch, Newspaper } from 'lucide-react'
 import ImportacaoLote from './ImportacaoLote'
 import ImportarLegislacao from './ImportarLegislacao'
 import ExtrairPeticao from './ExtrairPeticao'
-import PesquisaJuri from './PesquisaJuri'
 import Informativos from './Informativos'
 
 const ABAS = [
   { id: 'planilha',     label: 'Planilha',          icon: Upload },
   { id: 'legislacao',   label: 'Legislação',         icon: BookOpen },
   { id: 'peticao',      label: 'Extrair Petição',    icon: FileSearch },
-  { id: 'jurisprudencia', label: 'Jurisprudência',   icon: Search },
   { id: 'informativos', label: 'Informativos',       icon: Newspaper },
 ]
 
 function viewToAba(view) {
   if (view === 'legislacao')     return 'legislacao'
   if (view === 'extrair')        return 'peticao'
-  if (view === 'jurisprudencia') return 'jurisprudencia'
   if (view === 'informativos')   return 'informativos'
   return 'planilha'
 }
@@ -97,13 +94,6 @@ export default function ImportarHub({ session, initialTab, onAbaChange, setView,
       {aba === 'planilha'       && <ImportacaoLote session={session} />}
       {aba === 'legislacao'     && <ImportarLegislacao />}
       {aba === 'peticao'        && <ExtrairPeticao />}
-      {aba === 'jurisprudencia' && (
-        <PesquisaJuri
-          onImportar={entrada => {
-            if (onImportar) onImportar(entrada)
-          }}
-        />
-      )}
       {aba === 'informativos'   && (
         <Informativos
           onImportar={entrada => { if (onImportar) onImportar(entrada) }}
