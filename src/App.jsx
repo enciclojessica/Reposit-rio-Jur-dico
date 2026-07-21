@@ -219,8 +219,14 @@ export default function App() {
               .from('membros').select('*').eq('user_id', session.user.id).single()
             setMembro(novoMembro)
             setConviteToken(null)
+          } else {
+            notify(json.error || 'Não foi possível aceitar o convite.', 'err')
+            setConviteToken(null)
           }
-        } catch {}
+        } catch {
+          notify('Erro ao aceitar o convite. Tente novamente.', 'err')
+          setConviteToken(null)
+        }
         setAceitandoConvite(false)
       }
 
