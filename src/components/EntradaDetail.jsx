@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertTriangle, Check, Link2 } from 'lucide-react'
+import { AlertTriangle, Check, Link2, Unlock } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea } from '../shared'
 import { supabase } from '../supabase'
@@ -60,6 +60,8 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
   const [copied, setCopied]               = useState(false)
   const [copiedAbnt, setCopiedAbnt]       = useState(false)
   const [linkCopiado, setLinkCopiado]     = useState(false)
+  const [erroCompartilhar, setErroCompartilhar] = useState('')
+  const [publica, setPublica]             = useState(!!entry.publica)
   const [showPreviewAbnt, setShowPreviewAbnt] = useState(false)
   const [salvandoStatus, setSalvandoStatus] = useState(false)
 
@@ -105,10 +107,21 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
     setTimeout(() => setCopiedAbnt(false), 2000)
   }
 
-  function compartilhar() {
+  async function compartilhar() {
+    setErroCompartilhar('')
+    if (!publica) {
+      const { error } = await supabase.from('entradas').update({ publica: true }).eq('id', entry.id)
+      if (error) { setErroCompartilhar('Não foi possível gerar o link. Tente novamente.'); return }
+      setPublica(true)
+    }
     navigator.clipboard.writeText(`${window.location.origin}/?entrada=${entry.id}`)
     setLinkCopiado(true)
     setTimeout(() => setLinkCopiado(false), 2500)
+  }
+
+  async function tornarPrivada() {
+    const { error } = await supabase.from('entradas').update({ publica: false }).eq('id', entry.id)
+    if (!error) setPublica(false)
   }
 
   const btn = (cor) => ({
@@ -190,6 +203,15 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
         <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
           {linkCopiado ? <><Check size={13} /> Copiado</> : <><Link2 size={13} /> Compartilhar</>}
         </button>
+        {publica && (
+          <button onClick={tornarPrivada} title="Qualquer pessoa com o link ainda consegue acessar até você tornar privada de novo"
+            style={{ ...btn(), fontSize: 10, color: '#10b981', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Unlock size={12} /> Pública · tornar privada
+          </button>
+        )}
+        {erroCompartilhar && (
+          <div style={{ fontSize: 11, color: theme.error, width: '100%' }}>{erroCompartilhar}</div>
+        )}
 
         {!readOnly && (
           <>
