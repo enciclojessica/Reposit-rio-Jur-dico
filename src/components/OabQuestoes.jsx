@@ -215,7 +215,7 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
       // ── Busca por palavra-chave ──
       } else if (cfg.busca) {
         let q = supabase.from('oab_questoes').select('*')
-          .ilike('enunciado', `%${cfg.busca}%`)
+          .textSearch('enunciado', cfg.busca, { type: 'websearch', config: 'portuguese' })
         if (cfg.disciplina !== 'Todas') q = q.eq('disciplina', cfg.disciplina)
         if (cfg.exame !== 'Todos')      q = q.eq('exame', cfg.exame)
         if (cfg.topico && cfg.topico !== 'Todos') q = q.eq('topico', cfg.topico)
