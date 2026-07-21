@@ -241,13 +241,29 @@ function TabPreferencias({ session, membro }) {
 
 
 // ── Aba Backup ────────────────────────────────────────────────────────────────
-function TabBackup({ session }) {
+function TabBackup({ session, entradas }) {
   const { theme } = useTheme()
   const [status, setStatus] = useState(null) // null | 'carregando' | 'ok' | 'erro'
   const [msg, setMsg]       = useState('')
   const [ultimo, setUltimo] = useState(() => {
     try { return localStorage.getItem('lexia_ultimo_backup') || null } catch { return null }
   })
+  const [statusNotas, setStatusNotas] = useState(null) // null | 'carregando' | 'ok' | 'erro'
+  const [msgNotas, setMsgNotas]       = useState('')
+
+  async function exportarNotas() {
+    setStatusNotas('carregando')
+    setMsgNotas('Reunindo suas anotações...')
+    try {
+      const { exportarAnotacoesDocx } = await import('../utils/exportarAnotacoes')
+      const total = await exportarAnotacoesDocx(entradas || [])
+      setStatusNotas('ok')
+      setMsgNotas(`${total} anotação(ões) exportada(s) para o Word.`)
+    } catch (err) {
+      setStatusNotas('erro')
+      setMsgNotas(err.message || 'Erro ao exportar anotações.')
+    }
+  }
 
   async function fazerBackup() {
     setStatus('carregando')
@@ -331,6 +347,49 @@ function TabBackup({ session }) {
         </button>
       </div>
 
+      {/* Card: Caderno de Estudos */}
+      <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '20px 20px', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <Download size={18} color={theme.gold} />
+          <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
+            Meu Caderno de Estudos
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
+          Exporta todas as suas anotações pessoais (do Repositório e das Questões OAB) em um único documento Word, organizado por tema. Como as anotações ficam salvas neste navegador, só as deste dispositivo são exportadas.
+        </div>
+
+        <button
+          onClick={exportarNotas}
+          disabled={statusNotas === 'carregando'}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: statusNotas === 'carregando' ? theme.border : theme.gold,
+            color: statusNotas === 'carregando' ? theme.muted : '#0b0f1a',
+            border: 'none', borderRadius: 8, padding: '10px 20px',
+            fontSize: 13, fontWeight: 600, cursor: statusNotas === 'carregando' ? 'not-allowed' : 'pointer',
+            fontFamily: 'Inter, sans-serif',
+          }}>
+          <Download size={14} />
+          {statusNotas === 'carregando' ? 'Gerando documento...' : 'Exportar anotações (.docx)'}
+        </button>
+
+        {msgNotas && (
+          <div style={{
+            marginTop: 14, padding: '12px 14px', borderRadius: 8, fontSize: 12,
+            fontFamily: 'Inter, sans-serif', lineHeight: 1.6,
+            background: statusNotas === 'erro' ? theme.toastErr : statusNotas === 'ok' ? theme.toastOk : theme.raised,
+            color: statusNotas === 'erro' ? theme.error : statusNotas === 'ok' ? theme.success : theme.muted,
+            border: `1px solid ${statusNotas === 'erro' ? theme.error + '44' : statusNotas === 'ok' ? theme.success + '44' : theme.border}`,
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            {statusNotas === 'ok' && <Check size={14} />}
+            {statusNotas === 'erro' && <AlertCircle size={14} />}
+            {msgNotas}
+          </div>
+        )}
+      </div>
+
       {/* Status */}
       {msg && (
         <div style={{
@@ -367,7 +426,7 @@ function TabBackup({ session }) {
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
-export default function Configuracoes({ session, membro }) {
+export default function Configuracoes({ session, membro, entradas }) {
   const { theme } = useTheme()
   const [aba, setAba] = useState('perfil')
 
@@ -394,7 +453,7 @@ export default function Configuracoes({ session, membro }) {
       {aba === 'perfil'       && <TabPerfil session={session} membro={membro} />}
       {aba === 'preferencias' && <TabPreferencias session={session} membro={membro} />}
       {aba === 'seguranca'    && <TabPreferencias session={session} membro={membro} />}
-      {aba === 'backup'       && <TabBackup session={session} />}
+      {aba === 'backup'       && <TabBackup session={session} entradas={entradas} />}
     </div>
   )
 }

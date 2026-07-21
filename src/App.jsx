@@ -526,7 +526,7 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.CONFIG:
         return (
           <div className="fade-up">
-            <Configuracoes session={session} membro={membro} />
+            <Configuracoes session={session} membro={membro} entradas={entradas} />
           </div>
         )
 
