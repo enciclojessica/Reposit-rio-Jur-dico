@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Download, Search } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
@@ -13,13 +13,15 @@ const CODIGOS_META = {
 }
 
 // ── Modal de detalhe ────────────────────────────────────────────────────────
-function ArtigoModal({ artigo, onFechar }) {
+function ArtigoModal({ grupo, onFechar }) {
   const { theme } = useTheme()
-  const meta = CODIGOS_META[artigo.codigo] || { cor: '#888', label: artigo.codigo?.toUpperCase(), nome: artigo.codigo?.toUpperCase() }
+  const meta = CODIGOS_META[grupo.codigo] || { cor: '#888', label: grupo.codigo?.toUpperCase(), nome: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
+  const caput = grupo.caput
 
   function copiar() {
-    const t = `${artigo.codigo?.toUpperCase()} Art. ${artigo.numero}${artigo.inciso ? `, ${artigo.inciso}` : ''}${artigo.paragrafo ? `, ${artigo.paragrafo}` : ''}\n\n${artigo.texto}`
+    const corpo = grupo.itens.map(i => i.texto).join('\n')
+    const t = `${grupo.codigo?.toUpperCase()} ${grupo.titulo || `Art. ${grupo.numero}`}\n\n${corpo}`
     navigator.clipboard.writeText(t)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
@@ -47,9 +49,7 @@ function ArtigoModal({ artigo, onFechar }) {
               {meta.label}
             </span>
             <span style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: 'IBM Plex Mono, monospace' }}>
-              Art. {artigo.numero}
-              {artigo.inciso    ? `, ${artigo.inciso}`    : ''}
-              {artigo.paragrafo ? `, ${artigo.paragrafo}` : ''}
+              {grupo.titulo || `Art. ${grupo.numero}`}
             </span>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -65,32 +65,36 @@ function ArtigoModal({ artigo, onFechar }) {
           <div style={{ fontSize: 11, color: meta.cor, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12, fontFamily: 'IBM Plex Mono, monospace' }}>
             {meta.nome}
           </div>
-          <div style={{ fontSize: 15, color: theme.text, lineHeight: 1.8, fontFamily: 'Georgia, serif', marginBottom: 20 }}>
-            {artigo.texto}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+            {grupo.itens.map((item, i) => (
+              <div key={i} style={{ fontSize: 15, color: theme.text, lineHeight: 1.8, fontFamily: 'Georgia, serif', paddingLeft: (item.inciso || item.paragrafo) ? 16 : 0 }}>
+                {item.texto}
+              </div>
+            ))}
           </div>
 
-          {(artigo.contexto || artigo.aplicacao_pratica || artigo.resultado) && (
+          {(caput?.contexto || caput?.aplicacao_pratica || caput?.resultado) && (
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'IBM Plex Mono, monospace' }}>Experiência prática</div>
-              {artigo.contexto && (
+              {caput.contexto && (
                 <div>
                   <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Comentário Didático</div>
-                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontStyle: 'italic' }}>{artigo.contexto}</div>
+                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontStyle: 'italic' }}>{caput.contexto}</div>
                 </div>
               )}
-              {artigo.aplicacao_pratica && (
+              {caput.aplicacao_pratica && (
                 <div>
                   <div style={{ fontSize: 10, color: meta.cor, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Aplicação prática</div>
-                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6 }}>{artigo.aplicacao_pratica}</div>
+                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6 }}>{caput.aplicacao_pratica}</div>
                   <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', marginTop: 6 }}>
                     Um exemplo de aplicação, entre outras hipóteses possíveis de incidência do dispositivo.
                   </div>
                 </div>
               )}
-              {artigo.resultado && (
+              {caput.resultado && (
                 <div>
                   <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 5, fontFamily: 'IBM Plex Mono, monospace' }}>Resultado</div>
-                  <div style={{ fontSize: 13, color: theme.success, fontWeight: 700 }}>{artigo.resultado}</div>
+                  <div style={{ fontSize: 13, color: theme.success, fontWeight: 700 }}>{caput.resultado}</div>
                 </div>
               )}
             </div>
@@ -102,15 +106,18 @@ function ArtigoModal({ artigo, onFechar }) {
 }
 
 // ── Card do artigo ───────────────────────────────────────────────────────────
-function ArtigoCard({ artigo, onAbrir }) {
+function ArtigoCard({ grupo, onAbrir }) {
   const { theme } = useTheme()
-  const meta = CODIGOS_META[artigo.codigo] || { cor: theme.muted, label: artigo.codigo?.toUpperCase() }
+  const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
   const [hover, setHover] = useState(false)
+  const caput = grupo.caput
+  const numSubItens = grupo.itens.length - 1
 
   function copiar(e) {
     e.stopPropagation()
-    const t = `${artigo.codigo?.toUpperCase()} Art. ${artigo.numero}\n\n${artigo.texto}`
+    const corpo = grupo.itens.map(i => i.texto).join('\n')
+    const t = `${grupo.codigo?.toUpperCase()} Art. ${grupo.numero}\n\n${corpo}`
     navigator.clipboard.writeText(t)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
@@ -118,7 +125,7 @@ function ArtigoCard({ artigo, onAbrir }) {
 
   return (
     <div
-      onClick={() => onAbrir(artigo)}
+      onClick={() => onAbrir(grupo)}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -136,31 +143,34 @@ function ArtigoCard({ artigo, onAbrir }) {
               {meta.label}
             </span>
             <span style={{ fontSize: 12, color: theme.text, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}>
-              Art. {artigo.numero}
-              {artigo.inciso    ? `, ${artigo.inciso}`    : ''}
-              {artigo.paragrafo ? `, ${artigo.paragrafo}` : ''}
+              {grupo.titulo || `Art. ${grupo.numero}`}
             </span>
+            {numSubItens > 0 && (
+              <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
+                +{numSubItens} inciso{numSubItens !== 1 ? 's' : ''}/parágrafo{numSubItens !== 1 ? 's' : ''}
+              </span>
+            )}
           </div>
           <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: 'Georgia, serif' }}>
-            {artigo.texto}
+            {caput?.texto}
           </div>
-          {(artigo.contexto || artigo.aplicacao_pratica) && (
+          {(caput?.contexto || caput?.aplicacao_pratica) && (
             <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {artigo.contexto && (
+              {caput.contexto && (
                 <div style={{ fontSize: 11, color: theme.muted }}>
                   <span style={{ textTransform: 'uppercase', letterSpacing: 1, fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' }}>Comentário · </span>
-                  {artigo.contexto}
+                  {caput.contexto}
                 </div>
               )}
-              {artigo.aplicacao_pratica && (
+              {caput.aplicacao_pratica && (
                 <div style={{ fontSize: 11, color: theme.text }}>
                   <span style={{ color: meta.cor, textTransform: 'uppercase', letterSpacing: 1, fontSize: 9, fontFamily: 'IBM Plex Mono, monospace' }}>Aplicação · </span>
-                  {artigo.aplicacao_pratica}
+                  {caput.aplicacao_pratica}
                 </div>
               )}
-              {artigo.resultado && (
+              {caput.resultado && (
                 <div style={{ fontSize: 11, color: theme.success, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}>
-                  {artigo.resultado}
+                  {caput.resultado}
                 </div>
               )}
             </div>
@@ -197,6 +207,30 @@ export default function Legislacao() {
     })
   }, [])
 
+  // Agrupa as linhas (caput + incisos + parágrafos) por artigo real, pra
+  // exibir um card único por artigo em vez de um card por linha granular.
+  const gruposArtigos = useMemo(() => {
+    const mapa = new Map()
+    for (const item of artigos) {
+      const chave = `${item.codigo}|${item.numero}|${item.titulo || ''}`
+      if (!mapa.has(chave)) mapa.set(chave, { chave, codigo: item.codigo, numero: item.numero, titulo: item.titulo, itens: [] })
+      mapa.get(chave).itens.push(item)
+    }
+    const grupos = [...mapa.values()]
+    for (const g of grupos) {
+      g.itens.sort((a, b) => {
+        const pa = a.paragrafo === 'único' ? 0.5 : parseFloat(a.paragrafo) || 0
+        const pb = b.paragrafo === 'único' ? 0.5 : parseFloat(b.paragrafo) || 0
+        if (pa !== pb) return pa - pb
+        if (!a.inciso && b.inciso) return -1
+        if (a.inciso && !b.inciso) return 1
+        return 0
+      })
+      g.caput = g.itens.find(i => !i.inciso && !i.paragrafo) || g.itens[0]
+    }
+    return grupos
+  }, [artigos])
+
   useEffect(() => {
     const delay = setTimeout(buscarArtigos, 300)
     return () => clearTimeout(delay)
@@ -208,7 +242,7 @@ export default function Legislacao() {
       .order('numero',   { ascending: true })
       .order('inciso',    { ascending: true, nullsFirst: true })
       .order('paragrafo', { ascending: true, nullsFirst: true })
-      .limit(100)
+      .limit(500)
 
     if (codigoAtivo !== 'todos') q = q.eq('codigo', codigoAtivo)
 
@@ -334,14 +368,14 @@ export default function Legislacao() {
           </div>
 
           <div style={{ fontSize: 11, color: theme.muted, marginBottom: 12, fontFamily: 'IBM Plex Mono, monospace' }}>
-            {loading ? 'Buscando...' : `${artigos.length} artigo${artigos.length !== 1 ? 's' : ''} encontrado${artigos.length !== 1 ? 's' : ''}`}
+            {loading ? 'Buscando...' : `${gruposArtigos.length} artigo${gruposArtigos.length !== 1 ? 's' : ''} encontrado${gruposArtigos.length !== 1 ? 's' : ''}`}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {artigos.map((a, i) => (
-              <ArtigoCard key={a.id || i} artigo={a} onAbrir={setArtigoSelecionado} />
+            {gruposArtigos.map((g) => (
+              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} />
             ))}
-            {!loading && artigos.length === 0 && (
+            {!loading && gruposArtigos.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13 }}>Nenhum artigo encontrado.</div>
             )}
           </div>
@@ -350,7 +384,7 @@ export default function Legislacao() {
 
       {/* Modal */}
       {artigoSelecionado && (
-        <ArtigoModal artigo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} />
+        <ArtigoModal grupo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} />
       )}
     </div>
   )
