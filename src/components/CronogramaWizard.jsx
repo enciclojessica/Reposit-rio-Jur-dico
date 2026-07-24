@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../supabase'
 import { Calendar, Clock, BookOpen, ChevronRight, ChevronLeft, Check, RotateCcw, Zap, Lightbulb, GripVertical } from 'lucide-react'
 
-const TODAS_DISCIPLINAS = [
+export const TODAS_DISCIPLINAS = [
   { id: 'etica',    nome: 'Ética Profissional',   peso: 10, cor: '#7c3aed' },
   { id: 'civil',    nome: 'Direito Civil',          peso: 14, cor: '#16a34a' },
   { id: 'procc',    nome: 'Processo Civil',         peso: 13, cor: '#2563eb' },
@@ -13,7 +13,7 @@ const TODAS_DISCIPLINAS = [
   { id: 'trib',     nome: 'Direito Tributário',      peso: 8,  cor: '#ea580c' },
   { id: 'emp',      nome: 'Direito Empresarial',     peso: 8,  cor: '#64748b' },
   { id: 'adm',      nome: 'Direito Administrativo',  peso: 8,  cor: '#be185d' },
-  { id: 'simulado', nome: 'Simulados',               peso: 6,  cor: '#0891b2' },
+  { id: 'simulado', nome: 'Simulado Geral',          peso: 6,  cor: '#0891b2' },
 ]
 
 const DIAS_SEMANA = [
