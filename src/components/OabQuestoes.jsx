@@ -21,7 +21,9 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro]       = useState(null)
   const [tempo, setTempo]     = useState(() => { try { return parseInt(localStorage.getItem('oab_tempo') || '0', 10) } catch { return 0 } })
-  const [rodando, setRodando] = useState(false)
+  const [rodando, setRodando] = useState(() => {
+    try { return localStorage.getItem('oab_rodando') === '1' } catch { return false }
+  })
   const timerRef = useRef(null)
   const [statsGerais, setStatsGerais] = useState({ total:0, acertos:0 })
   const [favoritas, setFavoritas] = useState(new Set())
@@ -108,8 +110,9 @@ export default function OabQuestoes({ session, sessaoOabId, disciplinaInicial, t
       localStorage.setItem('oab_idx', String(idx))
       localStorage.setItem('oab_config', JSON.stringify(config))
       localStorage.setItem('oab_tempo', String(tempo))
+      localStorage.setItem('oab_rodando', rodando ? '1' : '0')
     } catch {}
-  }, [tela, questoes, respostas, idx, config, tempo])
+  }, [tela, questoes, respostas, idx, config, tempo, rodando])
 
   async function carregarStats() {
     const { data } = await supabase.from('oab_respostas').select('acertou').eq('user_id', session.user.id)

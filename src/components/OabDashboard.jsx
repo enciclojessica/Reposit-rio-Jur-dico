@@ -40,6 +40,28 @@ export default function OabDashboard({ session }) {
   const [fMes, setFMes]       = useState('Todos')
   const [exportando, setExportando] = useState(false)
 
+  // disciplinaFiltro/topicoFiltro/modoSimulado/simuladoAuto são gatilhos de
+  // "disparo único": devem iniciar uma nova sessão em OabQuestoes só na vez
+  // em que a aba Questões é aberta a partir de um clique em "Praticar" ou
+  // "Iniciar Simulado". Como <OabQuestoes> é desmontado/remontado toda vez
+  // que a aba muda (renderização condicional), sem isso esses gatilhos
+  // continuavam "verdadeiros" indefinidamente (só eram limpos pelo botão
+  // Sair explícito), e qualquer outro caminho de volta pra aba Questões
+  // (trocar de aba e voltar, o app recarregar sozinho ao sair do
+  // background) forçava reiniciar do zero, descartando o progresso que
+  // OabQuestoes já restaura corretamente do próprio localStorage.
+  useEffect(() => {
+    if (aba !== 'questoes') return
+    const t = setTimeout(() => {
+      setDisciplinaFiltro(null)
+      setTopicoFiltro(null)
+      setModoSimulado(false)
+      setSimuladoAuto(null)
+    }, 0)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aba])
+
   // Persistência no Supabase
   useEffect(() => {
     if (session) {
