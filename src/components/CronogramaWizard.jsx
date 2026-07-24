@@ -60,9 +60,18 @@ export function gerarSessoes(config) {
   const totalFase1 = diasFase1.length
   const sessoes = []
 
-  // Fase 1 — distribuir disciplinas proporcionalmente
+  // Fase 1 — distribuir disciplinas proporcionalmente, na ordem de prioridade
+  // definida pelo usuário (não na ordem fixa de TODAS_DISCIPLINAS — senão a
+  // disciplina que vem primeiro no array-fonte sempre cai nos primeiros dias,
+  // independentemente da prioridade configurada)
   const fila = []
-  discComPeso.forEach(d => {
+  const idsPriorizados = new Set(disciplinasPrioridade)
+  const naoPriorizadas = discComPeso.filter(d => !idsPriorizados.has(d.id))
+  const ordemFila = [
+    ...disciplinasPrioridade.map(id => discComPeso.find(d => d.id === id)).filter(Boolean),
+    ...naoPriorizadas,
+  ]
+  ordemFila.forEach(d => {
     const qtd = Math.max(1, Math.round((d.pesoFinal / pesoTotal) * totalFase1))
     for (let i = 0; i < qtd; i++) fila.push(d)
   })
