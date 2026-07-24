@@ -145,9 +145,9 @@ function gerarMetodos(discId, idx) {
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
-export default function CronogramaWizard({ session, theme, onConcluir }) {
+export default function CronogramaWizard({ session, theme, onConcluir, initialConfig }) {
   const [etapa, setEtapa] = useState(1)
-  const [config, setConfig] = useState({
+  const [config, setConfig] = useState(() => initialConfig ? { ...initialConfig } : {
     dataInicio: new Date().toISOString().slice(0, 10),
     diasSemana: [1, 3, 5, 6], // Seg, Qua, Sex, Sáb
     horasPorDia: 2,

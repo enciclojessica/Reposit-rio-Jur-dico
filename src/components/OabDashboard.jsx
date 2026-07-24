@@ -20,6 +20,7 @@ export default function OabDashboard({ session }) {
   const [dados, setDados]     = useState({})
   const [carregando, setCarregando] = useState(true)
   const [mostrarWizard, setMostrarWizard] = useState(false)
+  const [configSalva, setConfigSalva] = useState(null)
   const [sessoesDinamicas, setSessoesDinamicas] = useState(null) // null = usa SESSIONS_PADRAO
   const [aba, setAba] = useState(function() {
     try { return localStorage.getItem('lexia_oab_aba') || 'cronograma' } catch { return 'cronograma' }
@@ -70,7 +71,10 @@ export default function OabDashboard({ session }) {
     // reload — era o bug real por trás do cronograma "sumir").
     const { data: cfgRow } = await supabase
       .from('oab_cronograma_config').select('config').eq('user_id', session.user.id).maybeSingle()
-    if (cfgRow?.config) setSessoesDinamicas(gerarSessoes(cfgRow.config))
+    if (cfgRow?.config) {
+      setSessoesDinamicas(gerarSessoes(cfgRow.config))
+      setConfigSalva(cfgRow.config)
+    }
 
     const { data } = await supabase
       .from('oab_sessoes')
@@ -406,7 +410,7 @@ export default function OabDashboard({ session }) {
       {mostrarWizard && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: '#00000066', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div style={{ background: theme.bg || theme.raised, border: `1px solid ${theme.border}`, borderRadius: 16, padding: '24px', maxWidth: 580, width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px #00000044' }}>
-            <CronogramaWizard session={session} theme={theme} onConcluir={onWizardConcluir} />
+            <CronogramaWizard session={session} theme={theme} onConcluir={onWizardConcluir} initialConfig={configSalva} />
             <button onClick={() => setMostrarWizard(false)}
               style={{ marginTop: 12, width: '100%', background: 'none', border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '8px', cursor: 'pointer', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
               Cancelar
