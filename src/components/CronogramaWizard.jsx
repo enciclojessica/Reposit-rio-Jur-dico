@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
-import { Calendar, Clock, BookOpen, ChevronRight, ChevronLeft, Check, RotateCcw, Zap, Lightbulb } from 'lucide-react'
+import { Calendar, Clock, BookOpen, ChevronRight, ChevronLeft, Check, RotateCcw, Zap, Lightbulb, GripVertical } from 'lucide-react'
 
 const TODAS_DISCIPLINAS = [
   { id: 'etica',    nome: 'Ética Profissional',   peso: 10, cor: '#7c3aed' },
@@ -148,6 +148,8 @@ export default function CronogramaWizard({ session, theme, onConcluir }) {
   })
   const [gerando, setGerando] = useState(false)
   const [preview, setPreview] = useState(null)
+  const [dragIdx, setDragIdx] = useState(null)
+  const [overIdx, setOverIdx] = useState(null)
 
   function toggleDia(id) {
     setConfig(c => ({
@@ -166,6 +168,36 @@ export default function CronogramaWizard({ session, theme, onConcluir }) {
       ;[arr[idx], arr[novo]] = [arr[novo], arr[idx]]
       return { ...c, disciplinasPrioridade: arr }
     })
+  }
+
+  function reordenarDisc(origem, destino) {
+    if (origem === destino) return
+    setConfig(c => {
+      const arr = [...c.disciplinasPrioridade]
+      const [movida] = arr.splice(origem, 1)
+      arr.splice(destino, 0, movida)
+      return { ...c, disciplinasPrioridade: arr }
+    })
+  }
+
+  function handleDragStart(idx) {
+    setDragIdx(idx)
+  }
+
+  function handleDragOver(e, idx) {
+    e.preventDefault()
+    if (idx !== overIdx) setOverIdx(idx)
+  }
+
+  function handleDrop(idx) {
+    if (dragIdx !== null) reordenarDisc(dragIdx, idx)
+    setDragIdx(null)
+    setOverIdx(null)
+  }
+
+  function handleDragEnd() {
+    setDragIdx(null)
+    setOverIdx(null)
   }
 
   function gerarPreview() {
@@ -345,8 +377,23 @@ export default function CronogramaWizard({ session, theme, onConcluir }) {
             {config.disciplinasPrioridade.map((id, idx) => {
               const disc = TODAS_DISCIPLINAS.find(d => d.id === id)
               if (!disc) return null
+              const arrastando = dragIdx === idx
+              const alvoDoArraste = overIdx === idx && dragIdx !== null && dragIdx !== idx
               return (
-                <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 8, marginBottom: 6, borderLeft: `3px solid ${disc.cor}` }}>
+                <div key={id}
+                  draggable
+                  onDragStart={() => handleDragStart(idx)}
+                  onDragOver={e => handleDragOver(e, idx)}
+                  onDrop={() => handleDrop(idx)}
+                  onDragEnd={handleDragEnd}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                    background: theme.raised, border: `1px solid ${alvoDoArraste ? theme.gold : theme.border}`,
+                    borderRadius: 8, marginBottom: 6, borderLeft: `3px solid ${disc.cor}`,
+                    opacity: arrastando ? 0.4 : 1, cursor: 'grab',
+                    transition: 'border-color .12s, opacity .12s',
+                  }}>
+                  <GripVertical size={14} color={theme.muted} style={{ flexShrink: 0, cursor: 'grab' }} />
                   <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', minWidth: 20, textAlign: 'center' }}>{idx + 1}</span>
                   <div style={{ flex: 1, fontSize: 13, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{disc.nome}</div>
                   <div style={{ display: 'flex', gap: 4 }}>
