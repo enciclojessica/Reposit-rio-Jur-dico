@@ -31,7 +31,6 @@ const TABELAS = [
   'convites',
   'alertas',
   'notificacoes',
-  'radar_resultados',
   'flashcards',
   'oab_questoes',
   'oab_respostas',
