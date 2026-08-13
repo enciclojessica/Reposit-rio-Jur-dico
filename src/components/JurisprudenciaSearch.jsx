@@ -31,10 +31,31 @@ function RelevanciaBar({ pct, cor, theme }) {
   )
 }
 
+// A IA às vezes escreve uma frase ("não identificado", "não consta nas fontes...")
+// em vez de omitir o campo. Trata qualquer valor assim (ou vazio) como ausente,
+// em vez de exibir a frase colada no lugar do dado.
+function campoValido(v) {
+  if (!v || typeof v !== 'string') return null
+  const s = v.trim()
+  if (!s) return null
+  if (/não\s*identifi|não\s*consta|não\s*encontr|indispon[íi]vel/i.test(s)) return null
+  return s
+}
+
+function dataValida(v) {
+  const s = campoValido(v)
+  if (!s) return null
+  const d = new Date(s)
+  return isNaN(d.getTime()) ? null : d
+}
+
 function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
   const badge = badgeConfig(r.tendencia, r.area)
   const cor = badge.color
   const pct = r.relevancia || Math.floor(75 + Math.random() * 20)
+  const numero = campoValido(r.numero)
+  const relator = campoValido(r.relator)
+  const data = dataValida(r.data)
 
   return (
     <div style={{
@@ -46,11 +67,16 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
         <div>
           <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Georgia, serif' }}>
-            {r.tribunal} · {r.tipo} {r.numero}
+            {r.tribunal} · {r.tipo}{numero ? ` ${numero}` : ''}
+            {!numero && (
+              <span style={{ fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', marginLeft: 8, fontWeight: 400 }}>
+                nº não confirmado
+              </span>
+            )}
           </div>
-          {r.relator && (
+          {(relator || data) && (
             <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
-              {r.relator}{r.data ? ` · ${new Date(r.data).toLocaleDateString('pt-BR')}` : ''}
+              {relator || ''}{relator && data ? ' · ' : ''}{data ? data.toLocaleDateString('pt-BR') : ''}
             </div>
           )}
         </div>
@@ -138,19 +164,22 @@ export default function JurisprudenciaSearch({ session, theme }) {
     setSalvandoId(key)
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      const numero = campoValido(r.numero)
+      const relator = campoValido(r.relator)
+      const numeroTxt = numero || 'nº não confirmado'
       const entry = {
         area: AREAS[r.area] ? r.area : 'Cível',
         tipo: 'jurisprudência',
-        tema: `${r.tribunal} ${r.tipo} ${r.numero} — ${pesquisado}`,
+        tema: `${r.tribunal} ${r.tipo} ${numeroTxt} — ${pesquisado}`,
         fonte: r.tribunal,
-        referencia: `${r.tipo} ${r.numero}${r.relator ? ' — Rel. ' + r.relator : ''}`,
+        referencia: `${r.tipo} ${numeroTxt}${relator ? ' — Rel. ' + relator : ''}`,
         url: r.url || null,
         status: 'vigente',
         tags: ['jurisprudência', r.tribunal?.toLowerCase(), 'pesquisa-juri'].filter(Boolean),
         teses: [{
           tese_assunto: r.ementa?.slice(0, 150) || 'Ver ementa completa',
           fundamentacao_legal: r.fundamentacao || '',
-          precedente_sumula: `${r.tipo} ${r.numero}`,
+          precedente_sumula: `${r.tipo} ${numeroTxt}`,
           ratio_decidendi: r.ementa || '',
           aplicacao_pratica: `Decisão do ${r.tribunal} pesquisada em ${new Date().toLocaleDateString('pt-BR')} via Themis Jur`,
         }],

@@ -38,12 +38,18 @@ Pesquise decisões reais sobre: "${query}"
 ${tribunalFiltro}
 
 IMPORTANTE: Use a ferramenta de busca para encontrar decisões REAIS com dados verdadeiros.
-Traga entre 3 e 6 resultados relevantes.
+Traga entre 3 e 6 resultados relevantes. Só inclua uma decisão se você tiver uma URL real
+da fonte (Jusbrasil, site do tribunal, etc.) que a comprove.
 
 Para cada decisão, classifique "tendencia" como:
 - "favoravel": reconhece o direito, protege parte vulnerável, aplica CDC/CLT/princípios protetivos
 - "contrario": nega o direito, restringe a pretensão, exige requisitos adicionais
 - "neutro": interpreta norma sem favorecer parte, ou depende do caso concreto
+
+REGRA DE CAMPO AUSENTE: se a busca não confirmar um campo específico (número do processo,
+relator ou data), use o valor JSON "null" nesse campo. NUNCA escreva frases como "não
+identificado" ou "não identificado nas fontes pesquisadas" dentro de um campo — isso quebra
+a exibição. É preferível null a um dado inventado ou a uma frase no lugar do dado.
 
 Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
 {
@@ -83,7 +89,7 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
     if (!claudeRes.ok) {
       const raw = await claudeRes.text()
       console.error('[pesquisa-juri] Anthropic HTTP', claudeRes.status, raw.slice(0, 300))
-      return res.status(500).json({ error: `Falha na API: HTTP ${claudeRes.status} — ${raw.slice(0, 300)}` })
+      return res.status(500).json({ error: `Falha na API: HTTP ${claudeRes.status}` })
     }
 
     const data = await claudeRes.json()
