@@ -7,7 +7,8 @@ import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
 
   const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
   if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
@@ -88,8 +89,7 @@ Responda SOMENTE com JSON válido, sem nenhum texto antes ou depois, sem markdow
   ]
 }`
 
-  try {
-    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+  const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': ANTHROPIC_KEY,
