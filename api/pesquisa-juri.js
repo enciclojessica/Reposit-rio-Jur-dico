@@ -83,7 +83,7 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
     if (!claudeRes.ok) {
       const raw = await claudeRes.text()
       console.error('[pesquisa-juri] Anthropic HTTP', claudeRes.status, raw.slice(0, 300))
-      return res.status(500).json({ error: `Falha na API: HTTP ${claudeRes.status}` })
+      return res.status(500).json({ error: `Falha na API: HTTP ${claudeRes.status} — ${raw.slice(0, 300)}` })
     }
 
     const data = await claudeRes.json()
