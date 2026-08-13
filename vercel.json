@@ -5,6 +5,11 @@
       "schedule": "0 11 * * 1"
     }
   ],
+  "functions": {
+    "api/pesquisa-juri.js": { "maxDuration": 60 },
+    "api/informativos.js": { "maxDuration": 60 },
+    "api/auto-importar-informativos.js": { "maxDuration": 60 }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
