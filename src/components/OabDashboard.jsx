@@ -32,6 +32,7 @@ export default function OabDashboard({ session }) {
   }
   const [disciplinaFiltro, setDisciplinaFiltro] = useState(null)
   const [topicoFiltro, setTopicoFiltro]         = useState(null)
+  const [sessaoAtualId, setSessaoAtualId]       = useState(null)
   const [modoSimulado, setModoSimulado]         = useState(false)
   const [simuladoAuto, setSimuladoAuto]         = useState(null) // { quantidade, disciplinas } do tópico do cronograma
   const [fFase, setFFase]     = useState('Todas')
@@ -360,6 +361,7 @@ export default function OabDashboard({ session }) {
                     setModoSimulado(false)
                     setSimuladoAuto(null)
                   }
+                  setSessaoAtualId(s.id)
                   setAbaP('questoes')
                 }} theme={theme} />
           ))}
@@ -368,7 +370,7 @@ export default function OabDashboard({ session }) {
 
       {/* ABA: Questões */}
       {aba === 'questoes' && (
-        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} modoInicial={modoSimulado ? 'simulado' : null} simuladoAuto={simuladoAuto} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setModoSimulado(false); setSimuladoAuto(null); setAbaP('cronograma') }} />
+        <OabQuestoes session={session} disciplinaInicial={disciplinaFiltro} topicoSessao={topicoFiltro} modoInicial={modoSimulado ? 'simulado' : null} simuladoAuto={simuladoAuto} sessaoOabId={sessaoAtualId} onSair={() => { setDisciplinaFiltro(null); setTopicoFiltro(null); setModoSimulado(false); setSimuladoAuto(null); setSessaoAtualId(null); setAbaP('cronograma') }} />
       )}
 
       {/* ABA: Estatísticas */}
