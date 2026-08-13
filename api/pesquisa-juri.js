@@ -6,32 +6,33 @@ import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' })
 
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
-  if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
+    const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
+    if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
 
-  // ── Autenticar: CRON_SECRET (radar automático) OU JWT de usuário ──────
-  const authHeader = req.headers.authorization?.replace('Bearer ', '')
-  const isCron = process.env.CRON_SECRET && authHeader === process.env.CRON_SECRET
+    // ── Autenticar: CRON_SECRET (radar automático) OU JWT de usuário ──────
+    const authHeader = req.headers.authorization?.replace('Bearer ', '')
+    const isCron = process.env.CRON_SECRET && authHeader === process.env.CRON_SECRET
 
-  if (!isCron) {
-    if (!authHeader) return res.status(401).json({ error: 'Não autenticado.' })
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader)
-    if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
+    if (!isCron) {
+      if (!authHeader) return res.status(401).json({ error: 'Não autenticado.' })
+      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
+      const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader)
+      if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
 
-    const { permitido } = await checarRateLimit(supabase, user.id, 'pesquisa-juri', { limite: 15, janelaMs: 60_000 })
-    if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
-  }
+      const { permitido } = await checarRateLimit(supabase, user.id, 'pesquisa-juri', { limite: 15, janelaMs: 60_000 })
+      if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
+    }
 
-  const { query, tribunal } = req.body || {}
-  if (!query?.trim()) return res.status(400).json({ error: 'query obrigatória' })
+    const { query, tribunal } = req.body || {}
+    if (!query?.trim()) return res.status(400).json({ error: 'query obrigatória' })
 
-  const tribunais = Array.isArray(tribunal) ? tribunal : (tribunal ? [tribunal] : [])
-  const tribunalFiltro = tribunais.length && !tribunais.includes('todos')
-    ? `Foque apenas n${tribunais.length > 1 ? 'os tribunais' : 'o tribunal'}: ${tribunais.join(', ')}.`
-    : 'Busque no STJ e STF prioritariamente. Se não encontrar, inclua TRFs e TST.'
+    const tribunais = Array.isArray(tribunal) ? tribunal : (tribunal ? [tribunal] : [])
+    const tribunalFiltro = tribunais.length && !tribunais.includes('todos')
+      ? `Foque apenas n${tribunais.length > 1 ? 'os tribunais' : 'o tribunal'}: ${tribunais.join(', ')}.`
+      : 'Busque no STJ e STF prioritariamente. Se não encontrar, inclua TRFs e TST.'
 
   const prompt = `Você é um assistente jurídico especializado em jurisprudência brasileira.
 Pesquise decisões reais sobre: "${query}"
@@ -70,8 +71,7 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
   "aviso": "mensagem opcional se não houver resultados precisos"
 }`
 
-  try {
-    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+  const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': ANTHROPIC_KEY,
@@ -121,6 +121,6 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
     })
   } catch (err) {
     console.error('[pesquisa-juri] Erro:', err)
-    return res.status(500).json({ error: err.message })
+    return res.status(500).json({ error: err.message || 'Erro interno.' })
   }
 }
