@@ -27,8 +27,21 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
 
-  // 'beta' é um campo de controle nosso, não vai no corpo enviado à Anthropic
-  const { beta, ...body } = req.body || {}
+  // 'beta' e 'feature' são campos de controle nossos, não vão no corpo enviado à Anthropic
+  const { beta, feature, ...body } = req.body || {}
+
+  // Gate de recurso pago: só se aplica à Busca para Peça com IA (feature
+  // 'busca-peca'). Editor, Busca Semântica e Extração de Documentos não
+  // enviam esse campo e continuam liberados como antes — a trava é só
+  // para o único caminho de IA que hoje é opcional para o usuário final.
+  if (feature === 'busca-peca') {
+    const { data: membro } = await supabase
+      .from('membros').select('role, pago').eq('user_id', user.id).single()
+    const podeUsarIA = membro?.role === 'admin' || !!membro?.pago
+    if (!podeUsarIA) {
+      return res.status(403).json({ error: 'Busca com IA é um recurso pago. Peça liberação ao administrador.' })
+    }
+  }
 
   if (!MODELOS_PERMITIDOS.includes(body.model)) {
     return res.status(400).json({ error: 'Modelo não permitido.' })

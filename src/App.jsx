@@ -153,6 +153,9 @@ export default function App() {
   const isAdmin  = role === 'admin' || isOwner
   const isEditor = role === 'editor' || isAdmin
   const isMembro = !!membro
+  // Recursos de IA opcionais (ex: Busca para Peça com IA): admin sempre tem
+  // acesso; demais membros só se marcados manualmente como pago=true.
+  const podeUsarIA = isAdmin || !!membro?.pago
 
   // ── Ler token de convite na URL ────────────────────────────────────────
   useEffect(() => {
@@ -636,7 +639,7 @@ case VIEWS.JURISPRUDENCIA:
         ) : null
 
       case VIEWS.BUSCA:
-        return <div className="fade-up"><BuscaPeca entradas={entradas}/></div>
+        return <div className="fade-up"><BuscaPeca entradas={entradas} podeUsarIA={podeUsarIA}/></div>
 
       default:
         return (
