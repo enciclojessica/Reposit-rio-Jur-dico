@@ -17,7 +17,7 @@
     },
     {
       "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
+      "destination": "/api/legislacao?sitemap=1"
     },
     {
       "source": "/((?!\\.well-known/|robots\\.txt|sitemap\\.xml).*)",

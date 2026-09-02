@@ -8,6 +8,49 @@ const supabase = createClient(
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
+  // ── Sitemap dinâmico (rota /sitemap.xml via rewrite no vercel.json) ─────
+  // Vive aqui, e não em api/sitemap.js, porque o plano Hobby da Vercel
+  // limita a 12 Serverless Functions por deployment e o projeto já usa
+  // as 12 (ver vercel.json). Sem relação temática com legislação; é só
+  // o slot disponível.
+  if (req.query.sitemap) {
+    const BASE_URL = 'https://themisjur.com.br'
+    const escapeXml = (str) => String(str || '').replace(/[<>&'"]/g, (c) => ({
+      '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;',
+    }[c]))
+
+    const { data: entradas, error: erroEntradas } = await supabase
+      .from('entradas')
+      .select('id, atualizado_em')
+      .eq('publica', true)
+      .order('atualizado_em', { ascending: false })
+
+    if (erroEntradas) console.error('sitemap: erro ao buscar entradas públicas:', erroEntradas.message)
+
+    const urls = [
+      { loc: `${BASE_URL}/`, changefreq: 'daily', priority: '1.0' },
+      ...(entradas || []).map((e) => ({
+        loc: `${BASE_URL}/?entrada=${e.id}`,
+        lastmod: e.atualizado_em ? new Date(e.atualizado_em).toISOString().slice(0, 10) : undefined,
+        changefreq: 'weekly',
+        priority: '0.7',
+      })),
+    ]
+
+    const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((u) => `  <url>
+    <loc>${escapeXml(u.loc)}</loc>${u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : ''}
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>
+`
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400')
+    return res.status(200).send(body)
+  }
+
   const { codigo, numero, q } = req.query
 
   // Busca por comando: /cpc 300
