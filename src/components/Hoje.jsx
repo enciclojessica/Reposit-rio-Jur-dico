@@ -3,33 +3,22 @@ import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import { corDaArea } from '../shared'
 import { estaPendente } from '../utils/spacedRepetition'
-import { Dumbbell, AlertCircle, Sparkles, Check } from 'lucide-react'
+import { Dumbbell, Sparkles, Check } from 'lucide-react'
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000
 
-export default function Hoje({ entradas, session, onIrParaFlashcards, onIrParaOab, onSelectEntrada }) {
+export default function Hoje({ entradas, session, onIrParaFlashcards, onSelectEntrada }) {
   const { theme } = useTheme()
   const [revisaoMap, setRevisaoMap] = useState(null)     // flashcards: entrada_id -> { proxima_revisao }
-  const [erradasPendentes, setErradasPendentes] = useState(null) // número de questões OAB erradas ainda não revisadas
 
   useEffect(() => {
-    if (!session) { setRevisaoMap({}); setErradasPendentes(0); return }
+    if (!session) { setRevisaoMap({}); return }
 
     supabase.from('flashcards').select('entrada_id, proxima_revisao').eq('user_id', session.user.id)
       .then(({ data }) => {
         const mapa = {}
         ;(data || []).forEach(r => { mapa[r.entrada_id] = r })
         setRevisaoMap(mapa)
-      })
-
-    supabase.from('oab_respostas').select('questao_id, acertou, criado_em').eq('user_id', session.user.id)
-      .order('criado_em', { ascending: false })
-      .then(({ data }) => {
-        if (!data) { setErradasPendentes(0); return }
-        const ultimaPorQuestao = {}
-        data.forEach(r => { if (!ultimaPorQuestao[r.questao_id]) ultimaPorQuestao[r.questao_id] = r })
-        const erradas = Object.values(ultimaPorQuestao).filter(r => !r.acertou).length
-        setErradasPendentes(erradas)
       })
   }, [session])
 
@@ -46,8 +35,8 @@ export default function Hoje({ entradas, session, onIrParaFlashcards, onIrParaOa
     return [...base].sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em)).slice(0, 8)
   }, [entradas])
 
-  const carregando = revisaoMap === null || erradasPendentes === null
-  const semPendencias = !carregando && cardsPendentes === 0 && erradasPendentes === 0
+  const carregando = revisaoMap === null
+  const semPendencias = !carregando && cardsPendentes === 0
 
   const card = { background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20 }
   const secLabel = { fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }
@@ -87,22 +76,6 @@ export default function Hoje({ entradas, session, onIrParaFlashcards, onIrParaOa
                 {onIrParaFlashcards && (
                   <button onClick={onIrParaFlashcards} style={{ background: theme.gold, color: '#0b0f1a', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                     Revisar
-                  </button>
-                )}
-              </div>
-            )}
-
-            {erradasPendentes > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 14px', background: theme.raised, border: `1px solid ${theme.border}`, borderLeft: `3px solid #ef4444`, borderRadius: 8, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <AlertCircle size={16} color="#ef4444" />
-                  <div style={{ fontSize: 12, color: theme.text, fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {erradasPendentes} questão{erradasPendentes !== 1 ? 'ões' : ''} OAB errada{erradasPendentes !== 1 ? 's' : ''} ainda não revisada{erradasPendentes !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                {onIrParaOab && (
-                  <button onClick={onIrParaOab} style={{ background: 'none', color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                    Ver no OAB
                   </button>
                 )}
               </div>

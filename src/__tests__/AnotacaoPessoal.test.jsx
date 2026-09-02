@@ -12,30 +12,30 @@ describe('AnotacaoPessoal', () => {
   })
 
   it('salva no localStorage com chave namespaced (evita colisão entre telas)', () => {
-    render(<AnotacaoPessoal itemId="123" namespace="questao" theme={temaFake} />)
+    render(<AnotacaoPessoal itemId="123" namespace="peca" theme={temaFake} />)
     fireEvent.click(screen.getByText('Adicionar anotação'))
     fireEvent.change(screen.getByPlaceholderText('Sua anotação...'), { target: { value: 'nota de teste' } })
-    expect(localStorage.getItem('lexia_nota_questao_123')).toBe('nota de teste')
+    expect(localStorage.getItem('lexia_nota_peca_123')).toBe('nota de teste')
   })
 
   it('migra anotação salva na chave antiga (sem namespace)', () => {
     localStorage.setItem('lexia_nota_999', 'nota antiga')
-    render(<AnotacaoPessoal itemId="999" namespace="questao" theme={temaFake} />)
+    render(<AnotacaoPessoal itemId="999" namespace="peca" theme={temaFake} />)
     fireEvent.click(screen.getByText('Ver anotação'))
     expect(screen.getByDisplayValue('nota antiga')).toBeInTheDocument()
-    expect(localStorage.getItem('lexia_nota_questao_999')).toBe('nota antiga')
+    expect(localStorage.getItem('lexia_nota_peca_999')).toBe('nota antiga')
     expect(localStorage.getItem('lexia_nota_999')).toBeNull()
   })
 
   it('itens diferentes (mesmo id, namespaces diferentes) não colidem', () => {
     localStorage.setItem('lexia_nota_entrada_1', 'nota do repositório')
-    localStorage.setItem('lexia_nota_questao_1', 'nota da questão OAB')
+    localStorage.setItem('lexia_nota_peca_1', 'nota de outra tela')
     const { unmount } = render(<AnotacaoPessoal itemId="1" namespace="entrada" theme={temaFake} />)
     fireEvent.click(screen.getByText('Ver anotação'))
     expect(screen.getByDisplayValue('nota do repositório')).toBeInTheDocument()
     unmount()
-    render(<AnotacaoPessoal itemId="1" namespace="questao" theme={temaFake} />)
+    render(<AnotacaoPessoal itemId="1" namespace="peca" theme={temaFake} />)
     fireEvent.click(screen.getByText('Ver anotação'))
-    expect(screen.getByDisplayValue('nota da questão OAB')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('nota de outra tela')).toBeInTheDocument()
   })
 })

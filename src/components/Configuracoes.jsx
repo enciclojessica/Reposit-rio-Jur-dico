@@ -287,7 +287,7 @@ function TabBackup({ session, entradas }) {
 
     try {
       // 1. Buscar todas as tabelas
-      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'oab_questoes', 'flashcards', 'pecas_rascunhos']
+      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'flashcards', 'pecas_rascunhos']
       const backup = { gerado_em: new Date().toISOString(), tabelas: {} }
 
       for (const tabela of tabelas) {
@@ -337,7 +337,7 @@ function TabBackup({ session, entradas }) {
           </div>
         </div>
         <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
-          Exporta todas as entradas, legislação, questões OAB e flashcards em um arquivo JSON.
+          Exporta todas as entradas, legislação e flashcards em um arquivo JSON.
           Salve o arquivo no seu Google Drive para ter uma cópia de segurança.
         </div>
 
@@ -372,7 +372,7 @@ function TabBackup({ session, entradas }) {
           </div>
         </div>
         <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
-          Exporta todas as suas anotações pessoais (do Repositório e das Questões OAB) em um único documento Word, organizado por tema. Como as anotações ficam salvas neste navegador, só as deste dispositivo são exportadas.
+          Exporta todas as suas anotações pessoais do Repositório em um único documento Word, organizado por tema. Como as anotações ficam salvas neste navegador, só as deste dispositivo são exportadas.
         </div>
 
         <button

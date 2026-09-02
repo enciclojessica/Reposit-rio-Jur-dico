@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { PenLine } from 'lucide-react'
 
 // ── Anotação pessoal (localStorage), reutilizável em qualquer tela ──────
-// namespace evita colisão de chave entre diferentes tabelas com o mesmo id
-// (ex: uma questão OAB e uma entrada do Repositório nunca têm o mesmo
-// prefixo de chave, mesmo que os ids numéricos coincidissem por acaso).
+// namespace evita colisão de chave entre diferentes telas com o mesmo id
+// (ex: uma entrada do Repositório e um item de outra tela nunca têm o
+// mesmo prefixo de chave, mesmo que os ids numéricos coincidissem por acaso).
 export default function AnotacaoPessoal({ itemId, theme, namespace = 'geral', placeholder = 'Sua anotação...' }) {
   const key = `lexia_nota_${namespace}_${itemId}`
   const chaveAntiga = `lexia_nota_${itemId}`

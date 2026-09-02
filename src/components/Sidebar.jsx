@@ -56,7 +56,6 @@ export default function Sidebar({
           { id: 'alertas', label: 'Alertas',        action: () => setView(VIEWS.ALERTAS),   active: view === VIEWS.ALERTAS },
           { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
           { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
-          { id: 'oab',    label: 'Estudos OAB',      action: () => setView(VIEWS.OAB),       active: view === VIEWS.OAB },
           { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
         ].map(n => (
           <button key={n.id} onClick={n.action} style={{

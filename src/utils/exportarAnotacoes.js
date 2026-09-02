@@ -3,7 +3,6 @@ import {
   HeadingLevel, AlignmentType, BorderStyle,
   Footer, PageBreak,
 } from 'docx'
-import { supabase } from '../supabase'
 
 const A4_W   = 11906
 const A4_H   = 16838
@@ -25,11 +24,10 @@ function divisor() {
   })
 }
 
-// Lê todas as anotações pessoais salvas no localStorage (namespaces "entrada" e "questao").
-// Retorna { entradaIds: [...], questaoIds: [...], notas: { [chaveOriginal]: texto } }
+// Lê todas as anotações pessoais salvas no localStorage (namespace "entrada").
+// Retorna { entradaIds: [...], notas: { [chaveOriginal]: texto } }
 export function coletarAnotacoesDoLocalStorage() {
   const entradaIds = []
-  const questaoIds = []
   const notas = {}
 
   try {
@@ -40,37 +38,24 @@ export function coletarAnotacoesDoLocalStorage() {
       if (!texto || !texto.trim()) continue
 
       const mEntrada = key.match(/^lexia_nota_entrada_(.+)$/)
-      const mQuestao = key.match(/^lexia_nota_questao_(.+)$/)
-
       if (mEntrada) { entradaIds.push(mEntrada[1]); notas[key] = texto }
-      else if (mQuestao) { questaoIds.push(mQuestao[1]); notas[key] = texto }
     }
   } catch { /* localStorage indisponível: exporta vazio */ }
 
-  return { entradaIds, questaoIds, notas }
+  return { entradaIds, notas }
 }
 
 export async function exportarAnotacoesDocx(entradas) {
-  const { entradaIds, questaoIds, notas } = coletarAnotacoesDoLocalStorage()
+  const { entradaIds, notas } = coletarAnotacoesDoLocalStorage()
 
-  if (!entradaIds.length && !questaoIds.length) {
+  if (!entradaIds.length) {
     throw new Error('Nenhuma anotação encontrada neste navegador. As anotações ficam salvas localmente, então só aparecem no dispositivo onde foram escritas.')
-  }
-
-  // Busca as questões OAB referenciadas (só as que têm anotação, não o banco todo)
-  let questoes = []
-  if (questaoIds.length) {
-    const { data } = await supabase
-      .from('oab_questoes')
-      .select('id, disciplina, topico, subtema, enunciado')
-      .in('id', questaoIds)
-    questoes = data || []
   }
 
   const data = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
 
   // ── Capa ──────────────────────────────────────────────────────────────
-  const totalNotas = entradaIds.length + questaoIds.length
+  const totalNotas = entradaIds.length
   const capa = [
     paragrafo(txt('MEU CADERNO DE ESTUDOS', { bold: true, size: 40, color: 'C9A452' }), {
       alignment: AlignmentType.CENTER,
@@ -85,7 +70,7 @@ export async function exportarAnotacoesDocx(entradas) {
       spacing: { before: 0, after: 1000 },
     }),
     divisor(),
-    paragrafo(txt(`${totalNotas} anotação(ões) · ${entradaIds.length} do Repositório · ${questaoIds.length} de Questões OAB`, { size: 20, color: '888888' }), {
+    paragrafo(txt(`${totalNotas} anotação(ões) do Repositório`, { size: 20, color: '888888' }), {
       alignment: AlignmentType.CENTER,
       spacing: { before: 200, after: 0 },
     }),
@@ -117,50 +102,6 @@ export async function exportarAnotacoesDocx(entradas) {
         ], { spacing: { before: 0, after: 100 } }))
       } else {
         conteudo.push(paragrafo(txt('(Este item não existe mais no repositório, mas sua anotação foi preservada abaixo.)', { size: 18, color: 'aa8800', italics: true }), {
-          spacing: { before: 0, after: 100 },
-        }))
-      }
-
-      conteudo.push(new Paragraph({
-        border: { left: { style: BorderStyle.SINGLE, size: 12, color: 'C9A452', space: 8 } },
-        spacing: { before: 40, after: 200 },
-        indent: { left: 360 },
-        children: [txt(nota, { italics: true, size: 22 })],
-      }))
-    }
-  }
-
-  // ── Anotações de Questões OAB ───────────────────────────────────────────
-  if (questaoIds.length) {
-    conteudo.push(new Paragraph({ children: [new PageBreak()] }))
-    conteudo.push(paragrafo(txt('ANOTAÇÕES DE QUESTÕES OAB', { bold: true, size: 32, color: 'C9A452' }), {
-      heading: HeadingLevel.HEADING_1,
-      spacing: { before: 0, after: 360 },
-    }))
-    conteudo.push(divisor())
-
-    for (const id of questaoIds) {
-      const questao = questoes.find(q => q.id === id)
-      const nota = notas[`lexia_nota_questao_${id}`]
-
-      conteudo.push(paragrafo(txt(questao ? (questao.subtema || questao.topico || questao.disciplina) : 'Questão removida', { bold: true, size: 26 }), {
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 400, after: 80 },
-      }))
-
-      if (questao) {
-        conteudo.push(paragrafo([
-          txt(questao.disciplina || '', { size: 20, color: '888888', italics: true }),
-        ], { spacing: { before: 0, after: 60 } }))
-        if (questao.enunciado) {
-          const trecho = questao.enunciado.length > 300 ? questao.enunciado.slice(0, 300) + '…' : questao.enunciado
-          conteudo.push(paragrafo(txt(trecho, { size: 20, color: '666666' }), {
-            alignment: AlignmentType.JUSTIFIED,
-            spacing: { before: 0, after: 100, line: 280 },
-          }))
-        }
-      } else {
-        conteudo.push(paragrafo(txt('(Esta questão não existe mais no banco, mas sua anotação foi preservada abaixo.)', { size: 18, color: 'aa8800', italics: true }), {
           spacing: { before: 0, after: 100 },
         }))
       }

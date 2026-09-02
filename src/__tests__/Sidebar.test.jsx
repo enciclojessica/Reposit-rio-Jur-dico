@@ -32,7 +32,6 @@ describe('Sidebar', () => {
     expect(screen.getByText('Início')).toBeInTheDocument()
     expect(screen.getByText('Editor de Peças')).toBeInTheDocument()
     expect(screen.getByText('Alertas')).toBeInTheDocument()
-    expect(screen.getByText('Estudos OAB')).toBeInTheDocument()
   })
 
   it('navega para o Editor de Peças ao clicar', () => {

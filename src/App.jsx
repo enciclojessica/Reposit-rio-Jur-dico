@@ -22,7 +22,6 @@ import InstalarApp from './components/InstalarApp'
 import FlashCards from './components/FlashCards'
 import JurisprudenciaSearch from './components/JurisprudenciaSearch'
 import Configuracoes from './components/Configuracoes'
-import OabDashboard from './components/OabDashboard'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
 import { Lock, LogOut, Download, Trash2 } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
@@ -542,13 +541,6 @@ case VIEWS.JURISPRUDENCIA:
 
 
 
-      case VIEWS.OAB:
-        return (
-          <div className="fade-up">
-            <OabDashboard session={session} />
-          </div>
-        )
-
       case VIEWS.CONFIG:
         return (
           <div className="fade-up">
@@ -569,7 +561,6 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.HOJE:
         return <div className="fade-up"><Hoje entradas={entradas} session={session}
           onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}
-          onIrParaOab={() => setView(VIEWS.OAB)}
           onSelectEntrada={e => { setSelected(e); setView(VIEWS.DETAIL) }}
         /></div>
 

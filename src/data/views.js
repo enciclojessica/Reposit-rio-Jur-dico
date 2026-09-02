@@ -14,5 +14,4 @@ export const VIEWS = {
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', MEMBROS: 'membros', JURISPRUDENCIA: 'jurisprudencia',
   CONFIG: 'config',
-  OAB: 'oab',
 }
