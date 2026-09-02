@@ -91,7 +91,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
     return (
       e.tema?.toLowerCase().includes(q) ||
       e.fonte?.toLowerCase().includes(q) ||
-      (e.teses || []).some(t => t.tese_assunto?.toLowerCase().includes(q))
+      (Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.toLowerCase().includes(q)))
     )
   })
 
@@ -108,7 +108,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
 
       const ctx = JSON.stringify(entradas.map(e => ({
         id: e.id, tema: e.tema, fonte: e.fonte, tipo: e.tipo,
-        teses: (e.teses || []).map(t => t.tese_assunto),
+        teses: (Array.isArray(e.teses) ? e.teses : []).map(t => t.tese_assunto),
       })))
       const ritoCtx = rito ? `Rito processual: ${rito}. ` : ''
       const res  = await fetch('/api/busca', {
@@ -193,7 +193,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
               <div style={{ fontSize: 12, color: theme.text, marginBottom: 6, lineHeight: 1.4, fontFamily: 'Georgia, serif' }}>
                 <span style={{ color: cor, marginRight: 6, fontSize: 10 }}>▌</span>{entry.tema}
               </div>
-              {(entry.teses || []).map((t, i) => (
+              {(Array.isArray(entry.teses) ? entry.teses : []).map((t, i) => (
                 <div key={i} style={{ marginBottom: 4 }}>
                   {t.tese_assunto && (
                     <div style={{ fontSize: 11, color: theme.muted, marginBottom: 4, paddingLeft: 10, lineHeight: 1.4 }}>

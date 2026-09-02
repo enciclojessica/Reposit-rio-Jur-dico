@@ -127,7 +127,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onIr
       })
   }, [session])
 
-  const cardsElegiveis = useMemo(() => entradas.filter(e => (e.teses || []).some(t => t.tese_assunto?.trim())), [entradas])
+  const cardsElegiveis = useMemo(() => entradas.filter(e => Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.trim())), [entradas])
   const cardsPendentes = useMemo(() => {
     if (!revisaoMap) return 0
     return cardsElegiveis.filter(e => estaPendente(revisaoMap[e.id])).length
@@ -176,7 +176,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onIr
     const lacunas = porArea.filter(a => a.valor < 5)
 
     // Teses totais
-    const totalTeses = entradas.reduce((s, e) => s + (e.teses?.length || 0), 0)
+    const totalTeses = entradas.reduce((s, e) => s + (Array.isArray(e.teses) ? e.teses.length : 0), 0)
 
     // Recentes (últimas 5)
     const maisUsadas = [...entradas]

@@ -27,7 +27,7 @@ export default async function handler(req, res) {
   const indice = entradas.map(e => ({
     id: e.id, area: e.area, tipo: e.tipo, tema: e.tema,
     fonte: e.fonte, referencia: e.referencia, tags: e.tags || [],
-    teses: (e.teses || []).map(t => t.tese_assunto).filter(Boolean),
+    teses: (Array.isArray(e.teses) ? e.teses : []).map(t => t.tese_assunto).filter(Boolean),
   }))
 
   try {

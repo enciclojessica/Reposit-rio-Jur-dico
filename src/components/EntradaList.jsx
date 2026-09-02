@@ -159,7 +159,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     <td style={{ padding: '8px 12px', color: theme.text, fontFamily: 'Playfair Display, serif', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.tema}</td>
                     <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{e.tribunal}</td>
                     <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{e.data_julgamento ? new Date(e.data_julgamento).toLocaleDateString('pt-BR') : '-'}</td>
-                    <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{(e.teses || []).length}</td>
+                    <td style={{ padding: '8px 12px', color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{(Array.isArray(e.teses) ? e.teses : []).length}</td>
                     <td style={{ padding: '8px 12px' }}><IaStatusBadge status={e.ia_status} theme={theme} /></td>
                   </tr>
                 )
@@ -196,7 +196,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{e.ementa}</div>
                   )}
                   <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
-                    <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{(e.teses || []).length} {(e.teses || []).length === 1 ? 'tese' : 'teses'}</span>
+                    <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{(Array.isArray(e.teses) ? e.teses : []).length} {(Array.isArray(e.teses) ? e.teses : []).length === 1 ? 'tese' : 'teses'}</span>
                     {e.criado_em && <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>{new Date(e.criado_em).toLocaleDateString('pt-BR')}</span>}
                   </div>
                 </div>

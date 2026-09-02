@@ -26,7 +26,7 @@ function buildDeck(entradas, filtros, revisaoMap, soPendentes) {
     if (filtros.tipo !== 'all' && entry.tipo !== filtros.tipo) continue
     if (soPendentes && !estaPendente(revisaoMap?.[entry.id])) continue
 
-    for (const tese of (entry.teses || [])) {
+    for (const tese of (Array.isArray(entry.teses) ? entry.teses : [])) {
       if (!tese.tese_assunto?.trim()) continue
       cartas.push({ entry, tese })
     }

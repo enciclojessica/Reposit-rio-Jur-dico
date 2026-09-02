@@ -361,7 +361,7 @@ export default function App() {
         e.tema?.toLowerCase().includes(q) ||
         e.fonte?.toLowerCase().includes(q) ||
         e.referencia?.toLowerCase().includes(q) ||
-        e.teses?.some(t => t.tese_assunto?.toLowerCase().includes(q))
+        (Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.toLowerCase().includes(q)))
       )
     })
 

@@ -120,8 +120,9 @@ export async function exportarRepositorioDocx(entradas) {
       }
 
       // Teses
-      for (let ti = 0; ti < (entry.teses || []).length; ti++) {
-        const t = entry.teses[ti]
+      const tesesEntry = Array.isArray(entry.teses) ? entry.teses : []
+      for (let ti = 0; ti < tesesEntry.length; ti++) {
+        const t = tesesEntry[ti]
         conteudo.push(paragrafo(txt(`Tese ${ti + 1}`, { bold: true, size: 24, color: '444444' }), {
           spacing: { before: 240, after: 80 },
         }))

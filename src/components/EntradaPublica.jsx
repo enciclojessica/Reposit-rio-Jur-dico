@@ -47,7 +47,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
       `- Referência: ${entry.referencia}`,
       entry.url ? `- URL: ${entry.url}` : '',
       '',
-      ...(entry.teses || []).flatMap((t, i) => [
+      ...(Array.isArray(entry.teses) ? entry.teses : []).flatMap((t, i) => [
         `## Tese ${i + 1}: ${t.tese_assunto}`,
         `Fundamentação: ${t.fundamentacao_legal}`,
         `Precedente: ${t.precedente_sumula}`,
@@ -175,7 +175,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
             )}
 
             {/* Teses */}
-            {(entry.teses || []).map((t, i) => (
+            {(Array.isArray(entry.teses) ? entry.teses : []).map((t, i) => (
               <div key={i} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20, marginBottom: 12 }}>
                 <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16 }}>Tese {i + 1}</div>
                 <div style={{ overflowX: 'auto' }}>

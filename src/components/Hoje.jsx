@@ -22,7 +22,7 @@ export default function Hoje({ entradas, session, onIrParaFlashcards, onSelectEn
       })
   }, [session])
 
-  const cardsElegiveis = useMemo(() => entradas.filter(e => (e.teses || []).some(t => t.tese_assunto?.trim())), [entradas])
+  const cardsElegiveis = useMemo(() => entradas.filter(e => Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.trim())), [entradas])
   const cardsPendentes = useMemo(() => {
     if (!revisaoMap) return 0
     return cardsElegiveis.filter(e => estaPendente(revisaoMap[e.id])).length

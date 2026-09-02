@@ -101,7 +101,7 @@ export default async function handler(req, res) {
         ;(flashcardsUsuario || []).forEach(r => { revisaoMap[r.entrada_id] = r })
         const agora = new Date()
         cardsPendentes = (todasEntradas || [])
-          .filter(e => (e.teses || []).some(t => t.tese_assunto?.trim()))
+          .filter(e => Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.trim()))
           .filter(e => {
             const r = revisaoMap[e.id]
             return !r || new Date(r.proxima_revisao) <= agora
