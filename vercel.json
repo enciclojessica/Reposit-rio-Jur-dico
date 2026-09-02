@@ -16,7 +16,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!\\.well-known/).*)",
+      "source": "/((?!\\.well-known/|robots\\.txt|sitemap\\.xml).*)",
       "destination": "/index.html"
     }
   ],
