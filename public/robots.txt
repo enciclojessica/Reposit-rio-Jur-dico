@@ -1,4 +1,5 @@
 User-agent: *
-Allow: /
+Disallow: /
 
-Sitemap: https://themisjur.com.br/sitemap.xml
+# Ainda em beta fechado. Trocar para "Allow: /" quando abrir para terceiros.
+# Sitemap: https://themisjur.com.br/sitemap.xml
