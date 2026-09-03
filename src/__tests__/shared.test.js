@@ -1,13 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { AREAS, TIPOS, ROLE_COR, ROLE_LABEL, corDaArea } from '../shared'
 
-const temaFake = { muted: '#736b62', gold: '#800020' }
+const temaFake = { muted: '#736b62', gold: '#a9812e' }
 
 describe('AREAS', () => {
-  it('cada área tem cor e ícone', () => {
+  it('cada área tem cor válida', () => {
     for (const [area, meta] of Object.entries(AREAS)) {
       expect(meta.color, `área "${area}" sem cor`).toMatch(/^#[0-9a-fA-F]{6}$/)
-      expect(meta.icon, `área "${area}" sem ícone`).toBeTruthy()
     }
   })
 })

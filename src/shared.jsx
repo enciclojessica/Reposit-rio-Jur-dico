@@ -1,18 +1,18 @@
 import { useTheme } from './theme'
 
 export const AREAS = {
-  'Cível':           { color: '#800020', icon: '⚖' },
-  'Penal':           { color: '#ef4444', icon: '§' },
-  'Constitucional':  { color: '#c9a452', icon: '§' },
-  'Trabalhista':     { color: '#f59e0b', icon: '§' },
-  'Tributário':      { color: '#0ea5e9', icon: '§' },
-  'Administrativo':  { color: '#10b981', icon: '§' },
-  'Consumidor':      { color: '#8b5cf6', icon: '§' },
-  'Família':         { color: '#ec4899', icon: '§' },
-  'Previdenciário':  { color: '#14b8a6', icon: '§' },
-  'Ambiental':       { color: '#22c55e', icon: '§' },
-  'Internacional':   { color: '#6366f1', icon: '§' },
-  'Digital':         { color: '#f97316', icon: '§' },
+  'Cível':           { color: '#2c4a6e' },
+  'Penal':           { color: '#7a1128' },
+  'Constitucional':  { color: '#6e5a2c' },
+  'Trabalhista':     { color: '#8a5a2e' },
+  'Tributário':      { color: '#2c6e5a' },
+  'Administrativo':  { color: '#5a5a52' },
+  'Consumidor':      { color: '#5a4a7a' },
+  'Família':         { color: '#a34a68' },
+  'Previdenciário':  { color: '#2c5a6e' },
+  'Ambiental':       { color: '#3f6e3f' },
+  'Internacional':   { color: '#3f4a7a' },
+  'Digital':         { color: '#6e5a3f' },
 }
 
 export const TIPOS = ['jurisprudência', 'doutrina', 'súmula', 'lei']
@@ -28,7 +28,26 @@ export function corDaArea(area, theme) {
   return AREAS[base]?.color || theme?.gold || '#c9a452'
 }
 
-export const ROLE_COR   = { admin: '#c9a452', editor: '#3b82f6', leitor: '#10b981' }
+// Ponto pequeno colorido por área — usado na lista em formato de ementário
+// no lugar de badge/pílula. Ajuda no reconhecimento rápido sem virar
+// decoração (importa especialmente para quem está começando a estudar
+// e ainda não reconhece o assunto só pelo texto).
+export function AreaDot({ area, theme, size = 7 }) {
+  const cor = corDaArea(area, theme)
+  return (
+    <span
+      title={area}
+      style={{
+        display: 'inline-block',
+        width: size, height: size,
+        borderRadius: '50%',
+        background: cor,
+        flexShrink: 0,
+      }}
+    />
+  )
+}
+export const ROLE_COR   = { admin: '#a9812e', editor: '#2c4a6e', leitor: '#065f46' }
 export const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
 
 export const emptyEntry = () => ({
@@ -50,16 +69,10 @@ export const emptyEntry = () => ({
 export function Badge({ label, color, small }) {
   return (
     <span style={{
-      background: color + '22',
       color,
-      border: `1px solid ${color}44`,
-      borderRadius: 4,
-      padding: small ? '1px 6px' : '2px 8px',
-      fontSize: small ? 10 : 11,
-      textTransform: 'uppercase',
-      letterSpacing: 1,
-      fontWeight: 600,
-      fontFamily: 'IBM Plex Mono, monospace',
+      fontSize: small ? 11 : 12,
+      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontStyle: 'italic',
       whiteSpace: 'nowrap',
     }}>{label}</span>
   )
@@ -69,10 +82,10 @@ export function FieldLabel({ children }) {
   const { theme } = useTheme()
   return (
     <div style={{
-      fontSize: 10,
-      color: theme.muted,
-      textTransform: 'uppercase',
-      letterSpacing: 1.5,
+      fontSize: 12,
+      color: theme.gold,
+      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontStyle: 'italic',
       marginBottom: 6,
       marginTop: 14,
     }}>{children}</div>
@@ -83,12 +96,13 @@ export function SectionLabel({ children }) {
   const { theme } = useTheme()
   return (
     <div style={{
-      fontSize: 11,
-      color: theme.gold,
-      textTransform: 'uppercase',
-      letterSpacing: 2,
+      fontSize: 13,
+      color: theme.text,
+      fontFamily: theme.fontTitle,
+      fontWeight: 600,
+      borderBottom: `1px solid ${theme.text}`,
+      paddingBottom: 6,
       marginBottom: 14,
-      fontFamily: 'IBM Plex Mono, monospace',
     }}>{children}</div>
   )
 }
@@ -101,13 +115,13 @@ export function BtnGold({ onClick, children, disabled, style = {} }) {
       disabled={disabled}
       style={{
         background: disabled ? theme.border : theme.gold,
-        color: disabled ? theme.muted : '#0b0f1a',
+        color: disabled ? theme.muted : '#fdfbf7',
         border: 'none',
-        borderRadius: 8,
+        borderRadius: 6,
         padding: '10px 20px',
         fontSize: 13,
-        fontWeight: 700,
-        fontFamily: 'IBM Plex Mono, monospace',
+        fontWeight: 600,
+        fontFamily: "'Inter', system-ui, sans-serif",
         cursor: disabled ? 'not-allowed' : 'pointer',
         ...style,
       }}
@@ -121,13 +135,13 @@ export function BtnMuted({ onClick, children, style = {} }) {
     <button
       onClick={onClick}
       style={{
-        background: theme.btnMutedBg,
-        color: theme.muted,
+        background: 'transparent',
+        color: theme.textSub,
         border: `1px solid ${theme.border}`,
-        borderRadius: 8,
+        borderRadius: 6,
         padding: '10px 16px',
         fontSize: 13,
-        fontFamily: 'IBM Plex Mono, monospace',
+        fontFamily: "'Inter', system-ui, sans-serif",
         cursor: 'pointer',
         ...style,
       }}
@@ -138,10 +152,10 @@ export function BtnMuted({ onClick, children, style = {} }) {
 
 // ── Status de teses ───────────────────────────────────────────────────────
 export const STATUS_META = {
-  vigente:     { label: 'Vigente',     cor: '#10b981', icon: '✓' },
-  vinculante:  { label: 'Vinculante',  cor: '#c9a452', icon: '★' },
-  em_revisao:  { label: 'Em revisão',  cor: '#f59e0b', icon: '⚠' },
-  superada:    { label: 'Superada',    cor: '#ef4444', icon: '✗' },
+  vigente:     { label: 'Vigente',     cor: '#065f46' },
+  vinculante:  { label: 'Vinculante',  cor: '#a9812e' },
+  em_revisao:  { label: 'Em revisão',  cor: '#8a5a2e' },
+  superada:    { label: 'Superada',    cor: '#7a1128' },
 }
 
 export function StatusBadge({ status, onClick, pequena }) {
@@ -151,16 +165,17 @@ export function StatusBadge({ status, onClick, pequena }) {
       onClick={onClick}
       title={onClick ? 'Clique para alterar o status' : s.label}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 4,
-        background: s.cor + '22', color: s.cor,
-        border: `1px solid ${s.cor}44`,
-        borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
-        fontSize: pequena ? 10 : 11,
-        fontFamily: 'IBM Plex Mono, monospace',
+        display: 'inline-flex', alignItems: 'center',
+        color: s.cor,
+        border: `1px solid ${s.cor}55`,
+        borderRadius: 20, padding: pequena ? '1px 9px' : '3px 11px',
+        fontSize: pequena ? 11 : 12,
+        fontFamily: "Georgia, 'EB Garamond', serif",
+        fontStyle: 'italic',
         cursor: onClick ? 'pointer' : 'default',
         userSelect: 'none', whiteSpace: 'nowrap',
       }}>
-      {s.icon} {s.label}
+      {s.label}
     </span>
   )
 }
