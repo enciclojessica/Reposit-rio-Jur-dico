@@ -12,36 +12,20 @@ export default function Sidebar({
       borderRight: `1px solid ${theme.border}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,
     }}>
-      {/* Logo Themis Jur — Têmis */}
-      <div style={{ padding: '20px 20px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: '50%', flexShrink: 0,
-          border: '2px solid #C5A059',
-          background: '#800020',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden',
-          boxShadow: '0 2px 12px #80002044',
-          position: 'relative',
-        }}>
-          <img
-            src="/logo-temis.png"
-            alt="Themis Jur"
-            onClick={() => setView(VIEWS.HOJE)}
-            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
-            style={{ width: '100%', height: '100%', cursor: 'pointer', objectFit: 'cover', display: 'block' }}
-          />
-          <span style={{
-            display: 'none', position: 'absolute', inset: 0,
-            alignItems: 'center', justifyContent: 'center',
-            color: '#ffffff', fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 18,
-          }}>FF</span>
-        </div>
+      {/* Logo Themis Jur — zona de identidade, vinho fixo independente do tema claro/escuro */}
+      <div style={{ padding: '22px 20px 18px', background: '#5e0018', borderBottom: '2px solid #a9812e', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <img
+          src="/logo-temis-transparente.png"
+          alt="Themis Jur"
+          onClick={() => setView(VIEWS.HOJE)}
+          style={{ width: 46, height: 46, cursor: 'pointer', objectFit: 'contain', display: 'block', flexShrink: 0 }}
+        />
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
+          <div style={{ fontSize: 17, fontWeight: 600, color: '#f2e9d8', fontFamily: theme.fontTitle, lineHeight: 1.2 }}>
             Themis Jur
           </div>
-          <div style={{ fontSize: 9, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, marginTop: 2 }}>
-            Inteligência Jurídica
+          <div style={{ fontSize: 11, color: '#c9a878', fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 2 }}>
+            Inteligência jurídica
           </div>
         </div>
       </div>
@@ -97,8 +81,8 @@ export default function Sidebar({
       {/* Footer — apenas o bloco de assinatura, conforme especificação */}
       <div style={{ padding: '14px 20px', borderTop: `1px solid ${theme.border}` }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 9, color: theme.muted, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 2 }}>Plataforma e Curadoria</div>
-          <div style={{ fontSize: 11, color: theme.goldDark, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 3, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
+          <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 2 }}>Plataforma e curadoria</div>
+          <div style={{ fontSize: 13, color: theme.goldDark, fontWeight: 600, fontFamily: theme.fontTitle }}>Farias Fusquiani</div>
         </div>
       </div>
     </div>

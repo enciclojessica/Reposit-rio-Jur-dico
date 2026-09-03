@@ -71,27 +71,14 @@ export default function Auth() {
 
         {/* Logo Têmis + identidade */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{
-            width: 80, height: 80, borderRadius: '50%',
-            background: '#800020',
-            border: '3px solid #C5A059',
-            boxShadow: '0 8px 32px rgba(128,0,32,0.3)',
-            overflow: 'hidden', margin: '0 auto 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <img src="/logo-temis.png" alt="Themis Jur"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={e => {
-                e.target.style.display = 'none'
-                e.target.parentNode.innerHTML = '<span style="color:#C5A059;font-family:serif;font-weight:700;font-size:24px">FF</span>'
-              }}
-            />
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.2, marginBottom: 4 }}>
+          <img src="/logo-temis-transparente.png" alt="Themis Jur"
+            style={{ width: 84, height: 84, objectFit: 'contain', margin: '0 auto 16px', display: 'block' }}
+          />
+          <div style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.2, marginBottom: 4 }}>
             Themis Jur
           </div>
-          <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 3, fontFamily: 'Inter, sans-serif' }}>
-            Inteligência Jurídica · Farias Fusquiani
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            Inteligência jurídica, por Farias Fusquiani
           </div>
         </div>
 

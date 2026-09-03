@@ -74,18 +74,16 @@ export default function EntradaPublica({ entradaId, onFechar }) {
   return (
     <div style={{
       minHeight: '100vh', background: theme.bg,
-      fontFamily: 'IBM Plex Mono, monospace',
+      fontFamily: "Georgia, 'EB Garamond', serif",
     }}>
       {/* Header */}
       <div style={{
-        background: theme.surface, borderBottom: `1px solid ${theme.borderGold}`,
+        background: '#5e0018', borderBottom: '2px solid #a9812e',
         padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ background: theme.logoBg, borderRadius: 6, padding: '4px 10px 3px', border: mode === 'light' ? `1px solid ${theme.border}` : 'none' }}>
-            <img src="/logo.png" alt="Farias Fusquiani" style={{ height: 28, width: 'auto', display: 'block' }}/>
-          </div>
-          <div style={{ fontSize: 11, color: theme.muted }}>Repositório Jurídico · entrada compartilhada</div>
+          <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}/>
+          <div style={{ fontSize: 12, color: '#c9a878', fontStyle: 'italic' }}>Entrada compartilhada do repositório</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
