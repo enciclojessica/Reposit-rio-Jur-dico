@@ -14,19 +14,19 @@ function IaBadge({ status, theme }) {
   if (status === 'ia_revisado') {
     return (
       <span style={{
-        display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10,
-        color: theme.success || '#10b981', fontFamily: 'IBM Plex Mono, monospace', marginLeft: 8,
+        display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11,
+        color: theme.success, fontStyle: 'italic', fontFamily: theme.fontSerif, marginLeft: 8,
       }}>
-        <CheckCircle size={10} /> Revisado
+        <CheckCircle size={11} /> Revisado
       </span>
     )
   }
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10,
-      color: '#c9a452', fontFamily: 'IBM Plex Mono, monospace', marginLeft: 8,
+      display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11,
+      color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginLeft: 8,
     }}>
-      <AlertTriangle size={10} /> Gerado por IA — revise antes de salvar
+      <AlertTriangle size={11} /> Gerado por IA — revise antes de salvar
     </span>
   )
 }
@@ -104,7 +104,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
 
       const systemPrompt = [
         'Voce e um assistente de analise juridica de alta precisao.',
-        'Analise o acordao e retorne SOMENTE JSON valido, sem markdown, sem explicacoes.',
+        'Analise o acórdão e retorne SOMENTE JSON válido, sem markdown, sem explicações.',
         '',
         'INSTRUCOES:',
         '1. METADADOS (dados literais — nao inferir): tipo_item, ementa, tribunal, relator, data (YYYY-MM-DD), numero, url, fundamentacao_legal',
@@ -133,7 +133,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
           system: systemPrompt,
           messages: [{ role: 'user', content: [
             { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
-            { type: 'text', text: 'Analise o acordao e retorne APENAS o JSON conforme instruido.' },
+            { type: 'text', text: 'Analise o acórdão e retorne APENAS o JSON conforme instruído.' },
           ]}],
         }),
       })
@@ -243,7 +243,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
       fontSize: 13,
       width: '100%',
       outline: 'none',
-      fontFamily: 'inherit',
+      fontFamily: "Georgia, 'EB Garamond', serif",
       resize: multiline ? 'vertical' : 'none',
       boxSizing: 'border-box',
     }
@@ -251,6 +251,20 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
       return <textarea value={val} onChange={ev => fn(ev.target.value)} placeholder={placeholder} rows={3} style={style} />
     }
     return <input value={val} onChange={ev => fn(ev.target.value)} placeholder={placeholder} style={style} />
+  }
+
+  const selStyle = {
+    background: theme.cardBg,
+    border: '1px solid ' + theme.border,
+    borderRadius: 6,
+    padding: '8px 12px',
+    color: theme.text,
+    fontSize: 13,
+    width: '100%',
+    outline: 'none',
+    fontFamily: "Georgia, 'EB Garamond', serif",
+    boxSizing: 'border-box',
+    marginBottom: 4,
   }
 
   const cardStyle = {
@@ -273,18 +287,18 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <div>
             <div style={{ fontSize: 13, color: theme.text, fontWeight: 600, marginBottom: 3 }}>
-              {extraindo ? 'Extraindo e analisando o acordao...' : 'Importar PDF do Acordao'}
+              {extraindo ? 'Extraindo e analisando o acórdão…' : 'Importar PDF do acórdão'}
             </div>
             <div style={{ fontSize: 11, color: theme.muted }}>
               {pdfNome ? ('Arquivo: ' + pdfNome) : ('Upload do PDF — extrai metadados, teses, fundamento da decisao e aplicacao pratica. Max. ' + MAX_PDF_MB + 'MB.')}
             </div>
           </div>
           <label style={{
-            background: extraindo ? theme.border : ('linear-gradient(135deg, ' + theme.gold + ', ' + theme.goldDark + ')'),
-            color: extraindo ? theme.muted : '#0b0f1a',
-            borderRadius: 8, padding: '9px 16px', fontSize: 12, fontWeight: 700,
+            background: extraindo ? theme.border : theme.gold,
+            color: extraindo ? theme.muted : '#fdfbf7',
+            borderRadius: 6, padding: '9px 16px', fontSize: 13, fontWeight: 600,
             cursor: extraindo ? 'not-allowed' : 'pointer',
-            fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap',
+            fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
             pointerEvents: extraindo ? 'none' : 'auto',
           }}>
             {extraindo ? 'Processando...' : '+ Selecionar PDF'}
@@ -300,26 +314,26 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
 
         {pdfNome && !extraindo && !erroOcr && (
           <div style={{ marginTop: 12, padding: '10px 14px', background: mode === 'dark' ? '#0f2b1a' : '#f0fdf4', border: '1px solid ' + theme.success, borderRadius: 6, fontSize: 12, color: theme.success, lineHeight: 1.5 }}>
-            Extracao concluida. Campos com borda dourada tracejada foram gerados por IA e requerem revisao antes de salvar.
+            Extração concluída. Campos com borda dourada tracejada foram gerados por IA e requerem revisão antes de salvar.
           </div>
         )}
 
         {temPendentes && (
-          <div style={{ marginTop: 8, padding: '8px 14px', background: mode === 'dark' ? '#1c1600' : '#fffbeb', border: '1px solid #c9a452', borderRadius: 6, fontSize: 11, color: '#c9a452', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'IBM Plex Mono, monospace' }}>
-            <AlertTriangle size={12} />
-            Ha campos gerados por IA ainda nao revisados. Edite-os para confirmar a revisao.
+          <div style={{ marginTop: 8, padding: '8px 14px', background: mode === 'dark' ? '#1c1600' : '#fffbeb', border: `1px solid ${theme.gold}`, borderRadius: 6, fontSize: 12, color: theme.gold, display: 'flex', alignItems: 'center', gap: 6, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>
+            <AlertTriangle size={13} />
+            Há campos gerados por IA ainda não revisados. Edite-os para confirmar a revisão.
           </div>
         )}
       </div>
 
       <div style={cardStyle}>
-        <SectionLabel>Identificacao</SectionLabel>
-        <FieldLabel>Area</FieldLabel>
-        <select value={entry.area} onChange={e => setF('area', e.target.value)}>
+        <SectionLabel>Identificação</SectionLabel>
+        <FieldLabel>Área</FieldLabel>
+        <select value={entry.area} onChange={e => setF('area', e.target.value)} style={selStyle}>
           {Object.keys(AREAS).map(a => <option key={a}>{a}</option>)}
         </select>
         <FieldLabel>Tipo</FieldLabel>
-        <select value={entry.tipo} onChange={e => setF('tipo', e.target.value)}>
+        <select value={entry.tipo} onChange={e => setF('tipo', e.target.value)} style={selStyle}>
           {TIPOS.map(t => <option key={t}>{t}</option>)}
         </select>
         <FieldLabel>Tema / Assunto</FieldLabel>
@@ -329,7 +343,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
         </div>
         <FieldLabel>Fonte (Tribunal / Autor)</FieldLabel>
         {inp(entry.fonte, v => setF('fonte', v), 'Ex: STJ, TJSP, Caio Mario da Silva Pereira')}
-        <FieldLabel>Referencia</FieldLabel>
+        <FieldLabel>Referência</FieldLabel>
         {inp(entry.referencia, v => setF('referencia', v), 'Ex: REsp 1.234.567/SP, Sumula 479 STJ, Art. 186 CC')}
         <FieldLabel>Tags</FieldLabel>
         <TagInput tags={entry.tags || []} onChange={v => setF('tags', v)} todasAsTags={[]} />
@@ -339,10 +353,10 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
 
       {entry._zotero && (
         <div style={{ ...cardStyle, border: '1px solid ' + theme.gold + '33' }}>
-          <SectionLabel>Metadados Extraidos (Zotero)</SectionLabel>
+          <SectionLabel>Metadados extraídos (Zotero)</SectionLabel>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <FieldLabel>Tipo de Item</FieldLabel>
+              <FieldLabel>Tipo de item</FieldLabel>
               {inp(entry._zotero.tipo_item, v => setEntry(e => ({ ...e, _zotero: { ...e._zotero, tipo_item: v } })), 'Acordao, Decisao...')}
             </div>
             <div>
@@ -386,7 +400,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
             <FieldLabel>{labelCampoTese(entry.tipo, 'aplicacao_pratica')}</FieldLabel>
             <IaBadge status={iaStatus[i + '_aplicacao_pratica']} theme={theme} />
           </div>
-          <IaField value={t.aplicacao_pratica} onChange={v => setT(i, 'aplicacao_pratica', v)} placeholder="Como utilizar em pecas processuais" teseIdx={i} fieldName="aplicacao_pratica" />
+          <IaField value={t.aplicacao_pratica} onChange={v => setT(i, 'aplicacao_pratica', v)} placeholder="Como utilizar em peças processuais" teseIdx={i} fieldName="aplicacao_pratica" />
 
           <FieldLabel>{labelCampoTese(entry.tipo, 'precedente_sumula')}</FieldLabel>
           {inp(t.precedente_sumula, v => setT(i, 'precedente_sumula', v), 'Ex: REsp 1.234.567/SP, Sumula 370 STJ')}
@@ -400,7 +414,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
       <div style={{ display: 'flex', gap: 10 }}>
         <BtnMuted onClick={() => {
           const temDados = entry.tema.trim() || entry.fonte.trim() || (entry.teses[0] && entry.teses[0].tese_assunto && entry.teses[0].tese_assunto.trim())
-          if (temDados && !confirm('Descartar as alteracoes? Os dados nao salvos serao perdidos.')) return
+          if (temDados && !confirm('Descartar as alterações? Os dados não salvos serão perdidos.')) return
           onCancel()
         }} style={{ flex: 1 }}>Cancelar</BtnMuted>
         <BtnGold onClick={() => onSave({ ...entry, ia_status: temPendentes ? 'ia_pendente' : (entry.ia_status || 'manual') })} disabled={loading || extraindo || !entry.tema} style={{ flex: 2 }}>
