@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AREAS, STATUS_META, corDaArea } from '../shared'
+import { AREAS, STATUS_META, corDaArea, labelCampoTese } from '../shared'
 import { TagPill } from './TagInput'
+import { Check, Copy, ExternalLink, AlertCircle } from 'lucide-react'
 import SeletorTema from './SeletorTema'
 import { Lock } from 'lucide-react'
 
@@ -88,8 +89,8 @@ export default function EntradaPublica({ entradaId, onFechar }) {
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
           {onFechar && (
-            <button onClick={onFechar} style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: theme.muted, fontSize: 12, cursor: 'pointer' }}>
-              ← Voltar ao repositório
+            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", cursor: 'pointer' }}>
+              Voltar ao repositório
             </button>
           )}
         </div>
@@ -114,93 +115,75 @@ export default function EntradaPublica({ entradaId, onFechar }) {
           <>
             {/* Alerta de superada */}
             {entry.status === 'superada' && (
-              <div style={{ background: mode === 'dark' ? '#3b0f0f' : '#fef2f2', border: '1px solid #ef444466', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center' }}>
-                <span style={{ fontSize: 18 }}>✗</span>
+              <div style={{ background: mode === 'dark' ? '#2a0f10' : '#fff0f0', border: `1px solid ${theme.penal}55`, borderRadius: 8, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center' }}>
+                <AlertCircle size={18} color={theme.penal} />
                 <div>
-                  <div style={{ fontSize: 13, color: '#ef4444', fontWeight: 700, marginBottom: 2 }}>Entendimento superado</div>
-                  <div style={{ fontSize: 12, color: theme.muted }}>Esta tese foi marcada como superada. Verifique o entendimento atual antes de usar.</div>
+                  <div style={{ fontSize: 13, color: theme.penal, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 2 }}>Entendimento superado</div>
+                  <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic' }}>Esta tese foi marcada como superada. Verifique o entendimento atual antes de usar.</div>
                 </div>
               </div>
             )}
 
             {/* Cabeçalho da entrada */}
             <div style={{ marginBottom: 24 }}>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12, alignItems: 'center' }}>
-                <span style={{ background: am.color + '22', color: am.color, border: `1px solid ${am.color}44`, borderRadius: 4, padding: '2px 8px', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>{entry.area}</span>
-                <span style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '2px 8px', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>{entry.tipo}</span>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12, alignItems: 'center' }}>
+                <span style={{ color: am.color, fontSize: 12, fontStyle: 'italic' }}>{entry.area}</span>
+                <span style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic' }}>{entry.tipo}</span>
                 {status && (
-                  <span style={{ background: status.cor + '22', color: status.cor, border: `1px solid ${status.cor}44`, borderRadius: 20, padding: '2px 10px', fontSize: 11 }}>
-                    {status.icon} {status.label}
+                  <span style={{ color: status.cor, fontSize: 12, fontStyle: 'italic', border: `1px solid ${status.cor}55`, borderRadius: 20, padding: '2px 10px' }}>
+                    {status.label}
                   </span>
                 )}
                 {(entry.tags || []).map(t => <TagPill key={t} tag={t} pequena />)}
               </div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.3, margin: '0 0 8px' }}>
+              <h1 style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.3, margin: '0 0 8px' }}>
                 {entry.tema}
               </h1>
-              <div style={{ fontSize: 12, color: theme.muted }}>
-                {entry.fonte && <span>{entry.fonte} · </span>}
-                {entry.referencia && <span>{entry.referencia} · </span>}
-                Compartilhado em {new Date().toLocaleDateString('pt-BR')}
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                {[entry.fonte, entry.referencia, `Compartilhado em ${new Date().toLocaleDateString('pt-BR')}`].filter(Boolean).join(', ')}
               </div>
             </div>
 
             {/* Botões */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-              <button onClick={copiarFichamento} style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: copiado ? theme.success : theme.muted, borderRadius: 8, padding: '8px 14px', fontSize: 12, cursor: 'pointer' }}>
-                {copiado ? '✓ Copiado' : '⎘ Copiar fichamento'}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 28, flexWrap: 'wrap' }}>
+              <button onClick={copiarFichamento} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: copiado ? theme.success : theme.textSub, borderRadius: 6, padding: '8px 14px', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif' }}>
+                {copiado ? <Check size={13} /> : <Copy size={13} />} {copiado ? 'Copiado' : 'Copiar fichamento'}
               </button>
-              <button onClick={copiarABNT} style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: copiadoABNT ? theme.success : theme.muted, borderRadius: 8, padding: '8px 14px', fontSize: 12, cursor: 'pointer' }}>
-                {copiadoABNT ? '✓ Copiado' : '« Copiar ABNT'}
+              <button onClick={copiarABNT} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: copiadoABNT ? theme.success : theme.gold, borderRadius: 6, padding: '8px 14px', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif' }}>
+                {copiadoABNT ? <Check size={13} /> : <Copy size={13} />} {copiadoABNT ? 'Copiado' : 'Copiar ABNT'}
               </button>
               {entry.url && (
-                <a href={entry.url} target="_blank" rel="noreferrer" style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.gold, borderRadius: 8, padding: '8px 14px', fontSize: 12, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-                  ↗ Portal oficial
+                <a href={entry.url} target="_blank" rel="noreferrer" style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: theme.gold, borderRadius: 6, padding: '8px 14px', fontSize: 13, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif' }}>
+                  <ExternalLink size={13} /> Portal oficial
                 </a>
               )}
             </div>
 
-            {/* Metadados */}
-            {(entry.fonte || entry.referencia || entry.url) && (
-              <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20, marginBottom: 16 }}>
-                <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14 }}>Metadados</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                  {entry.fonte     && <div><div style={{ fontSize: 10, color: theme.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Fonte</div><div style={{ fontSize: 13, color: theme.text }}>{entry.fonte}</div></div>}
-                  {entry.referencia && <div><div style={{ fontSize: 10, color: theme.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Referência</div><div style={{ fontSize: 13, color: theme.text }}>{entry.referencia}</div></div>}
-                </div>
-                {entry.url && <div style={{ marginTop: 12 }}><div style={{ fontSize: 10, color: theme.muted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>URL</div><a href={entry.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: theme.gold, wordBreak: 'break-all' }}>{entry.url}</a></div>}
-              </div>
-            )}
-
             {/* Teses */}
             {(Array.isArray(entry.teses) ? entry.teses : []).map((t, i) => (
-              <div key={i} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20, marginBottom: 12 }}>
-                <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16 }}>Tese {i + 1}</div>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                    <thead>
-                      <tr>
-                        {['Tese/Assunto', 'Fundamentação Legal', 'Precedente/Súmula', 'Ratio Decidendi', 'Aplicação Prática'].map(h => (
-                          <th key={h} style={{ textAlign: 'left', padding: '8px 12px', background: theme.bg, color: theme.muted, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, borderBottom: `1px solid ${theme.border}` }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        {[t.tese_assunto, t.fundamentacao_legal, t.precedente_sumula, t.ratio_decidendi, t.aplicacao_pratica].map((val, ci) => (
-                          <td key={ci} style={{ padding: '10px 12px', color: theme.text, borderBottom: `1px solid ${theme.border}22`, verticalAlign: 'top', lineHeight: 1.6 }}>{val || '—'}</td>
-                        ))}
-                      </tr>
-                    </tbody>
-                  </table>
+              <div key={i} style={{ marginBottom: 28 }}>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 14 }}>
+                  Tese {i + 1}
                 </div>
+                {[
+                  ['tese_assunto',        t.tese_assunto],
+                  ['fundamentacao_legal', t.fundamentacao_legal],
+                  ['precedente_sumula',   t.precedente_sumula],
+                  ['ratio_decidendi',     t.ratio_decidendi],
+                  ['aplicacao_pratica',   t.aplicacao_pratica],
+                ].filter(([, val]) => val).map(([campo, val]) => (
+                  <div key={campo} style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 3 }}>{labelCampoTese(entry.tipo, campo)}</div>
+                    <div style={{ fontSize: 14, color: theme.text, lineHeight: 1.7 }}>{val}</div>
+                  </div>
+                ))}
               </div>
             ))}
 
             {/* Citação ABNT */}
-            <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20, marginTop: 8 }}>
-              <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>Citação ABNT NBR 6023:2018</div>
-              <div style={{ fontSize: 12, color: theme.text, lineHeight: 1.8, fontFamily: 'Georgia, serif' }}>{gerarABNT(entry)}</div>
+            <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, marginTop: 8 }}>
+              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8 }}>Citação ABNT NBR 6023:2018</div>
+              <div style={{ fontSize: 13, color: theme.textSub, lineHeight: 1.8 }}>{gerarABNT(entry)}</div>
             </div>
           </>
         )}

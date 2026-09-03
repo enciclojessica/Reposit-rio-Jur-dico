@@ -35,9 +35,7 @@ export default function Auth() {
     setLoading(false)
   }
 
-  const bgPage = mode === 'dark'
-    ? 'linear-gradient(160deg, #0f0a0b 0%, #1a0f10 60%, #0f0a0b 100%)'
-    : 'linear-gradient(160deg, #fdfbf7 0%, #f5f0e8 60%, #fdfbf7 100%)'
+  const bgPage = theme.bg
 
   const inp = {
     width: '100%', background: theme.raised,

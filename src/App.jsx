@@ -22,7 +22,7 @@ import InstalarApp from './components/InstalarApp'
 import JurisprudenciaSearch from './components/JurisprudenciaSearch'
 import Configuracoes from './components/Configuracoes'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
-import { Lock, LogOut, Download, Trash2 } from 'lucide-react'
+import { Lock, LogOut, Download, Trash2, AlertTriangle } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
@@ -502,7 +502,7 @@ async function handleSave(entry) {
         position: 'fixed', top: 16, left: 16, zIndex: 200,
         background: theme.raised, border: `1px solid ${theme.border}`,
         borderRadius: 8, padding: '8px 14px', color: theme.muted,
-        fontSize: 13, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+        fontSize: 13, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif",
       }}>← Voltar</button>
       <Auth conviteToken={conviteToken} />
     </div>
@@ -607,7 +607,7 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.DETAIL:
         return selected ? (
           <div className="fade-up">
-            <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: 'IBM Plex Mono, monospace' }}>← Voltar à lista</button>
+            <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "Georgia, 'EB Garamond', serif" }}>← Voltar à lista</button>
             <ErrorBoundary>
               <EntradaDetail
                 entry={selected}
@@ -733,7 +733,7 @@ case VIEWS.JURISPRUDENCIA:
                 <select
                   value={tagFilter || ''}
                   onChange={ev => setTagFilter(ev.target.value || null)}
-                  style={{ width: '100%', background: tagFilter ? theme.gold + '12' : theme.raised, border: `1px solid ${tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '7px 12px', color: tagFilter ? theme.gold : theme.muted, fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', cursor: 'pointer', outline: 'none' }}>
+                  style={{ width: '100%', background: tagFilter ? theme.gold + '12' : theme.raised, border: `1px solid ${tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '7px 12px', color: tagFilter ? theme.gold : theme.muted, fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", cursor: 'pointer', outline: 'none' }}>
                   <option value=''>Filtrar por tag...</option>
                   {todasAsTags.map(t => (
                     <option key={t} value={t}>#{t}</option>
@@ -796,13 +796,13 @@ case VIEWS.JURISPRUDENCIA:
               <>
                 {isOwner && entradas.length > 0 && (
                   <button onClick={exportarTesesPlanilha} disabled={exportandoTeses} title="Exportar planilha"
-                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Download size={13} /> {exportandoTeses ? 'Exportando...' : 'Exportar'}
                   </button>
                 )}
                 {isAdmin && (
                   <button onClick={() => setConfirmLimpar(true)} title="Limpar repositório"
-                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: theme.error, cursor: 'pointer', fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: theme.error, cursor: 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Trash2 size={13} />
                   </button>
                 )}
@@ -836,7 +836,7 @@ case VIEWS.JURISPRUDENCIA:
                   </div>
                 </div>
                 <button onClick={() => supabase.auth.signOut()} title="Sair"
-                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                   <LogOut size={14} /> Sair
                 </button>
               </>
@@ -883,20 +883,20 @@ case VIEWS.JURISPRUDENCIA:
       {confirmLimpar && (
         <div style={{ position: 'fixed', inset: 0, background: '#00000099', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div style={{ background: theme.surface, border: '1px solid #5a1f1f', borderRadius: 14, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 16px 48px #000000cc' }}>
-            <div style={{ fontSize: 36, marginBottom: 14, color: '#c0504d' }}>⚠</div>
+            <div style={{ marginBottom: 14, color: theme.penal, display: 'flex', justifyContent: 'center' }}><AlertTriangle size={32} /></div>
             <div style={{ fontSize: 17, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', marginBottom: 10 }}>
               Limpar todo o repositório?
             </div>
             <div style={{ fontSize: 12, color: theme.muted, marginBottom: 24, lineHeight: 1.7 }}>
-              Esta ação remove <span style={{ color: '#c0504d', fontWeight: 700 }}>{entradas.length} entrada(s)</span> permanentemente do banco de dados. Exporte um backup antes se necessário.
+              Esta ação remove <span style={{ color: theme.penal, fontWeight: 700 }}>{entradas.length} entrada(s)</span> permanentemente do banco de dados. Exporte um backup antes se necessário.
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               <button onClick={() => setConfirmLimpar(false)}
-                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 22px', cursor: 'pointer', fontSize: 13, fontFamily: 'IBM Plex Mono, monospace' }}>
+                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 22px', cursor: 'pointer', fontSize: 13, fontFamily: "Georgia, 'EB Garamond', serif" }}>
                 Cancelar
               </button>
               <button onClick={limparTodoRepositorio} disabled={limpandoRepo}
-                style={{ background: '#3b0f0f', border: '1px solid #c0504d', color: '#c0504d', borderRadius: 8, padding: '10px 22px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}>
+                style={{ background: (mode === 'dark' ? '#2a0f10' : '#fff0f0'), border: `1px solid ${theme.penal}`, color: theme.penal, borderRadius: 8, padding: '10px 22px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "Georgia, 'EB Garamond', serif" }}>
                 {limpandoRepo ? 'Limpando...' : 'Confirmar exclusão'}
               </button>
             </div>
