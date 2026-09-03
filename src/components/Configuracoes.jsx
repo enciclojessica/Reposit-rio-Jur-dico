@@ -272,7 +272,7 @@ function TabBackup({ session, entradas }) {
     setMsgNotas('Reunindo suas anotações...')
     try {
       const { exportarAnotacoesDocx } = await import('../utils/exportarAnotacoes')
-      const total = await exportarAnotacoesDocx(entradas || [])
+      const total = await exportarAnotacoesDocx(entradas || [], session?.user?.id)
       setStatusNotas('ok')
       setMsgNotas(`${total} anotação(ões) exportada(s) para o Word.`)
     } catch (err) {
@@ -287,7 +287,7 @@ function TabBackup({ session, entradas }) {
 
     try {
       // 1. Buscar todas as tabelas
-      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'pecas_rascunhos']
+      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'pecas_rascunhos', 'anotacoes']
       const backup = { gerado_em: new Date().toISOString(), tabelas: {} }
 
       for (const tabela of tabelas) {
@@ -372,7 +372,7 @@ function TabBackup({ session, entradas }) {
           </div>
         </div>
         <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
-          Exporta todas as suas anotações pessoais do Repositório em um único documento Word, organizado por tema. Como as anotações ficam salvas neste navegador, só as deste dispositivo são exportadas.
+          Exporta todas as suas anotações pessoais do Repositório em um único documento Word, organizado por tema. Sincronizadas com sua conta, disponíveis em qualquer dispositivo.
         </div>
 
         <button

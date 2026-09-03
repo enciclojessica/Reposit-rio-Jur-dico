@@ -33,7 +33,7 @@ function gerarABNT(entry) {
   } catch { return '' }
 }
 
-export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar }) {
+export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar }) {
   const { theme, mode } = useTheme()
 
   // Normalização defensiva total
@@ -273,7 +273,7 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
       {/* Minha Anotação — estudo ativo */}
       <div style={{ marginTop: 8 }}>
         <div style={secao}>Minha anotação</div>
-        <AnotacaoPessoal itemId={entry.id} namespace="entrada" theme={theme} placeholder="Anote aqui o que você aprendeu, uma dúvida, ou como pretende usar isso numa peça..." />
+        <AnotacaoPessoal itemId={entry.id} session={session} namespace="entrada" theme={theme} placeholder="Anote aqui o que você aprendeu, uma dúvida, ou como pretende usar isso numa peça..." />
       </div>
 
       {/* Histórico */}

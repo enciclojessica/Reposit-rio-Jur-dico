@@ -1,39 +1,49 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { coletarAnotacoesDoLocalStorage } from '../utils/exportarAnotacoes'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-beforeEach(() => localStorage.clear())
+// Mock encadeável do client do Supabase: from().select().eq().eq() resolve
+// pro valor configurado em mockData para o teste atual.
+let mockData = []
+vi.mock('../supabase', () => {
+  const chain = {
+    select: () => chain,
+    eq: () => chain,
+    then: (resolve) => resolve({ data: mockData, error: null }),
+  }
+  return { supabase: { from: () => chain } }
+})
 
-describe('coletarAnotacoesDoLocalStorage', () => {
-  it('retorna lista vazia quando não há nenhuma anotação', () => {
-    const r = coletarAnotacoesDoLocalStorage()
+const { coletarAnotacoes } = await import('../utils/exportarAnotacoes')
+
+beforeEach(() => { mockData = [] })
+
+describe('coletarAnotacoes', () => {
+  it('retorna lista vazia sem userId, sem consultar o banco', async () => {
+    const r = await coletarAnotacoes(null)
     expect(r.entradaIds).toEqual([])
   })
 
-  it('coleta anotações de entrada pelo namespace lexia_nota_entrada_', () => {
-    localStorage.setItem('lexia_nota_entrada_abc', 'nota sobre a entrada')
-    const r = coletarAnotacoesDoLocalStorage()
+  it('coleta anotações retornadas pela consulta', async () => {
+    mockData = [{ item_id: 'abc', texto: 'nota sobre a entrada' }]
+    const r = await coletarAnotacoes('user-1')
     expect(r.entradaIds).toEqual(['abc'])
-    expect(r.notas['lexia_nota_entrada_abc']).toBe('nota sobre a entrada')
+    expect(r.notas['abc']).toBe('nota sobre a entrada')
   })
 
-  it('ignora anotações vazias (usuário abriu o campo mas não escreveu nada)', () => {
-    localStorage.setItem('lexia_nota_entrada_vazia', '')
-    localStorage.setItem('lexia_nota_entrada_espacos', '   ')
-    const r = coletarAnotacoesDoLocalStorage()
+  it('ignora anotações vazias ou só com espaços', async () => {
+    mockData = [
+      { item_id: 'vazia', texto: '' },
+      { item_id: 'espacos', texto: '   ' },
+    ]
+    const r = await coletarAnotacoes('user-1')
     expect(r.entradaIds).toEqual([])
   })
 
-  it('ignora chaves de localStorage que não são anotações (ex: filtros, preferências)', () => {
-    localStorage.setItem('lexia_tema', 'dark')
-    localStorage.setItem('lexia_ultimo_backup', '20/07/2026')
-    const r = coletarAnotacoesDoLocalStorage()
-    expect(r.entradaIds).toEqual([])
-  })
-
-  it('lida com múltiplas anotações de entrada', () => {
-    localStorage.setItem('lexia_nota_entrada_1', 'a')
-    localStorage.setItem('lexia_nota_entrada_2', 'b')
-    const r = coletarAnotacoesDoLocalStorage()
+  it('lida com múltiplas anotações', async () => {
+    mockData = [
+      { item_id: '1', texto: 'a' },
+      { item_id: '2', texto: 'b' },
+    ]
+    const r = await coletarAnotacoes('user-1')
     expect(r.entradaIds.sort()).toEqual(['1', '2'])
   })
 })

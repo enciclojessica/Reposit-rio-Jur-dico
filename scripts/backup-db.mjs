@@ -24,21 +24,20 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
-// Tabelas com dados que não podem ser recriados (exclui logs/cache irrelevantes).
+// Tabelas com dados que não podem ser recriados (exclui logs/cache
+// irrelevantes como api_rate_limit). Lista conferida contra o schema real
+// do banco em 03/09/2026 — mantenha isso em mente ao apagar ou criar
+// tabelas: esta lista precisa ser atualizada junto, senão o backup falha
+// silenciosamente ou pula tabelas novas sem avisar.
 const TABELAS = [
   'entradas',
+  'legislacao',
   'membros',
   'convites',
   'alertas',
   'notificacoes',
-  'flashcards',
-  'oab_questoes',
-  'oab_respostas',
-  'oab_sessoes',
-  'oab_favoritas',
-  'material_estudo',
   'pecas_rascunhos',
-  'oab_cronograma_config',
+  'anotacoes',
 ]
 
 async function exportarTabela(nome) {
@@ -58,12 +57,26 @@ async function exportarTabela(nome) {
 async function main() {
   const dump = { gerado_em: new Date().toISOString(), tabelas: {} }
   let totalLinhas = 0
+  const falhas = []
 
+  // Cada tabela é isolada em try/catch: uma tabela renomeada, apagada ou com
+  // erro de permissão não deve impedir o backup das demais (foi exatamente
+  // isso que quebrou o backup inteiro quando oab_* e flashcards saíram do
+  // schema sem essa lista ser atualizada).
   for (const tabela of TABELAS) {
-    const linhas = await exportarTabela(tabela)
-    dump.tabelas[tabela] = linhas
-    totalLinhas += linhas.length
-    console.log(`  ${tabela}: ${linhas.length} linha(s)`)
+    try {
+      const linhas = await exportarTabela(tabela)
+      dump.tabelas[tabela] = linhas
+      totalLinhas += linhas.length
+      console.log(`  ${tabela}: ${linhas.length} linha(s)`)
+    } catch (err) {
+      falhas.push(tabela)
+      console.error(`  ${tabela}: FALHOU — ${err.message}`)
+    }
+  }
+
+  if (falhas.length) {
+    console.warn(`\nATENÇÃO: ${falhas.length} tabela(s) não foram incluídas neste backup: ${falhas.join(', ')}`)
   }
 
   const dataArquivo = dump.gerado_em.slice(0, 10) // YYYY-MM-DD
@@ -82,6 +95,8 @@ async function main() {
   console.log(`\nBackup enviado: backups-db/${caminho} (${totalLinhas} linhas no total)`)
 
   await limparBackupsAntigos()
+
+  if (falhas.length) process.exitCode = 1
 }
 
 // Mantém só os backups dos últimos 90 dias, pra não acumular indefinidamente.

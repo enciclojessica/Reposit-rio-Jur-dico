@@ -3,6 +3,7 @@ import {
   HeadingLevel, AlignmentType, BorderStyle,
   Footer, PageBreak,
 } from 'docx'
+import { supabase } from '../supabase'
 
 const A4_W   = 11906
 const A4_H   = 16838
@@ -24,32 +25,33 @@ function divisor() {
   })
 }
 
-// Lê todas as anotações pessoais salvas no localStorage (namespace "entrada").
-// Retorna { entradaIds: [...], notas: { [chaveOriginal]: texto } }
-export function coletarAnotacoesDoLocalStorage() {
+// Busca as anotações pessoais do usuário autenticado (tabela anotacoes,
+// namespace "entrada"). Retorna { entradaIds: [...], notas: { [entradaId]: texto } }
+export async function coletarAnotacoes(userId) {
   const entradaIds = []
   const notas = {}
+  if (!userId) return { entradaIds, notas }
 
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (!key) continue
-      const texto = localStorage.getItem(key)
-      if (!texto || !texto.trim()) continue
+  const { data } = await supabase
+    .from('anotacoes')
+    .select('item_id, texto')
+    .eq('user_id', userId)
+    .eq('namespace', 'entrada')
 
-      const mEntrada = key.match(/^lexia_nota_entrada_(.+)$/)
-      if (mEntrada) { entradaIds.push(mEntrada[1]); notas[key] = texto }
-    }
-  } catch { /* localStorage indisponível: exporta vazio */ }
+  for (const row of (data || [])) {
+    if (!row.texto || !row.texto.trim()) continue
+    entradaIds.push(row.item_id)
+    notas[row.item_id] = row.texto
+  }
 
   return { entradaIds, notas }
 }
 
-export async function exportarAnotacoesDocx(entradas) {
-  const { entradaIds, notas } = coletarAnotacoesDoLocalStorage()
+export async function exportarAnotacoesDocx(entradas, userId) {
+  const { entradaIds, notas } = await coletarAnotacoes(userId)
 
   if (!entradaIds.length) {
-    throw new Error('Nenhuma anotação encontrada neste navegador. As anotações ficam salvas localmente, então só aparecem no dispositivo onde foram escritas.')
+    throw new Error('Nenhuma anotação encontrada na sua conta ainda.')
   }
 
   const data = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
@@ -89,7 +91,7 @@ export async function exportarAnotacoesDocx(entradas) {
 
     for (const id of entradaIds) {
       const entry = (entradas || []).find(e => e.id === id)
-      const nota = notas[`lexia_nota_entrada_${id}`]
+      const nota = notas[id]
 
       conteudo.push(paragrafo(txt(entry?.tema || 'Entrada removida do repositório', { bold: true, size: 26 }), {
         heading: HeadingLevel.HEADING_2,
@@ -98,7 +100,7 @@ export async function exportarAnotacoesDocx(entradas) {
 
       if (entry) {
         conteudo.push(paragrafo([
-          txt(`${entry.area || ''}${entry.tipo ? ' · ' + entry.tipo : ''}`, { size: 20, color: '888888', italics: true }),
+          txt([entry.area, entry.tipo].filter(Boolean).join(', '), { size: 20, color: '888888', italics: true }),
         ], { spacing: { before: 0, after: 100 } }))
       } else {
         conteudo.push(paragrafo(txt('(Este item não existe mais no repositório, mas sua anotação foi preservada abaixo.)', { size: 18, color: 'aa8800', italics: true }), {

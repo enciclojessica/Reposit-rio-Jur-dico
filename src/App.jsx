@@ -611,6 +611,7 @@ case VIEWS.JURISPRUDENCIA:
             <ErrorBoundary>
               <EntradaDetail
                 entry={selected}
+                session={session}
                 onClose={() => setView(VIEWS.HOME)}
                 onDelete={isAdmin ? handleDelete : null}
                 onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
