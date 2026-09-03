@@ -97,14 +97,22 @@ function Donut({ fatias, raio = 52 }) {
 }
 
 // ── Stat card ─────────────────────────────────────────────────────────────
-function StatCard({ label, valor, cor, sub }) {
+function StatCard({ label, valor, cor, sub, onClick }) {
   const { theme } = useTheme()
+  const [hover, setHover] = useState(false)
   return (
-    <div style={{
-      background: theme.cardBg, border: `1px solid ${theme.border}`,
-      borderLeft: `3px solid ${cor}`,
-      borderRadius: 10, padding: '14px 18px',
-    }}>
+    <div
+      onClick={onClick}
+      onMouseEnter={() => onClick && setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover ? theme.raised : theme.cardBg,
+        border: `1px solid ${hover ? cor + '77' : theme.border}`,
+        borderLeft: `3px solid ${cor}`,
+        borderRadius: 10, padding: '14px 18px',
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'background .15s, border-color .15s',
+      }}>
       <div style={{ fontSize: 28, fontWeight: 700, color: cor, fontFamily: 'IBM Plex Mono, monospace', lineHeight: 1 }}>{valor}</div>
       <div style={{ fontSize: 11, color: theme.text, marginTop: 4, fontFamily: 'IBM Plex Mono, monospace' }}>{label}</div>
       {sub && <div style={{ fontSize: 10, color: theme.muted, marginTop: 2 }}>{sub}</div>}
@@ -113,7 +121,7 @@ function StatCard({ label, valor, cor, sub }) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────
-export default function Dashboard({ entradas, countLegislacao = 0, session, onIrParaFlashcards, onCriarAlerta }) {
+export default function Dashboard({ entradas, countLegislacao = 0, session, onIrParaFlashcards, onCriarAlerta, onSelecionarArea, onIrParaLegislacao }) {
   const { theme } = useTheme()
   const [revisaoMap, setRevisaoMap] = useState(null) // null = ainda carregando
 
@@ -237,11 +245,12 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onIr
       {/* ── Stats cards ───────────────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>
         <StatCard label="Entradas" valor={stats.total} cor={theme.gold}
-          sub={`${stats.totalTeses} teses`} />
+          sub={`${stats.totalTeses} teses`} onClick={() => onSelecionarArea?.('all')} />
         <StatCard label="Legislação" valor={countLegislacao} cor={'#10b981'}
-          sub="artigos cadastrados" />
+          sub="artigos cadastrados" onClick={onIrParaLegislacao} />
         {stats.porArea.map(a => (
-          <StatCard key={a.label} label={a.label} valor={a.valor} cor={a.cor} />
+          <StatCard key={a.label} label={a.label} valor={a.valor} cor={a.cor}
+            onClick={() => onSelecionarArea?.(a.label)} />
         ))}
       </div>
 

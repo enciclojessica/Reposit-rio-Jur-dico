@@ -567,6 +567,8 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.DASHBOARD:
         return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session} onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}
           onCriarAlerta={area => { setTemaAlertaPrefill(area); setView(VIEWS.ALERTAS) }}
+          onSelecionarArea={area => { setAreaFilter(area); setTipoFilter('all'); setView(VIEWS.HOME) }}
+          onIrParaLegislacao={() => setView(VIEWS.LEG_VIEW)}
         /></div>
 
       case VIEWS.EDITOR:
