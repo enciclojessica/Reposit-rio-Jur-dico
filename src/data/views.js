@@ -14,4 +14,5 @@ export const VIEWS = {
   BUSCA: 'busca', MEMBROS: 'membros', JURISPRUDENCIA: 'jurisprudencia',
   CONFIG: 'config',
   INDICE: 'indice',
+  FAVORITOS: 'favoritos',
 }

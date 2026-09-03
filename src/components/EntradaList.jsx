@@ -3,7 +3,7 @@ import { AREAS, corDaArea, AreaDot } from '../shared'
 import { TagPill } from './TagInput'
 import { tagsVisiveis } from '../utils/tagsVisiveis'
 import { useTheme } from '../theme'
-import { Trash2, Square, CheckSquare } from 'lucide-react'
+import { Trash2, Square, CheckSquare, Star } from 'lucide-react'
 
 function IaStatusLabel({ status, theme }) {
   if (!status || status === 'manual') return null
@@ -21,7 +21,7 @@ function IaStatusLabel({ status, theme }) {
   )
 }
 
-export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMultiple, isAdmin }) {
+export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMultiple, isAdmin, favoritos, onAlternarFavorito }) {
   const { theme } = useTheme()
   const [modoTabela, setModoTabela] = useState(false)
   const [selecionados, setSelecionados] = useState(new Set())
@@ -201,6 +201,14 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     </div>
                   )}
                 </div>
+
+                {onAlternarFavorito && (
+                  <div onClick={ev => { ev.stopPropagation(); onAlternarFavorito(e.id) }}
+                    style={{ flexShrink: 0, paddingTop: 3, cursor: 'pointer' }}
+                    title={favoritos?.has(e.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}>
+                    <Star size={14} color={theme.gold} fill={favoritos?.has(e.id) ? theme.gold : 'none'} />
+                  </div>
+                )}
               </div>
             )
           })}

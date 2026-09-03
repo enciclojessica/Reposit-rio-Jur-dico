@@ -107,6 +107,7 @@ export default function App() {
   const [membro, setMembro]         = useState(null)   // { role, nome, email }
   const [membroLoading, setMembroLoading] = useState(false)
   const [entradas, setEntradas]     = useState([])
+  const [favoritos, setFavoritos]   = useState(new Set())
   const [view, setView]             = useState(VIEWS.HOJE)
   const [areaFilter, setAreaFilter] = useState('all')
   const [tipoFilter, setTipoFilter]   = useState('all')
@@ -246,6 +247,25 @@ export default function App() {
 
     verificarMembro()
   }, [session, conviteToken])
+
+  // ── Carregar favoritos do usuário logado ────────────────────────────────
+  useEffect(() => {
+    if (!session) { setFavoritos(new Set()); return }
+    supabase.from('favoritos').select('entrada_id').eq('user_id', session.user.id)
+      .then(({ data }) => setFavoritos(new Set((data || []).map(f => f.entrada_id))))
+  }, [session])
+
+  async function alternarFavorito(entradaId) {
+    if (!session) return
+    const jaFavoritado = favoritos.has(entradaId)
+    if (jaFavoritado) {
+      await supabase.from('favoritos').delete().eq('user_id', session.user.id).eq('entrada_id', entradaId)
+      setFavoritos(prev => { const next = new Set(prev); next.delete(entradaId); return next })
+    } else {
+      await supabase.from('favoritos').insert({ user_id: session.user.id, entrada_id: entradaId })
+      setFavoritos(prev => new Set(prev).add(entradaId))
+    }
+  }
 
   // ── Entradas (leitura pública) ─────────────────────────────────────────
   // Atalhos de teclado globais
@@ -587,6 +607,24 @@ case VIEWS.JURISPRUDENCIA:
           onSelecionarTag={tag => { setTagFilter(tag); setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
         /></div>
 
+      case VIEWS.FAVORITOS:
+        return (
+          <div className="fade-up">
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>Favoritos</div>
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                Entradas que você marcou manualmente, só sua conta vê essa lista
+              </div>
+            </div>
+            <EntradaList entradas={entradas.filter(e => favoritos.has(e.id))}
+              onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }}
+              isAdmin={isAdmin}
+              favoritos={favoritos}
+              onAlternarFavorito={alternarFavorito}
+            />
+          </div>
+        )
+
       case VIEWS.EDITOR:
         return (
           <div className="fade-up" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -647,6 +685,8 @@ case VIEWS.JURISPRUDENCIA:
                   setLegislacaoPreFiltro({ codigo, numero })
                   setView(VIEWS.LEG_VIEW)
                 }}
+                favorito={favoritos.has(selected.id)}
+                onAlternarFavorito={alternarFavorito}
               />
             </ErrorBoundary>
           </div>
@@ -791,6 +831,8 @@ case VIEWS.JURISPRUDENCIA:
             </div>
             <EntradaList entradas={filtered} onSelect={e => { setSelected(e); setView(VIEWS.DETAIL) }} onImportar={aba => { setImportarAba(aba || 'planilha'); setView(VIEWS.IMPORTAR) }}
               isAdmin={isAdmin}
+              favoritos={favoritos}
+              onAlternarFavorito={alternarFavorito}
               onDeleteMultiple={isAdmin ? async (ids) => {
                 const OWNER = 'foxjessica01@gmail.com'
                 if (session?.user?.email !== OWNER) { notify('Sem permissão para esta ação.', 'err'); return }

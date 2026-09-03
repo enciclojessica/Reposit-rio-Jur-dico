@@ -37,6 +37,7 @@ export default function Sidebar({
           { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
           { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
           { id: 'indice', label: 'Índice remissivo', action: () => setView(VIEWS.INDICE),    active: view === VIEWS.INDICE },
+          { id: 'favoritos', label: 'Favoritos',     action: () => setView(VIEWS.FAVORITOS), active: view === VIEWS.FAVORITOS },
           { id: 'juri',   label: 'Jurisprudência',   action: () => setView(VIEWS.JURISPRUDENCIA), active: view === VIEWS.JURISPRUDENCIA },
           { id: 'alertas', label: 'Alertas',        action: () => setView(VIEWS.ALERTAS),   active: view === VIEWS.ALERTAS },
           { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
