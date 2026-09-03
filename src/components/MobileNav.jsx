@@ -19,7 +19,6 @@ export default function MobileNav({
     { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
     { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
-    { v: VIEWS.FLASHCARDS,  label: 'Flashcards' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),

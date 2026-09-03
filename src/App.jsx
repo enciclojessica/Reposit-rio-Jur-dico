@@ -19,7 +19,6 @@ import ImportarHub from './components/ImportarHub'
 import Legislacao from './components/Legislacao'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
-import FlashCards from './components/FlashCards'
 import JurisprudenciaSearch from './components/JurisprudenciaSearch'
 import Configuracoes from './components/Configuracoes'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
@@ -536,11 +535,6 @@ case VIEWS.JURISPRUDENCIA:
           </div>
         )
 
-      case VIEWS.FLASHCARDS:
-        return <div className="fade-up"><FlashCards entradas={entradas} session={session} /></div>
-
-
-
       case VIEWS.CONFIG:
         return (
           <div className="fade-up">
@@ -560,12 +554,11 @@ case VIEWS.JURISPRUDENCIA:
 
       case VIEWS.HOJE:
         return <div className="fade-up"><Hoje entradas={entradas} session={session}
-          onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}
           onSelectEntrada={e => { setSelected(e); setView(VIEWS.DETAIL) }}
         /></div>
 
       case VIEWS.DASHBOARD:
-        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session} onIrParaFlashcards={() => setView(VIEWS.FLASHCARDS)}
+        return <div className="fade-up"><Dashboard entradas={entradas} countLegislacao={countLegislacao} session={session}
           onCriarAlerta={area => { setTemaAlertaPrefill(area); setView(VIEWS.ALERTAS) }}
           onSelecionarArea={area => { setAreaFilter(area); setTipoFilter('all'); setView(VIEWS.HOME) }}
           onIrParaLegislacao={() => setView(VIEWS.LEG_VIEW)}

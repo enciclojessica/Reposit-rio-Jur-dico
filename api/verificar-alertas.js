@@ -92,30 +92,14 @@ export default async function handler(req, res) {
           .eq('id', alerta.id)
       }
 
-      // Flashcards pendentes de revisão — mesma lógica da tela Hoje/Dashboard
-      let cardsPendentes = 0
-      if (userId) {
-        const { data: flashcardsUsuario } = await supabase
-          .from('flashcards').select('entrada_id, proxima_revisao').eq('user_id', userId)
-        const revisaoMap = {}
-        ;(flashcardsUsuario || []).forEach(r => { revisaoMap[r.entrada_id] = r })
-        const agora = new Date()
-        cardsPendentes = (todasEntradas || [])
-          .filter(e => Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.trim()))
-          .filter(e => {
-            const r = revisaoMap[e.id]
-            return !r || new Date(r.proxima_revisao) <= agora
-          }).length
-      }
-
-      // Só envia se houver algo de fato novo/pendente — lacunas sozinhas não
-      // disparam e-mail toda semana (é dado estático, viraria spam).
-      if (!resultadosPorTema.length && !cardsPendentes) {
-        console.log(`[verificar-alertas] ${email}: nada novo nem pendente esta semana.`)
+      // Só envia se houver novidade de fato — sem isso, vira spam semanal
+      // sem conteúdo.
+      if (!resultadosPorTema.length) {
+        console.log(`[verificar-alertas] ${email}: nada novo esta semana.`)
         continue
       }
 
-      const html = montarEmail(resultadosPorTema, { cardsPendentes, lacunas })
+      const html = montarEmail(resultadosPorTema, { lacunas })
 
       const envio = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -126,9 +110,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'Themis Jur <alertas@themisjur.com.br>',
           to: [email],
-          subject: resultadosPorTema.length
-            ? `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`
-            : `Boletim semanal Themis Jur — ${new Date().toLocaleDateString('pt-BR')}`,
+          subject: `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`,
           html,
         }),
       })
@@ -138,12 +120,8 @@ export default async function handler(req, res) {
         enviados++
         const resumoTemas = resultadosPorTema.map(t => t.tema).join(', ')
         const totalDecisoes = resultadosPorTema.reduce((s, t) => s + t.resultados.length, 0)
-        const titulo = totalDecisoes > 0
-          ? `${totalDecisoes} nova(s) decisão(ões) para seus alertas`
-          : `Boletim semanal: ${cardsPendentes} card(s) de flashcard pendente(s)`
-        const corpo = totalDecisoes > 0
-          ? `Temas monitorados com novidades: ${resumoTemas}`
-          : 'Sem decisão nova esta semana, mas você tem flashcards pendentes de revisão.'
+        const titulo = `${totalDecisoes} nova(s) decisão(ões) para seus alertas`
+        const corpo = `Temas monitorados com novidades: ${resumoTemas}`
         const uid = userId
         if (uid) {
           await supabase.from('notificacoes').insert({
@@ -151,7 +129,7 @@ export default async function handler(req, res) {
             tipo: 'alerta',
             titulo,
             corpo,
-            dados: { temas: resultadosPorTema.map(t => t.tema), total: totalDecisoes, cardsPendentes },
+            dados: { temas: resultadosPorTema.map(t => t.tema), total: totalDecisoes },
           })
         }
       } else {
@@ -174,7 +152,7 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, enviados, erros })
 }
 
-function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {}) {
+function montarEmail(resultadosPorTema, { lacunas = [] } = {}) {
   const linhasTemas = resultadosPorTema.map(({ tema, tribunal, resultados }) => {
     const linhasResultados = resultados.map(r => `
       <div style="border-left:3px solid #c9a452;padding:10px 14px;margin-bottom:10px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #c9a452;border-radius:0 6px 6px 0;">
@@ -203,20 +181,6 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
     `
   }).join('')
 
-  const secaoPendencias = cardsPendentes > 0 ? `
-    <div style="margin-bottom:28px;">
-      <div style="font-size:13px;font-weight:700;color:#800020;font-family:'IBM Plex Mono',monospace;
-                  text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
-                  border-bottom:1px solid #e8e3dc;padding-bottom:8px;">
-        Pendências desta semana
-      </div>
-      <div style="border-left:3px solid #c9a452;padding:10px 14px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #c9a452;border-radius:0 6px 6px 0;">
-        <div style="font-size:13px;color:#2c241b;line-height:1.6;">
-          ${cardsPendentes} card${cardsPendentes !== 1 ? 's' : ''} de flashcard${cardsPendentes !== 1 ? 's' : ''} pendente${cardsPendentes !== 1 ? 's' : ''} de revisão, gerado${cardsPendentes !== 1 ? 's' : ''} a partir das teses do seu repositório.
-        </div>
-      </div>
-    </div>
-  ` : ''
 
   const secaoLacunas = lacunas.length > 0 ? `
     <div style="margin-bottom:28px;">
@@ -253,12 +217,9 @@ function montarEmail(resultadosPorTema, { cardsPendentes = 0, lacunas = [] } = {
         <div style="font-size:13px;color:#4a3f35;margin-bottom:24px;line-height:1.6;
                     padding:14px;background:#ffffff;border:1px solid #e8e3dc;border-radius:8px;
                     border-left:3px solid #800020;">
-          ${resultadosPorTema.length
-            ? 'Encontramos novas decisões relevantes para os temas que você monitora. Revise, importe para o repositório ou descarte conforme necessário.'
-            : 'Nenhuma decisão nova esta semana para os temas monitorados, mas veja o que está pendente abaixo.'}
+          Encontramos novas decisões relevantes para os temas que você monitora. Revise, importe para o repositório ou descarte conforme necessário.
         </div>
 
-        ${secaoPendencias}
         ${secaoLacunas}
         ${linhasTemas}
 

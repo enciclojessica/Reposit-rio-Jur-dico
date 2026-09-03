@@ -10,7 +10,6 @@ export const VIEWS = {
   LEGISLACAO:    'legislacao',
   LEG_VIEW:      'leg_view',
   EXTRAIR:       'extrair',
-  FLASHCARDS:   'flashcards',
   HOME: 'home', ADD: 'add', EDIT: 'edit', DETAIL: 'detail',
   BUSCA: 'busca', MEMBROS: 'membros', JURISPRUDENCIA: 'jurisprudencia',
   CONFIG: 'config',

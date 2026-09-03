@@ -1,32 +1,12 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useTheme } from '../theme'
-import { supabase } from '../supabase'
 import { corDaArea } from '../shared'
-import { estaPendente } from '../utils/spacedRepetition'
-import { Dumbbell, Sparkles, Check } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000
 
-export default function Hoje({ entradas, session, onIrParaFlashcards, onSelectEntrada }) {
+export default function Hoje({ entradas, session, onSelectEntrada }) {
   const { theme } = useTheme()
-  const [revisaoMap, setRevisaoMap] = useState(null)     // flashcards: entrada_id -> { proxima_revisao }
-
-  useEffect(() => {
-    if (!session) { setRevisaoMap({}); return }
-
-    supabase.from('flashcards').select('entrada_id, proxima_revisao').eq('user_id', session.user.id)
-      .then(({ data }) => {
-        const mapa = {}
-        ;(data || []).forEach(r => { mapa[r.entrada_id] = r })
-        setRevisaoMap(mapa)
-      })
-  }, [session])
-
-  const cardsElegiveis = useMemo(() => entradas.filter(e => Array.isArray(e.teses) && e.teses.some(t => t.tese_assunto?.trim())), [entradas])
-  const cardsPendentes = useMemo(() => {
-    if (!revisaoMap) return 0
-    return cardsElegiveis.filter(e => estaPendente(revisaoMap[e.id])).length
-  }, [cardsElegiveis, revisaoMap])
 
   const novidades = useMemo(() => {
     const agora = Date.now()
@@ -34,9 +14,6 @@ export default function Hoje({ entradas, session, onIrParaFlashcards, onSelectEn
     const base = recentes.length > 0 ? recentes : [...entradas].sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em)).slice(0, 5)
     return [...base].sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em)).slice(0, 8)
   }, [entradas])
-
-  const carregando = revisaoMap === null
-  const semPendencias = !carregando && cardsPendentes === 0
 
   const card = { background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20 }
   const secLabel = { fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }
@@ -50,38 +27,6 @@ export default function Hoje({ entradas, session, onIrParaFlashcards, onSelectEn
           Hoje
         </div>
         <div style={{ fontSize: 12, color: theme.muted, textTransform: 'capitalize' }}>{data}</div>
-      </div>
-
-      {/* ── Pendências ────────────────────────────────────────────────── */}
-      <div style={{ ...card, marginBottom: 16 }}>
-        <div style={secLabel}>Pendências</div>
-
-        {carregando ? (
-          <div style={{ color: theme.muted, fontSize: 12 }}>Carregando...</div>
-        ) : semPendencias ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0' }}>
-            <Check size={18} color={theme.success} />
-            <div style={{ fontSize: 13, color: theme.text }}>Nada pendente hoje. Tudo revisado.</div>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {cardsPendentes > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 14px', background: theme.raised, border: `1px solid ${theme.border}`, borderLeft: `3px solid ${theme.gold}`, borderRadius: 8, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Dumbbell size={16} color={theme.gold} />
-                  <div style={{ fontSize: 12, color: theme.text, fontFamily: 'IBM Plex Mono, monospace' }}>
-                    {cardsPendentes} card{cardsPendentes !== 1 ? 's' : ''} de flashcard{cardsPendentes !== 1 ? 's' : ''} pendente{cardsPendentes !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                {onIrParaFlashcards && (
-                  <button onClick={onIrParaFlashcards} style={{ background: theme.gold, color: '#0b0f1a', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-                    Revisar
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* ── Novidades ─────────────────────────────────────────────────── */}

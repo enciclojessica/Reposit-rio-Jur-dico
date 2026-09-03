@@ -287,7 +287,7 @@ function TabBackup({ session, entradas }) {
 
     try {
       // 1. Buscar todas as tabelas
-      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'flashcards', 'pecas_rascunhos']
+      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'pecas_rascunhos']
       const backup = { gerado_em: new Date().toISOString(), tabelas: {} }
 
       for (const tabela of tabelas) {
@@ -337,7 +337,7 @@ function TabBackup({ session, entradas }) {
           </div>
         </div>
         <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 16 }}>
-          Exporta todas as entradas, legislação e flashcards em um arquivo JSON.
+          Exporta todas as entradas e legislação em um arquivo JSON.
           Salve o arquivo no seu Google Drive para ter uma cópia de segurança.
         </div>
 
