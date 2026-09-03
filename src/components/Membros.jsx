@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import { Check, Copy, X } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { ROLE_LABEL, ROLE_COR } from '../shared'
 
-const ROLE_DESC  = {
+const ROLE_DESC = {
   admin:  'Controle total: adiciona, edita, remove entradas e gerencia membros.',
   editor: 'Pode adicionar e editar as próprias entradas. Não gerencia membros.',
   leitor: 'Somente consulta e usa a Busca para Peça.',
@@ -82,61 +83,68 @@ export default function Membros({ session }) {
 
   const card = {
     background: theme.cardBg, border: `1px solid ${theme.border}`,
-    borderRadius: 12, padding: 20, marginBottom: 16,
+    borderRadius: 10, padding: 20, marginBottom: 16,
   }
 
   const sectionLabel = {
-    fontSize: 11, color: theme.gold, textTransform: 'uppercase',
-    letterSpacing: 2, marginBottom: 16, fontFamily: 'IBM Plex Mono, monospace',
+    fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600,
+    borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 16,
+  }
+
+  const selStyle = {
+    background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 6,
+    padding: '8px 12px', color: theme.text, fontSize: 13,
+    fontFamily: "Georgia, 'EB Garamond', serif", outline: 'none', boxSizing: 'border-box',
   }
 
   if (loading) return (
-    <div style={{ color: theme.muted, padding: 40, textAlign: 'center', fontFamily: 'IBM Plex Mono, monospace' }}>
-      Carregando...
+    <div style={{ color: theme.muted, padding: 40, textAlign: 'center', fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+      Carregando…
     </div>
   )
 
   return (
     <div style={{ paddingBottom: 40, maxWidth: 720 }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
-          Membros e Acessos
+        <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>
+          Membros e acessos
         </div>
-        <div style={{ fontSize: 12, color: theme.muted }}>
+        <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
           Gerencie quem tem acesso ao repositório e com qual nível de permissão.
         </div>
       </div>
 
       {/* ── Gerar convite ────────────────────────────────── */}
       <div style={card}>
-        <div style={sectionLabel}>Convidar Pessoa</div>
+        <div style={sectionLabel}>Convidar pessoa</div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, marginBottom: 14 }}>
           <input
             value={novoEmail}
             onChange={e => setNovoEmail(e.target.value)}
             placeholder="E-mail (opcional — apenas para referência)"
+            style={selStyle}
           />
           <select value={novoRole} onChange={e => setNovoRole(e.target.value)}
-            style={{ width: 110 }}>
+            style={{ ...selStyle, width: 110 }}>
             <option value="leitor">Leitor</option>
             <option value="editor">Editor</option>
           </select>
         </div>
 
-        <div style={{ fontSize: 11, color: theme.muted, marginBottom: 14, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 12, color: theme.muted, marginBottom: 14, lineHeight: 1.6, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
           {ROLE_DESC[novoRole]}
         </div>
 
         <button onClick={gerarConvite} disabled={gerando}
           style={{
             background: gerando ? theme.border : theme.gold,
-            color: gerando ? theme.muted : '#0b0f1a',
-            border: 'none', borderRadius: 8, padding: '10px 20px',
-            fontSize: 13, fontWeight: 700, cursor: gerando ? 'not-allowed' : 'pointer',
-            fontFamily: 'IBM Plex Mono, monospace',
+            color: gerando ? theme.muted : '#fdfbf7',
+            border: 'none', borderRadius: 6, padding: '10px 20px',
+            fontSize: 13, fontWeight: 600, cursor: gerando ? 'not-allowed' : 'pointer',
+            fontFamily: 'Inter, sans-serif',
           }}>
-          {gerando ? 'Gerando...' : '+ Gerar Link de Convite'}
+          {gerando ? 'Gerando…' : 'Gerar link de convite'}
         </button>
 
         {/* Link gerado */}
@@ -145,12 +153,12 @@ export default function Membros({ session }) {
             marginTop: 16, background: mode === 'dark' ? '#0f2b1a' : '#f0fdf4',
             border: `1px solid ${theme.success}`, borderRadius: 8, padding: 14,
           }}>
-            <div style={{ fontSize: 10, color: theme.success, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: theme.success, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 8 }}>
               Link gerado — válido por 7 dias
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div style={{
-                flex: 1, fontSize: 11, color: theme.text,
+                flex: 1, fontSize: 12, color: theme.text,
                 background: theme.inputBg, border: `1px solid ${theme.border}`,
                 borderRadius: 6, padding: '8px 12px', fontFamily: 'monospace',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -158,16 +166,17 @@ export default function Membros({ session }) {
                 {linkGerado}
               </div>
               <button onClick={copiarLink} style={{
-                background: copiado ? theme.success : theme.raised,
-                color: copiado ? '#fff' : theme.muted,
+                background: 'transparent',
+                color: copiado ? theme.success : theme.textSub,
                 border: `1px solid ${copiado ? theme.success : theme.border}`,
                 borderRadius: 6, padding: '8px 14px', fontSize: 12,
-                cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap',
+                cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', gap: 6,
               }}>
-                {copiado ? '✓ Copiado' : '⎘ Copiar'}
+                {copiado ? <><Check size={13} /> Copiado</> : <><Copy size={13} /> Copiar</>}
               </button>
             </div>
-            <div style={{ fontSize: 11, color: theme.muted, marginTop: 8 }}>
+            <div style={{ fontSize: 12, color: theme.muted, marginTop: 8, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
               Envie este link por WhatsApp, e-mail ou como preferir. Ao acessar, a pessoa cria a conta e entra automaticamente.
             </div>
           </div>
@@ -176,61 +185,51 @@ export default function Membros({ session }) {
 
       {/* ── Membros ativos ───────────────────────────────── */}
       <div style={card}>
-        <div style={sectionLabel}>Membros Ativos ({membros.length})</div>
+        <div style={sectionLabel}>Membros ativos ({membros.length})</div>
         {membros.length === 0 ? (
-          <div style={{ color: theme.muted, fontSize: 13 }}>Nenhum membro ainda.</div>
+          <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Nenhum membro ainda.</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {membros.map(m => {
+          <div>
+            {membros.map((m, i) => {
               const ehVoce = m.user_id === session.user.id
               return (
                 <div key={m.id} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '12px 14px', background: theme.raised,
-                  border: `1px solid ${theme.border}`, borderRadius: 8, gap: 12,
+                  padding: '12px 0', gap: 12,
+                  borderBottom: i < membros.length - 1 ? `0.5px solid ${theme.border}` : 'none',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: theme.text, fontFamily: 'IBM Plex Mono, monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {m.nome || m.email || m.user_id.slice(0, 8) + '...'}
-                      {ehVoce && <span style={{ fontSize: 10, color: theme.gold, marginLeft: 8 }}>(você)</span>}
+                    <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {m.nome || m.email || m.user_id.slice(0, 8) + '…'}
+                      {ehVoce && <span style={{ fontSize: 11, color: theme.gold, marginLeft: 8, fontStyle: 'italic' }}>(você)</span>}
                     </div>
                     {m.email && m.nome && (
-                      <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>{m.email}</div>
+                      <div style={{ fontSize: 11, color: theme.muted, marginTop: 2, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{m.email}</div>
                     )}
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    {/* Só admin não-próprio pode trocar o papel */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                     {!ehVoce ? (
                       <select
                         value={m.role}
                         onChange={e => alterarRole(m.id, e.target.value)}
-                        style={{
-                          background: ROLE_COR[m.role] + '22',
-                          border: `1px solid ${ROLE_COR[m.role]}44`,
-                          color: ROLE_COR[m.role], borderRadius: 6,
-                          padding: '4px 8px', fontSize: 11,
-                          fontFamily: 'IBM Plex Mono, monospace', cursor: 'pointer',
-                        }}>
+                        style={{ ...selStyle, color: ROLE_COR[m.role], padding: '5px 8px', fontSize: 12 }}>
                         <option value="leitor">Leitor</option>
                         <option value="editor">Editor</option>
                         <option value="admin">Admin</option>
                       </select>
                     ) : (
-                      <span style={{
-                        background: ROLE_COR[m.role] + '22', color: ROLE_COR[m.role],
-                        border: `1px solid ${ROLE_COR[m.role]}44`,
-                        borderRadius: 6, padding: '4px 10px', fontSize: 11,
-                        fontFamily: 'IBM Plex Mono, monospace',
-                      }}>{ROLE_LABEL[m.role]}</span>
+                      <span style={{ color: ROLE_COR[m.role], fontSize: 12, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                        {ROLE_LABEL[m.role]}
+                      </span>
                     )}
 
                     {!ehVoce && (
                       <button onClick={() => removerMembro(m.user_id)} style={{
                         background: 'none', border: 'none',
-                        color: theme.error, cursor: 'pointer', fontSize: 16,
-                        lineHeight: 1, padding: '2px 4px',
-                      }} title="Remover membro">✕</button>
+                        color: theme.penal, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', padding: 2,
+                      }} title="Remover membro"><X size={15} /></button>
                     )}
                   </div>
                 </div>
@@ -243,31 +242,29 @@ export default function Membros({ session }) {
       {/* ── Convites pendentes ───────────────────────────── */}
       {convites.length > 0 && (
         <div style={card}>
-          <div style={sectionLabel}>Convites Pendentes ({convites.length})</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {convites.map(c => (
+          <div style={sectionLabel}>Convites pendentes ({convites.length})</div>
+          <div>
+            {convites.map((c, i) => (
               <div key={c.id} style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '10px 14px', background: theme.raised,
-                border: `1px solid ${theme.border}`, borderRadius: 8, gap: 12,
+                padding: '10px 0', gap: 12,
+                borderBottom: i < convites.length - 1 ? `0.5px solid ${theme.border}` : 'none',
               }}>
                 <div>
-                  <div style={{ fontSize: 12, color: theme.text, fontFamily: 'IBM Plex Mono, monospace' }}>
+                  <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif }}>
                     {c.email || 'Sem e-mail'}
-                    <span style={{
-                      marginLeft: 8, background: ROLE_COR[c.role] + '22',
-                      color: ROLE_COR[c.role], border: `1px solid ${ROLE_COR[c.role]}44`,
-                      borderRadius: 4, padding: '1px 6px', fontSize: 10,
-                    }}>{ROLE_LABEL[c.role]}</span>
+                    <span style={{ marginLeft: 8, color: ROLE_COR[c.role], fontSize: 12, fontStyle: 'italic' }}>
+                      {ROLE_LABEL[c.role]}
+                    </span>
                   </div>
-                  <div style={{ fontSize: 10, color: theme.muted, marginTop: 3 }}>
+                  <div style={{ fontSize: 11, color: theme.muted, marginTop: 3, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
                     Expira em {new Date(c.expires_at).toLocaleDateString('pt-BR')}
                   </div>
                 </div>
                 <button onClick={() => revogarConvite(c.id)} style={{
                   background: 'none', border: `1px solid ${theme.border}`,
-                  color: theme.muted, borderRadius: 6, padding: '5px 10px',
-                  fontSize: 11, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+                  color: theme.textSub, borderRadius: 6, padding: '5px 12px',
+                  fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                 }}>Revogar</button>
               </div>
             ))}
@@ -282,8 +279,11 @@ export default function Membros({ session }) {
           border: `1px solid ${toast.type === 'err' ? theme.error : theme.success}`,
           borderRadius: 8, padding: '10px 16px', fontSize: 13, color: theme.text,
           boxShadow: theme.shadow, zIndex: 100,
+          display: 'flex', alignItems: 'center', gap: 8,
+          fontFamily: theme.fontSerif,
         }}>
-          {toast.type === 'err' ? '✕ ' : '✓ '}{toast.msg}
+          {toast.type === 'err' ? <X size={14} color={theme.error} /> : <Check size={14} color={theme.success} />}
+          {toast.msg}
         </div>
       )}
     </div>

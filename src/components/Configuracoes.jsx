@@ -24,7 +24,7 @@ function Campo({ label, children }) {
   const { theme } = useTheme()
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 11, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>{label}</div>
+      <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>{label}</div>
       {children}
     </div>
   )
@@ -342,7 +342,7 @@ function TabBackup({ session, entradas }) {
         </div>
 
         {ultimo && (
-          <div style={{ fontSize: 11, color: theme.gold, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
+          <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
             Último backup: {ultimo}
           </div>
         )}
@@ -467,7 +467,7 @@ function TabBackup({ session, entradas }) {
 
       {/* Instruções */}
       <div style={{ marginTop: 20, padding: '14px 16px', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10 }}>
-        <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 10 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 10 }}>
           Como fazer backup semanal
         </div>
         {[

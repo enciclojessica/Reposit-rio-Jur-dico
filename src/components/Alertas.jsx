@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { Bell, BellOff, Trash2, RefreshCw, Clock, CheckCircle } from 'lucide-react'
+import { AreaDot, corDaArea } from '../shared'
 
 // ── Radar de Atualizações ─────────────────────────────────────────────────────
 // Lê entradas criadas nos últimos 7 dias no próprio banco de dados.
@@ -148,7 +149,6 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
   }
 
   // ── Helpers de UI ───────────────────────────────────────────────────────
-  const AREA_COR = { Cível: '#1e3a8a', Penal: '#800020', Doutrina: '#581c87', Legislação: '#0ea5e9' }
 
   function tempoRelativo(iso) {
     const d = new Date(iso)
@@ -253,21 +253,22 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {recentes.map(e => {
-                const cor = AREA_COR[e.area] || theme.muted
+                const cor = corDaArea(e.area, theme)
                 const teses = Array.isArray(e.teses) ? e.teses : []
                 return (
                   <div key={e.id} style={{
                     background: theme.cardBg, border: `1px solid ${theme.border}`,
-                    borderLeft: `3px solid ${cor}`, borderRadius: 10, padding: '14px 16px',
+                    borderRadius: 8, padding: '14px 16px',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                          <span style={{ background: cor + '22', color: cor, border: `1px solid ${cor}44`, borderRadius: 4, padding: '1px 8px', fontSize: 10, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                          <AreaDot area={e.area} theme={theme} />
+                          <span style={{ fontSize: 11, color: theme.text, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
                             {e.area}
                           </span>
-                          <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>{e.tipo}</span>
-                          {e.fonte && <span style={{ fontSize: 10, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>{e.fonte}</span>}
+                          <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.tipo}</span>
+                          {e.fonte && <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.fonte}</span>}
                         </div>
                         <div style={{ fontSize: 14, color: theme.text, fontFamily: 'Georgia, serif', lineHeight: 1.4, marginBottom: 4 }}>
                           {e.tema}
@@ -295,15 +296,15 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
         <>
           {/* Novo alerta */}
           <div style={card}>
-            <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+            <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 16 }}>
               Monitorar novo tema
             </div>
-            <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Tema</div>
+            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Tema</div>
             <input value={tema} onChange={e => setTema(e.target.value)} onKeyDown={e => e.key === 'Enter' && adicionar()}
               placeholder="Ex: dano moral plano de saúde, responsabilidade civil bancária"
-              style={{ marginBottom: 12, fontFamily: 'Inter, sans-serif' }} />
+              style={{ marginBottom: 12, fontFamily: "Georgia, 'EB Garamond', serif" }} />
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8, fontFamily: 'Inter, sans-serif' }}>Tribunais</div>
+              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8, fontFamily: "Georgia, 'EB Garamond', serif" }}>Tribunais</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {TRIBUNAIS.map(t => {
                   const ativo = tribunais.includes(t.id)
@@ -322,8 +323,8 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Receber em</div>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: 'Inter, sans-serif', maxWidth: 320 }} />
+              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Receber em</div>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: "Georgia, 'EB Garamond', serif", maxWidth: 320 }} />
             </div>
             <button onClick={adicionar} disabled={salvando || !tema.trim() || !email.trim()} style={{
               background: salvando || !tema.trim() || !email.trim() ? theme.border : theme.gold,
@@ -350,20 +351,19 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
                   padding: '12px 16px',
                   background: theme.cardBg, border: `1px solid ${a.ativo ? theme.gold + '33' : theme.border}`,
-                  borderLeft: `3px solid ${a.ativo ? theme.gold : theme.border}`,
-                  borderRadius: 10, opacity: a.ativo ? 1 : 0.55, transition: 'all .15s',
+                  borderTop: `2px solid ${a.ativo ? theme.gold : theme.border}`,
+                  borderRadius: 8, opacity: a.ativo ? 1 : 0.55, transition: 'all .15s',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: theme.text, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Georgia, serif' }}>
+                    <div style={{ fontSize: 13, color: theme.text, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "Georgia, 'EB Garamond', serif" }}>
                       {a.tema}
                     </div>
-                    <div style={{ fontSize: 11, color: theme.muted, display: 'flex', gap: 8, flexWrap: 'wrap', fontFamily: 'Inter, sans-serif' }}>
-                      <span>{(Array.isArray(a.tribunal) ? a.tribunal : [a.tribunal]).includes('todos') ? 'Todos os tribunais' : (Array.isArray(a.tribunal) ? a.tribunal.join(', ') : a.tribunal)}</span>
-                      <span>·</span>
-                      <span>{a.email}</span>
-                      {a.ultima_verificacao && (
-                        <><span>·</span><span>Verificado: {new Date(a.ultima_verificacao).toLocaleDateString('pt-BR')}</span></>
-                      )}
+                    <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                      {[
+                        (Array.isArray(a.tribunal) ? a.tribunal : [a.tribunal]).includes('todos') ? 'Todos os tribunais' : (Array.isArray(a.tribunal) ? a.tribunal.join(', ') : a.tribunal),
+                        a.email,
+                        a.ultima_verificacao ? `verificado em ${new Date(a.ultima_verificacao).toLocaleDateString('pt-BR')}` : null,
+                      ].filter(Boolean).join(', ')}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
