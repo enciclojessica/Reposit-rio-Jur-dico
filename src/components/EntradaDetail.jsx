@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertTriangle, Check, Link2, Unlock } from 'lucide-react'
+import { Check, Link2, Unlock } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea } from '../shared'
 import { supabase } from '../supabase'
@@ -124,12 +124,15 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
     if (!error) setPublica(false)
   }
 
-  const btn = (cor) => ({
-    border: `1px solid ${theme.border}`, borderRadius: 8, padding: '7px 12px',
-    fontSize: 12, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+  const btn = (destaque) => ({
+    border: `1px solid ${destaque || theme.border}`, borderRadius: 6, padding: '8px 14px',
+    fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
     display: 'flex', alignItems: 'center', gap: 6,
-    background: cor || theme.raised, color: theme.muted,
+    background: 'transparent', color: theme.textSub,
   })
+
+  const label = { fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }
+  const secao = { fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 14 }
 
   const sm = STATUS_META[status] || STATUS_META['vigente']
 
@@ -137,43 +140,43 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
     <div style={{ paddingBottom: 40 }}>
       {/* Cabeçalho */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
           <Badge label={entry.area} color={am.color} />
           <Badge label={entry.tipo} color={theme.muted} />
           {entry.tags.map(t => <TagPill key={t} tag={t} pequena />)}
         </div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.3, marginBottom: 6 }}>
+        <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.3, marginBottom: 6 }}>
           {entry.tema}
         </div>
         {(entry.fonte || entry.referencia) && (
-          <div style={{ fontSize: 11, color: theme.muted }}>
-            {entry.fonte}{entry.referencia ? ` · ${entry.referencia}` : ''}
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+            {[entry.fonte, entry.referencia].filter(Boolean).join(', ')}
           </div>
         )}
         {entry.url && (
           <a href={entry.url} target="_blank" rel="noreferrer"
-            style={{ fontSize: 11, color: theme.gold, wordBreak: 'break-all', display: 'block', marginTop: 4 }}>
+            style={{ fontSize: 12, color: theme.gold, wordBreak: 'break-all', display: 'block', marginTop: 4, fontFamily: theme.fontSerif }}>
             {entry.url}
           </a>
         )}
       </div>
 
       {/* Ações */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         {/* Status */}
         {!readOnly && (
           <div style={{ position: 'relative' }}>
             <span onClick={() => setShowStatus(m => !m)}
-              style={{ background: sm.cor+'22', color: sm.cor, border: `1px solid ${sm.cor}44`, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', cursor: 'pointer', userSelect: 'none' }}>
-              {sm.icon} {sm.label}
+              style={{ color: sm.cor, border: `1px solid ${sm.cor}55`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontStyle: 'italic', fontFamily: theme.fontSerif, cursor: 'pointer', userSelect: 'none', display: 'inline-block' }}>
+              {sm.label}
             </span>
             {showStatus && (
-              <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 50, background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 10, overflow: 'hidden', boxShadow: theme.shadow, minWidth: 160 }}>
+              <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 50, background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 10, overflow: 'hidden', boxShadow: theme.shadow, minWidth: 170 }}>
                 {Object.entries(STATUS_META).map(([k, meta]) => (
                   <button key={k} onClick={() => alterarStatus(k)}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: status === k ? meta.cor+'22' : 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: status === k ? meta.cor : theme.text, fontFamily: 'IBM Plex Mono, monospace', textAlign: 'left' }}>
-                    <span style={{ color: meta.cor }}>{meta.icon}</span> {meta.label}
-                    {status === k && <span style={{ marginLeft: 'auto' }}>✓</span>}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: status === k ? meta.cor+'14' : 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: status === k ? meta.cor : theme.text, fontFamily: theme.fontSerif, fontStyle: 'italic', textAlign: 'left' }}>
+                    {meta.label}
+                    {status === k && <Check size={13} style={{ marginLeft: 'auto' }} />}
                   </button>
                 ))}
               </div>
@@ -181,8 +184,8 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
           </div>
         )}
 
-        <button onClick={copyFichamento} style={{ ...btn(), color: copied ? theme.success : theme.muted }}>
-          {copied ? '✓' : '⎘'} {copied ? 'Copiado' : 'Fichamento'}
+        <button onClick={copyFichamento} style={{ ...btn(), color: copied ? theme.success : theme.textSub }}>
+          {copied ? 'Copiado' : 'Fichamento'}
         </button>
 
         <div style={{ position: 'relative' }}>
@@ -190,39 +193,38 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
             onMouseEnter={() => setShowPreviewAbnt(true)}
             onMouseLeave={() => setShowPreviewAbnt(false)}
             style={{ ...btn(), color: copiedAbnt ? theme.success : theme.gold }}>
-            {copiedAbnt ? '✓' : '§'} {copiedAbnt ? 'Copiado' : 'ABNT'}
+            {copiedAbnt ? 'Copiado' : 'ABNT'}
           </button>
           {showPreviewAbnt && abnt && (
-            <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, background: theme.surface, border: `1px solid ${theme.borderGold}`, borderRadius: 8, padding: '10px 14px', width: 340, fontSize: 11, color: theme.text, lineHeight: 1.7, fontFamily: 'Georgia, serif', boxShadow: theme.shadow, zIndex: 50 }}>
-              <div style={{ fontSize: 9, color: theme.gold, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'IBM Plex Mono, monospace' }}>Prévia ABNT</div>
+            <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, background: theme.surface, border: `1px solid ${theme.borderGold}`, borderRadius: 8, padding: '12px 16px', width: 340, fontSize: 12, color: theme.text, lineHeight: 1.7, fontFamily: theme.fontSerif, boxShadow: theme.shadow, zIndex: 50 }}>
+              <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', marginBottom: 6 }}>Prévia ABNT</div>
               {abnt}
             </div>
           )}
         </div>
 
-        <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.muted, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
           {linkCopiado ? <><Check size={13} /> Copiado</> : <><Link2 size={13} /> Compartilhar</>}
         </button>
         {publica && (
           <button onClick={tornarPrivada} title="Qualquer pessoa com o link ainda consegue acessar até você tornar privada de novo"
-            style={{ ...btn(), fontSize: 10, color: '#10b981', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Unlock size={12} /> Pública · tornar privada
+            style={{ ...btn(theme.success), fontSize: 11, color: theme.success, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Unlock size={12} /> Pública, tornar privada
           </button>
         )}
         {erroCompartilhar && (
-          <div style={{ fontSize: 11, color: theme.error, width: '100%' }}>{erroCompartilhar}</div>
+          <div style={{ fontSize: 12, color: theme.penal, width: '100%', fontStyle: 'italic', fontFamily: theme.fontSerif }}>{erroCompartilhar}</div>
         )}
 
         {!readOnly && (
           <>
             {onDuplicar && (
-              <button onClick={() => onDuplicar(raw)} style={btn()}>⧉ Duplicar</button>
+              <button onClick={() => onDuplicar(raw)} style={btn()}>Duplicar</button>
             )}
-            <button onClick={onEdit} style={{ ...btn(), marginLeft: 'auto' }}>✎ Editar</button>
+            <button onClick={onEdit} style={{ ...btn(), marginLeft: 'auto' }}>Editar</button>
             {onDelete && (
-              <button onClick={onDelete}
-                style={{ ...btn(), background: mode==='dark'?'#2a0f0f':'#fef2f2', color: theme.error, border: `1px solid ${mode==='dark'?'#5a1f1f':'#fca5a5'}` }}>
-                ✕ Excluir
+              <button onClick={onDelete} style={{ ...btn(theme.penal), color: theme.penal }}>
+                Excluir
               </button>
             )}
           </>
@@ -233,33 +235,31 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
       {entry.teses.length > 0 && entry.teses.map((t, i) => {
         if (!t || typeof t !== 'object') return null
         return (
-          <div key={i} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 16, marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }}>
-              Tese {i+1}
-            </div>
+          <div key={i} style={{ marginBottom: 28 }}>
+            <div style={secao}>Tese {i+1}</div>
             {[
-              ['Tese / Assunto',      s(t.tese_assunto),        false],
-              ['Fundamentação Legal', s(t.fundamentacao_legal),  false],
-              ['Precedente / Súmula', s(t.precedente_sumula),    false],
-              ['Fundamento da Decisão',     s(t.ratio_decidendi),      true],
-              ['Aplicação Prática',   s(t.aplicacao_pratica),    true],
-            ].filter(([, val]) => val).map(([label, val, isIa]) => (
-              <div key={label} style={{
-                marginBottom: 12,
+              ['Tese ou assunto',      s(t.tese_assunto),        false],
+              ['Fundamentação legal',  s(t.fundamentacao_legal), false],
+              ['Precedente ou súmula', s(t.precedente_sumula),   false],
+              ['Fundamento da decisão', s(t.ratio_decidendi),    true],
+              ['Aplicação prática',    s(t.aplicacao_pratica),   true],
+            ].filter(([, val]) => val).map(([campo, val, isIa]) => (
+              <div key={campo} style={{
+                marginBottom: 14,
                 background: isIa && iasPendente ? (mode === 'dark' ? '#1c160033' : '#fffbeb66') : 'transparent',
-                border: isIa && iasPendente ? '1px dashed #c9a45266' : '1px solid transparent',
+                border: isIa && iasPendente ? `1px dashed ${theme.gold}66` : 'none',
                 borderRadius: isIa && iasPendente ? 8 : 0,
                 padding: isIa && iasPendente ? '10px 12px' : 0,
               }}>
-                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {label}
+                <div style={label}>
+                  {campo}
                   {isIa && iasPendente && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, color: '#c9a452', fontSize: 9, fontFamily: 'IBM Plex Mono, monospace', background: '#c9a45218', border: '1px solid #c9a45244', borderRadius: 4, padding: '1px 6px' }}>
-                      <AlertTriangle size={8} /> IA · Pendente de revisão
+                    <span style={{ color: theme.gold, fontSize: 11, fontStyle: 'italic' }}>
+                      — sugestão de IA, pendente de revisão
                     </span>
                   )}
                 </div>
-                <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7 }}>{val}</div>
+                <div style={{ fontSize: 14, color: theme.text, lineHeight: 1.7, fontFamily: theme.fontSerif }}>{val}</div>
               </div>
             ))}
           </div>
@@ -267,29 +267,25 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
       })}
 
       {entry.teses.length === 0 && (
-        <div style={{ color: theme.muted, fontSize: 13, padding: '20px 0' }}>Nenhuma tese cadastrada.</div>
+        <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: theme.fontSerif, padding: '20px 0' }}>Nenhuma tese cadastrada.</div>
       )}
 
       {/* Minha Anotação — estudo ativo */}
-      <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 16, marginTop: 8 }}>
-        <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 6, fontFamily: 'IBM Plex Mono, monospace' }}>
-          Minha Anotação
-        </div>
+      <div style={{ marginTop: 8 }}>
+        <div style={secao}>Minha anotação</div>
         <AnotacaoPessoal itemId={entry.id} namespace="entrada" theme={theme} placeholder="Anote aqui o que você aprendeu, uma dúvida, ou como pretende usar isso numa peça..." />
       </div>
 
       {/* Histórico */}
       {entry.historico.length > 0 && (
-        <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 16, marginTop: 8, opacity: 0.7 }}>
-          <div style={{ fontSize: 11, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10, fontFamily: 'IBM Plex Mono, monospace' }}>
-            Histórico de alterações
-          </div>
+        <div style={{ marginTop: 28, opacity: 0.75 }}>
+          <div style={{ ...secao, color: theme.muted, borderBottom: `1px solid ${theme.border}` }}>Histórico de alterações</div>
           {entry.historico.slice(0, 10).map((h, i) => (
-            <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 4 }}>
-              <div style={{ fontSize: 10, color: theme.muted, whiteSpace: 'nowrap', fontFamily: 'IBM Plex Mono, monospace' }}>
+            <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 6 }}>
+              <div style={{ fontSize: 11, color: theme.muted, whiteSpace: 'nowrap', fontStyle: 'italic', fontFamily: theme.fontSerif }}>
                 {h?.data ? new Date(h.data).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : ''}
               </div>
-              <div style={{ fontSize: 12, color: theme.text }}>{s(h?.descricao)}</div>
+              <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif }}>{s(h?.descricao)}</div>
             </div>
           ))}
         </div>
