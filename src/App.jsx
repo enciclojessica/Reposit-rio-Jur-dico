@@ -854,7 +854,7 @@ case VIEWS.JURISPRUDENCIA:
         )}
         {isMobile && (
           <MobileHeader
-            theme={theme} role={role} session={session} setShowLogin={setShowLogin}
+            theme={theme} role={role} session={session} membro={membro} setShowLogin={setShowLogin}
             setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter} setView={setView}
           />
         )}
