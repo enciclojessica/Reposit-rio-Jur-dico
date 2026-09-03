@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react'
 import { useTheme } from '../theme'
 
-// Paleta cíclica para tags — versões mais escuras no tema claro (senão
-// cores como ciano/amarelo ficam claras demais sobre fundo branco).
-const TAG_CORES_ESCURO = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#a855f7', '#06b6d4', '#f97316', '#ec4899']
-const TAG_CORES_CLARO  = ['#1e3a8a', '#065f46', '#92400e', '#991b1b', '#6b21a8', '#155e75', '#9a3412', '#9d174d']
+// Paleta cíclica para tags, derivada da mesma família de cor do resto do
+// app (tinta, vinho, ouro e as cores mutadas de área) — não mais uma
+// paleta genérica de arco-íris sem relação com o tema.
+const TAG_CORES_ESCURO = ['#c9a878', '#a3324f', '#8fb89e', '#c5a05e', '#a89fc9', '#7fb0c9', '#d4a373', '#c98fa3']
+const TAG_CORES_CLARO  = ['#6e5a2c', '#7a1128', '#2c6e5a', '#8a5a2e', '#5a4a7a', '#2c5a6e', '#8a5a2e', '#a34a68']
 
 function corParaTag(tag, isDark) {
   let hash = 0
@@ -19,8 +20,8 @@ export function TagPill({ tag, onRemove, pequena }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
-      background: cor + '1a', color: cor, fontWeight: 700,
-      border: `1px solid ${cor}55`,
+      background: cor + '12', color: cor, fontStyle: 'italic',
+      border: `1px solid ${cor}3a`,
       borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
       fontSize: pequena ? 10 : 11,
       fontFamily: "Georgia, 'EB Garamond', serif",
