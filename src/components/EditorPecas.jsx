@@ -147,7 +147,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ padding: '12px 14px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
-        <div style={{ fontSize: 10, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 10 }}>
           Citações
         </div>
         {/* Formato */}

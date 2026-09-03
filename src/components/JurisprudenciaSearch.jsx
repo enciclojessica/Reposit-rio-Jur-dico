@@ -1,30 +1,29 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { AREAS } from '../shared'
-import { Search, Scale, BookmarkPlus, Check, AlertCircle, Minus } from 'lucide-react'
+import { Search, Scale, BookmarkPlus, Check, AlertCircle } from 'lucide-react'
 
 const TRIBUNAIS = ['Todos', 'STF', 'STJ', 'TST', 'TRFs', 'TJSP', 'TJRJ', 'TJMG']
 
-function badgeConfig(tendencia, area) {
-  // Verifica campo tendencia primeiro, depois tenta inferir da area/ementa
+function badgeConfig(tendencia, area, theme) {
   const t = (tendencia || area || '').toLowerCase()
   if (t.includes('favorável') || t.includes('favoravel') || t === 'favoravel')
-    return { label: 'Favorável', bg: '#10b98122', color: '#10b981', border: '#10b98155' }
+    return { label: 'Favorável', color: theme.success }
   if (t.includes('contrário') || t.includes('contrario') || t.includes('desfavorável') || t === 'contrario')
-    return { label: 'Contrário', bg: '#ef444422', color: '#ef4444', border: '#ef444455' }
-  return { label: 'Neutro', bg: '#6b728022', color: '#6b7280', border: '#6b728044' }
+    return { label: 'Contrário', color: theme.penal }
+  return { label: 'Neutro', color: theme.muted }
 }
 
 function RelevanciaBar({ pct, cor, theme }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-      <span style={{ fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', letterSpacing: 1, textTransform: 'uppercase', flexShrink: 0 }}>
+      <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>
         Relevância
       </span>
       <div style={{ flex: 1, height: 4, background: theme.border, borderRadius: 2 }}>
-        <div style={{ height: '100%', width: pct + '%', background: cor, borderRadius: 2, transition: 'width .6s' }} />
+        <div style={{ height: '100%', width: pct + '%', background: cor, borderRadius: 2, transition: 'width .6s', opacity: 0.8 }} />
       </div>
-      <span style={{ fontSize: 10, color: cor, fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, flexShrink: 0 }}>
+      <span style={{ fontSize: 11, color: cor, fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>
         {pct}%
       </span>
     </div>
@@ -50,7 +49,7 @@ function dataValida(v) {
 }
 
 function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
-  const badge = badgeConfig(r.tendencia, r.area)
+  const badge = badgeConfig(r.tendencia, r.area, theme)
   const cor = badge.color
   const pct = r.relevancia || Math.floor(75 + Math.random() * 20)
   const numero = campoValido(r.numero)
@@ -60,32 +59,28 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
   return (
     <div style={{
       background: theme.raised, border: `1px solid ${theme.border}`,
-      borderRadius: 12, padding: '16px 18px', marginBottom: 12,
-      borderLeft: `3px solid ${cor}`,
+      borderTop: `2px solid ${cor}`,
+      borderRadius: 8, padding: '16px 18px', marginBottom: 12,
     }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Georgia, serif' }}>
-            {r.tribunal} · {r.tipo}{numero ? ` ${numero}` : ''}
+          <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
+            {r.tribunal}, {r.tipo}{numero ? ` ${numero}` : ''}
             {!numero && (
-              <span style={{ fontSize: 9, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', marginLeft: 8, fontWeight: 400 }}>
-                nº não confirmado
+              <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginLeft: 8, fontWeight: 400 }}>
+                (número não confirmado)
               </span>
             )}
           </div>
           {(relator || data) && (
-            <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', marginTop: 2 }}>
-              {relator || ''}{relator && data ? ' · ' : ''}{data ? data.toLocaleDateString('pt-BR') : ''}
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginTop: 2 }}>
+              {[relator, data ? data.toLocaleDateString('pt-BR') : null].filter(Boolean).join(', ')}
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <span style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase',
-            background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`,
-            borderRadius: 4, padding: '3px 8px', fontFamily: 'IBM Plex Mono, monospace',
-          }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <span style={{ fontSize: 12, color: badge.color, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
             {badge.label}
           </span>
           <button
@@ -93,10 +88,10 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
             disabled={salvo || salvando}
             title={salvo ? 'Salvo no repositório' : 'Salvar no repositório'}
             style={{
-              background: salvo ? '#10b98122' : 'none',
-              border: `1px solid ${salvo ? '#10b981' : theme.border}`,
+              background: 'transparent',
+              border: `1px solid ${salvo ? theme.success : theme.border}`,
               borderRadius: 6, padding: '4px 6px', cursor: salvo ? 'default' : 'pointer',
-              color: salvo ? '#10b981' : theme.muted, display: 'flex', alignItems: 'center',
+              color: salvo ? theme.success : theme.muted, display: 'flex', alignItems: 'center',
             }}>
             {salvando ? <AlertCircle size={13} /> : salvo ? <Check size={13} /> : <BookmarkPlus size={13} />}
           </button>
@@ -104,7 +99,7 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
       </div>
 
       {/* Ementa */}
-      <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Georgia, serif', lineHeight: 1.6 }}>
+      <div style={{ fontSize: 13, color: theme.textSub, fontFamily: "Georgia, 'EB Garamond', serif", lineHeight: 1.6 }}>
         {r.ementa}
       </div>
 
@@ -147,7 +142,6 @@ export default function JurisprudenciaSearch({ session, theme }) {
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
-      // Adicionar relevância calculada
       const rs = (data.resultados || []).map((r, i) => ({
         ...r,
         relevancia: Math.max(65, 96 - i * 4 - Math.floor(Math.random() * 5)),
@@ -200,11 +194,11 @@ export default function JurisprudenciaSearch({ session, theme }) {
       <div style={{ marginBottom: 28, paddingTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <Scale size={22} color={theme.gold} />
-          <span style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 2 }}>
+          <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
             Jurisprudência
           </span>
         </div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: theme.text, fontFamily: 'Georgia, serif', margin: 0, lineHeight: 1.3 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, margin: 0, lineHeight: 1.3 }}>
           A jurisprudência que sustenta<br />
           seu caso, <span style={{ color: theme.gold }}>em minutos.</span>
         </h1>
@@ -215,17 +209,17 @@ export default function JurisprudenciaSearch({ session, theme }) {
         <div style={{
           display: 'flex', gap: 10, alignItems: 'stretch',
           background: theme.raised, border: `1.5px solid ${theme.gold}66`,
-          borderRadius: 12, padding: '4px 4px 4px 16px',
+          borderRadius: 10, padding: '4px 4px 4px 16px',
         }}>
           <Scale size={16} color={theme.gold} style={{ flexShrink: 0, alignSelf: 'center' }} />
           <input
             value={busca}
             onChange={e => setBusca(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && pesquisar()}
-            placeholder="Ex: responsabilidade civil objetiva consumidor..."
+            placeholder="Ex: responsabilidade civil objetiva consumidor…"
             style={{
               flex: 1, background: 'none', border: 'none', outline: 'none',
-              color: theme.text, fontSize: 14, fontFamily: 'Inter, sans-serif',
+              color: theme.text, fontSize: 14, fontFamily: "Georgia, 'EB Garamond', serif",
               padding: '10px 0',
             }}
           />
@@ -233,43 +227,42 @@ export default function JurisprudenciaSearch({ session, theme }) {
             onClick={pesquisar}
             disabled={carregando || !busca.trim()}
             style={{
-              background: theme.gold, border: 'none', borderRadius: 9,
+              background: theme.gold, border: 'none', borderRadius: 6,
               padding: '10px 18px', cursor: busca.trim() ? 'pointer' : 'default',
               display: 'flex', alignItems: 'center', gap: 6,
-              color: '#000', fontWeight: 700, fontSize: 12,
+              color: '#fdfbf7', fontWeight: 600, fontSize: 13,
               fontFamily: 'Inter, sans-serif', opacity: busca.trim() ? 1 : 0.5,
               flexShrink: 0,
             }}>
             <Search size={14} />
-            {carregando ? 'Buscando...' : 'Buscar'}
+            {carregando ? 'Buscando…' : 'Buscar'}
           </button>
         </div>
       </div>
 
       {/* Filtro de tribunal */}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 24, borderBottom: `1px solid ${theme.border}`, paddingBottom: 2 }}>
         {TRIBUNAIS.map(t => (
-          <button key={t} onClick={() => setTribunal(t)}
+          <span key={t} onClick={() => setTribunal(t)}
             style={{
-              fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', padding: '4px 10px',
-              borderRadius: 6, cursor: 'pointer',
-              border: `1px solid ${tribunal === t ? theme.gold : theme.border}`,
-              background: tribunal === t ? theme.gold + '18' : 'none',
-              color: tribunal === t ? theme.gold : theme.muted,
-              fontWeight: tribunal === t ? 700 : 400,
+              fontSize: 13, fontFamily: "Georgia, 'EB Garamond', serif", paddingBottom: 8,
+              cursor: 'pointer',
+              borderBottom: tribunal === t ? `1.5px solid ${theme.gold}` : '1.5px solid transparent',
+              color: tribunal === t ? theme.text : theme.muted,
+              fontStyle: tribunal === t ? 'normal' : 'italic',
             }}>
             {t}
-          </button>
+          </span>
         ))}
       </div>
 
       {/* Estado de carregando */}
       {carregando && (
         <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted }}>
-          <div style={{ fontSize: 13, fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
-            Consultando STF, STJ e tribunais...
+          <div style={{ fontSize: 14, fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 8 }}>
+            Consultando STF, STJ e tribunais…
           </div>
-          <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace' }}>
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
             Isso pode levar alguns segundos
           </div>
         </div>
@@ -277,7 +270,7 @@ export default function JurisprudenciaSearch({ session, theme }) {
 
       {/* Erro */}
       {erro && (
-        <div style={{ background: '#ef444411', border: '1px solid #ef444433', borderRadius: 10, padding: '12px 16px', color: '#ef4444', fontSize: 13, fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ background: 'transparent', border: `1px solid ${theme.penal}55`, borderRadius: 8, padding: '12px 16px', color: theme.penal, fontSize: 13, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
           {erro}
         </div>
       )}
@@ -285,14 +278,14 @@ export default function JurisprudenciaSearch({ session, theme }) {
       {/* Resultados */}
       {resultados.length > 0 && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
               {resultados.length} resultado{resultados.length !== 1 ? 's' : ''} para "{pesquisado}"
             </div>
-            <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 4 }}>
               {salvos.size > 0
                 ? `${salvos.size} salvo${salvos.size > 1 ? 's' : ''} no repositório`
-                : <>Clique em <BookmarkPlus size={11} /> para salvar</>}
+                : <>Clique em <BookmarkPlus size={12} /> para salvar</>}
             </div>
           </div>
           {resultados.map((r, i) => {
@@ -315,7 +308,7 @@ export default function JurisprudenciaSearch({ session, theme }) {
       {!carregando && resultados.length === 0 && !erro && (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <Scale size={32} color={theme.muted} style={{ marginBottom: 12 }} />
-          <div style={{ fontSize: 13, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6 }}>
+          <div style={{ fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", lineHeight: 1.6 }}>
             Digite o tema, tese ou número do processo<br />
             para buscar jurisprudência em tempo real
           </div>
