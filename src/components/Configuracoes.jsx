@@ -513,6 +513,12 @@ export default function Configuracoes({ session, membro, entradas }) {
       {aba === 'preferencias' && <TabPreferencias session={session} membro={membro} />}
       {aba === 'seguranca'    && <TabPreferencias session={session} membro={membro} />}
       {aba === 'backup'       && <TabBackup session={session} entradas={entradas} />}
+
+      <div style={{ marginTop: 32, paddingTop: 16, borderTop: `1px solid ${theme.border}`, fontSize: 11, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+        <a href="/?pagina=termos" style={{ color: theme.muted, textDecoration: 'underline' }}>Termos de uso</a>
+        <span style={{ color: theme.muted, margin: '0 6px' }}>·</span>
+        <a href="/?pagina=privacidade" style={{ color: theme.muted, textDecoration: 'underline' }}>Política de privacidade</a>
+      </div>
     </div>
   )
 }

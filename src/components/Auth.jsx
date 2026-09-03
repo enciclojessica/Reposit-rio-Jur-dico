@@ -185,6 +185,11 @@ export default function Auth() {
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: theme.muted, fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic', opacity: 0.75 }}>
           Plataforma e curadoria, Farias Fusquiani
         </div>
+        <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <a href="/?pagina=termos" style={{ color: theme.muted, textDecoration: 'underline' }}>Termos de uso</a>
+          <span style={{ color: theme.muted, margin: '0 6px' }}>e</span>
+          <a href="/?pagina=privacidade" style={{ color: theme.muted, textDecoration: 'underline' }}>política de privacidade</a>
+        </div>
       </div>
     </div>
   )

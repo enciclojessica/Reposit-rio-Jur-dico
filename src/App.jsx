@@ -15,6 +15,8 @@ import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
 import LegislacaoPublica from './components/LegislacaoPublica'
+import PaginaLegal from './components/PaginaLegal'
+import { TERMOS_DE_USO, POLITICA_PRIVACIDADE } from './data/textosLegais'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
 import ImportarHub from './components/ImportarHub'
@@ -133,6 +135,7 @@ export default function App() {
   const [recuperandoSenha, setRecuperandoSenha] = useState(false)
   const [entradaPublicaId, setEntradaPublicaId] = useState(null)
   const [legislacaoPublica, setLegislacaoPublica] = useState(null)
+  const [paginaLegal, setPaginaLegal] = useState(null) // 'termos' | 'privacidade' | null
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const [exportandoRepo, setExportandoRepo] = useState(false)
@@ -177,6 +180,11 @@ export default function App() {
     const artParam = params.get('art')
     if (leiParam && artParam) {
       setLegislacaoPublica({ codigo: leiParam, numero: parseInt(artParam, 10) })
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+    const paginaParam = params.get('pagina')
+    if (paginaParam === 'termos' || paginaParam === 'privacidade') {
+      setPaginaLegal(paginaParam)
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
@@ -514,6 +522,13 @@ async function handleSave(entry) {
       codigo={legislacaoPublica.codigo}
       numero={legislacaoPublica.numero}
       onFechar={() => setLegislacaoPublica(null)}
+    />
+  )
+
+  if (paginaLegal) return (
+    <PaginaLegal
+      documento={paginaLegal === 'termos' ? TERMOS_DE_USO : POLITICA_PRIVACIDADE}
+      onFechar={() => setPaginaLegal(null)}
     />
   )
 
