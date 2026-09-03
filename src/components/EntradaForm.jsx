@@ -354,7 +354,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
       {entry._zotero && (
         <div style={{ ...cardStyle, border: '1px solid ' + theme.gold + '33' }}>
           <SectionLabel>Metadados extraídos (Zotero)</SectionLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
             <div>
               <FieldLabel>Tipo de item</FieldLabel>
               {inp(entry._zotero.tipo_item, v => setEntry(e => ({ ...e, _zotero: { ...e._zotero, tipo_item: v } })), 'Acordao, Decisao...')}

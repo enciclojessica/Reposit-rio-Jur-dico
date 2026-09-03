@@ -208,7 +208,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
       </div>
 
       {/* ── Evolução mensal + Tipos ────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14, marginBottom: 14 }}>
         <div style={card}>
           <div style={secLabel}>Entradas por mês</div>
           <ReguaBarras dados={stats.meses} />
@@ -220,7 +220,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
       </div>
 
       {/* ── Por área + Top fontes ──────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14, marginBottom: 14 }}>
         <div style={card}>
           <div style={secLabel}>Por área</div>
           <BarrasPorArea dados={stats.porArea} />
@@ -254,7 +254,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
       </div>
 
       {/* ── Lacunas + Recentes ─────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
 
         <div style={card}>
           <div style={secLabel}>Lacunas de cobertura</div>
