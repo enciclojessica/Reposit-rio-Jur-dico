@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Download, Search, Check, Copy } from 'lucide-react'
+import { Download, Search, Check, Copy, Link2 } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 
@@ -17,6 +17,7 @@ function ArtigoModal({ grupo, onFechar }) {
   const { theme } = useTheme()
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase(), nome: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
+  const [linkCopiado, setLinkCopiado] = useState(false)
   const caput = grupo.caput
 
   function copiar() {
@@ -25,6 +26,13 @@ function ArtigoModal({ grupo, onFechar }) {
     navigator.clipboard.writeText(t)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
+  }
+
+  function compartilharLink() {
+    const url = `${window.location.origin}/?lei=${grupo.codigo}&art=${grupo.numero}`
+    navigator.clipboard.writeText(url)
+    setLinkCopiado(true)
+    setTimeout(() => setLinkCopiado(false), 2500)
   }
 
   const rotuloSecao = { fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 5 }
@@ -55,6 +63,9 @@ function ArtigoModal({ grupo, onFechar }) {
             </span>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={compartilharLink} style={{ background: 'transparent', color: linkCopiado ? theme.success : theme.gold, border: `1px solid ${linkCopiado ? theme.success : theme.border}`, borderRadius: 6, padding: '6px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+              {linkCopiado ? <><Check size={13} /> Copiado</> : <><Link2 size={13} /> Compartilhar</>}
+            </button>
             <button onClick={copiar} style={{ background: 'transparent', color: copiado ? theme.success : theme.textSub, border: `1px solid ${copiado ? theme.success : theme.border}`, borderRadius: 6, padding: '6px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
               {copiado ? <><Check size={13} /> Copiado</> : <><Copy size={13} /> Copiar</>}
             </button>

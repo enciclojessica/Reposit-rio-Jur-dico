@@ -13,6 +13,7 @@ import Dashboard from './components/Dashboard'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
+import LegislacaoPublica from './components/LegislacaoPublica'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
 import ImportarHub from './components/ImportarHub'
@@ -129,6 +130,7 @@ export default function App() {
   const [temaAlertaPrefill, setTemaAlertaPrefill] = useState(null)
   const [recuperandoSenha, setRecuperandoSenha] = useState(false)
   const [entradaPublicaId, setEntradaPublicaId] = useState(null)
+  const [legislacaoPublica, setLegislacaoPublica] = useState(null)
   const [conviteToken, setConviteToken] = useState(null)
   const [aceitandoConvite, setAceitandoConvite] = useState(false)
   const [exportandoRepo, setExportandoRepo] = useState(false)
@@ -167,6 +169,12 @@ export default function App() {
     const entradaParam = params.get('entrada')
     if (entradaParam) {
       setEntradaPublicaId(entradaParam)
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+    const leiParam = params.get('lei')
+    const artParam = params.get('art')
+    if (leiParam && artParam) {
+      setLegislacaoPublica({ codigo: leiParam, numero: parseInt(artParam, 10) })
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
@@ -477,6 +485,14 @@ async function handleSave(entry) {
     <EntradaPublica
       entradaId={entradaPublicaId}
       onFechar={() => setEntradaPublicaId(null)}
+    />
+  )
+
+  if (legislacaoPublica) return (
+    <LegislacaoPublica
+      codigo={legislacaoPublica.codigo}
+      numero={legislacaoPublica.numero}
+      onFechar={() => setLegislacaoPublica(null)}
     />
   )
 

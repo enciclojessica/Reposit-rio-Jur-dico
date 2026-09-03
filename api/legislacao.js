@@ -27,6 +27,19 @@ export default async function handler(req, res) {
 
     if (erroEntradas) console.error('sitemap: erro ao buscar entradas públicas:', erroEntradas.message)
 
+    const { data: artigos, error: erroArtigos } = await supabase
+      .from('legislacao')
+      .select('codigo, numero')
+      .eq('vigente', true)
+
+    if (erroArtigos) console.error('sitemap: erro ao buscar artigos de legislação:', erroArtigos.message)
+
+    // legislacao tem várias linhas por artigo (caput + incisos + parágrafos);
+    // o sitemap só quer uma URL por artigo, não por linha.
+    const artigosUnicos = [...new Map(
+      (artigos || []).map((a) => [`${a.codigo}|${a.numero}`, a])
+    ).values()]
+
     const urls = [
       { loc: `${BASE_URL}/`, changefreq: 'daily', priority: '1.0' },
       ...(entradas || []).map((e) => ({
@@ -34,6 +47,11 @@ export default async function handler(req, res) {
         lastmod: e.atualizado_em ? new Date(e.atualizado_em).toISOString().slice(0, 10) : undefined,
         changefreq: 'weekly',
         priority: '0.7',
+      })),
+      ...artigosUnicos.map((a) => ({
+        loc: `${BASE_URL}/?lei=${a.codigo}&art=${a.numero}`,
+        changefreq: 'monthly',
+        priority: '0.5',
       })),
     ]
 
