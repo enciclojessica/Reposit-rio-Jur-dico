@@ -10,6 +10,7 @@ import Membros from './components/Membros'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
+import IndiceRemissivo from './components/IndiceRemissivo'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
@@ -579,6 +580,11 @@ case VIEWS.JURISPRUDENCIA:
           onCriarAlerta={area => { setTemaAlertaPrefill(area); setView(VIEWS.ALERTAS) }}
           onSelecionarArea={area => { setAreaFilter(area); setTipoFilter('all'); setView(VIEWS.HOME) }}
           onIrParaLegislacao={() => setView(VIEWS.LEG_VIEW)}
+        /></div>
+
+      case VIEWS.INDICE:
+        return <div className="fade-up"><IndiceRemissivo entradas={entradas}
+          onSelecionarTag={tag => { setTagFilter(tag); setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
         /></div>
 
       case VIEWS.EDITOR:

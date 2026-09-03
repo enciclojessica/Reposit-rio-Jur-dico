@@ -17,6 +17,7 @@ export default function MobileNav({
     { v: VIEWS.HOME,        label: 'Repositório' },
     { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
     { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
+    { v: VIEWS.INDICE,         label: 'Índice remissivo' },
     { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
