@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../supabase'
-import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted } from '../shared'
+import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted, labelCampoTese } from '../shared'
 import TagInput from './TagInput'
 import { useTheme } from '../theme'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
@@ -371,24 +371,24 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
               <button onClick={() => removeTese(i)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 18 }}>x</button>
             )}
           </div>
-          <FieldLabel>Tese / Assunto</FieldLabel>
+          <FieldLabel>{labelCampoTese(entry.tipo, 'tese_assunto')}</FieldLabel>
           {inp(t.tese_assunto, v => setT(i, 'tese_assunto', v), 'Enunciado da tese')}
-          <FieldLabel>Fundamentacao Legal</FieldLabel>
+          <FieldLabel>{labelCampoTese(entry.tipo, 'fundamentacao_legal')}</FieldLabel>
           {inp(t.fundamentacao_legal, v => setT(i, 'fundamentacao_legal', v), 'Art. X, Lei Y / Sumula Z')}
 
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center' }}>
-            <FieldLabel>Fundamento da Decisão</FieldLabel>
+            <FieldLabel>{labelCampoTese(entry.tipo, 'ratio_decidendi')}</FieldLabel>
             <IaBadge status={iaStatus[i + '_ratio_decidendi']} theme={theme} />
           </div>
-          <IaField value={t.ratio_decidendi} onChange={v => setT(i, 'ratio_decidendi', v)} placeholder="Fundamento determinante da decisãoento determinante da decisao" teseIdx={i} fieldName="ratio_decidendi" />
+          <IaField value={t.ratio_decidendi} onChange={v => setT(i, 'ratio_decidendi', v)} placeholder="Fundamento determinante" teseIdx={i} fieldName="ratio_decidendi" />
 
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center' }}>
-            <FieldLabel>Aplicacao Pratica</FieldLabel>
+            <FieldLabel>{labelCampoTese(entry.tipo, 'aplicacao_pratica')}</FieldLabel>
             <IaBadge status={iaStatus[i + '_aplicacao_pratica']} theme={theme} />
           </div>
           <IaField value={t.aplicacao_pratica} onChange={v => setT(i, 'aplicacao_pratica', v)} placeholder="Como utilizar em pecas processuais" teseIdx={i} fieldName="aplicacao_pratica" />
 
-          <FieldLabel>Precedente / Sumula</FieldLabel>
+          <FieldLabel>{labelCampoTese(entry.tipo, 'precedente_sumula')}</FieldLabel>
           {inp(t.precedente_sumula, v => setT(i, 'precedente_sumula', v), 'Ex: REsp 1.234.567/SP, Sumula 370 STJ')}
         </div>
       ))}

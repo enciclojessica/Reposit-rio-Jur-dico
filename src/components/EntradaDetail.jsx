@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Check, Link2, Unlock } from 'lucide-react'
 import { useTheme } from '../theme'
-import { AREAS, Badge, STATUS_META, corDaArea } from '../shared'
+import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
 import AnotacaoPessoal from './AnotacaoPessoal'
@@ -238,11 +238,11 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
           <div key={i} style={{ marginBottom: 28 }}>
             <div style={secao}>Tese {i+1}</div>
             {[
-              ['Tese ou assunto',      s(t.tese_assunto),        false],
-              ['Fundamentação legal',  s(t.fundamentacao_legal), false],
-              ['Precedente ou súmula', s(t.precedente_sumula),   false],
-              ['Fundamento da decisão', s(t.ratio_decidendi),    true],
-              ['Aplicação prática',    s(t.aplicacao_pratica),   true],
+              ['tese_assunto',        s(t.tese_assunto),        false],
+              ['fundamentacao_legal', s(t.fundamentacao_legal), false],
+              ['precedente_sumula',   s(t.precedente_sumula),   false],
+              ['ratio_decidendi',     s(t.ratio_decidendi),     true],
+              ['aplicacao_pratica',   s(t.aplicacao_pratica),   true],
             ].filter(([, val]) => val).map(([campo, val, isIa]) => (
               <div key={campo} style={{
                 marginBottom: 14,
@@ -252,7 +252,7 @@ export default function EntradaDetail({ entry: raw, onClose, onDelete, onEdit, r
                 padding: isIa && iasPendente ? '10px 12px' : 0,
               }}>
                 <div style={label}>
-                  {campo}
+                  {labelCampoTese(entry.tipo, campo)}
                   {isIa && iasPendente && (
                     <span style={{ color: theme.gold, fontSize: 11, fontStyle: 'italic' }}>
                       — sugestão de IA, pendente de revisão

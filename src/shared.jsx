@@ -50,6 +50,47 @@ export function AreaDot({ area, theme, size = 7 }) {
 export const ROLE_COR   = { admin: '#a9812e', editor: '#2c4a6e', leitor: '#065f46' }
 export const ROLE_LABEL = { admin: 'Admin', editor: 'Editor', leitor: 'Leitor' }
 
+// Rótulos dos campos de tese variam por tipo de entrada — os mesmos 5
+// campos do banco (tese_assunto, fundamentacao_legal, precedente_sumula,
+// ratio_decidendi, aplicacao_pratica) significam coisas diferentes se a
+// entrada é jurisprudência, doutrina, súmula ou lei. Confirmado com dados
+// reais do repositório antes de definir os rótulos (não é suposição).
+export const CAMPOS_TESE_POR_TIPO = {
+  'jurisprudência': {
+    tese_assunto:        'Tese ou assunto',
+    fundamentacao_legal: 'Fundamentação legal',
+    precedente_sumula:   'Precedente ou súmula',
+    ratio_decidendi:     'Fundamento da decisão',
+    aplicacao_pratica:   'Aplicação prática',
+  },
+  'doutrina': {
+    tese_assunto:        'Conceito ou tese defendida',
+    fundamentacao_legal: 'Dispositivo comentado',
+    precedente_sumula:   'Referência bibliográfica',
+    ratio_decidendi:     'Argumento do autor',
+    aplicacao_pratica:   'Aplicação prática',
+  },
+  'súmula': {
+    tese_assunto:        'Enunciado',
+    fundamentacao_legal: 'Fundamentação legal',
+    precedente_sumula:   'Número e tribunal',
+    ratio_decidendi:     'Fundamento do enunciado',
+    aplicacao_pratica:   'Aplicação prática',
+  },
+  'lei': {
+    tese_assunto:        'Tese ou assunto',
+    fundamentacao_legal: 'Fundamentação legal',
+    precedente_sumula:   'Precedente ou súmula',
+    ratio_decidendi:     'Fundamento jurídico',
+    aplicacao_pratica:   'Aplicação prática',
+  },
+}
+
+export function labelCampoTese(tipo, campo) {
+  const porTipo = CAMPOS_TESE_POR_TIPO[tipo] || CAMPOS_TESE_POR_TIPO['jurisprudência']
+  return porTipo[campo] || CAMPOS_TESE_POR_TIPO['jurisprudência'][campo]
+}
+
 export const emptyEntry = () => ({
   area: 'Cível',
   tema: '',
