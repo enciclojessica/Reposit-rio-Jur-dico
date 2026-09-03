@@ -77,13 +77,13 @@ export default function InstalarApp() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
         {[
-          ['1', '⎋', 'Toque em Compartilhar (ícone de seta para cima)'],
-          ['2', '＋', 'Toque em "Adicionar à Tela de Início"'],
-          ['3', '✓',  'Toque em "Adicionar" no canto superior direito'],
-        ].map(([n, icon, text]) => (
+          ['1', 'Toque em Compartilhar (ícone de seta para cima)'],
+          ['2', 'Toque em "Adicionar à Tela de Início"'],
+          ['3', 'Toque em "Adicionar" no canto superior direito'],
+        ].map(([n, text]) => (
           <div key={n} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 24, height: 24, borderRadius: '50%', background: theme.gold + '22', color: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{n}</div>
-            <div style={{ fontSize: 12, color: theme.text }}><span style={{ marginRight: 6 }}>{icon}</span>{text}</div>
+            <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{text}</div>
           </div>
         ))}
       </div>
@@ -110,7 +110,7 @@ export default function InstalarApp() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
         <button onClick={instalar}
-          style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap' }}>
+          style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", whiteSpace: 'nowrap' }}>
           Instalar
         </button>
         <button onClick={() => setVisivel(false)}

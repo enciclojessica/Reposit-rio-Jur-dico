@@ -226,7 +226,7 @@ export default function ImportacaoLote({ session }) {
                 style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Download size={14} /> Template
               </button>
-              <label style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              <label style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 + Selecionar arquivo
                 <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleArquivo} style={{ display: 'none' }} />
               </label>
@@ -241,7 +241,7 @@ export default function ImportacaoLote({ session }) {
 
           {/* Instruções */}
           <div style={card}>
-            <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
               Formato esperado
             </div>
             <div style={{ overflowX: 'auto' }}>
@@ -286,12 +286,12 @@ export default function ImportacaoLote({ session }) {
         <>
           {/* Resumo */}
           <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-            <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderLeft: `3px solid ${theme.success}` }}>
+            <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderTop: `2px solid ${theme.success}` }}>
               <div style={{ fontSize: 26, fontWeight: 700, color: theme.success, fontFamily: 'Inter, sans-serif' }}>{validas}</div>
               <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>prontas para importar</div>
             </div>
             {invalidas > 0 && (
-              <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderLeft: `3px solid ${theme.error}` }}>
+              <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderTop: `2px solid ${theme.error}` }}>
                 <div style={{ fontSize: 26, fontWeight: 700, color: theme.error, fontFamily: 'Inter, sans-serif' }}>{invalidas}</div>
                 <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>com erros — serão ignoradas</div>
               </div>
@@ -305,7 +305,7 @@ export default function ImportacaoLote({ session }) {
                 <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
                   <tr>
                     {['#', 'Área', 'Tipo', 'Tema', 'Fonte', 'Tese', 'Status'].map(h => (
-                      <th key={h} style={{ textAlign: 'left', padding: '10px 12px', background: theme.bg, color: theme.muted, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ textAlign: 'left', padding: '10px 12px', background: theme.bg, color: theme.muted, fontSize: 10, fontStyle: 'italic', borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -380,11 +380,11 @@ export default function ImportacaoLote({ session }) {
 
           {resultados.errosMsgs && resultados.errosMsgs.length > 0 && (
             <div style={{ marginTop: 16, textAlign: 'left', background: theme.inputBg, border: `1px solid ${theme.error}44`, borderRadius: 8, padding: '12px 16px', maxHeight: 200, overflowY: 'auto' }}>
-              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'IBM Plex Mono, monospace' }}>
+              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
                 Detalhes dos erros
               </div>
               {resultados.errosMsgs.map((msg, i) => (
-                <div key={i} style={{ fontSize: 11, color: theme.muted, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 4, lineHeight: 1.5, wordBreak: 'break-word' }}>
+                <div key={i} style={{ fontSize: 11, color: theme.muted, fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 4, lineHeight: 1.5, wordBreak: 'break-word' }}>
                   {msg}
                 </div>
               ))}
@@ -392,7 +392,7 @@ export default function ImportacaoLote({ session }) {
           )}
 
           <button onClick={reiniciar}
-            style={{ background: theme.gold, border: 'none', color: '#0b0f1a', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginTop: 20 }}>
+            style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginTop: 20 }}>
             Importar mais
           </button>
         </div>

@@ -31,7 +31,7 @@ export default function ModalModelos({ onUsar, onFechar }) {
                 border: `1px solid ${categoria === c ? theme.gold : theme.border}`,
                 background: categoria === c ? theme.gold + '18' : 'none',
                 color: categoria === c ? theme.gold : theme.muted,
-                fontFamily: 'IBM Plex Mono, monospace',
+                fontFamily: "Georgia, 'EB Garamond', serif",
               }}>
               {c}
             </button>
@@ -60,7 +60,7 @@ export default function ModalModelos({ onUsar, onFechar }) {
                 <div style={{ fontSize: 11, color: theme.muted, marginTop: 4, lineHeight: 1.5, fontFamily: 'Inter, sans-serif' }}>
                   {m.descricao}
                 </div>
-                <div style={{ fontSize: 9, color: theme.gold, marginTop: 6, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: 1 }}>
+                <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic' }}>
                   {m.categoria} · {m.rito}
                 </div>
               </div>

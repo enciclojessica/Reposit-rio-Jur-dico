@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AREAS, corDaArea } from '../shared'
-import { Lock } from 'lucide-react'
+import { Lock, Check, Plus, RefreshCw, Sparkles } from 'lucide-react'
 import { supabase } from '../supabase'
 
 const TRIBUNAIS = [
@@ -17,18 +17,18 @@ function DecisaoCard({ decisao, onImportar, importada }) {
     <div style={{
       background: theme.cardBg,
       border: `1px solid ${importada ? cor + '55' : theme.border}`,
-      borderLeft: `3px solid ${cor}`,
-      borderRadius: 10, padding: '14px 18px',
+      borderTop: `2px solid ${cor}`,
+      borderRadius: 6, padding: '14px 18px',
       display: 'flex', gap: 14, alignItems: 'flex-start',
     }}>
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Badges */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ background: cor + '22', color: cor, border: `1px solid ${cor}44`, borderRadius: 4, padding: '1px 7px', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
+        {/* Metadados */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ color: cor, fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
             {decisao.area || 'Informativo'}
           </span>
           {decisao.orgao && (
-            <span style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '1px 7px', fontSize: 10 }}>
+            <span style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
               {decisao.orgao}
             </span>
           )}
@@ -67,14 +67,15 @@ function DecisaoCard({ decisao, onImportar, importada }) {
       <button onClick={() => onImportar(decisao)} disabled={importada}
         style={{
           flexShrink: 0,
-          background: importada ? (theme.success + '22') : theme.gold,
-          color: importada ? theme.success : '#0b0f1a',
+          background: importada ? (theme.success + '18') : theme.gold,
+          color: importada ? theme.success : '#fdfbf7',
           border: `1px solid ${importada ? theme.success + '55' : theme.gold}`,
-          borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700,
+          borderRadius: 6, padding: '8px 14px', fontSize: 12, fontWeight: 600,
           cursor: importada ? 'default' : 'pointer',
-          fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap',
+          fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
+          display: 'flex', alignItems: 'center', gap: 5,
         }}>
-        {importada ? '✓ Importada' : '+ Importar'}
+        {importada ? <><Check size={12} /> Importada</> : <><Plus size={12} /> Importar</>}
       </button>
     </div>
   )
@@ -197,8 +198,8 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
               color: tribunal === t.id ? theme.gold : theme.muted,
               border: `1px solid ${tribunal === t.id ? theme.gold + '55' : theme.border}`,
               borderRadius: 8, padding: '8px 20px', fontSize: 13,
-              fontWeight: tribunal === t.id ? 700 : 400,
-              cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+              fontWeight: tribunal === t.id ? 600 : 400,
+              cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif",
             }}>
             {t.label}
             <span style={{ display: 'block', fontSize: 9, opacity: 0.6, marginTop: 1 }}>{t.sub}</span>
@@ -214,13 +215,13 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
             onKeyDown={e => e.key === 'Enter' && buscar()}
           />
           <button onClick={buscar} disabled={loading}
-            style={{ background: loading ? theme.border : theme.raised, color: loading ? theme.muted : theme.muted, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '10px 16px', fontSize: 12, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap' }}>
-            {loading ? '⟳' : '↻ Atualizar'}
+            style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 16px', fontSize: 13, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <RefreshCw size={13} style={loading ? { animation: 'spin 1s linear infinite' } : undefined} /> Atualizar
           </button>
           {isEditor && (
             <button onClick={autoImportar} disabled={autoImportando}
-              style={{ background: autoImportando ? theme.border : `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`, color: autoImportando ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 8, padding: '10px 16px', fontSize: 12, fontWeight: 700, cursor: autoImportando ? 'not-allowed' : 'pointer', fontFamily: 'IBM Plex Mono, monospace', whiteSpace: 'nowrap' }}>
-              {autoImportando ? '⟳ Analisando...' : '✦ Auto-importar relevantes'}
+              style={{ background: autoImportando ? theme.border : theme.gold, color: autoImportando ? theme.muted : '#fdfbf7', border: 'none', borderRadius: 6, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: autoImportando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Sparkles size={13} /> {autoImportando ? 'Analisando…' : 'Auto-importar relevantes'}
             </button>
           )}
         </div>
@@ -285,12 +286,12 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
           {/* Meta do informativo */}
           <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
             <div>
-              <span style={{ fontSize: 13, color: theme.text, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}>
+              <span style={{ fontSize: 14, color: theme.text, fontWeight: 600, fontFamily: theme.fontTitle }}>
                 Informativo {dados.tribunal} nº {dados.edicao}
               </span>
               {dados.data && (
-                <span style={{ fontSize: 12, color: theme.muted, marginLeft: 10 }}>
-                  · {new Date(dados.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                <span style={{ fontSize: 12, color: theme.muted, marginLeft: 10, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                  {new Date(dados.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </span>
               )}
             </div>

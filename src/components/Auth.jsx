@@ -90,8 +90,8 @@ export default function Auth() {
           {/* Título da tela */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22 }}>
             <div style={{ flex: 1, height: 1, background: theme.border }} />
-            <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 2.5, fontFamily: 'Inter, sans-serif' }}>
-              {{ login: 'Acesso', register: 'Cadastro', forgot: 'Redefinir Senha' }[screen]}
+            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+              {{ login: 'Acesso', register: 'Cadastro', forgot: 'Redefinir senha' }[screen]}
             </div>
             <div style={{ flex: 1, height: 1, background: theme.border }} />
           </div>
@@ -99,7 +99,7 @@ export default function Auth() {
           <form onSubmit={handleSubmit}>
             {/* E-mail */}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>E-mail</div>
+              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>E-mail</div>
               <div style={{ position: 'relative' }}>
                 <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
@@ -111,7 +111,7 @@ export default function Auth() {
             {/* Senha */}
             {screen !== 'forgot' && (
               <div style={{ marginBottom: screen === 'login' ? 8 : 18 }}>
-                <div style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6, fontFamily: 'Inter, sans-serif' }}>Senha</div>
+                <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Senha</div>
                 <div style={{ position: 'relative' }}>
                   <Lock size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                   <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
@@ -182,8 +182,8 @@ export default function Auth() {
         </div>
 
         {/* Rodapé */}
-        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 10, color: theme.muted, fontFamily: 'Inter, sans-serif', letterSpacing: 1, textTransform: 'uppercase', opacity: 0.6 }}>
-          Plataforma e Curadoria · Farias Fusquiani
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: theme.muted, fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic', opacity: 0.75 }}>
+          Plataforma e curadoria, Farias Fusquiani
         </div>
       </div>
     </div>

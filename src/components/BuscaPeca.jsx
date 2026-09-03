@@ -2,11 +2,8 @@ import { useState } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
-
-const AREA_COR = {
-  'Cível': '#3b82f6', 'Penal': '#ef4444',
-  'Constitucional': '#8b5cf6', 'Trabalhista': '#f59e0b',
-}
+import { Check, Copy, Search, RefreshCw, Sparkles, X, AlertTriangle, Lock } from 'lucide-react'
+import { corDaArea } from '../shared'
 
 function ResultadoFts({ entradas, theme }) {
   if (!entradas.length) {
@@ -24,20 +21,14 @@ function ResultadoFts({ entradas, theme }) {
           background: theme.cardBg, border: `1px solid ${theme.border}`,
           borderRadius: 10, padding: 14,
         }}>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{
-              fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1,
-              color: AREA_COR[e.area] || theme.muted,
-              background: (AREA_COR[e.area] || theme.muted) + '18',
-              border: `1px solid ${(AREA_COR[e.area] || theme.muted)}44`,
-              borderRadius: 4, padding: '2px 6px',
-            }}>{e.area}</span>
-            <span style={{ fontSize: 10, color: theme.muted, textTransform: 'uppercase', letterSpacing: 1 }}>{e.tipo}</span>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, fontStyle: 'italic', color: corDaArea(e.area, theme), fontFamily: "Georgia, 'EB Garamond', serif" }}>{e.area}</span>
+            <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>{e.tipo}</span>
             {e.status === 'superada' && (
-              <span style={{ fontSize: 10, color: '#f59e0b' }}>⚠ superada</span>
+              <span style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>superada</span>
             )}
           </div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: theme.text, marginBottom: 4 }}>{e.tema}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, marginBottom: 4, fontFamily: theme.fontTitle }}>{e.tema}</div>
           {e.fonte && <div style={{ fontSize: 11, color: theme.muted, marginBottom: 8 }}>{e.fonte}</div>}
           {Array.isArray(e.teses) && e.teses.length > 0 && (
             <ul style={{ margin: 0, paddingLeft: 18 }}>
@@ -177,13 +168,14 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
               disabled={buscandoFts || !query.trim()}
               style={{
                 background: buscandoFts || !query.trim() ? theme.raised : theme.gold,
-                color: buscandoFts || !query.trim() ? theme.muted : '#0b0f1a',
-                border: 'none', borderRadius: 8, padding: '10px 18px',
-                fontSize: 13, fontWeight: 700,
-                fontFamily: 'IBM Plex Mono, monospace',
+                color: buscandoFts || !query.trim() ? theme.muted : '#fdfbf7',
+                border: 'none', borderRadius: 6, padding: '10px 18px',
+                fontSize: 13, fontWeight: 600,
+                fontFamily: 'Inter, sans-serif',
                 cursor: buscandoFts || !query.trim() ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6,
               }}>
-              {buscandoFts ? '⟳ Buscando...' : '🔍 Buscar'}
+              {buscandoFts ? <><RefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Buscando…</> : <><Search size={13} /> Buscar</>}
             </button>
             <button
               onClick={buscarComIA}
@@ -192,15 +184,15 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
               style={{
                 background: !podeUsarIA
                   ? theme.raised
-                  : (loadingIA || !query.trim() ? theme.raised : `linear-gradient(135deg, ${theme.gold}, ${theme.goldDark})`),
-                color: !podeUsarIA || loadingIA || !query.trim() ? theme.muted : '#0b0f1a',
-                border: 'none', borderRadius: 8, padding: '10px 18px',
-                fontSize: 13, fontWeight: 700,
-                fontFamily: 'IBM Plex Mono, monospace',
+                  : (loadingIA || !query.trim() ? theme.raised : theme.gold),
+                color: !podeUsarIA || loadingIA || !query.trim() ? theme.muted : '#fdfbf7',
+                border: 'none', borderRadius: 6, padding: '10px 18px',
+                fontSize: 13, fontWeight: 600,
+                fontFamily: 'Inter, sans-serif',
                 cursor: (!podeUsarIA || loadingIA || !query.trim()) ? 'not-allowed' : 'pointer',
                 opacity: podeUsarIA ? 1 : 0.6,
               }}>
-              {!podeUsarIA ? '🔒 Buscar com IA' : (loadingIA ? '⟳ Buscando...' : '✦ Buscar com IA')}
+              {!podeUsarIA ? <><Lock size={13} /> Buscar com IA</> : (loadingIA ? <><RefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Buscando…</> : <><Sparkles size={13} /> Buscar com IA</>)}
             </button>
           </div>
         </div>
@@ -213,17 +205,18 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
 
       {erroFts && (
         <div style={{
-          background: mode === 'dark' ? '#3b0f0f' : '#fef2f2',
-          border: '1px solid #f87171', borderRadius: 10,
-          padding: 16, color: '#f87171', fontSize: 13, marginBottom: 16,
+          background: mode === 'dark' ? '#2a0f10' : '#fff0f0',
+          border: `1px solid ${theme.penal}55`, borderRadius: 8,
+          padding: 16, color: theme.penal, fontSize: 13, marginBottom: 16,
+          display: 'flex', alignItems: 'center', gap: 8, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif",
         }}>
-          ✕ {erroFts}
+          <AlertTriangle size={15} /> {erroFts}
         </div>
       )}
 
       {resultadosFts !== null && !resultIA && (
         <>
-          <div style={{ fontSize: 11, color: theme.gold, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>
+          <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 10, fontFamily: "Georgia, 'EB Garamond', serif" }}>
             {resultadosFts.length} resultado(s)
           </div>
           <ResultadoFts entradas={resultadosFts} theme={theme} />
@@ -232,11 +225,12 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
 
       {erroIA && (
         <div style={{
-          background: mode === 'dark' ? '#3b0f0f' : '#fef2f2',
-          border: '1px solid #f87171', borderRadius: 10,
-          padding: 16, color: '#f87171', fontSize: 13, marginBottom: 16,
+          background: mode === 'dark' ? '#2a0f10' : '#fff0f0',
+          border: `1px solid ${theme.penal}55`, borderRadius: 8,
+          padding: 16, color: theme.penal, fontSize: 13, marginBottom: 16,
+          display: 'flex', alignItems: 'center', gap: 8, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif",
         }}>
-          ✕ {erroIA}
+          <AlertTriangle size={15} /> {erroIA}
         </div>
       )}
 
@@ -250,10 +244,9 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
             alignItems: 'center', marginBottom: 14,
           }}>
             <div style={{
-              fontSize: 11, color: theme.gold,
-              textTransform: 'uppercase', letterSpacing: 2,
+              fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600,
             }}>
-              Teses Selecionadas (IA)
+              Teses selecionadas pela IA
             </div>
             <button onClick={copyResult} style={{
               background: copied
@@ -261,10 +254,11 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
                 : theme.raised,
               border: `1px solid ${copied ? theme.success : theme.border}`,
               color: copied ? theme.success : theme.muted,
-              borderRadius: 6, padding: '6px 12px', fontSize: 11,
-              cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace',
+              borderRadius: 6, padding: '6px 12px', fontSize: 12,
+              cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              display: 'flex', alignItems: 'center', gap: 5,
             }}>
-              {copied ? '✓ Copiado' : '⎘ Copiar'}
+              {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? 'Copiado' : 'Copiar'}
             </button>
           </div>
           {entradas.some(e => e.status === 'superada' && resultIA.includes(e.tema?.slice(0, 20) || '')) && (
