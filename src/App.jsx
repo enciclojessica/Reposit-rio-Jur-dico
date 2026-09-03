@@ -121,6 +121,7 @@ export default function App() {
   const [resultadosSem, setResultadosSem] = useState(null) // null = não buscado ainda
   const [erroSem, setErroSem]           = useState('')
   const [selected, setSelected]     = useState(null)
+  const [legislacaoPreFiltro, setLegislacaoPreFiltro] = useState(null)
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
@@ -543,7 +544,7 @@ case VIEWS.JURISPRUDENCIA:
         )
 
       case VIEWS.LEG_VIEW:
-        return <div className="fade-up"><Legislacao /></div>
+        return <div className="fade-up"><Legislacao preFiltro={legislacaoPreFiltro} onPreFiltroConsumido={() => setLegislacaoPreFiltro(null)} /></div>
 
 
 
@@ -619,6 +620,10 @@ case VIEWS.JURISPRUDENCIA:
                 readOnly={!isEditor}
                 onStatusChange={(id, novoStatus) => {
                   setEntradas(prev => prev.map(e => e.id === id ? { ...e, status: novoStatus } : e))
+                }}
+                onAbrirArtigoLegislacao={(codigo, numero) => {
+                  setLegislacaoPreFiltro({ codigo, numero })
+                  setView(VIEWS.LEG_VIEW)
                 }}
               />
             </ErrorBoundary>

@@ -187,16 +187,23 @@ function ArtigoCard({ grupo, onAbrir }) {
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
-export default function Legislacao() {
+export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
   const { theme } = useTheme()
-  const [codigoAtivo, setCodigoAtivo]           = useState('todos')
-  const [busca, setBusca]                        = useState('')
+  const [codigoAtivo, setCodigoAtivo]           = useState(preFiltro?.codigo || 'todos')
+  const [busca, setBusca]                        = useState(preFiltro?.numero ? String(preFiltro.numero) : '')
   const [artigos, setArtigos]                    = useState([])
   const [loading, setLoading]                    = useState(true)
   const [codigos, setCodigos]                    = useState([])
   const [total, setTotal]                        = useState(0)
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
   const [exportando, setExportando] = useState(false)
+
+  useEffect(() => {
+    if (!preFiltro) return
+    setCodigoAtivo(preFiltro.codigo || 'todos')
+    setBusca(preFiltro.numero ? String(preFiltro.numero) : '')
+    onPreFiltroConsumido?.()
+  }, [preFiltro])
 
   useEffect(() => {
     supabase.from('legislacao').select('codigo').eq('vigente', true).then(({ data }) => {

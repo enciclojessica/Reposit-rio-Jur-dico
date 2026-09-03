@@ -32,3 +32,44 @@ export function detectarCodigoNoTexto(janela) {
   }
   return null
 }
+
+// Encontra menções a "art. N" / "artigo N" num texto livre, e tenta casar
+// cada uma com o diploma mencionado por perto (antes ou depois, numa janela
+// de ~60 caracteres — cobre tanto "art. 5º, LVII, da CF" quanto "CDC, art. 6º").
+// Só retorna o número inteiro do artigo (sem sufixo tipo "-A"): é o que a
+// coluna legislacao.numero armazena, o sufixo mora em "titulo".
+// Usado para linkar citações de lei dentro de uma tese ao artigo real, se
+// ele já estiver importado no repositório.
+const REGEX_ARTIGO = /art(?:igo)?\.?\s*(\d+)[º°]?/gi
+
+export function extrairReferenciasLegais(texto) {
+  if (!texto) return []
+
+  // Primeiro localiza todas as ocorrências de "art. N", sem resolver
+  // diploma ainda — precisamos das posições de todas pra não deixar a
+  // janela de uma vazar pra outra.
+  const ocorrencias = []
+  let m
+  REGEX_ARTIGO.lastIndex = 0
+  while ((m = REGEX_ARTIGO.exec(texto)) !== null) {
+    const numero = parseInt(m[1], 10)
+    if (numero) ocorrencias.push({ numero, matchTexto: m[0], start: m.index, end: m.index + m[0].length })
+  }
+
+  const refs = []
+  ocorrencias.forEach((oc, i) => {
+    // Janela "depois" (mais comum: "art. N do/da <Código>"), sem invadir a
+    // próxima ocorrência de artigo.
+    const limiteDepois = i + 1 < ocorrencias.length ? ocorrencias[i + 1].start : texto.length
+    const janelaDepois = texto.slice(oc.end, Math.min(limiteDepois, oc.end + 40))
+    // Janela "antes", curta (cobre "CDC, art. N"), sem invadir a ocorrência anterior.
+    const limiteAntes = i > 0 ? ocorrencias[i - 1].end : 0
+    const janelaAntes = texto.slice(Math.max(limiteAntes, oc.start - 25), oc.start)
+
+    const codigo = detectarCodigoNoTexto(janelaDepois) || detectarCodigoNoTexto(janelaAntes)
+    if (!codigo) return // sem diploma identificado sem ambiguidade, não arrisca link errado
+
+    refs.push({ codigo, numero: oc.numero, matchTexto: oc.matchTexto, start: oc.start, end: oc.end })
+  })
+  return refs
+}

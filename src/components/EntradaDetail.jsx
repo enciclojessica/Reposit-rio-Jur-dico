@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check, Link2, Unlock } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
+import TextoComReferenciasLegais from './TextoComReferenciasLegais'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
 import AnotacaoPessoal from './AnotacaoPessoal'
@@ -33,7 +34,7 @@ function gerarABNT(entry) {
   } catch { return '' }
 }
 
-export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar }) {
+export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao }) {
   const { theme, mode } = useTheme()
 
   // Normalização defensiva total
@@ -259,7 +260,11 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
                     </span>
                   )}
                 </div>
-                <div style={{ fontSize: 14, color: theme.text, lineHeight: 1.7, fontFamily: theme.fontSerif }}>{val}</div>
+                <div style={{ fontSize: 14, color: theme.text, lineHeight: 1.7, fontFamily: theme.fontSerif }}>
+                  {(campo === 'fundamentacao_legal' || campo === 'ratio_decidendi')
+                    ? <TextoComReferenciasLegais texto={val} theme={theme} onAbrirArtigo={onAbrirArtigoLegislacao} />
+                    : val}
+                </div>
               </div>
             ))}
           </div>

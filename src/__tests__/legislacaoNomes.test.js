@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { NOME_CODIGO, detectarCodigoNoTexto } from '../data/legislacaoNomes'
+import { NOME_CODIGO, detectarCodigoNoTexto, extrairReferenciasLegais } from '../data/legislacaoNomes'
 
 describe('NOME_CODIGO', () => {
   it('tem um nome completo para cada código usado no editor', () => {
@@ -31,5 +31,35 @@ describe('detectarCodigoNoTexto', () => {
 
   it('retorna null quando nenhum diploma é mencionado', () => {
     expect(detectarCodigoNoTexto('o autor sustenta que houve dano moral')).toBe(null)
+  })
+})
+
+describe('extrairReferenciasLegais', () => {
+  it('encontra artigo com código depois da menção', () => {
+    const refs = extrairReferenciasLegais('violação ao art. 5º, LVII, da Constituição Federal')
+    expect(refs).toEqual([{ codigo: 'cf', numero: 5, matchTexto: 'art. 5º', start: expect.any(Number), end: expect.any(Number) }])
+  })
+
+  it('encontra artigo com código antes da menção', () => {
+    const refs = extrairReferenciasLegais('nos termos do CDC, art. 6º, inciso VIII')
+    expect(refs.length).toBe(1)
+    expect(refs[0].codigo).toBe('cdc')
+    expect(refs[0].numero).toBe(6)
+  })
+
+  it('não retorna referência quando não identifica o diploma por perto', () => {
+    const refs = extrairReferenciasLegais('conforme art. 300, sem mais contexto que ajude')
+    expect(refs).toEqual([])
+  })
+
+  it('encontra múltiplas referências no mesmo texto, cada uma com seu diploma', () => {
+    const texto = 'combinação do art. 927 do Código Civil com o art. 6º do Código de Defesa do Consumidor'
+    const refs = extrairReferenciasLegais(texto)
+    expect(refs.map(r => [r.codigo, r.numero])).toEqual([['cc', 927], ['cdc', 6]])
+  })
+
+  it('retorna lista vazia para texto vazio ou nulo', () => {
+    expect(extrairReferenciasLegais('')).toEqual([])
+    expect(extrairReferenciasLegais(null)).toEqual([])
   })
 })
