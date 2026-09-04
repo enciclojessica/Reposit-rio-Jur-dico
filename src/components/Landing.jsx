@@ -83,7 +83,7 @@ export default function Landing({ onEntrar }) {
           A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório.
         </div>
         <div style={{ fontFamily: theme.fontTitle, fontSize: 14, color: '#2c241b' }}>Jessica Farias Fusquiani</div>
-        <div style={{ fontStyle: 'italic', fontSize: 12, color: '#736b62' }}>Curadora do acervo</div>
+        <div style={{ fontStyle: 'italic', fontSize: 12, color: '#736b62' }}>Idealizadora do Themis Jur</div>
       </div>
     </div>,
 
