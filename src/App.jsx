@@ -16,6 +16,7 @@ import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
 import LegislacaoPublica from './components/LegislacaoPublica'
 import PaginaLegal from './components/PaginaLegal'
+import Landing from './components/Landing'
 import { TERMOS_DE_USO, POLITICA_PRIVACIDADE } from './data/textosLegais'
 import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
@@ -544,8 +545,7 @@ async function handleSave(entry) {
 
   if (aceitandoConvite) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, flexDirection: 'column', gap: 16 }}>
-      <div style={{ fontSize: 32 }}>✦</div>
-      Ativando seu acesso...
+      Ativando seu acesso…
     </div>
   )
 
@@ -559,6 +559,13 @@ async function handleSave(entry) {
       }}>← Voltar</button>
       <Auth conviteToken={conviteToken} />
     </div>
+  )
+
+  // Visitante sem conta, sem ter clicado em entrar ainda: página de
+  // apresentação, não o shell do app. Os deep links (?entrada=, ?lei=,
+  // ?pagina=) já foram tratados mais acima e nunca chegam aqui.
+  if (!session && !showLogin) return (
+    <Landing onEntrar={() => setShowLogin(true)} />
   )
 
   const sidebarItems = [
