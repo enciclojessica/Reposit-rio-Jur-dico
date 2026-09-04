@@ -192,16 +192,34 @@ export default function App() {
 
   // ── Auth ───────────────────────────────────────────────────────────────
   useEffect(() => {
+    // Se getSession() nunca responder (rede instável, service worker preso
+    // numa versão antiga), a tela de "Carregando..." travava pra sempre —
+    // sem limite de tempo, sem saída. Trava real vista em produção. Depois
+    // de 8s sem resposta, segue sem sessão em vez de ficar preso.
+    let resolvido = false
+    const timeoutSeguranca = setTimeout(() => {
+      if (!resolvido) { resolvido = true; setAuthLoading(false) }
+    }, 8000)
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (resolvido) return
+      resolvido = true
+      clearTimeout(timeoutSeguranca)
       setSession(session)
       setAuthLoading(false)
+    }).catch(() => {
+      if (resolvido) return
+      resolvido = true
+      clearTimeout(timeoutSeguranca)
+      setAuthLoading(false)
     })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s)
       if (event === 'PASSWORD_RECOVERY') setRecuperandoSenha(true)
       else if (s) setShowLogin(false)
     })
-    return () => subscription.unsubscribe()
+    return () => { subscription.unsubscribe(); clearTimeout(timeoutSeguranca) }
   }, [])
 
   // ── Carregar perfil de membro após login ───────────────────────────────
