@@ -14,6 +14,7 @@ import IndiceRemissivo from './components/IndiceRemissivo'
 import ComparadorTeses from './components/ComparadorTeses'
 import PainelMetricas from './components/PainelMetricas'
 import NovidadesApp from './components/NovidadesApp'
+import MapaAcervo from './components/MapaAcervo'
 import { NOVIDADES_APP } from './data/novidadesApp'
 import TourBoasVindas from './components/TourBoasVindas'
 import Hoje from './components/Hoje'
@@ -109,6 +110,23 @@ async function gerarPlanilhaTeses() {
 }
 
 export default function App() {
+  // Leitura offline: os dados do acervo (Supabase REST) já ficam em cache
+  // por 24h via runtimeCaching (NetworkFirst, configurado em vite.config.js)
+  // — assim que carregado uma vez online, o acervo inteiro (favoritos
+  // inclusos) continua legível sem internet. Esse estado só existe pra
+  // avisar a pessoa disso; sem aviso, os ~8s de timeout de rede até cair
+  // no cache pareceriam trava, não leitura offline funcionando.
+  const [online, setOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true)
+  useEffect(() => {
+    const marcarOnline = () => setOnline(true)
+    const marcarOffline = () => setOnline(false)
+    window.addEventListener('online', marcarOnline)
+    window.addEventListener('offline', marcarOffline)
+    return () => {
+      window.removeEventListener('online', marcarOnline)
+      window.removeEventListener('offline', marcarOffline)
+    }
+  }, [])
   const { theme, mode, isDark, toggle } = useTheme()
   const [session, setSession]       = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
@@ -711,6 +729,11 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.NOVIDADES_APP:
         return <div className="fade-up"><NovidadesApp session={session} /></div>
 
+      case VIEWS.MAPA:
+        return <div className="fade-up"><MapaAcervo entradas={entradas}
+          onSelecionarTag={tag => { setTagFilter(tag); setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
+        /></div>
+
       case VIEWS.EDITOR:
         return (
           <div className="fade-up" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -936,6 +959,16 @@ case VIEWS.JURISPRUDENCIA:
 
   return (
     <>
+    {!online && (
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 600,
+        background: '#3d0012', color: '#e8c98a', textAlign: 'center',
+        padding: '6px 12px', fontSize: 12, fontStyle: 'italic',
+        fontFamily: "Georgia, 'EB Garamond', serif",
+      }}>
+        Sem conexão. Mostrando os últimos dados salvos no aparelho — favoritos e anotações não sincronizam até a internet voltar.
+      </div>
+    )}
     {membro && !membro.tour_visto && (
       <TourBoasVindas onFechar={async () => {
         setMembro(prev => ({ ...prev, tour_visto: true }))
@@ -978,6 +1011,7 @@ case VIEWS.JURISPRUDENCIA:
                 <SinoNotificacoes
                   session={session}
                   onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
+                  onAbrirEntrada={id => { const e = entradas.find(x => x.id === id); if (e) { setSelected(e); setView(VIEWS.DETAIL) } }}
                 />
                 <div style={{ width: 1, height: 20, background: theme.border }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1023,6 +1057,7 @@ case VIEWS.JURISPRUDENCIA:
           <MobileHeader
             theme={theme} role={role} session={session} membro={membro} setShowLogin={setShowLogin}
             setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter} setView={setView}
+            entradas={entradas} setSelected={setSelected}
           />
         )}
         <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '16px 16px 80px' : 28 }}>

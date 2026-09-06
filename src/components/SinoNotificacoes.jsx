@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { Bell, Megaphone, ClipboardList, Info, Sparkles } from 'lucide-react'
+import { Bell, Megaphone, ClipboardList, Info, Sparkles, AlertTriangle } from 'lucide-react'
 
-const TIPO_ICONE = { alerta: Megaphone, informativo: ClipboardList, sistema: Info, auto: Sparkles }
-const TIPO_COR   = { alerta: '#f59e0b', informativo: '#10b981', sistema: '#6b7fa3', auto: '#c9a452' }
+const TIPO_ICONE = { alerta: Megaphone, informativo: ClipboardList, sistema: Info, auto: Sparkles, superada: AlertTriangle }
+const TIPO_COR   = { alerta: '#f59e0b', informativo: '#10b981', sistema: '#6b7fa3', auto: '#c9a452', superada: '#ef4444' }
 
-export default function SinoNotificacoes({ session, onNavegar }) {
+export default function SinoNotificacoes({ session, onNavegar, onAbrirEntrada, corIcone }) {
   const { theme, mode } = useTheme()
   const [notifs, setNotifs]     = useState([])
   const [aberto, setAberto]     = useState(false)
@@ -97,6 +97,7 @@ export default function SinoNotificacoes({ session, onNavegar }) {
     marcarLida(notif.id)
     if (notif.tipo === 'alerta' && onNavegar)    onNavegar('alertas')
     if (notif.tipo === 'informativo' && onNavegar) onNavegar('informativos')
+    if (notif.tipo === 'superada' && notif.dados?.entrada_id && onAbrirEntrada) onAbrirEntrada(notif.dados.entrada_id)
     setAberto(false)
   }
 
@@ -124,7 +125,7 @@ export default function SinoNotificacoes({ session, onNavegar }) {
         }}
         title="Notificações"
       >
-        <Bell size={18} color={theme.text} />
+        <Bell size={18} color={corIcone || theme.text} />
         {naoLidas > 0 && (
           <span style={{
             position: 'absolute', top: 0, right: 0,

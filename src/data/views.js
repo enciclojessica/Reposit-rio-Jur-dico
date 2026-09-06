@@ -18,4 +18,5 @@ export const VIEWS = {
   COMPARAR: 'comparar',
   METRICAS: 'metricas',
   NOVIDADES_APP: 'novidades_app',
+  MAPA: 'mapa',
 }

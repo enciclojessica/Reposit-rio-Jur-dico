@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { PenLine, Check, Loader2 } from 'lucide-react'
+import { PenLine, Check, Loader2, Mic, MicOff } from 'lucide-react'
 import { supabase } from '../supabase'
 
 // ── Anotação pessoal (Supabase), reutilizável em qualquer tela ──────────
@@ -15,6 +15,49 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
   const [salvo, setSalvo] = useState(false)
   const timeoutRef = useRef(null)
   const userId = session?.user?.id
+
+  // Ditado por voz — API nativa do navegador, sem custo, sem servidor.
+  // Chrome/Edge/Safari recente suportam via webkitSpeechRecognition; se
+  // não suportar, o botão de microfone simplesmente não aparece.
+  const [gravando, setGravando] = useState(false)
+  const reconhecimentoRef = useRef(null)
+  const notaAntesDoDitadoRef = useRef('')
+  const SpeechRecognitionAPI = typeof window !== 'undefined'
+    ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null
+
+  function alternarDitado() {
+    if (!SpeechRecognitionAPI) return
+    if (gravando) {
+      reconhecimentoRef.current?.stop()
+      return
+    }
+    const rec = new SpeechRecognitionAPI()
+    rec.lang = 'pt-BR'
+    rec.continuous = true
+    rec.interimResults = true
+    notaAntesDoDitadoRef.current = nota
+    let transcricaoFinal = ''
+
+    rec.onresult = (evento) => {
+      let interina = ''
+      for (let i = evento.resultIndex; i < evento.results.length; i++) {
+        const texto = evento.results[i][0].transcript
+        if (evento.results[i].isFinal) transcricaoFinal += texto + ' '
+        else interina += texto
+      }
+      const base = notaAntesDoDitadoRef.current
+      const separador = base && !base.endsWith(' ') && !base.endsWith('\n') ? ' ' : ''
+      salvar(base + separador + transcricaoFinal + interina)
+    }
+    rec.onerror = () => setGravando(false)
+    rec.onend = () => setGravando(false)
+
+    reconhecimentoRef.current = rec
+    setGravando(true)
+    rec.start()
+  }
+
+  useEffect(() => () => reconhecimentoRef.current?.stop(), [])
 
   useEffect(() => {
     if (!userId || !itemId) { setCarregando(false); return }
@@ -88,6 +131,12 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
       </button>
       {aberto && !carregando && (
         <div style={{ marginTop: 6 }}>
+          {SpeechRecognitionAPI && (
+            <button onClick={alternarDitado}
+              style={{ fontSize: 11, background: gravando ? theme.penal + '22' : 'none', border: `1px solid ${gravando ? theme.penal : theme.border}`, borderRadius: 6, color: gravando ? theme.penal : theme.muted, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+              {gravando ? <><MicOff size={11} /> Parar ditado</> : <><Mic size={11} /> Ditar</>}
+            </button>
+          )}
           <textarea value={nota} onChange={e => salvar(e.target.value)}
             placeholder={placeholder}
             style={{ width: '100%', minHeight: 70, background: theme.raised, border: `1px solid ${nota ? theme.gold + '66' : theme.border}`, borderRadius: 8, color: theme.text, fontSize: 12, padding: '8px 10px', fontFamily: 'Georgia, serif', lineHeight: 1.5, resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}

@@ -1,12 +1,13 @@
 import { Lock } from 'lucide-react'
 import { supabase } from '../supabase'
 import SeletorTema from './SeletorTema'
+import SinoNotificacoes from './SinoNotificacoes'
 import { ROLE_LABEL } from '../shared'
 import { VIEWS } from '../data/views'
 
 export default function MobileHeader({
   theme, role, session, membro, setShowLogin,
-  setAreaFilter, setTipoFilter, setView,
+  setAreaFilter, setTipoFilter, setView, entradas, setSelected,
 }) {
   return (
     <div style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -23,6 +24,12 @@ export default function MobileHeader({
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 10, color: '#e8c98a', fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>{ROLE_LABEL[role]}</span>}
         <SeletorTema compact />
+        {session && (
+          <SinoNotificacoes session={session} corIcone="#e8dfc8"
+            onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
+            onAbrirEntrada={id => { const e = entradas?.find(x => x.id === id); if (e) { setSelected?.(e); setView(VIEWS.DETAIL) } }}
+          />
+        )}
         {session && (
           membro?.avatar_url ? (
             <img src={membro.avatar_url} alt="avatar"
