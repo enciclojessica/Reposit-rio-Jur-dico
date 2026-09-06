@@ -11,6 +11,7 @@ import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import IndiceRemissivo from './components/IndiceRemissivo'
+import ComparadorTeses from './components/ComparadorTeses'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
@@ -128,6 +129,7 @@ export default function App() {
   const [erroSem, setErroSem]           = useState('')
   const [selected, setSelected]     = useState(null)
   const [legislacaoPreFiltro, setLegislacaoPreFiltro] = useState(null)
+  const [comparadorPrefilA, setComparadorPrefilA] = useState(null)
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
@@ -665,6 +667,9 @@ case VIEWS.JURISPRUDENCIA:
           </div>
         )
 
+      case VIEWS.COMPARAR:
+        return <div className="fade-up"><ComparadorTeses entradas={entradas} prefilA={comparadorPrefilA} /></div>
+
       case VIEWS.EDITOR:
         return (
           <div className="fade-up" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -727,6 +732,7 @@ case VIEWS.JURISPRUDENCIA:
                 }}
                 favorito={favoritos.has(selected.id)}
                 onAlternarFavorito={alternarFavorito}
+                onComparar={(entrada) => { setComparadorPrefilA(entrada); setView(VIEWS.COMPARAR) }}
               />
             </ErrorBoundary>
           </div>

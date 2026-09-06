@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Check, Link2, Unlock, Star } from 'lucide-react'
+import { Check, Link2, Unlock, Star, ArrowLeftRight } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
@@ -34,7 +34,7 @@ function gerarABNT(entry) {
   } catch { return '' }
 }
 
-export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito }) {
+export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar }) {
   const { theme, mode } = useTheme()
 
   // Normalização defensiva total
@@ -199,6 +199,12 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
             title={favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
             style={{ ...btn(favorito ? theme.gold : theme.border), color: favorito ? theme.gold : theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Star size={13} fill={favorito ? theme.gold : 'none'} /> {favorito ? 'Favorito' : 'Favoritar'}
+          </button>
+        )}
+
+        {onComparar && (
+          <button onClick={() => onComparar(entry)} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <ArrowLeftRight size={13} /> Comparar
           </button>
         )}
 

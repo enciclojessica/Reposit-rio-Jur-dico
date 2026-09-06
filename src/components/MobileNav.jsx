@@ -19,6 +19,7 @@ export default function MobileNav({
     { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
     { v: VIEWS.INDICE,         label: 'Índice remissivo' },
     { v: VIEWS.FAVORITOS,      label: 'Favoritos' },
+    { v: VIEWS.COMPARAR,       label: 'Comparador de teses' },
     { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),

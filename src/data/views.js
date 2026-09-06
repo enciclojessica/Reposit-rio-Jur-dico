@@ -15,4 +15,5 @@ export const VIEWS = {
   CONFIG: 'config',
   INDICE: 'indice',
   FAVORITOS: 'favoritos',
+  COMPARAR: 'comparar',
 }
