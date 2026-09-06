@@ -18,7 +18,6 @@ export default function MobileNav({
     { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
     { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
     { v: VIEWS.INDICE,         label: 'Índice remissivo' },
-    { v: VIEWS.MAPA,           label: 'Mapa do acervo' },
     { v: VIEWS.FAVORITOS,      label: 'Favoritos' },
     { v: VIEWS.COMPARAR,       label: 'Comparador de teses' },
     { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },

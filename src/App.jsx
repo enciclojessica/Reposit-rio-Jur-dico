@@ -14,7 +14,6 @@ import IndiceRemissivo from './components/IndiceRemissivo'
 import ComparadorTeses from './components/ComparadorTeses'
 import PainelMetricas from './components/PainelMetricas'
 import NovidadesApp from './components/NovidadesApp'
-import MapaAcervo from './components/MapaAcervo'
 import { NOVIDADES_APP } from './data/novidadesApp'
 import TourBoasVindas from './components/TourBoasVindas'
 import Hoje from './components/Hoje'
@@ -728,11 +727,6 @@ case VIEWS.JURISPRUDENCIA:
 
       case VIEWS.NOVIDADES_APP:
         return <div className="fade-up"><NovidadesApp session={session} /></div>
-
-      case VIEWS.MAPA:
-        return <div className="fade-up"><MapaAcervo entradas={entradas}
-          onSelecionarTag={tag => { setTagFilter(tag); setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
-        /></div>
 
       case VIEWS.EDITOR:
         return (
