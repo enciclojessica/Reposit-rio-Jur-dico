@@ -3,7 +3,7 @@ import { Home, Sparkles, PenLine, Plus, MoreHorizontal } from 'lucide-react'
 
 export default function MobileNav({
   theme, view, setView, maisAberto, setMaisAberto,
-  isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha,
+  isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha, temNovidadeNaoVista,
 }) {
   // Itens fixos no mobile nav
   const navFixos = [
@@ -26,6 +26,7 @@ export default function MobileNav({
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
     ...(isAdmin  ? [{ v: VIEWS.METRICAS, label: 'Métricas' }] : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
+    ...(session  ? [{ v: VIEWS.NOVIDADES_APP, label: 'O que há de novo', dot: temNovidadeNaoVista }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
   ]
   const maisAtivo = navMais.some(n => n.v === view)
@@ -54,10 +55,11 @@ export default function MobileNav({
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '10px 4px', background: view === item.v ? theme.gold + '22' : 'none',
                 border: `1px solid ${view === item.v ? theme.gold + '44' : 'transparent'}`,
-                borderRadius: 8,
+                borderRadius: 8, position: 'relative',
                 color: view === item.v ? theme.gold : theme.muted,
                 cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", fontSize: 10,
               }}>
+              {item.dot && <span style={{ position: 'absolute', top: 6, right: 10, width: 6, height: 6, borderRadius: '50%', background: theme.gold }} />}
               {item.label}
             </button>
           ))}

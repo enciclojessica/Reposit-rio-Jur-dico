@@ -13,6 +13,8 @@ import Dashboard from './components/Dashboard'
 import IndiceRemissivo from './components/IndiceRemissivo'
 import ComparadorTeses from './components/ComparadorTeses'
 import PainelMetricas from './components/PainelMetricas'
+import NovidadesApp from './components/NovidadesApp'
+import { NOVIDADES_APP } from './data/novidadesApp'
 import TourBoasVindas from './components/TourBoasVindas'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
@@ -160,6 +162,8 @@ export default function App() {
   const role     = membro?.role || (session && !membroLoading ? 'editor' : null)
   const isOwner  = session?.user?.email === 'foxjessica01@gmail.com'
   const isAdmin  = role === 'admin' || isOwner
+  const ultimaNovidade = NOVIDADES_APP[0]?.data
+  const temNovidadeNaoVista = !!ultimaNovidade && (!membro?.novidades_vista_em || membro.novidades_vista_em.slice(0, 10) < ultimaNovidade)
   const isEditor = role === 'editor' || isAdmin
   const isMembro = !!membro
   // Recursos de IA opcionais (ex: Busca para Peça com IA): admin sempre tem
@@ -704,6 +708,9 @@ case VIEWS.JURISPRUDENCIA:
         if (!isAdmin) return <div className="fade-up"><div style={{ color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Sem permissão pra ver esta tela.</div></div>
         return <div className="fade-up"><PainelMetricas /></div>
 
+      case VIEWS.NOVIDADES_APP:
+        return <div className="fade-up"><NovidadesApp session={session} /></div>
+
       case VIEWS.EDITOR:
         return (
           <div className="fade-up" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -939,6 +946,7 @@ case VIEWS.JURISPRUDENCIA:
           theme={theme} view={view} setView={setView}
           setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter}
           isAdmin={isAdmin} isEditor={isEditor} setPrefillEntry={setPrefillEntry}
+          temNovidadeNaoVista={temNovidadeNaoVista}
         />
       )}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -1024,6 +1032,7 @@ case VIEWS.JURISPRUDENCIA:
             maisAberto={maisAberto} setMaisAberto={setMaisAberto}
             isEditor={isEditor} isAdmin={isAdmin} session={session}
             entradas={entradas} isOwner={isOwner} exportarTesesPlanilha={exportarTesesPlanilha}
+            temNovidadeNaoVista={temNovidadeNaoVista}
           />
         )}
       </div>

@@ -4,7 +4,7 @@ import { VIEWS } from '../data/views'
 // conforme especificação. Controles de sessão vivem no header (App.jsx).
 export default function Sidebar({
   theme, view, setView, setAreaFilter, setTipoFilter,
-  isAdmin, isEditor, setPrefillEntry,
+  isAdmin, isEditor, setPrefillEntry, temNovidadeNaoVista,
 }) {
   return (
     <div style={{
@@ -44,6 +44,7 @@ export default function Sidebar({
           { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
           { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
           { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
+          { id: 'novidades_app', label: 'O que há de novo', action: () => setView(VIEWS.NOVIDADES_APP), active: view === VIEWS.NOVIDADES_APP, dot: temNovidadeNaoVista },
         ].map(n => (
           <button key={n.id} onClick={n.action} style={{
             width: '100%', background: n.active ? theme.gold + '12' : 'none',
@@ -54,6 +55,7 @@ export default function Sidebar({
             fontFamily: 'Inter, sans-serif',
           }}>
             {n.label}
+            {n.dot && <span style={{ width: 6, height: 6, borderRadius: '50%', background: theme.gold, flexShrink: 0 }} />}
           </button>
         ))}
 
