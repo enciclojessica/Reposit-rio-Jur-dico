@@ -1,19 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTheme } from '../theme'
-
-// Uma tag é "legislação" (código ou artigo citado) e não "assunto" quando
-// bate com um dos dois padrões abaixo. Misturar os dois tipos na mesma
-// lista alfabética era a principal fonte de confusão da versão anterior:
-// "cpp" (código, 41 usos) e "homicídio qualificado" (assunto, 5 usos)
-// não são a mesma espécie de informação, mesmo cabendo os dois em "#tag".
-const CODIGOS_CONHECIDOS = new Set(['cc', 'cdc', 'cf', 'cp', 'cpc', 'cpp', 'ctb', 'clt'])
-function ehLegislacao(tag) {
-  const t = tag.toLowerCase().trim()
-  if (CODIGOS_CONHECIDOS.has(t)) return true
-  if (/^art\.?\s*\d/i.test(t)) return true
-  if (/^lei[\s.]?\d/i.test(t)) return true
-  return false
-}
+import { classificarTagIndice } from '../utils/tagsVisiveis'
 
 function agruparPorLetra(tags) {
   const mapa = new Map()
@@ -69,15 +56,17 @@ export default function IndiceRemissivo({ entradas, onSelecionarTag }) {
     for (const e of entradas) {
       for (const t of (e.tags || [])) contagem[t] = (contagem[t] || 0) + 1
     }
-    let tags = Object.keys(contagem).sort((a, b) => a.localeCompare(b, 'pt-BR'))
+    let tags = Object.keys(contagem)
+      .filter(t => classificarTagIndice(t) !== 'oculta')
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
     if (busca.trim()) {
       const q = busca.trim().toLowerCase()
       tags = tags.filter(t => t.toLowerCase().includes(q))
     }
     const itens = tags.map(tag => ({ tag, count: contagem[tag] }))
     return {
-      assuntos: agruparPorLetra(itens.filter(i => !ehLegislacao(i.tag))),
-      legislacao: agruparPorLetra(itens.filter(i => ehLegislacao(i.tag))),
+      assuntos: agruparPorLetra(itens.filter(i => classificarTagIndice(i.tag) === 'assunto')),
+      legislacao: agruparPorLetra(itens.filter(i => classificarTagIndice(i.tag) === 'legislacao')),
       total: itens.length,
     }
   }, [entradas, busca])

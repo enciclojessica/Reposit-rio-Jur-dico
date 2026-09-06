@@ -3,12 +3,41 @@
 // para filtro/busca; isso só afeta o que é renderizado no card.
 
 // Tags de origem/metadado interno — úteis pra filtrar, não pra mostrar
-// toda vez que a entrada aparece na lista.
-const TAGS_ORIGEM_OCULTAS = ['pesquisa-juri', 'extraído-de-peça', 'auto-importado', 'informativo']
+// toda vez que a entrada aparece na lista. 'jurisprudência' entra aqui
+// também (não só via a checagem dinâmica contra o tipo): mesmo numa
+// entrada de outro tipo, uma tag chamada 'jurisprudência' nunca ajuda
+// a reconhecer do que a entrada trata.
+export const TAGS_ORIGEM_OCULTAS = ['pesquisa-juri', 'extraído-de-peça', 'auto-importado', 'informativo', 'jurisprudência']
 
 // Siglas de código/diploma legal — classificação estrutural, não conteúdo
 // que ajuda a reconhecer a entrada de relance na lista.
-const CODIGOS_OCULTOS = ['cc', 'cpc', 'cdc', 'cf', 'cpp', 'cp', 'ctb', 'clt', 'ctn', 'lei9099']
+export const CODIGOS_OCULTOS = ['cc', 'cpc', 'cdc', 'cf', 'cpp', 'cp', 'ctb', 'clt', 'ctn', 'lei9099']
+
+// Tribunais — sigla de quem decidiu, não do que trata. Cobre as siglas
+// conhecidas do acervo hoje, mais um padrão geral pra tribunais de
+// justiça estaduais (tjXX) e regionais federais (trfN), sem precisar
+// listar todo estado.
+const TRIBUNAIS_CONHECIDOS = ['stf', 'stj', 'tst', 'tse', 'stm']
+function ehTribunal(tl) {
+  return TRIBUNAIS_CONHECIDOS.includes(tl) || /^tj[a-z]{2}$/.test(tl) || /^trf\d?$/.test(tl)
+}
+
+// Classifica uma tag (isolada, sem o contexto de uma entrada específica)
+// pro Índice Remissivo: 'oculta' nunca aparece lá (é rastro técnico, tipo
+// duplicado, não ajuda ninguém a navegar por assunto); 'legislacao' inclui
+// código, artigo, número de lei, súmula e tribunal (é "de onde vem", não
+// "do que trata"); o resto é 'assunto' de verdade.
+export function classificarTagIndice(tag) {
+  const tl = (tag || '').toLowerCase().trim()
+  if (!tl) return 'oculta'
+  if (TAGS_ORIGEM_OCULTAS.includes(tl)) return 'oculta'
+  if (CODIGOS_OCULTOS.includes(tl)) return 'legislacao'
+  if (/^lei\s*n?[ºo°]?\s*\d/.test(tl)) return 'legislacao'
+  if (/^art\.?\s*\d/.test(tl)) return 'legislacao'
+  if (/^súmula\s*\d/i.test(tl)) return 'legislacao'
+  if (ehTribunal(tl)) return 'legislacao'
+  return 'assunto'
+}
 
 export function tagsVisiveis(entry) {
   const tags = entry?.tags || []

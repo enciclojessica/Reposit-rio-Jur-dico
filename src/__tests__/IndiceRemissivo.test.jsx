@@ -43,6 +43,32 @@ describe('IndiceRemissivo', () => {
     expect(onSelecionarTag).toHaveBeenCalledWith('cc')
   })
 
+  it('nunca mostra tags de origem/metadado técnico (não são assunto nem legislação)', () => {
+    render(
+      <ThemeProvider>
+        <IndiceRemissivo entradas={[
+          { id: '5', tags: ['pesquisa-juri', 'extraído-de-peça', 'jurisprudência', 'homicídio qualificado'] },
+        ]} onSelecionarTag={vi.fn()} />
+      </ThemeProvider>
+    )
+    expect(screen.getByText('#homicídio qualificado')).toBeInTheDocument()
+    expect(screen.queryByText('#pesquisa-juri')).not.toBeInTheDocument()
+    expect(screen.queryByText('#extraído-de-peça')).not.toBeInTheDocument()
+    expect(screen.queryByText('#jurisprudência')).not.toBeInTheDocument()
+  })
+
+  it('classifica súmula e tribunal como legislação, não assunto', () => {
+    render(
+      <ThemeProvider>
+        <IndiceRemissivo entradas={[
+          { id: '6', tags: ['súmula 7 STJ', 'stj', 'tjrs'] },
+        ]} onSelecionarTag={vi.fn()} />
+      </ThemeProvider>
+    )
+    expect(screen.getByText('Legislação citada')).toBeInTheDocument()
+    expect(screen.queryByText('Assuntos')).not.toBeInTheDocument()
+  })
+
   it('mostra mensagem quando não há tags', () => {
     render(
       <ThemeProvider>
