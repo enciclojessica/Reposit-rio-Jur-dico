@@ -252,6 +252,9 @@ function TabBackup({ session, entradas }) {
   const [msgNotas, setMsgNotas]       = useState('')
   const [statusRascunhos, setStatusRascunhos] = useState(null)
   const [msgRascunhos, setMsgRascunhos]       = useState('')
+  const [statusRestaurar, setStatusRestaurar] = useState(null)
+  const [msgRestaurar, setMsgRestaurar]       = useState('')
+  const inputRestaurarRef = useRef(null)
 
   async function exportarRascunhos() {
     setStatusRascunhos('carregando')
@@ -326,6 +329,58 @@ function TabBackup({ session, entradas }) {
     }
   }
 
+  // Restaura só os dados PESSOAIS de um arquivo de backup (anotações,
+  // favoritos, histórico, rascunhos) — nunca entradas, legislação nem
+  // membros. O acervo compartilhado é gerido pela curadoria, não por
+  // backup individual de quem quer que esteja restaurando; um backup
+  // antigo reintroduzido por cima do acervo atual poderia apagar edições
+  // feitas depois que aquele backup foi tirado.
+  async function restaurarBackup(arquivo) {
+    setStatusRestaurar('carregando')
+    setMsgRestaurar('Lendo arquivo...')
+    try {
+      const texto = await arquivo.text()
+      const dados = JSON.parse(texto)
+      const userId = session?.user?.id
+      if (!userId) throw new Error('Sessão inválida.')
+
+      const tabelasPessoais = [
+        { nome: 'anotacoes', onConflict: 'user_id,namespace,item_id', mapear: r => ({ user_id: userId, namespace: r.namespace, item_id: r.item_id, texto: r.texto }) },
+        { nome: 'favoritos', onConflict: 'user_id,entrada_id', mapear: r => ({ user_id: userId, entrada_id: r.entrada_id }) },
+        { nome: 'historico_leitura', onConflict: 'user_id,entrada_id', mapear: r => ({ user_id: userId, entrada_id: r.entrada_id, visto_em: r.visto_em }) },
+        { nome: 'historico_busca', onConflict: 'user_id,termo', mapear: r => ({ user_id: userId, termo: r.termo, buscado_em: r.buscado_em }) },
+        { nome: 'pecas_rascunhos', onConflict: 'id', mapear: r => ({ id: r.id, user_id: userId, titulo: r.titulo, conteudo: r.conteudo, rito: r.rito }) },
+      ]
+
+      let totalRestaurado = 0
+      const ignoradas = []
+      for (const { nome, onConflict, mapear } of tabelasPessoais) {
+        const linhas = dados?.tabelas?.[nome]
+        if (!Array.isArray(linhas) || linhas.length === 0) continue
+        setMsgRestaurar(`Restaurando ${nome}...`)
+        const { error } = await supabase.from(nome).upsert(linhas.map(mapear), { onConflict })
+        if (error) ignoradas.push(nome)
+        else totalRestaurado += linhas.length
+      }
+
+      if (totalRestaurado === 0 && ignoradas.length === 0) {
+        setStatusRestaurar('erro')
+        setMsgRestaurar('Nenhum dado pessoal reconhecido nesse arquivo.')
+        return
+      }
+
+      setStatusRestaurar('ok')
+      setMsgRestaurar(
+        `${totalRestaurado} registro(s) pessoal(is) restaurado(s) na sua conta.` +
+        (ignoradas.length ? ` Falha em: ${ignoradas.join(', ')}.` : '') +
+        ' Entradas do acervo, legislação e membros nunca são restaurados por aqui.'
+      )
+    } catch (err) {
+      setStatusRestaurar('erro')
+      setMsgRestaurar('Não foi possível ler esse arquivo. Confira se é um backup exportado por aqui.')
+    }
+  }
+
   return (
     <div style={{ maxWidth: 520 }}>
       {/* Card principal */}
@@ -361,6 +416,34 @@ function TabBackup({ session, entradas }) {
           <Download size={14} />
           {status === 'carregando' ? 'Gerando backup...' : 'Gerar backup agora'}
         </button>
+
+        <div style={{ borderTop: `1px solid ${theme.border}`, marginTop: 18, paddingTop: 16 }}>
+          <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif', lineHeight: 1.6, marginBottom: 10 }}>
+            Restaurar de um arquivo de backup: só os seus dados pessoais (anotações, favoritos, histórico, rascunhos) voltam pra sua conta. Entradas do acervo e legislação nunca são alteradas por aqui.
+          </div>
+          <input ref={inputRestaurarRef} type="file" accept="application/json" style={{ display: 'none' }}
+            onChange={e => { const f = e.target.files?.[0]; if (f) restaurarBackup(f); e.target.value = '' }} />
+          <button
+            onClick={() => inputRestaurarRef.current?.click()}
+            disabled={statusRestaurar === 'carregando'}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'transparent',
+              color: statusRestaurar === 'carregando' ? theme.muted : theme.gold,
+              border: `1px solid ${statusRestaurar === 'carregando' ? theme.border : theme.gold}`, borderRadius: 8, padding: '9px 18px',
+              fontSize: 13, fontWeight: 600, cursor: statusRestaurar === 'carregando' ? 'not-allowed' : 'pointer',
+              fontFamily: 'Inter, sans-serif',
+            }}>
+            <Upload size={14} />
+            {statusRestaurar === 'carregando' ? 'Restaurando...' : 'Restaurar dados pessoais de um backup'}
+          </button>
+          {msgRestaurar && (
+            <div style={{ marginTop: 10, fontSize: 12, color: statusRestaurar === 'erro' ? theme.error : theme.gold, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+              {statusRestaurar === 'erro' ? <AlertCircle size={13} style={{ flexShrink: 0, marginTop: 1 }} /> : <Check size={13} style={{ flexShrink: 0, marginTop: 1 }} />}
+              {msgRestaurar}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Card: Caderno de Estudos */}
