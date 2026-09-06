@@ -40,6 +40,7 @@ const TABELAS = [
   'anotacoes',
   'favoritos',
   'historico_leitura',
+  'historico_busca',
 ]
 
 async function exportarTabela(nome) {

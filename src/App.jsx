@@ -122,9 +122,7 @@ export default function App() {
   const [ordenacao, setOrdenacao]    = useState('data_desc')
   const [search, setSearch]         = useState('')
   const [modoSemantico, setModoSemantico] = useState(false)
-  const [historicoBusca, setHistoricoBusca] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('rj_busca_historico') || '[]') } catch { return [] }
-  })
+  const [historicoBusca, setHistoricoBusca] = useState([])
   const [showHistorico, setShowHistorico] = useState(false)
   const [buscandoSem, setBuscandoSem]   = useState(false)
   const [resultadosSem, setResultadosSem] = useState(null) // null = não buscado ainda
@@ -286,6 +284,34 @@ export default function App() {
       .then(({ data }) => setFavoritos(new Set((data || []).map(f => f.entrada_id))))
   }, [session])
 
+  // ── Carregar histórico de busca, migrando o legado do localStorage ─────
+  useEffect(() => {
+    if (!session?.user?.id) { setHistoricoBusca([]); return }
+    async function carregar() {
+      const { data } = await supabase.from('historico_busca')
+        .select('termo').eq('user_id', session.user.id)
+        .order('buscado_em', { ascending: false }).limit(5)
+
+      if (data && data.length > 0) {
+        setHistoricoBusca(data.map(d => d.termo))
+        return
+      }
+
+      // Sem histórico no Supabase ainda: migra o que tiver no localStorage.
+      let legado = []
+      try { legado = JSON.parse(localStorage.getItem('rj_busca_historico') || '[]') } catch {}
+      if (legado.length > 0) {
+        setHistoricoBusca(legado)
+        await supabase.from('historico_busca').upsert(
+          legado.map(termo => ({ user_id: session.user.id, termo })),
+          { onConflict: 'user_id,termo' }
+        )
+        localStorage.removeItem('rj_busca_historico')
+      }
+    }
+    carregar()
+  }, [session?.user?.id])
+
   async function alternarFavorito(entradaId) {
     if (!session) return
     const jaFavoritado = favoritos.has(entradaId)
@@ -354,11 +380,13 @@ export default function App() {
     setResultadosSem(null)
     setErroSem('')
     // Salvar no histórico
-    setHistoricoBusca(prev => {
-      const nova = [search, ...prev.filter(h => h !== search)].slice(0, 5)
-      localStorage.setItem('rj_busca_historico', JSON.stringify(nova))
-      return nova
-    })
+    setHistoricoBusca(prev => [search, ...prev.filter(h => h !== search)].slice(0, 5))
+    if (session?.user?.id) {
+      supabase.from('historico_busca').upsert(
+        { user_id: session.user.id, termo: search, buscado_em: new Date().toISOString() },
+        { onConflict: 'user_id,termo' }
+      )
+    }
     try {
       const { data: { session: sessaoAtual } } = await supabase.auth.getSession()
       if (!sessaoAtual) throw new Error('Sessão expirada. Faça login novamente.')

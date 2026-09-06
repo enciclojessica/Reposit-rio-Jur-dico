@@ -287,7 +287,7 @@ function TabBackup({ session, entradas }) {
 
     try {
       // 1. Buscar todas as tabelas
-      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'pecas_rascunhos', 'anotacoes', 'favoritos', 'historico_leitura']
+      const tabelas = ['entradas', 'legislacao', 'membros', 'alertas', 'pecas_rascunhos', 'anotacoes', 'favoritos', 'historico_leitura', 'historico_busca']
       const backup = { gerado_em: new Date().toISOString(), tabelas: {} }
 
       for (const tabela of tabelas) {
