@@ -759,6 +759,8 @@ case VIEWS.JURISPRUDENCIA:
               <EntradaDetail
                 entry={selected}
                 session={session}
+                todasEntradas={entradas}
+                onSelecionarRelacionada={(e) => setSelected(e)}
                 onClose={() => setView(VIEWS.HOME)}
                 onDelete={isAdmin ? handleDelete : null}
                 onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Check, Link2, Unlock, Star, ArrowLeftRight } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
@@ -34,7 +34,7 @@ function gerarABNT(entry) {
   } catch { return '' }
 }
 
-export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar }) {
+export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar, todasEntradas, onSelecionarRelacionada }) {
   const { theme, mode } = useTheme()
 
   // Normalização defensiva total
@@ -55,6 +55,19 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
   }
 
   const iasPendente = entry.ia_status === 'ia_pendente'
+
+  // Teses relacionadas: outras entradas com pelo menos uma tag em comum,
+  // ordenadas por quantas tags compartilham (mais em comum primeiro).
+  const relacionadas = useMemo(() => {
+    if (!entry.tags.length || !todasEntradas?.length) return []
+    const tagsSet = new Set(entry.tags)
+    return todasEntradas
+      .filter(e => e.id !== entry.id)
+      .map(e => ({ entrada: e, comuns: (e.tags || []).filter(t => tagsSet.has(t)).length }))
+      .filter(x => x.comuns > 0)
+      .sort((a, b) => b.comuns - a.comuns || new Date(b.entrada.criado_em) - new Date(a.entrada.criado_em))
+      .slice(0, 3)
+  }, [entry.id, entry.tags, todasEntradas])
 
   const [status, setStatus]               = useState(entry.status)
   const [showStatus, setShowStatus]       = useState(false)
@@ -296,6 +309,26 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
 
       {entry.teses.length === 0 && (
         <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: theme.fontSerif, padding: '20px 0' }}>Nenhuma tese cadastrada.</div>
+      )}
+
+      {/* Teses relacionadas */}
+      {relacionadas.length > 0 && (
+        <div style={{ marginTop: 28 }}>
+          <div style={secao}>Teses relacionadas</div>
+          {relacionadas.map(({ entrada, comuns }) => (
+            <div key={entrada.id} onClick={() => onSelecionarRelacionada?.(entrada)}
+              style={{ padding: '10px 0', borderBottom: `0.5px solid ${theme.border}`, cursor: onSelecionarRelacionada ? 'pointer' : 'default' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: corDaArea(entrada.area, theme), flexShrink: 0 }} />
+                <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{entrada.area}, {entrada.tipo}</span>
+              </div>
+              <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{entrada.tema}</div>
+              <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 2 }}>
+                {comuns} tag{comuns > 1 ? 's' : ''} em comum
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Minha Anotação — estudo ativo */}
