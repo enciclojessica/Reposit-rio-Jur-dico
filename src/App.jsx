@@ -16,6 +16,7 @@ import PainelMetricas from './components/PainelMetricas'
 import NovidadesApp from './components/NovidadesApp'
 import { NOVIDADES_APP } from './data/novidadesApp'
 import TourBoasVindas from './components/TourBoasVindas'
+import CommandPalette from './components/CommandPalette'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
@@ -149,6 +150,7 @@ export default function App() {
   const [selected, setSelected]     = useState(null)
   const [legislacaoPreFiltro, setLegislacaoPreFiltro] = useState(null)
   const [comparadorPrefilA, setComparadorPrefilA] = useState(null)
+  const [paletaAberta, setPaletaAberta] = useState(false)
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
@@ -349,6 +351,15 @@ export default function App() {
   // Atalhos de teclado globais
   useEffect(() => {
     function handler(e) {
+      // Cmd/Ctrl+K funciona mesmo com foco num campo de texto — é o
+      // padrão esperado desse atalho, diferente de "/" ou "n" que
+      // atrapalhariam quem está digitando.
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletaAberta(a => !a)
+        return
+      }
+
       const tag = document.activeElement?.tagName
       const editando = ['INPUT','TEXTAREA','SELECT'].includes(tag)
       if (editando) return
@@ -962,6 +973,15 @@ case VIEWS.JURISPRUDENCIA:
       }}>
         Sem conexão. Mostrando os últimos dados salvos no aparelho — favoritos e anotações não sincronizam até a internet voltar.
       </div>
+    )}
+    {paletaAberta && (
+      <CommandPalette
+        onFechar={() => setPaletaAberta(false)}
+        setView={setView}
+        isAdmin={isAdmin}
+        isEditor={isEditor}
+        setPrefillEntry={setPrefillEntry}
+      />
     )}
     {membro && !membro.tour_visto && (
       <TourBoasVindas onFechar={async () => {
