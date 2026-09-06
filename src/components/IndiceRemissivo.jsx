@@ -32,7 +32,7 @@ function Secao({ titulo, grupos, onSelecionarTag, theme }) {
                   padding: '7px 0', cursor: 'pointer',
                   borderTop: i > 0 ? `0.5px solid ${theme.border}` : 'none',
                 }}>
-                <span style={{ fontSize: 14, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>#{tag}</span>
+                <span style={{ fontSize: 14, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{tag}</span>
                 <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>{count}</span>
               </div>
             ))}

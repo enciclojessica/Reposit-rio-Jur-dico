@@ -24,22 +24,22 @@ describe('IndiceRemissivo', () => {
     renderIndice()
     expect(screen.getByText('Assuntos')).toBeInTheDocument()
     expect(screen.getByText('Legislação citada')).toBeInTheDocument()
-    expect(screen.getByText('#homicídio qualificado')).toBeInTheDocument()
-    expect(screen.getByText('#cpp')).toBeInTheDocument()
-    expect(screen.getByText('#art. 121 §2º III CP')).toBeInTheDocument()
-    expect(screen.getByText('#lei 9.099')).toBeInTheDocument()
+    expect(screen.getByText('homicídio qualificado')).toBeInTheDocument()
+    expect(screen.getByText('cpp')).toBeInTheDocument()
+    expect(screen.getByText('art. 121 §2º III CP')).toBeInTheDocument()
+    expect(screen.getByText('lei 9.099')).toBeInTheDocument()
   })
 
   it('filtra tags pelo campo de busca', () => {
     renderIndice()
     fireEvent.change(screen.getByPlaceholderText(/Filtrar/), { target: { value: 'homic' } })
-    expect(screen.getByText('#homicídio qualificado')).toBeInTheDocument()
-    expect(screen.queryByText('#cpp')).not.toBeInTheDocument()
+    expect(screen.getByText('homicídio qualificado')).toBeInTheDocument()
+    expect(screen.queryByText('cpp')).not.toBeInTheDocument()
   })
 
   it('aciona onSelecionarTag com o nome certo ao clicar', () => {
     const { onSelecionarTag } = renderIndice()
-    fireEvent.click(screen.getByText('#cc'))
+    fireEvent.click(screen.getByText('cc'))
     expect(onSelecionarTag).toHaveBeenCalledWith('cc')
   })
 
@@ -51,10 +51,10 @@ describe('IndiceRemissivo', () => {
         ]} onSelecionarTag={vi.fn()} />
       </ThemeProvider>
     )
-    expect(screen.getByText('#homicídio qualificado')).toBeInTheDocument()
-    expect(screen.queryByText('#pesquisa-juri')).not.toBeInTheDocument()
-    expect(screen.queryByText('#extraído-de-peça')).not.toBeInTheDocument()
-    expect(screen.queryByText('#jurisprudência')).not.toBeInTheDocument()
+    expect(screen.getByText('homicídio qualificado')).toBeInTheDocument()
+    expect(screen.queryByText('pesquisa-juri')).not.toBeInTheDocument()
+    expect(screen.queryByText('extraído-de-peça')).not.toBeInTheDocument()
+    expect(screen.queryByText('jurisprudência')).not.toBeInTheDocument()
   })
 
   it('classifica súmula e tribunal como legislação, não assunto', () => {
