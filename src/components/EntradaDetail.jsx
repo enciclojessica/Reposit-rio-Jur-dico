@@ -3,6 +3,7 @@ import { Check, Link2, Unlock, Star, ArrowLeftRight } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
+import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
 import AnotacaoPessoal from './AnotacaoPessoal'
@@ -55,6 +56,37 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
   }
 
   const iasPendente = entry.ia_status === 'ia_pendente'
+
+  // Referências legais citadas nas teses (fundamentacao_legal, ratio_decidendi),
+  // pra checar quais artigos já não estão mais vigentes. Uma consulta só,
+  // pra todas as referências da entrada inteira, não uma por campo.
+  const referenciasNaEntrada = useMemo(() => {
+    const textos = (entry.teses || []).flatMap(t => [t.fundamentacao_legal, t.ratio_decidendi])
+    const todasRefs = textos.flatMap(t => extrairReferenciasLegais(t || ''))
+    const unicas = new Map()
+    todasRefs.forEach(r => unicas.set(`${r.codigo}|${r.numero}`, r))
+    return [...unicas.values()]
+  }, [entry.teses])
+
+  const [revogados, setRevogados] = useState(new Set())
+  useEffect(() => {
+    if (!referenciasNaEntrada.length) { setRevogados(new Set()); return }
+    let cancelado = false
+    async function checar() {
+      const porCodigo = {}
+      referenciasNaEntrada.forEach(r => { (porCodigo[r.codigo] ||= []).push(r.numero) })
+      const resultados = await Promise.all(
+        Object.entries(porCodigo).map(([codigo, numeros]) =>
+          supabase.from('legislacao').select('numero, vigente')
+            .eq('codigo', codigo).in('numero', [...new Set(numeros)]).eq('vigente', false)
+            .then(({ data }) => (data || []).map(d => `${codigo}|${d.numero}`))
+        )
+      )
+      if (!cancelado) setRevogados(new Set(resultados.flat()))
+    }
+    checar()
+    return () => { cancelado = true }
+  }, [referenciasNaEntrada])
 
   // Teses relacionadas: outras entradas com pelo menos uma tag em comum,
   // ordenadas por quantas tags compartilham (mais em comum primeiro).
@@ -298,7 +330,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
                 </div>
                 <div style={{ fontSize: 14, color: theme.text, lineHeight: 1.7, fontFamily: theme.fontSerif }}>
                   {(campo === 'fundamentacao_legal' || campo === 'ratio_decidendi')
-                    ? <TextoComReferenciasLegais texto={val} theme={theme} onAbrirArtigo={onAbrirArtigoLegislacao} />
+                    ? <TextoComReferenciasLegais texto={val} theme={theme} onAbrirArtigo={onAbrirArtigoLegislacao} revogados={revogados} />
                     : val}
                 </div>
               </div>
