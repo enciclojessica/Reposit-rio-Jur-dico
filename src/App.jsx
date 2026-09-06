@@ -12,6 +12,7 @@ import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
 import IndiceRemissivo from './components/IndiceRemissivo'
 import ComparadorTeses from './components/ComparadorTeses'
+import PainelMetricas from './components/PainelMetricas'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
@@ -669,6 +670,10 @@ case VIEWS.JURISPRUDENCIA:
 
       case VIEWS.COMPARAR:
         return <div className="fade-up"><ComparadorTeses entradas={entradas} prefilA={comparadorPrefilA} /></div>
+
+      case VIEWS.METRICAS:
+        if (!isAdmin) return <div className="fade-up"><div style={{ color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Sem permissão pra ver esta tela.</div></div>
+        return <div className="fade-up"><PainelMetricas /></div>
 
       case VIEWS.EDITOR:
         return (

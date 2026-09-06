@@ -24,6 +24,7 @@ export default function MobileNav({
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
+    ...(isAdmin  ? [{ v: VIEWS.METRICAS, label: 'Métricas' }] : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
   ]

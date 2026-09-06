@@ -67,6 +67,16 @@ export default function Sidebar({
           }}>Membros</button>
         )}
 
+        {isAdmin && (
+          <button onClick={() => setView(VIEWS.METRICAS)} style={{
+            width: '100%', background: view === VIEWS.METRICAS ? theme.gold + '12' : 'none',
+            border: 'none', borderLeft: `3px solid ${view === VIEWS.METRICAS ? theme.gold : 'transparent'}`,
+            padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
+            color: view === VIEWS.METRICAS ? theme.text : theme.muted, fontSize: 13,
+            fontFamily: 'Inter, sans-serif', transition: 'all .15s',
+          }}>Métricas</button>
+        )}
+
         {isEditor && (
           <>
             <div style={{ margin: '8px 16px', borderTop: `1px solid ${theme.border}` }}/>
