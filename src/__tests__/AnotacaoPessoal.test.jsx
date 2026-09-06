@@ -19,14 +19,32 @@ vi.mock('../supabase', () => {
 
 const sessaoFake = { user: { id: 'user-1' } }
 
+// Mock de SpeechRecognition — jsdom não tem essa API nativamente.
+// Guarda a última instância criada pra poder disparar onresult/onend/onerror
+// manualmente, simulando o comportamento real do navegador.
+let ultimaInstanciaRec = null
+class FakeSpeechRecognition {
+  constructor() {
+    this.startCallCount = 0
+    ultimaInstanciaRec = this
+  }
+  start() { this.startCallCount++ }
+  stop() { this.onend?.() }
+}
+
 beforeEach(() => {
   localStorage.clear()
   mockRow = null
   upsertCalls = []
+  ultimaInstanciaRec = null
   vi.useFakeTimers({ shouldAdvanceTime: true })
+  window.SpeechRecognition = FakeSpeechRecognition
 })
 
-afterEach(() => { vi.useRealTimers() })
+afterEach(() => {
+  vi.useRealTimers()
+  delete window.SpeechRecognition
+})
 
 describe('AnotacaoPessoal', () => {
   it('sem sessão, não renderiza nada (evita salvar anotação anônima)', () => {
@@ -67,5 +85,36 @@ describe('AnotacaoPessoal', () => {
     await act(async () => { vi.advanceTimersByTime(900) })
     expect(upsertCalls.length).toBe(1)
     expect(upsertCalls[0]).toMatchObject({ user_id: 'user-1', namespace: 'entrada', item_id: '1', texto: 'nota nova' })
+  })
+
+  it('quando o reconhecimento termina sozinho (comportamento do Safari), reinicia automaticamente', async () => {
+    render(<AnotacaoPessoal itemId="1" session={sessaoFake} namespace="entrada" theme={temaFake} />)
+    await waitFor(() => expect(screen.getByText('Adicionar anotação')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Adicionar anotação'))
+
+    fireEvent.click(screen.getByText('Ditar'))
+    expect(ultimaInstanciaRec.startCallCount).toBe(1)
+    expect(screen.getByText('Parar ditado')).toBeInTheDocument()
+
+    // Simula o Safari cortando sozinho por silêncio, sem a pessoa ter clicado em parar
+    await act(async () => { ultimaInstanciaRec.onend() })
+    await act(async () => { vi.advanceTimersByTime(300) })
+
+    expect(ultimaInstanciaRec.startCallCount).toBe(2) // reiniciou sozinho
+    expect(screen.getByText('Parar ditado')).toBeInTheDocument() // continua "gravando" pro usuário
+  })
+
+  it('clicar em "Parar ditado" não reinicia o reconhecimento', async () => {
+    render(<AnotacaoPessoal itemId="1" session={sessaoFake} namespace="entrada" theme={temaFake} />)
+    await waitFor(() => expect(screen.getByText('Adicionar anotação')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Adicionar anotação'))
+
+    fireEvent.click(screen.getByText('Ditar'))
+    fireEvent.click(screen.getByText('Parar ditado')) // chama rec.stop(), que já dispara onend no mock
+
+    await act(async () => { vi.advanceTimersByTime(300) })
+
+    expect(ultimaInstanciaRec.startCallCount).toBe(1) // não reiniciou
+    expect(screen.getByText('Ditar')).toBeInTheDocument() // voltou ao estado parado
   })
 })

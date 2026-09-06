@@ -23,6 +23,8 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
   const [erroDitado, setErroDitado] = useState('')
   const reconhecimentoRef = useRef(null)
   const notaAntesDoDitadoRef = useRef('')
+  const paradoIntencionalmenteRef = useRef(false)
+  const tentativasReinicioRef = useRef(0)
   const SpeechRecognitionAPI = typeof window !== 'undefined'
     ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null
 
@@ -30,9 +32,12 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
     if (!SpeechRecognitionAPI) return
     setErroDitado('')
     if (gravando) {
+      paradoIntencionalmenteRef.current = true
       reconhecimentoRef.current?.stop()
       return
     }
+    paradoIntencionalmenteRef.current = false
+    tentativasReinicioRef.current = 0
     const rec = new SpeechRecognitionAPI()
     rec.lang = 'pt-BR'
     rec.continuous = true
@@ -41,6 +46,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
     let transcricaoFinal = ''
 
     rec.onresult = (evento) => {
+      tentativasReinicioRef.current = 0 // reconheceu fala de verdade, zera o contador de reinício
       let interina = ''
       for (let i = evento.resultIndex; i < evento.results.length; i++) {
         const texto = evento.results[i][0].transcript
@@ -52,16 +58,36 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
       salvar(base + separador + transcricaoFinal + interina)
     }
     rec.onerror = (evento) => {
+      // 'no-speech' não é erro de verdade aqui, é o Safari cortando por
+      // silêncio — deixa o onend cuidar do reinício automático, sem
+      // mostrar mensagem de erro nem desligar o microfone.
+      if (evento.error === 'no-speech') return
       setGravando(false)
       if (evento.error === 'not-allowed' || evento.error === 'service-not-allowed') {
         setErroDitado('Permissão de microfone negada. Ative nas configurações do navegador.')
-      } else if (evento.error === 'no-speech') {
-        setErroDitado('Nenhuma fala reconhecida.')
       } else {
         setErroDitado('Não foi possível usar o ditado agora.')
       }
     }
-    rec.onend = () => setGravando(false)
+    // Safari corta o reconhecimento sozinho depois de um silêncio, mesmo
+    // com continuous=true (limitação conhecida, não bug nosso) — se quem
+    // parou foi o Safari e não a própria pessoa clicando 'Parar ditado',
+    // reinicia automaticamente a mesma sessão, até um teto de tentativas
+    // (pra não entrar em loop se o microfone estiver genuinamente com
+    // problema). Cada reconhecimento de fala bem-sucedido zera o contador.
+    rec.onend = () => {
+      if (paradoIntencionalmenteRef.current) { setGravando(false); return }
+      if (tentativasReinicioRef.current >= 20) {
+        setGravando(false)
+        setErroDitado('O ditado parou de responder. Toque em Ditar para tentar de novo.')
+        return
+      }
+      tentativasReinicioRef.current++
+      setTimeout(() => {
+        if (paradoIntencionalmenteRef.current) return
+        try { rec.start() } catch { setGravando(false) }
+      }, 250)
+    }
 
     try {
       reconhecimentoRef.current = rec
@@ -73,7 +99,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
     }
   }
 
-  useEffect(() => () => reconhecimentoRef.current?.stop(), [])
+  useEffect(() => () => { paradoIntencionalmenteRef.current = true; reconhecimentoRef.current?.stop() }, [])
 
   useEffect(() => {
     if (!userId || !itemId) { setCarregando(false); return }
