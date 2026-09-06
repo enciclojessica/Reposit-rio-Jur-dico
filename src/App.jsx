@@ -763,7 +763,7 @@ case VIEWS.JURISPRUDENCIA:
                 {prefillEntry ? 'Importar Jurisprudência' : 'Nova Entrada'}
               </div>
             </div>
-            <EntradaForm initial={prefillEntry} onSave={handleSave} onCancel={() => { setPrefillEntry(null); setView(VIEWS.HOME) }} loading={saving}/>
+            <EntradaForm initial={prefillEntry} onSave={handleSave} onCancel={() => { setPrefillEntry(null); setView(VIEWS.HOME) }} loading={saving} entradas={entradas}/>
           </div>
         )
 
@@ -775,7 +775,7 @@ case VIEWS.JURISPRUDENCIA:
               <button onClick={() => setView(VIEWS.DETAIL)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>←</button>
               <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Editar Entrada</div>
             </div>
-            <EntradaForm initial={selected} onSave={handleSave} onCancel={() => setView(VIEWS.DETAIL)} loading={saving}/>
+            <EntradaForm initial={selected} onSave={handleSave} onCancel={() => setView(VIEWS.DETAIL)} loading={saving} entradas={entradas}/>
           </div>
         )
 

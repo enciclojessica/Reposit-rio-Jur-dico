@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { supabase } from '../supabase'
 import { AREAS, TIPOS, emptyEntry, FieldLabel, SectionLabel, BtnGold, BtnMuted, labelCampoTese } from '../shared'
 import TagInput from './TagInput'
 import { useTheme } from '../theme'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
+import { encontrarPossiveisDuplicatas } from '../utils/duplicatas'
 
 const MAX_PDF_MB = 10
 const IA_FIELDS = ['ratio_decidendi', 'aplicacao_pratica']
@@ -31,9 +32,14 @@ function IaBadge({ status, theme }) {
   )
 }
 
-export default function EntradaForm({ initial, onSave, onCancel, loading }) {
+export default function EntradaForm({ initial, onSave, onCancel, loading, entradas }) {
   const { theme, mode } = useTheme()
   const [entry, setEntry]         = useState(initial || emptyEntry())
+
+  const possiveisDuplicatas = useMemo(
+    () => encontrarPossiveisDuplicatas(entry.tema, entradas, initial?.id),
+    [entry.tema, entradas, initial?.id]
+  )
   const [extraindo, setExtraindo] = useState(false)
   const [erroOcr, setErroOcr]    = useState('')
   const [pdfNome, setPdfNome]    = useState('')
@@ -341,6 +347,19 @@ export default function EntradaForm({ initial, onSave, onCancel, loading }) {
         <div style={{ fontSize: 10, color: entry.tema.length > 120 ? theme.error : theme.muted, textAlign: 'right', marginTop: 2 }}>
           {entry.tema.length}/150 caracteres
         </div>
+
+        {possiveisDuplicatas.length > 0 && (
+          <div style={{ background: theme.raised, border: `1px solid ${theme.error}55`, borderRadius: 8, padding: '10px 12px', marginTop: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: theme.error, fontSize: 12, fontFamily: 'Inter, sans-serif' }}>
+              <AlertTriangle size={13} /> Pode já existir algo parecido no acervo
+            </div>
+            {possiveisDuplicatas.map(({ entrada, score }) => (
+              <div key={entrada.id} style={{ fontSize: 12, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif", padding: '3px 0' }}>
+                {entrada.tema} <span style={{ color: theme.muted, fontStyle: 'italic', fontSize: 10 }}>({entrada.area}, {Math.round(score * 100)}% parecido)</span>
+              </div>
+            ))}
+          </div>
+        )}
         <FieldLabel>Fonte (Tribunal / Autor)</FieldLabel>
         {inp(entry.fonte, v => setF('fonte', v), 'Ex: STJ, TJSP, Caio Mario da Silva Pereira')}
         <FieldLabel>Referência</FieldLabel>
