@@ -13,6 +13,7 @@ import Dashboard from './components/Dashboard'
 import IndiceRemissivo from './components/IndiceRemissivo'
 import ComparadorTeses from './components/ComparadorTeses'
 import PainelMetricas from './components/PainelMetricas'
+import TourBoasVindas from './components/TourBoasVindas'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
@@ -897,6 +898,13 @@ case VIEWS.JURISPRUDENCIA:
   }
 
   return (
+    <>
+    {membro && !membro.tour_visto && (
+      <TourBoasVindas onFechar={async () => {
+        setMembro(prev => ({ ...prev, tour_visto: true }))
+        await supabase.from('membros').update({ tour_visto: true }).eq('user_id', session.user.id)
+      }} />
+    )}
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: theme.bg }}>
       {!isMobile && (
         <Sidebar
@@ -1025,5 +1033,6 @@ case VIEWS.JURISPRUDENCIA:
         </div>
       )}
     </div>
+    </>
   )
 }
