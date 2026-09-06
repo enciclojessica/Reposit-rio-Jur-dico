@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { tagsVisiveis } from '../utils/tagsVisiveis'
+import { tagsVisiveis, formatarTagIndice } from '../utils/tagsVisiveis'
 
 describe('tagsVisiveis', () => {
   it('esconde tags de origem/metadado interno', () => {
@@ -55,5 +55,28 @@ describe('tagsVisiveis', () => {
       tags: ['cp', 'lei 10.826'],
     }
     expect(tagsVisiveis(entry)).toEqual([])
+  })
+})
+
+describe('formatarTagIndice', () => {
+  it('sigla de código de lei vira caixa alta', () => {
+    expect(formatarTagIndice('cpp')).toBe('CPP')
+    expect(formatarTagIndice('cc')).toBe('CC')
+    expect(formatarTagIndice('cdc')).toBe('CDC')
+  })
+
+  it('sigla de tribunal vira caixa alta, incluindo o padrão tjXX', () => {
+    expect(formatarTagIndice('stj')).toBe('STJ')
+    expect(formatarTagIndice('tjrs')).toBe('TJRS')
+  })
+
+  it('assunto ganha só a inicial maiúscula, resto preservado', () => {
+    expect(formatarTagIndice('homicídio qualificado')).toBe('Homicídio qualificado')
+    expect(formatarTagIndice('in dubio pro societate')).toBe('In dubio pro societate')
+  })
+
+  it('artigo/lei mantém o resto do texto como está, só capitaliza a inicial', () => {
+    expect(formatarTagIndice('art. 121 §2º III CP')).toBe('Art. 121 §2º III CP')
+    expect(formatarTagIndice('lei 9.099')).toBe('Lei 9.099')
   })
 })

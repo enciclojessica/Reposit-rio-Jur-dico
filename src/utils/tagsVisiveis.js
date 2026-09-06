@@ -39,6 +39,18 @@ export function classificarTagIndice(tag) {
   return 'assunto'
 }
 
+// Formata uma tag pra exibição, sem alterar o dado salvo. Sigla de
+// código/tribunal (cc, cpp, stj, tjrs...) vira caixa alta de verdade
+// (é abreviação, não frase); o resto ganha só a inicial maiúscula, na
+// norma culta usada no resto do app — o dado no banco costuma vir tudo
+// minúsculo, mas exibir assim destoa do texto editorial ao redor.
+export function formatarTagIndice(tag) {
+  const tl = (tag || '').toLowerCase().trim()
+  if (!tl) return tag
+  if (CODIGOS_OCULTOS.includes(tl) || ehTribunal(tl)) return tag.toUpperCase()
+  return tag.charAt(0).toUpperCase() + tag.slice(1)
+}
+
 export function tagsVisiveis(entry) {
   const tags = entry?.tags || []
   if (!tags.length) return []
