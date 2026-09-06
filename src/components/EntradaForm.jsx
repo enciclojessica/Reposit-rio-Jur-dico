@@ -5,7 +5,7 @@ import TagInput from './TagInput'
 import { useTheme } from '../theme'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
-import { encontrarPossiveisDuplicatas } from '../utils/duplicatas'
+import { encontrarPossiveisDuplicatas, diferenciarTemaSeNecessario } from '../utils/duplicatas'
 
 const MAX_PDF_MB = 10
 const IA_FIELDS = ['ratio_decidendi', 'aplicacao_pratica']
@@ -436,7 +436,12 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
           if (temDados && !confirm('Descartar as alterações? Os dados não salvos serão perdidos.')) return
           onCancel()
         }} style={{ flex: 1 }}>Cancelar</BtnMuted>
-        <BtnGold onClick={() => onSave({ ...entry, ia_status: temPendentes ? 'ia_pendente' : (entry.ia_status || 'manual') })} disabled={loading || extraindo || !entry.tema} style={{ flex: 2 }}>
+        <BtnGold onClick={() => {
+          const temaFinal = diferenciarTemaSeNecessario(entry.tema, entry.fonte, entry.tipo, entradas, initial?.id)
+          const entryFinal = { ...entry, tema: temaFinal, ia_status: temPendentes ? 'ia_pendente' : (entry.ia_status || 'manual') }
+          if (temaFinal !== entry.tema) setF('tema', temaFinal)
+          onSave(entryFinal)
+        }} disabled={loading || extraindo || !entry.tema} style={{ flex: 2 }}>
           {loading ? 'Salvando...' : 'Salvar'}
         </BtnGold>
       </div>

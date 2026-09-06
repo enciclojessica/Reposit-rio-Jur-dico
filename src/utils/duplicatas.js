@@ -28,6 +28,40 @@ export function similaridadeTemas(a, b) {
   return uniao === 0 ? 0 : intersecao / uniao
 }
 
+function ultimoSobrenome(fonte) {
+  const partes = (fonte || '').trim().split(/\s+/).filter(Boolean)
+  return partes[partes.length - 1] || ''
+}
+
+// Duas entradas de doutrina com o tema exatamente igual, mas de autores
+// diferentes, não são duplicata (são autoridades diferentes definindo o
+// mesmo conceito) — mas ficam impossíveis de distinguir numa lista sem
+// abrir cada uma. Achado real no acervo: três entradas com o mesmo tema
+// (Noronha, Masson, Bitencourt, todos sobre "meio cruel" no homicídio
+// qualificado), só diferenciáveis pelo campo fonte. Esta função garante
+// que, daqui pra frente, o sobrenome do autor entra no tema automaticamente
+// sempre que essa colisão específica acontecer — não roda pra outros
+// tipos (jurisprudência já se diferencia pelo número do processo, que
+// normalmente já está no tema) nem se o tema já menciona o autor.
+export function diferenciarTemaSeNecessario(tema, fonte, tipo, entradas, idExcluir) {
+  const temaLimpo = (tema || '').trim()
+  const fonteLimpa = (fonte || '').trim()
+  if (tipo !== 'doutrina' || !temaLimpo || !fonteLimpa || !entradas?.length) return temaLimpo
+
+  const temaNorm = temaLimpo.toLowerCase()
+  const colisao = entradas.some(e =>
+    e.id !== idExcluir &&
+    e.tipo === 'doutrina' &&
+    (e.fonte || '').trim() !== fonteLimpa &&
+    (e.tema || '').trim().toLowerCase() === temaNorm
+  )
+  if (!colisao) return temaLimpo
+
+  const autor = ultimoSobrenome(fonteLimpa)
+  if (!autor || temaNorm.includes(autor.toLowerCase())) return temaLimpo
+  return `${temaLimpo} (${autor})`
+}
+
 // Retorna até 3 entradas existentes com tema parecido, da mais parecida
 // pra menos. idExcluir evita comparar uma entrada em edição com ela mesma.
 // Não roda pra temas muito curtos (< 8 caracteres): tema curto tem palavra

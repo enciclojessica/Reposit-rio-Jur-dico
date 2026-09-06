@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { similaridadeTemas, encontrarPossiveisDuplicatas } from '../utils/duplicatas'
+import { similaridadeTemas, encontrarPossiveisDuplicatas, diferenciarTemaSeNecessario } from '../utils/duplicatas'
 
 describe('similaridadeTemas', () => {
   it('tema idêntico tem similaridade 1', () => {
@@ -62,5 +62,53 @@ describe('encontrarPossiveisDuplicatas', () => {
   it('lida com acervo vazio ou tema vazio', () => {
     expect(encontrarPossiveisDuplicatas('', acervo, null)).toEqual([])
     expect(encontrarPossiveisDuplicatas('Tema qualquer bem específico', [], null)).toEqual([])
+  })
+})
+
+describe('diferenciarTemaSeNecessario', () => {
+  const acervoDoutrina = [
+    { id: '1', tipo: 'doutrina', fonte: 'E. Magalhães Noronha', tema: 'Homicídio qualificado — conceito de "meio cruel"' },
+    { id: '2', tipo: 'doutrina', fonte: 'Cleber Masson', tema: 'Homicídio qualificado — conceito de "meio cruel"' },
+  ]
+
+  it('acrescenta o sobrenome do autor quando dois doutrinadores diferentes têm o mesmo tema exato (caso real do acervo)', () => {
+    const r = diferenciarTemaSeNecessario(
+      'Homicídio qualificado — conceito de "meio cruel"',
+      'Cezar Roberto Bitencourt', 'doutrina', acervoDoutrina, null
+    )
+    expect(r).toBe('Homicídio qualificado — conceito de "meio cruel" (Bitencourt)')
+  })
+
+  it('não altera quando o tema é diferente', () => {
+    const r = diferenciarTemaSeNecessario('Legítima defesa, requisitos', 'Bitencourt', 'doutrina', acervoDoutrina, null)
+    expect(r).toBe('Legítima defesa, requisitos')
+  })
+
+  it('não altera quando é a própria entrada em edição, sem outra colisão real', () => {
+    const soAPropria = [{ id: '1', tipo: 'doutrina', fonte: 'E. Magalhães Noronha', tema: 'Homicídio qualificado — conceito de "meio cruel"' }]
+    const r = diferenciarTemaSeNecessario(
+      'Homicídio qualificado — conceito de "meio cruel"',
+      'E. Magalhães Noronha', 'doutrina', soAPropria, '1'
+    )
+    expect(r).toBe('Homicídio qualificado — conceito de "meio cruel"')
+  })
+
+  it('não altera quando o tema já menciona o autor', () => {
+    const r = diferenciarTemaSeNecessario(
+      'Homicídio qualificado — conceito de "meio cruel" segundo Bitencourt',
+      'Cezar Roberto Bitencourt', 'doutrina', acervoDoutrina, null
+    )
+    expect(r).toBe('Homicídio qualificado — conceito de "meio cruel" segundo Bitencourt')
+  })
+
+  it('não roda pra jurisprudência (já se diferencia pelo número do processo)', () => {
+    const acervoJuris = [{ id: '1', tipo: 'jurisprudencia', fonte: 'STJ', tema: 'Mesmo tema' }]
+    const r = diferenciarTemaSeNecessario('Mesmo tema', 'STF', 'jurisprudencia', acervoJuris, null)
+    expect(r).toBe('Mesmo tema')
+  })
+
+  it('lida com tema ou fonte vazios sem quebrar', () => {
+    expect(diferenciarTemaSeNecessario('', 'Bitencourt', 'doutrina', acervoDoutrina, null)).toBe('')
+    expect(diferenciarTemaSeNecessario('Tema', '', 'doutrina', acervoDoutrina, null)).toBe('Tema')
   })
 })
