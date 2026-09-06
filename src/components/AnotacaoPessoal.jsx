@@ -20,6 +20,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
   // Chrome/Edge/Safari recente suportam via webkitSpeechRecognition; se
   // não suportar, o botão de microfone simplesmente não aparece.
   const [gravando, setGravando] = useState(false)
+  const [erroDitado, setErroDitado] = useState('')
   const reconhecimentoRef = useRef(null)
   const notaAntesDoDitadoRef = useRef('')
   const SpeechRecognitionAPI = typeof window !== 'undefined'
@@ -27,6 +28,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
 
   function alternarDitado() {
     if (!SpeechRecognitionAPI) return
+    setErroDitado('')
     if (gravando) {
       reconhecimentoRef.current?.stop()
       return
@@ -49,12 +51,26 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
       const separador = base && !base.endsWith(' ') && !base.endsWith('\n') ? ' ' : ''
       salvar(base + separador + transcricaoFinal + interina)
     }
-    rec.onerror = () => setGravando(false)
+    rec.onerror = (evento) => {
+      setGravando(false)
+      if (evento.error === 'not-allowed' || evento.error === 'service-not-allowed') {
+        setErroDitado('Permissão de microfone negada. Ative nas configurações do navegador.')
+      } else if (evento.error === 'no-speech') {
+        setErroDitado('Nenhuma fala reconhecida.')
+      } else {
+        setErroDitado('Não foi possível usar o ditado agora.')
+      }
+    }
     rec.onend = () => setGravando(false)
 
-    reconhecimentoRef.current = rec
-    setGravando(true)
-    rec.start()
+    try {
+      reconhecimentoRef.current = rec
+      setGravando(true)
+      rec.start()
+    } catch {
+      setGravando(false)
+      setErroDitado('Não foi possível iniciar o ditado.')
+    }
   }
 
   useEffect(() => () => reconhecimentoRef.current?.stop(), [])
@@ -136,6 +152,11 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
               style={{ fontSize: 11, background: gravando ? theme.penal + '22' : 'none', border: `1px solid ${gravando ? theme.penal : theme.border}`, borderRadius: 6, color: gravando ? theme.penal : theme.muted, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
               {gravando ? <><MicOff size={11} /> Parar ditado</> : <><Mic size={11} /> Ditar</>}
             </button>
+          )}
+          {erroDitado && (
+            <div style={{ fontSize: 10, color: theme.penal, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 6 }}>
+              {erroDitado}
+            </div>
           )}
           <textarea value={nota} onChange={e => salvar(e.target.value)}
             placeholder={placeholder}
