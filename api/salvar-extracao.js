@@ -1,6 +1,7 @@
 // Endpoint leve: apenas persiste os dados extraídos pelo browser
 // Sem chamada à IA — sem risco de timeout
 import { createClient } from '@supabase/supabase-js'
+import { normalizarArea } from '../lib/normalizarArea.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -31,16 +32,10 @@ export default async function handler(req, res) {
   const detalheTeses = []
   const detalheArtigos = []
 
-const AREAS_VALIDAS = [
-  'Cível', 'Penal', 'Constitucional', 'Trabalhista', 'Tributário',
-  'Administrativo', 'Consumidor', 'Família', 'Previdenciário',
-  'Ambiental', 'Internacional', 'Digital',
-]
-
   for (const t of (dados.teses || [])) {
     if (!t.tema?.trim()) continue
     const { error } = await supabase.from('entradas').insert({
-      area:       AREAS_VALIDAS.includes(t.area) ? t.area : 'Cível',
+      area:       normalizarArea(t.area),
       tipo:       t.tipo || 'jurisprudência',
       tema:       t.tema,
       fonte:      t.fonte || '',
@@ -58,7 +53,7 @@ const AREAS_VALIDAS = [
       criado_por: user.id,
     })
     if (error) erros.push(`Tese "${t.tema}": ${error.message}`)
-    else { tesesSalvas++; detalheTeses.push({ tema: t.tema, area: t.area || 'Cível', tipo: t.tipo || 'jurisprudência', status: 'novo' }) }
+    else { tesesSalvas++; detalheTeses.push({ tema: t.tema, area: normalizarArea(t.area), tipo: t.tipo || 'jurisprudência', status: 'novo' }) }
   }
 
   for (const a of (dados.artigos || [])) {
@@ -126,7 +121,7 @@ const AREAS_VALIDAS = [
     } else {
       // Não existe — criar entrada nova
       const { error } = await supabase.from('entradas').insert({
-        area: AREAS_VALIDAS.includes(j.area) ? j.area : 'Cível',
+        area: normalizarArea(j.area),
         tipo: 'jurisprudência',
         tema: `${j.tribunal} ${ref}`,
         fonte: j.tribunal,

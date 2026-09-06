@@ -6,6 +6,7 @@ import { useTheme } from '../theme'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
 import { encontrarPossiveisDuplicatas, diferenciarTemaSeNecessario } from '../utils/duplicatas'
+import { normalizarArea } from '../../lib/normalizarArea'
 
 const MAX_PDF_MB = 10
 const IA_FIELDS = ['ratio_decidendi', 'aplicacao_pratica']
@@ -438,8 +439,10 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
         }} style={{ flex: 1 }}>Cancelar</BtnMuted>
         <BtnGold onClick={() => {
           const temaFinal = diferenciarTemaSeNecessario(entry.tema, entry.fonte, entry.tipo, entradas, initial?.id)
-          const entryFinal = { ...entry, tema: temaFinal, ia_status: temPendentes ? 'ia_pendente' : (entry.ia_status || 'manual') }
+          const areaFinal = normalizarArea(entry.area)
+          const entryFinal = { ...entry, tema: temaFinal, area: areaFinal, ia_status: temPendentes ? 'ia_pendente' : (entry.ia_status || 'manual') }
           if (temaFinal !== entry.tema) setF('tema', temaFinal)
+          if (areaFinal !== entry.area) setF('area', areaFinal)
           onSave(entryFinal)
         }} disabled={loading || extraindo || !entry.tema} style={{ flex: 2 }}>
           {loading ? 'Salvando...' : 'Salvar'}

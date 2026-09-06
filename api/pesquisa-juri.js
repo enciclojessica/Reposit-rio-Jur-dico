@@ -4,6 +4,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 import { checarRateLimit } from '../lib/rateLimit.js'
+import { normalizarArea } from '../lib/normalizarArea.js'
 
 export default async function handler(req, res) {
   try {
@@ -116,7 +117,7 @@ Responda SOMENTE com JSON válido, sem texto antes ou depois, no formato:
     }
 
     return res.status(200).json({
-      resultados: parsed.resultados || [],
+      resultados: (parsed.resultados || []).map(r => ({ ...r, area: normalizarArea(r.area) })),
       aviso: parsed.aviso || '',
     })
   } catch (err) {
