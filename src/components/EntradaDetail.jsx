@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, Link2, Unlock, Star } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
@@ -65,6 +65,15 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
   const [publica, setPublica]             = useState(!!entry.publica)
   const [showPreviewAbnt, setShowPreviewAbnt] = useState(false)
   const [salvandoStatus, setSalvandoStatus] = useState(false)
+
+  // Histórico de leitura — alimenta "Continuar de onde parei" no Hoje.
+  // Fora do fluxo visível pro usuário, silencioso, best-effort.
+  useEffect(() => {
+    if (!session?.user?.id || !entry.id) return
+    supabase.from('historico_leitura').upsert({
+      user_id: session.user.id, entrada_id: entry.id, visto_em: new Date().toISOString(),
+    }, { onConflict: 'user_id,entrada_id' })
+  }, [session?.user?.id, entry.id])
 
   const am = { color: corDaArea(entry.area, theme) }
   const abnt = gerarABNT(entry)

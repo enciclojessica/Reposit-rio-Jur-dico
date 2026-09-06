@@ -38,6 +38,8 @@ const TABELAS = [
   'notificacoes',
   'pecas_rascunhos',
   'anotacoes',
+  'favoritos',
+  'historico_leitura',
 ]
 
 async function exportarTabela(nome) {

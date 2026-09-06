@@ -1,11 +1,29 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AreaDot } from '../shared'
+import { supabase } from '../supabase'
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000
 
 export default function Hoje({ entradas, session, onSelectEntrada }) {
   const { theme } = useTheme()
+  const [historico, setHistorico] = useState([])
+
+  useEffect(() => {
+    if (!session?.user?.id) { setHistorico([]); return }
+    supabase.from('historico_leitura')
+      .select('entrada_id')
+      .eq('user_id', session.user.id)
+      .order('visto_em', { ascending: false })
+      .limit(3)
+      .then(({ data }) => setHistorico(data || []))
+  }, [session?.user?.id])
+
+  const continuarLendo = useMemo(() => {
+    if (!historico.length) return []
+    const mapa = new Map(entradas.map(e => [e.id, e]))
+    return historico.map(h => mapa.get(h.entrada_id)).filter(Boolean)
+  }, [historico, entradas])
 
   const novidades = useMemo(() => {
     const agora = Date.now()
@@ -25,6 +43,30 @@ export default function Hoje({ entradas, session, onSelectEntrada }) {
         </div>
         <div style={{ fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{dataCapitalizada}</div>
       </div>
+
+      {continuarLendo.length > 0 && (
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 4 }}>
+            Continuar de onde parei
+          </div>
+          {continuarLendo.map(e => (
+            <div key={e.id} onClick={() => onSelectEntrada?.(e)}
+              style={{ display: 'flex', gap: 10, padding: '12px 0', borderBottom: `0.5px solid ${theme.border}`, cursor: onSelectEntrada ? 'pointer' : 'default' }}>
+              <div style={{ paddingTop: 3, flexShrink: 0 }}>
+                <AreaDot area={e.area} theme={theme} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {e.tema}
+                </div>
+                <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 2 }}>
+                  {[e.area, e.tipo].filter(Boolean).join(', ')}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 4 }}>
         Novidades
