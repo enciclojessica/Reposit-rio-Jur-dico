@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 
+import { AREAS_VALIDAS } from '../../lib/normalizarArea'
+
 function StatBox({ label, valor, theme, cor }) {
   return (
     <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderTop: `2px solid ${cor || theme.gold}`, borderRadius: 8, padding: '14px 16px' }}>
@@ -11,7 +13,7 @@ function StatBox({ label, valor, theme, cor }) {
   )
 }
 
-export default function PainelMetricas() {
+export default function PainelMetricas({ entradas }) {
   const { theme } = useTheme()
   const [loading, setLoading] = useState(true)
   const [dados, setDados] = useState(null)
@@ -68,6 +70,16 @@ export default function PainelMetricas() {
 
   const maxDia = Math.max(1, ...Object.values(dados.porDia))
 
+  // Lacunas do acervo: distribuição por área, incluindo as 12 áreas
+  // oficiais que não têm nenhuma entrada ainda (por isso a lista vem de
+  // AREAS_VALIDAS, não das áreas já presentes nas entradas — senão uma
+  // área vazia simplesmente não apareceria em lugar nenhum).
+  const porArea = (entradas || []).reduce((acc, e) => { acc[e.area] = (acc[e.area] || 0) + 1; return acc }, {})
+  const distribuicaoAreas = AREAS_VALIDAS
+    .map(area => ({ area, count: porArea[area] || 0 }))
+    .sort((a, b) => b.count - a.count)
+  const maxArea = Math.max(1, ...distribuicaoAreas.map(a => a.count))
+
   return (
     <div style={{ paddingBottom: 40 }}>
       <div style={{ marginBottom: 24 }}>
@@ -112,6 +124,26 @@ export default function PainelMetricas() {
             <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>rascunhos de peças</div>
           </div>
         </div>
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 4 }}>Lacunas do acervo, por área</div>
+        <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 14 }}>
+          As 12 áreas oficiais do app, mesmo as que ainda não têm nenhuma entrada
+        </div>
+        {distribuicaoAreas.map(({ area, count }) => (
+          <div key={area} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 7 }}>
+            <div style={{ width: 110, flexShrink: 0, fontSize: 12, color: count === 0 ? theme.muted : theme.text, fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: count === 0 ? 'italic' : 'normal' }}>
+              {area}
+            </div>
+            <div style={{ flex: 1, background: theme.border + '55', borderRadius: 3, height: 10, overflow: 'hidden' }}>
+              {count > 0 && <div style={{ width: `${(count / maxArea) * 100}%`, height: '100%', background: theme.gold, borderRadius: 3 }} />}
+            </div>
+            <div style={{ width: 26, textAlign: 'right', flexShrink: 0, fontSize: 12, color: count === 0 ? theme.muted : theme.gold, fontFamily: theme.fontTitle }}>
+              {count}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div>

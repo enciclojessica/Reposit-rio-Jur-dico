@@ -734,7 +734,7 @@ case VIEWS.JURISPRUDENCIA:
 
       case VIEWS.METRICAS:
         if (!isAdmin) return <div className="fade-up"><div style={{ color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Sem permissão pra ver esta tela.</div></div>
-        return <div className="fade-up"><PainelMetricas /></div>
+        return <div className="fade-up"><PainelMetricas entradas={entradas} /></div>
 
       case VIEWS.NOVIDADES_APP:
         return <div className="fade-up"><NovidadesApp session={session} /></div>
