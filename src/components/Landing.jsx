@@ -65,6 +65,22 @@ function ItemNumerado({ numero, texto, cor, atraso, corpoStyle }) {
   )
 }
 
+// Barra horizontal proporcional — mesmo princípio já usado no Painel de
+// Métricas (lacunas por área), pra mostrar composição sem virar tabela.
+function BarraItem({ label, valor, max, cor, atraso }) {
+  return (
+    <div style={{ marginBottom: 14, animation: 'fadeUp .5s ease both', animationDelay: `${atraso}s` }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+        <span style={{ fontSize: 13, color: '#2c241b', fontFamily: 'Georgia, serif' }}>{label}</span>
+        <span style={{ fontSize: 13, color: cor, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>{valor.toLocaleString('pt-BR')}</span>
+      </div>
+      <div style={{ background: '#e4ddd0', borderRadius: 3, height: 8, overflow: 'hidden' }}>
+        <div style={{ width: `${Math.max(3, (valor / max) * 100)}%`, height: '100%', background: cor, borderRadius: 3 }} />
+      </div>
+    </div>
+  )
+}
+
 export default function Landing({ onEntrar }) {
   const { theme } = useTheme()
   const [pagina, setPagina] = useState(0)
@@ -76,9 +92,16 @@ export default function Landing({ onEntrar }) {
   const [numeros, setNumeros] = useState(null)
   useEffect(() => {
     supabase.rpc('contar_acervo_publico').then(({ data }) => {
-      if (data?.[0]) setNumeros(data[0])
+      if (data) setNumeros(data)
     })
   }, [])
+
+  const NOME_TIPO = { 'jurisprudência': 'Jurisprudência', 'doutrina': 'Doutrina', 'súmula': 'Súmula', 'lei': 'Legislação' }
+  const NOME_CODIGO_LANDING = {
+    cc: 'Código Civil', cpc: 'Código de Processo Civil', cpp: 'Código de Processo Penal',
+    cdc: 'Código de Defesa do Consumidor', cf: 'Constituição Federal',
+    ctb: 'Código de Trânsito Brasileiro', lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
+  }
 
   const numeral = { fontFamily: theme.fontTitle, fontSize: 13, flexShrink: 0 }
   const corpo = { fontFamily: theme.fontSerif, fontSize: 14, color: '#3a3128', lineHeight: 1.65 }
@@ -219,7 +242,71 @@ export default function Landing({ onEntrar }) {
       </div>
     </div>,
 
-    // 5 — Do acervo, agora
+    // 5 — Tipos de fonte
+    <div key="tipos" style={{ background: '#fdfbf7', borderTop: '4px solid #a9812e', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <MarcaCanto cor="#a9812e" />
+      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
+        <RotuloComBarra texto="composição do acervo" cor="#a9812e" />
+        <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 19, color: '#2c241b', marginBottom: 24 }}>
+          Jurisprudência, doutrina, súmula e lei, lado a lado
+        </div>
+        {!numeros ? (
+          <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', fontFamily: theme.fontSerif }}>Carregando…</div>
+        ) : (() => {
+          const maxTipo = Math.max(...Object.values(numeros.por_tipo))
+          const cores = { 'jurisprudência': '#7a1128', 'doutrina': '#2c4a6e', 'súmula': '#a34a68', 'lei': '#a9812e' }
+          return Object.entries(numeros.por_tipo)
+            .sort((a, b) => b[1] - a[1])
+            .map(([tipo, valor], i) => (
+              <BarraItem key={tipo} label={NOME_TIPO[tipo] || tipo} valor={valor} max={maxTipo} cor={cores[tipo] || '#a9812e'} atraso={i * 0.12} />
+            ))
+        })()}
+      </div>
+    </div>,
+
+    // 6 — Legislação por código
+    <div key="legislacao" style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <MarcaCanto cor="#2c4a6e" />
+      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
+        <RotuloComBarra texto="legislação vigente no acervo" cor="#2c4a6e" />
+        <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 19, color: '#2c241b', marginBottom: 24 }}>
+          Artigo por artigo, código por código
+        </div>
+        {!numeros ? (
+          <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', fontFamily: theme.fontSerif }}>Carregando…</div>
+        ) : (() => {
+          const maxCodigo = Math.max(...Object.values(numeros.por_codigo))
+          return Object.entries(numeros.por_codigo)
+            .sort((a, b) => b[1] - a[1])
+            .map(([codigo, valor], i) => (
+              <BarraItem key={codigo} label={NOME_CODIGO_LANDING[codigo] || codigo.toUpperCase()} valor={valor} max={maxCodigo} cor="#2c4a6e" atraso={i * 0.1} />
+            ))
+        })()}
+      </div>
+    </div>,
+
+    // 7 — Tribunais representados
+    <div key="tribunais" style={{ background: '#fdfbf7', borderTop: '4px solid #7a1128', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <MarcaCanto cor="#7a1128" />
+      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
+        <RotuloComBarra texto="jurisprudência e súmula, por tribunal" cor="#7a1128" />
+        <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 19, color: '#2c241b', marginBottom: 24 }}>
+          De onde vêm as decisões
+        </div>
+        {!numeros ? (
+          <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', fontFamily: theme.fontSerif }}>Carregando…</div>
+        ) : (() => {
+          const maxTribunal = Math.max(...Object.values(numeros.por_tribunal))
+          return Object.entries(numeros.por_tribunal)
+            .sort((a, b) => b[1] - a[1])
+            .map(([tribunal, valor], i) => (
+              <BarraItem key={tribunal} label={tribunal} valor={valor} max={maxTribunal} cor="#7a1128" atraso={i * 0.1} />
+            ))
+        })()}
+      </div>
+    </div>,
+
+    // 8 — Do acervo, agora
     <div key="acervo" style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '40px 24px', position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <MarcaCanto cor="#2c4a6e" />
       <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
