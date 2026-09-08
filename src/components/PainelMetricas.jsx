@@ -91,6 +91,22 @@ export default function PainelMetricas({ entradas }) {
     .filter(e => !dados.vistasSet.has(e.id))
     .sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em))
 
+  // Teses incompletas: sem fundamentação legal ou sem ratio decidendi.
+  // Achado real: entrada com 6 teses do mesmo acórdão, só a 1ª com
+  // fundamentacao_legal preenchida — a extração por IA às vezes captura
+  // a tese e o raciocínio mas não move a citação de lei pro campo certo,
+  // mesmo ela estando escrita no meio do texto de ratio_decidendi.
+  const temasIncompletos = (entradas || [])
+    .map(e => {
+      const teses = e.teses || []
+      const semFundamentacao = teses.filter(t => !t.fundamentacao_legal?.trim()).length
+      const semRatio = teses.filter(t => !t.ratio_decidendi?.trim()).length
+      return { entrada: e, semFundamentacao, semRatio }
+    })
+    .filter(x => x.semFundamentacao > 0 || x.semRatio > 0)
+    .sort((a, b) => (b.semFundamentacao + b.semRatio) - (a.semFundamentacao + a.semRatio))
+  const totalTesesIncompletas = temasIncompletos.reduce((acc, x) => acc + x.semFundamentacao + x.semRatio, 0)
+
   return (
     <div style={{ paddingBottom: 40 }}>
       <div style={{ marginBottom: 24 }}>
@@ -177,6 +193,36 @@ export default function PainelMetricas({ entradas }) {
             {nuncaAbertas.length > 8 && (
               <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 8 }}>
                 + {nuncaAbertas.length - 8} outra(s)
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 4 }}>
+          Teses incompletas ({totalTesesIncompletas})
+        </div>
+        <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 12 }}>
+          Teses sem fundamentação legal ou sem ratio decidendi preenchidos — geralmente extração por IA que capturou o raciocínio mas não moveu a citação de lei pro campo certo
+        </div>
+        {temasIncompletos.length === 0 ? (
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Toda tese do acervo tem os dois campos preenchidos.</div>
+        ) : (
+          <>
+            {temasIncompletos.slice(0, 8).map(({ entrada, semFundamentacao, semRatio }) => (
+              <div key={entrada.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}` }}>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{entrada.tema}</div>
+                <div style={{ fontSize: 11, color: theme.error, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                  {semFundamentacao > 0 && `${semFundamentacao} sem fundamentação`}
+                  {semFundamentacao > 0 && semRatio > 0 && ', '}
+                  {semRatio > 0 && `${semRatio} sem ratio decidendi`}
+                </div>
+              </div>
+            ))}
+            {temasIncompletos.length > 8 && (
+              <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 8 }}>
+                + {temasIncompletos.length - 8} outra(s) entrada(s)
               </div>
             )}
           </>
