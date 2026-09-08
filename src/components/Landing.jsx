@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTheme } from '../theme'
 import SeletorTema from './SeletorTema'
@@ -198,8 +198,45 @@ export default function Landing({ onEntrar }) {
     touchStart.current = null
   }
 
+  // Setas do teclado navegam entre as telas — pegada de apresentação/
+  // carrossel HTML, não só toque ou clique no pontinho.
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === 'ArrowRight') irPara(pagina + 1)
+      if (e.key === 'ArrowLeft') irPara(pagina - 1)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [pagina])
+
+  // Em tela larga, o cartão fica centralizado com respiro ao redor (em
+  // vez da cor de fundo esticando a tela inteira, vazia) — só em telas
+  // estreitas (celular) o cartão ocupa 100% da largura, sem borda visível,
+  // como já era antes.
+  const [estreito, setEstreito] = useState(typeof window !== 'undefined' ? window.innerWidth <= 640 : true)
+  useEffect(() => {
+    function onResize() { setEstreito(window.innerWidth <= 640) }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const [hoverEsquerda, setHoverEsquerda] = useState(false)
+  const [hoverDireita, setHoverDireita] = useState(false)
+
   return (
-    <div style={{ height: '100vh', background: '#fdfbf7', fontFamily: theme.fontSerif, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{
+      minHeight: '100vh', background: estreito ? '#fdfbf7' : '#1a1410',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: estreito ? 0 : 24, boxSizing: 'border-box',
+    }}>
+      <div style={{
+        width: '100%', maxWidth: 560, height: estreito ? '100vh' : 'min(760px, calc(100vh - 48px))',
+        background: '#fdfbf7', fontFamily: theme.fontSerif,
+        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        position: 'relative',
+        borderRadius: estreito ? 0 : 14,
+        boxShadow: estreito ? 'none' : '0 24px 60px #00000066',
+      }}>
 
       {/* Header, sempre visível */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px 16px', flexShrink: 0 }}>
@@ -227,9 +264,26 @@ export default function Landing({ onEntrar }) {
             {conteudo}
           </div>
         ))}
+
+        {/* Zonas de borda: passar o mouse revela a seta, clique navega —
+            pegada de carrossel HTML, além do toque e das setas do teclado. */}
+        {pagina > 0 && (
+          <div onClick={() => irPara(pagina - 1)}
+            onMouseEnter={() => setHoverEsquerda(true)} onMouseLeave={() => setHoverEsquerda(false)}
+            style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 56, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8, cursor: 'pointer', zIndex: 5 }}>
+            <ChevronLeft size={24} color="#736b62" style={{ opacity: hoverEsquerda ? 0.9 : 0, transition: 'opacity .2s ease' }} />
+          </div>
+        )}
+        {pagina < paginas.length - 1 && (
+          <div onClick={() => irPara(pagina + 1)}
+            onMouseEnter={() => setHoverDireita(true)} onMouseLeave={() => setHoverDireita(false)}
+            style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 56, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8, cursor: 'pointer', zIndex: 5 }}>
+            <ChevronRight size={24} color="#736b62" style={{ opacity: hoverDireita ? 0.9 : 0, transition: 'opacity .2s ease' }} />
+          </div>
+        )}
       </div>
 
-      {/* Navegação: setas + pontos, sempre visível */}
+      {/* Navegação: setas + pontos, sempre visível (toque em celular, sem hover) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px 16px', flexShrink: 0 }}>
         <button onClick={() => irPara(pagina - 1)} aria-label="Página anterior"
           style={{ background: 'none', border: 'none', color: '#736b62', cursor: 'pointer', padding: 6, visibility: pagina === 0 ? 'hidden' : 'visible' }}>
@@ -245,6 +299,7 @@ export default function Landing({ onEntrar }) {
           style={{ background: 'none', border: 'none', color: '#736b62', cursor: 'pointer', padding: 6, visibility: pagina === paginas.length - 1 ? 'hidden' : 'visible' }}>
           <ChevronRight size={22} />
         </button>
+      </div>
       </div>
     </div>
   )
