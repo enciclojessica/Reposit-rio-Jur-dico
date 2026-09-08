@@ -32,9 +32,8 @@ function MarcaCanto({ cor }) {
 
 function RotuloComBarra({ texto, cor }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-      <div style={{ width: 28, height: 2, background: cor }} />
-      <div style={{ fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic', fontSize: 13, color: cor, letterSpacing: 0.5 }}>{texto}</div>
+    <div style={{ fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic', fontSize: 13, color: cor, letterSpacing: 0.5, marginBottom: 10 }}>
+      {texto}
     </div>
   )
 }
