@@ -216,7 +216,7 @@ export default function Landing({ onEntrar }) {
       {/* O acervo em números */}
       <Secao style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '80px 28px' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <RotuloComBarra texto="o acervo em números" cor="#2c4a6e" />
+          <RotuloComBarra texto="O acervo em números" cor="#2c4a6e" />
           <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 22, color: '#2c241b', marginBottom: 30 }}>
             Curadoria real, não promessa vazia
           </div>
@@ -237,7 +237,7 @@ export default function Landing({ onEntrar }) {
       <Secao style={{ background: '#f6ede0', padding: '80px 28px' }}>
         <div style={{ maxWidth: 960, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 48 }}>
           <div>
-            <RotuloComBarra texto="composição do acervo" cor="#a9812e" />
+            <RotuloComBarra texto="Composição do acervo" cor="#a9812e" />
             <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 16, color: '#2c241b', marginBottom: 18 }}>Por tipo de fonte</div>
             {numeros && (() => {
               const max = Math.max(...Object.values(numeros.por_tipo))
@@ -248,7 +248,7 @@ export default function Landing({ onEntrar }) {
             })()}
           </div>
           <div>
-            <RotuloComBarra texto="legislação vigente" cor="#2c4a6e" />
+            <RotuloComBarra texto="Legislação vigente" cor="#2c4a6e" />
             <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 16, color: '#2c241b', marginBottom: 18 }}>Por código</div>
             {numeros && (() => {
               const max = Math.max(...Object.values(numeros.por_codigo))
@@ -258,7 +258,7 @@ export default function Landing({ onEntrar }) {
             })()}
           </div>
           <div>
-            <RotuloComBarra texto="jurisprudência e súmula" cor="#7a1128" />
+            <RotuloComBarra texto="Jurisprudência e súmula" cor="#7a1128" />
             <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 16, color: '#2c241b', marginBottom: 18 }}>Por tribunal</div>
             {numeros && (() => {
               const max = Math.max(...Object.values(numeros.por_tribunal))
