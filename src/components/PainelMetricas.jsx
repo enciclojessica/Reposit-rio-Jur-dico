@@ -25,7 +25,7 @@ export default function PainelMetricas({ entradas }) {
         supabase.from('anotacoes').select('id', { count: 'exact', head: true }),
         supabase.from('favoritos').select('id', { count: 'exact', head: true }),
         supabase.from('pecas_rascunhos').select('id', { count: 'exact', head: true }),
-        supabase.from('historico_leitura').select('user_id, visto_em'),
+        supabase.from('historico_leitura').select('user_id, entrada_id, visto_em'),
       ])
 
       const membros = membrosRes.data || []
@@ -50,6 +50,8 @@ export default function PainelMetricas({ entradas }) {
         if (chave in porDia) porDia[chave]++
       })
 
+      const vistasSet = new Set(historico.map(h => h.entrada_id))
+
       setDados({
         totalMembros: membros.length,
         porRole,
@@ -59,6 +61,7 @@ export default function PainelMetricas({ entradas }) {
         totalRascunhos: rascunhosRes.count || 0,
         ativos7, ativos30,
         porDia,
+        vistasSet,
       })
       setLoading(false)
     }
@@ -79,6 +82,14 @@ export default function PainelMetricas({ entradas }) {
     .map(area => ({ area, count: porArea[area] || 0 }))
     .sort((a, b) => b.count - a.count)
   const maxArea = Math.max(1, ...distribuicaoAreas.map(a => a.count))
+
+  // Nunca abertas: entradas cuja id não aparece em nenhuma linha de
+  // historico_leitura. Mais antigas primeiro (quanto mais tempo sem
+  // ninguém abrir, mais forte o sinal de que algo está errado — tag
+  // ruim, difícil de achar, ou pouco relevante mesmo).
+  const nuncaAbertas = (entradas || [])
+    .filter(e => !dados.vistasSet.has(e.id))
+    .sort((a, b) => new Date(a.criado_em) - new Date(b.criado_em))
 
   return (
     <div style={{ paddingBottom: 40 }}>
@@ -144,6 +155,32 @@ export default function PainelMetricas({ entradas }) {
             </div>
           </div>
         ))}
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 4 }}>
+          Nunca abertas ({nuncaAbertas.length})
+        </div>
+        <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 12 }}>
+          Ninguém abriu essas entradas desde que o histórico de leitura começou a ser registrado — não quer dizer que nunca foram lidas antes disso, só que não há registro. Pode ser tag ruim, difícil de achar, ou pouco relevante mesmo.
+        </div>
+        {nuncaAbertas.length === 0 ? (
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Toda entrada do acervo já foi aberta por alguém.</div>
+        ) : (
+          <>
+            {nuncaAbertas.slice(0, 8).map(e => (
+              <div key={e.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}` }}>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{e.tema}</div>
+                <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.area}, {e.tipo}</div>
+              </div>
+            ))}
+            {nuncaAbertas.length > 8 && (
+              <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 8 }}>
+                + {nuncaAbertas.length - 8} outra(s)
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       <div>
