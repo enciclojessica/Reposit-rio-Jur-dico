@@ -73,6 +73,10 @@ textarea { resize: vertical; }
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+@keyframes respirar {
+  0%, 100% { opacity: 0.13; transform: scale(1); }
+  50%      { opacity: 0.19; transform: scale(1.04); }
+}
 
 .fade-up  { animation: fadeUp  0.18s ease; }
 .slide-up { animation: slideUp 0.22s ease; }

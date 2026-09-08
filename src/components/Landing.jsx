@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTheme } from '../theme'
+import { supabase } from '../supabase'
 import SeletorTema from './SeletorTema'
 
 // Balança em linha fina + monograma FF — mesma marca em toda a página,
@@ -30,10 +31,54 @@ function MarcaCanto({ cor }) {
   )
 }
 
+// Rótulo pequeno com barrinha dourada antes do título — técnica emprestada
+// de landing pages de SaaS jurídico (ex: jusratio.com.br), adaptada pra
+// tipografia serifada e paleta vinho/ouro do Themis Jur em vez do
+// navy/laranja/sans-serif original.
+function RotuloComBarra({ texto, cor }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+      <div style={{ width: 28, height: 2, background: cor }} />
+      <div style={{ fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic', fontSize: 13, color: cor, letterSpacing: 0.5 }}>{texto}</div>
+    </div>
+  )
+}
+
+// Item numerado com entrada em cascata (delay por índice) e leve elevação
+// ao passar o mouse — só o essencial, sem exagero, mantendo o registro
+// editorial do resto do app.
+function ItemNumerado({ numero, texto, cor, atraso, corpoStyle }) {
+  const [hover, setHover] = useState(false)
+  return (
+    <div
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{
+        padding: 14, borderRadius: 8, marginBottom: 12,
+        animation: `fadeUp .5s ease both`, animationDelay: `${atraso}s`,
+        transform: hover ? 'translateY(-3px)' : 'translateY(0)',
+        boxShadow: hover ? '0 10px 20px rgba(0,0,0,0.08)' : 'none',
+        transition: 'transform .2s ease, box-shadow .2s ease',
+      }}>
+      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: cor, marginBottom: 6, lineHeight: 1 }}>{numero}</div>
+      <div style={corpoStyle}>{texto}</div>
+    </div>
+  )
+}
+
 export default function Landing({ onEntrar }) {
   const { theme } = useTheme()
   const [pagina, setPagina] = useState(0)
   const touchStart = useRef(null)
+
+  // Números reais do acervo, buscados ao vivo (função contar_acervo_publico,
+  // security definer — só devolve agregados, nunca conteúdo de entrada
+  // nenhuma) — atualizam sozinhos conforme o acervo cresce, nunca fixos.
+  const [numeros, setNumeros] = useState(null)
+  useEffect(() => {
+    supabase.rpc('contar_acervo_publico').then(({ data }) => {
+      if (data?.[0]) setNumeros(data[0])
+    })
+  }, [])
 
   const numeral = { fontFamily: theme.fontTitle, fontSize: 13, flexShrink: 0 }
   const corpo = { fontFamily: theme.fontSerif, fontSize: 14, color: '#3a3128', lineHeight: 1.65 }
@@ -41,7 +86,7 @@ export default function Landing({ onEntrar }) {
   const paginas = [
     // 0 — Hero
     <div key="hero" style={{ background: '#3d0012', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ position: 'absolute', right: -60, top: -30, opacity: 0.15 }}>
+      <div className="fade-up" style={{ position: 'absolute', right: -60, top: -30, opacity: 0.15, animation: 'respirar 6s ease-in-out infinite' }}>
         <svg width="300" height="210" viewBox="0 0 260 180" aria-hidden="true">
           <line x1="130" y1="10" x2="130" y2="90" stroke="#e8c98a" strokeWidth="1.1" />
           <line x1="80" y1="30" x2="180" y2="30" stroke="#e8c98a" strokeWidth="1.1" />
@@ -50,7 +95,7 @@ export default function Landing({ onEntrar }) {
           <line x1="105" y1="105" x2="155" y2="105" stroke="#e8c98a" strokeWidth="1.1" />
         </svg>
       </div>
-      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
+      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%', animation: 'fadeUp .5s ease both' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 30, height: 30, objectFit: 'contain' }} />
           <span style={{ fontFamily: theme.fontTitle, fontSize: 14, color: '#f2e9d8' }}>Themis Jur</span>
@@ -69,7 +114,7 @@ export default function Landing({ onEntrar }) {
 
     // 1 — Por que existe
     <div key="porque" style={{ background: '#f6ede0', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ position: 'absolute', right: -60, bottom: -80, opacity: 0.14 }}>
+      <div style={{ position: 'absolute', right: -60, bottom: -80, opacity: 0.14, animation: 'respirar 6s ease-in-out infinite' }}>
         <svg width="260" height="260" viewBox="0 0 220 220" aria-hidden="true">
           <circle cx="110" cy="110" r="90" fill="none" stroke="#a9812e" strokeWidth="0.8" />
           <circle cx="110" cy="110" r="62" fill="none" stroke="#a9812e" strokeWidth="0.8" />
@@ -77,9 +122,9 @@ export default function Landing({ onEntrar }) {
         </svg>
       </div>
       <MarcaCanto cor="#a9812e" />
-      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
-        <div style={{ fontFamily: theme.fontTitle, fontSize: 36, color: '#a9812e', lineHeight: 0.5, marginBottom: 10 }}>"</div>
-        <div style={{ ...corpo, marginBottom: 18 }}>
+      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%', animation: 'fadeUp .5s ease both' }}>
+        <div style={{ fontFamily: theme.fontTitle, fontSize: 44, color: '#a9812e', lineHeight: 0.5, marginBottom: 12 }}>"</div>
+        <div style={{ ...corpo, fontSize: 16, marginBottom: 18 }}>
           A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório.
         </div>
         <div style={{ fontFamily: theme.fontTitle, fontSize: 14, color: '#2c241b' }}>Jessica Farias Fusquiani</div>
@@ -89,7 +134,7 @@ export default function Landing({ onEntrar }) {
 
     // 2 — O que tem de diferente
     <div key="diferente" style={{ background: '#fdfbf7', borderTop: '4px solid #a9812e', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ position: 'absolute', right: -40, bottom: -30, opacity: 0.13 }}>
+      <div style={{ position: 'absolute', right: -40, bottom: -30, opacity: 0.13, animation: 'respirar 6s ease-in-out infinite' }}>
         <svg width="230" height="160" viewBox="0 0 200 140" aria-hidden="true">
           <line x1="20" y1="30" x2="180" y2="30" stroke="#a9812e" strokeWidth="0.8" />
           <line x1="100" y1="30" x2="100" y2="10" stroke="#a9812e" strokeWidth="0.8" />
@@ -103,25 +148,19 @@ export default function Landing({ onEntrar }) {
       </div>
       <MarcaCanto cor="#a9812e" />
       <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
-        <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 17, color: '#2c241b', marginBottom: 18 }}>O que tem de diferente</div>
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-          <div style={{ ...numeral, color: '#a9812e' }}>01</div>
-          <div style={corpo}>Cada entrada reúne tese, fundamento e uma indicação de uso prático: não é ementa solta, é material pronto para consulta em peça.</div>
-        </div>
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-          <div style={{ ...numeral, color: '#a9812e' }}>02</div>
-          <div style={corpo}>Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo.</div>
-        </div>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <div style={{ ...numeral, color: '#a9812e' }}>03</div>
-          <div style={corpo}>Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.</div>
-        </div>
+        <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 17, color: '#2c241b', marginBottom: 14 }}>O que tem de diferente</div>
+        <ItemNumerado numero="01" cor="#a9812e" atraso={0.05} corpoStyle={corpo}
+          texto="Cada entrada reúne tese, fundamento e uma indicação de uso prático: não é ementa solta, é material pronto para consulta em peça." />
+        <ItemNumerado numero="02" cor="#a9812e" atraso={0.18} corpoStyle={corpo}
+          texto="Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo." />
+        <ItemNumerado numero="03" cor="#a9812e" atraso={0.31} corpoStyle={corpo}
+          texto="Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra." />
       </div>
     </div>,
 
     // 3 — Para quem é
     <div key="paraquem" style={{ background: '#fdfbf7', borderTop: '4px solid #7a1128', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ position: 'absolute', right: -40, bottom: -30, opacity: 0.12 }}>
+      <div style={{ position: 'absolute', right: -40, bottom: -30, opacity: 0.12, animation: 'respirar 6s ease-in-out infinite' }}>
         <svg width="210" height="180" viewBox="0 0 180 150" aria-hidden="true">
           <circle cx="40" cy="30" r="5" fill="none" stroke="#7a1128" strokeWidth="1" />
           <circle cx="90" cy="20" r="5" fill="none" stroke="#7a1128" strokeWidth="1" />
@@ -137,23 +176,50 @@ export default function Landing({ onEntrar }) {
       </div>
       <MarcaCanto cor="#7a1128" />
       <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
-        <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 17, color: '#2c241b', marginBottom: 18 }}>Para quem é</div>
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-          <div style={{ ...numeral, color: '#7a1128' }}>01</div>
-          <div style={corpo}>Para quem inicia os estudos, o acervo oferece fonte primária no lugar do resumo de resumo.</div>
-        </div>
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-          <div style={{ ...numeral, color: '#7a1128' }}>02</div>
-          <div style={corpo}>Para quem já advoga, é citação pronta e tese comentada em meio à rotina.</div>
-        </div>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <div style={{ ...numeral, color: '#7a1128' }}>03</div>
-          <div style={corpo}>Para quem leciona, o material já chega organizado por área e por tipo.</div>
-        </div>
+        <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 17, color: '#2c241b', marginBottom: 14 }}>Para quem é</div>
+        <ItemNumerado numero="01" cor="#7a1128" atraso={0.05} corpoStyle={corpo}
+          texto="Para quem inicia os estudos, o acervo oferece fonte primária no lugar do resumo de resumo." />
+        <ItemNumerado numero="02" cor="#7a1128" atraso={0.18} corpoStyle={corpo}
+          texto="Para quem já advoga, é citação pronta e tese comentada em meio à rotina." />
+        <ItemNumerado numero="03" cor="#7a1128" atraso={0.31} corpoStyle={corpo}
+          texto="Para quem leciona, o material já chega organizado por área e por tipo." />
       </div>
     </div>,
 
-    // 4 — Do acervo, agora
+    // 4 — O acervo em números (dados ao vivo)
+    <div key="numeros" style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '40px 24px', position: 'relative', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <MarcaCanto cor="#2c4a6e" />
+      <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
+        <RotuloComBarra texto="o acervo em números" cor="#2c4a6e" />
+        <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 19, color: '#2c241b', marginBottom: 24 }}>
+          Curadoria real, não promessa vazia
+        </div>
+        {!numeros ? (
+          <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', fontFamily: theme.fontSerif }}>Carregando números do acervo…</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22 }}>
+            <div style={{ animation: 'fadeUp .5s ease both', animationDelay: '.05s' }}>
+              <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 36, color: '#7a1128', lineHeight: 1 }}>{numeros.total_entradas}</div>
+              <div style={{ fontSize: 12, color: '#3a3128', fontFamily: theme.fontSerif, marginTop: 6, lineHeight: 1.4 }}>entradas curadas</div>
+            </div>
+            <div style={{ animation: 'fadeUp .5s ease both', animationDelay: '.15s' }}>
+              <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 36, color: '#a9812e', lineHeight: 1 }}>{numeros.total_artigos_vigentes.toLocaleString('pt-BR')}</div>
+              <div style={{ fontSize: 12, color: '#3a3128', fontFamily: theme.fontSerif, marginTop: 6, lineHeight: 1.4 }}>artigos de lei vigentes</div>
+            </div>
+            <div style={{ animation: 'fadeUp .5s ease both', animationDelay: '.25s' }}>
+              <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 36, color: '#2c4a6e', lineHeight: 1 }}>{numeros.total_codigos}</div>
+              <div style={{ fontSize: 12, color: '#3a3128', fontFamily: theme.fontSerif, marginTop: 6, lineHeight: 1.4 }}>códigos e diplomas legais</div>
+            </div>
+            <div style={{ animation: 'fadeUp .5s ease both', animationDelay: '.35s' }}>
+              <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 36, color: '#3a3128', lineHeight: 1 }}>100%</div>
+              <div style={{ fontSize: 12, color: '#3a3128', fontFamily: theme.fontSerif, marginTop: 6, lineHeight: 1.4 }}>fonte real e rastreável</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>,
+
+    // 5 — Do acervo, agora
     <div key="acervo" style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '40px 24px', position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <MarcaCanto cor="#2c4a6e" />
       <div style={{ position: 'relative', maxWidth: 480, margin: '0 auto', width: '100%' }}>
@@ -198,8 +264,6 @@ export default function Landing({ onEntrar }) {
     touchStart.current = null
   }
 
-  // Setas do teclado navegam entre as telas — pegada de apresentação/
-  // carrossel HTML, não só toque ou clique no pontinho.
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key === 'ArrowRight') irPara(pagina + 1)
@@ -209,10 +273,6 @@ export default function Landing({ onEntrar }) {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [pagina])
 
-  // Em tela larga, o cartão fica centralizado com respiro ao redor (em
-  // vez da cor de fundo esticando a tela inteira, vazia) — só em telas
-  // estreitas (celular) o cartão ocupa 100% da largura, sem borda visível,
-  // como já era antes.
   const [estreito, setEstreito] = useState(typeof window !== 'undefined' ? window.innerWidth <= 640 : true)
   useEffect(() => {
     function onResize() { setEstreito(window.innerWidth <= 640) }
@@ -265,8 +325,6 @@ export default function Landing({ onEntrar }) {
           </div>
         ))}
 
-        {/* Zonas de borda: passar o mouse revela a seta, clique navega —
-            pegada de carrossel HTML, além do toque e das setas do teclado. */}
         {pagina > 0 && (
           <div onClick={() => irPara(pagina - 1)}
             onMouseEnter={() => setHoverEsquerda(true)} onMouseLeave={() => setHoverEsquerda(false)}
@@ -283,7 +341,7 @@ export default function Landing({ onEntrar }) {
         )}
       </div>
 
-      {/* Navegação: setas + pontos, sempre visível (toque em celular, sem hover) */}
+      {/* Navegação: setas + pontos, sempre visível */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px 16px', flexShrink: 0 }}>
         <button onClick={() => irPara(pagina - 1)} aria-label="Página anterior"
           style={{ background: 'none', border: 'none', color: '#736b62', cursor: 'pointer', padding: 6, visibility: pagina === 0 ? 'hidden' : 'visible' }}>
