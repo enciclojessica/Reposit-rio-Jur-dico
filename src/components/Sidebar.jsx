@@ -7,7 +7,7 @@ export default function Sidebar({
   isAdmin, isEditor, setPrefillEntry, temNovidadeNaoVista,
 }) {
   return (
-    <div style={{
+    <div className="no-print" style={{
       width: 220, background: theme.surface,
       borderRight: `1px solid ${theme.border}`,
       display: 'flex', flexDirection: 'column', height: '100vh', flexShrink: 0,

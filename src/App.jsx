@@ -1001,7 +1001,7 @@ case VIEWS.JURISPRUDENCIA:
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar desktop */}
         {!isMobile && (
-          <div style={{
+          <div className="no-print" style={{
             height: 56, background: theme.surface, borderBottom: `1px solid ${theme.border}`,
             display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
             padding: '0 28px', gap: 12, flexShrink: 0,

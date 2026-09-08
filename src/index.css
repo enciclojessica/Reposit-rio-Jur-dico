@@ -76,3 +76,18 @@ textarea { resize: vertical; }
 
 .fade-up  { animation: fadeUp  0.18s ease; }
 .slide-up { animation: slideUp 0.22s ease; }
+
+/* ── Impressão / exportar PDF (via window.print, sem dependência nova) ────
+   Esconde a navegação e ações, mostra só o conteúdo marcado como
+   .print-area. O botão "Exportar PDF" chama window.print(); o próprio
+   navegador oferece "Salvar como PDF" no diálogo de impressão — não
+   precisa gerar o PDF no código, o navegador já faz isso. */
+@media print {
+  .no-print { display: none !important; }
+  .print-area {
+    position: absolute; inset: 0; overflow: visible !important;
+    padding: 0 !important; margin: 0 !important;
+  }
+  body { background: #fff !important; }
+}
+

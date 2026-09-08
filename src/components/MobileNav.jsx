@@ -32,7 +32,7 @@ export default function MobileNav({
   const maisAtivo = navMais.some(n => n.v === view)
 
   return (
-    <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }}>
+    <div className="no-print" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }}>
       {/* Drawer do menu "mais" */}
       {maisAberto && (
         <div

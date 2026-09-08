@@ -10,7 +10,7 @@ export default function MobileHeader({
   setAreaFilter, setTipoFilter, setView, entradas, setSelected,
 }) {
   return (
-    <div style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div className="no-print" style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <img src="/logo-temis-transparente.png" alt="Themis Jur"
           style={{ width: 34, height: 34, objectFit: 'contain', cursor: 'pointer', flexShrink: 0 }}

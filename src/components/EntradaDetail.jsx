@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Check, Link2, Unlock, Star, ArrowLeftRight } from 'lucide-react'
+import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
@@ -192,7 +192,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
   const sm = STATUS_META[status] || STATUS_META['vigente']
 
   return (
-    <div style={{ paddingBottom: 40 }}>
+    <div className="print-area" style={{ paddingBottom: 40 }}>
       {/* Cabeçalho */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
@@ -217,7 +217,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
       </div>
 
       {/* Ações */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="no-print" style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         {/* Status */}
         {!readOnly && (
           <div style={{ position: 'relative' }}>
@@ -252,6 +252,10 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
             <ArrowLeftRight size={13} /> Comparar
           </button>
         )}
+
+        <button onClick={() => window.print()} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Printer size={13} /> Exportar PDF
+        </button>
 
         <button onClick={copyFichamento} style={{ ...btn(), color: copied ? theme.success : theme.textSub }}>
           {copied ? 'Copiado' : 'Fichamento'}
@@ -345,7 +349,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
 
       {/* Teses relacionadas */}
       {relacionadas.length > 0 && (
-        <div style={{ marginTop: 28 }}>
+        <div className="no-print" style={{ marginTop: 28 }}>
           <div style={secao}>Teses relacionadas</div>
           {relacionadas.map(({ entrada, comuns }) => (
             <div key={entrada.id} onClick={() => onSelecionarRelacionada?.(entrada)}
@@ -364,7 +368,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
       )}
 
       {/* Minha Anotação — estudo ativo */}
-      <div style={{ marginTop: 8 }}>
+      <div className="no-print" style={{ marginTop: 8 }}>
         <div style={secao}>Minha anotação</div>
         <AnotacaoPessoal itemId={entry.id} session={session} namespace="entrada" theme={theme} placeholder="Anote aqui o que você aprendeu, uma dúvida, ou como pretende usar isso numa peça..." />
       </div>
