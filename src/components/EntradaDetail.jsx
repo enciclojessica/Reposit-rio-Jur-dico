@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer } from 'lucide-react'
+import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer, Maximize2, Minimize2 } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
@@ -35,7 +35,7 @@ function gerarABNT(entry) {
   } catch { return '' }
 }
 
-export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar, todasEntradas, onSelecionarRelacionada }) {
+export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar, todasEntradas, onSelecionarRelacionada, modoFoco, onAlternarModoFoco }) {
   const { theme, mode } = useTheme()
 
   // Normalização defensiva total
@@ -217,6 +217,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
       </div>
 
       {/* Ações */}
+      {!modoFoco && (
       <div className="no-print" style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         {/* Status */}
         {!readOnly && (
@@ -256,6 +257,12 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
         <button onClick={() => window.print()} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
           <Printer size={13} /> Exportar PDF
         </button>
+
+        {onAlternarModoFoco && (
+          <button onClick={onAlternarModoFoco} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Maximize2 size={13} /> Modo de leitura
+          </button>
+        )}
 
         <button onClick={copyFichamento} style={{ ...btn(), color: copied ? theme.success : theme.textSub }}>
           {copied ? 'Copiado' : 'Fichamento'}
@@ -303,6 +310,15 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
           </>
         )}
       </div>
+      )}
+
+      {/* Botão de sair, sempre visível no modo de leitura, já que o resto da navegação some */}
+      {modoFoco && (
+        <button onClick={onAlternarModoFoco} className="no-print"
+          style={{ ...btn(theme.gold), color: theme.gold, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 24 }}>
+          <Minimize2 size={13} /> Sair do modo de leitura
+        </button>
+      )}
 
       {/* Teses */}
       {entry.teses.length > 0 && entry.teses.map((t, i) => {
@@ -348,7 +364,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
       )}
 
       {/* Teses relacionadas */}
-      {relacionadas.length > 0 && (
+      {!modoFoco && relacionadas.length > 0 && (
         <div className="no-print" style={{ marginTop: 28 }}>
           <div style={secao}>Teses relacionadas</div>
           {relacionadas.map(({ entrada, comuns }) => (
@@ -368,10 +384,12 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
       )}
 
       {/* Minha Anotação — estudo ativo */}
+      {!modoFoco && (
       <div className="no-print" style={{ marginTop: 8 }}>
         <div style={secao}>Minha anotação</div>
         <AnotacaoPessoal itemId={entry.id} session={session} namespace="entrada" theme={theme} placeholder="Anote aqui o que você aprendeu, uma dúvida, ou como pretende usar isso numa peça..." />
       </div>
+      )}
 
       {/* Histórico */}
       {entry.historico.length > 0 && (

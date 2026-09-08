@@ -151,6 +151,8 @@ export default function App() {
   const [legislacaoPreFiltro, setLegislacaoPreFiltro] = useState(null)
   const [comparadorPrefilA, setComparadorPrefilA] = useState(null)
   const [paletaAberta, setPaletaAberta] = useState(false)
+  const [modoFoco, setModoFoco] = useState(false)
+  useEffect(() => { if (view !== VIEWS.DETAIL) setModoFoco(false) }, [view])
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
@@ -789,6 +791,8 @@ case VIEWS.JURISPRUDENCIA:
                 session={session}
                 todasEntradas={entradas}
                 onSelecionarRelacionada={(e) => setSelected(e)}
+                modoFoco={modoFoco}
+                onAlternarModoFoco={() => setModoFoco(f => !f)}
                 onClose={() => setView(VIEWS.HOME)}
                 onDelete={isAdmin ? handleDelete : null}
                 onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
@@ -990,7 +994,7 @@ case VIEWS.JURISPRUDENCIA:
       }} />
     )}
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: theme.bg }}>
-      {!isMobile && (
+      {!isMobile && !modoFoco && (
         <Sidebar
           theme={theme} view={view} setView={setView}
           setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter}
@@ -1000,7 +1004,7 @@ case VIEWS.JURISPRUDENCIA:
       )}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Topbar desktop */}
-        {!isMobile && (
+        {!isMobile && !modoFoco && (
           <div className="no-print" style={{
             height: 56, background: theme.surface, borderBottom: `1px solid ${theme.border}`,
             display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
@@ -1067,7 +1071,7 @@ case VIEWS.JURISPRUDENCIA:
             )}
           </div>
         )}
-        {isMobile && (
+        {isMobile && !modoFoco && (
           <MobileHeader
             theme={theme} role={role} session={session} membro={membro} setShowLogin={setShowLogin}
             setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter} setView={setView}
@@ -1077,7 +1081,7 @@ case VIEWS.JURISPRUDENCIA:
         <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '16px 16px 80px' : 28 }}>
           {renderContent()}
         </div>
-        {isMobile && (
+        {isMobile && !modoFoco && (
           <MobileNav
             theme={theme} view={view} setView={setView}
             maisAberto={maisAberto} setMaisAberto={setMaisAberto}
