@@ -104,6 +104,14 @@ function TabPerfil({ session, membro }) {
 
   async function salvar() {
     if (!session) return
+    const telLimpo = telefone.trim()
+    if (telLimpo) {
+      const digitos = telLimpo.replace(/\D/g, '')
+      if (digitos.length !== 10 && digitos.length !== 11) {
+        setMsg({ tipo: 'erro', texto: 'Telefone inválido. Use DDD + número, ex: (13) 99999-9999, ou deixe em branco.' })
+        return
+      }
+    }
     setSalvando(true); setMsg(null)
     const { error } = await supabase.from('membros').update({
       nome, telefone, oab_numero: oab, oab_uf: uf, avatar_url: avatarUrl,

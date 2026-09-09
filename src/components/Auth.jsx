@@ -15,6 +15,14 @@ export default function Auth() {
   const [error, setError]       = useState('')
   const [success, setSuccess]   = useState('')
 
+  // Telefone brasileiro: 10 dígitos (fixo, com DDD) ou 11 (celular, com
+  // DDD) depois de tirar tudo que não é número — aceita qualquer
+  // formatação que a pessoa digitar (com traço, parênteses, espaço).
+  function telefoneValido(t) {
+    const digitos = t.replace(/\D/g, '')
+    return digitos.length === 10 || digitos.length === 11
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(''); setSuccess(''); setLoading(true)
@@ -23,6 +31,11 @@ export default function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) setError(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message)
       } else if (screen === 'register') {
+        if (!telefoneValido(telefone)) {
+          setError('Telefone inválido. Use DDD + número, ex: (13) 99999-9999.')
+          setLoading(false)
+          return
+        }
         const { error } = await supabase.auth.signUp({
           email, password,
           options: { data: { full_name: nome.trim(), telefone: telefone.trim() } },
