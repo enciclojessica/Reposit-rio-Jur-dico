@@ -110,6 +110,18 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Falha corrigida: esse endpoint usa SERVICE_KEY (contorna RLS) e a RPC
+  // buscar_entradas_fts não filtra por publica=true — busca o acervo
+  // inteiro. Sem essa checagem, qualquer pessoa que descobrisse a URL
+  // (o repositório é público no GitHub) leria o acervo curado inteiro
+  // sem login nenhum, contornando cadastro e paywall. MCP_API_KEY precisa
+  // ser configurada nas variáveis de ambiente do Vercel.
+  const chave = req.headers.authorization?.replace('Bearer ', '')
+  if (!process.env.MCP_API_KEY || chave !== process.env.MCP_API_KEY) {
+    res.status(401).json({ error: "Não autenticado." });
+    return;
+  }
+
   const server = buildServer();
   // sessionIdGenerator: undefined => modo stateless, adequado a funções serverless
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });

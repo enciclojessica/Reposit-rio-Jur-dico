@@ -271,11 +271,12 @@ export default function App() {
         try {
           const res = await fetch('/api/aceitar-convite', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
             body: JSON.stringify({
               token: conviteToken,
-              user_id: session.user.id,
-              email: session.user.email,
               nome: session.user.user_metadata?.full_name || null,
               telefone: session.user.user_metadata?.telefone || null,
             }),
