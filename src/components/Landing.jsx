@@ -3,105 +3,15 @@ import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import SeletorTema from './SeletorTema'
 
-// Balança em linha fina + monograma FF — mesma marca em toda a página,
-// só muda de cor por seção e de tamanho.
-function IconeBalanca({ cor, size = 20 }) {
-  return (
-    <svg width={size} height={size * 1.1} viewBox="0 0 40 44" aria-hidden="true">
-      <line x1="20" y1="6" x2="20" y2="28" stroke={cor} strokeWidth="1" />
-      <line x1="8" y1="11" x2="32" y2="11" stroke={cor} strokeWidth="1" />
-      <path d="M4 20 A8 6 0 0 0 12 20" fill="none" stroke={cor} strokeWidth="0.9" />
-      <path d="M28 20 A8 6 0 0 0 36 20" fill="none" stroke={cor} strokeWidth="0.9" />
-      <line x1="8" y1="11" x2="4" y2="20" stroke={cor} strokeWidth="0.7" />
-      <line x1="8" y1="11" x2="12" y2="20" stroke={cor} strokeWidth="0.7" />
-      <line x1="32" y1="11" x2="28" y2="20" stroke={cor} strokeWidth="0.7" />
-      <line x1="32" y1="11" x2="36" y2="20" stroke={cor} strokeWidth="0.7" />
-      <circle cx="20" cy="6" r="1.6" fill={cor} />
-      <text x="20" y="40" textAnchor="middle" fontFamily="'Playfair Display', serif" fontSize="12" fill={cor}>FF</text>
-    </svg>
-  )
-}
-
-function MarcaCanto({ cor }) {
-  return (
-    <div style={{ position: 'absolute', right: 24, top: 20, opacity: 0.55 }}>
-      <IconeBalanca cor={cor} size={20} />
-    </div>
-  )
-}
-
-function RotuloComBarra({ texto, cor }) {
-  return (
-    <div style={{ fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic', fontSize: 13, color: cor, letterSpacing: 0.5, marginBottom: 10 }}>
-      {texto}
-    </div>
-  )
-}
-
-// Revela a seção com fade+subida assim que ela entra na tela ao rolar —
-// a mesma técnica de "scroll reveal" usada em landing pages modernas
-// (ex: jusratio.com.br), via IntersectionObserver: dispara uma vez,
-// não fica reanimando toda hora que a seção entra e sai da tela.
-function useRevelar() {
-  const ref = useRef(null)
-  const [visivel, setVisivel] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entrada]) => { if (entrada.isIntersecting) { setVisivel(true); obs.disconnect() } },
-      { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-  return [ref, visivel]
-}
-
-function Secao({ children, style, id }) {
-  const [ref, visivel] = useRevelar()
-  return (
-    <section ref={ref} id={id} style={{
-      opacity: visivel ? 1 : 0,
-      transform: visivel ? 'translateY(0)' : 'translateY(28px)',
-      transition: 'opacity .7s ease, transform .7s ease',
-      ...style,
-    }}>
-      {children}
-    </section>
-  )
-}
-
-function ItemNumerado({ numero, texto, cor, corpoStyle }) {
-  const [hover, setHover] = useState(false)
-  return (
-    <div
-      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-      style={{
-        padding: 16, borderRadius: 8, marginBottom: 14,
-        transform: hover ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hover ? '0 10px 20px rgba(0,0,0,0.08)' : 'none',
-        transition: 'transform .2s ease, box-shadow .2s ease',
-      }}>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 30, color: cor, marginBottom: 6, lineHeight: 1 }}>{numero}</div>
-      <div style={corpoStyle}>{texto}</div>
-    </div>
-  )
-}
-
-function BarraItem({ label, valor, max, cor }) {
-  return (
-    <div style={{ marginBottom: 14 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-        <span style={{ fontSize: 13, color: '#2c241b', fontFamily: 'Georgia, serif' }}>{label}</span>
-        <span style={{ fontSize: 13, color: cor, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>{valor.toLocaleString('pt-BR')}</span>
-      </div>
-      <div style={{ background: '#e4ddd0', borderRadius: 3, height: 8, overflow: 'hidden' }}>
-        <div style={{ width: `${Math.max(3, (valor / max) * 100)}%`, height: '100%', background: cor, borderRadius: 3, transition: 'width 1s ease' }} />
-      </div>
-    </div>
-  )
-}
+const VINHO = '#3d0012'
+const OURO = '#a9812e'
+const OURO_CLARO = '#e8c98a'
+const MARFIM = '#fdfbf7'
+const MARFIM_ESCURO = '#f6ede0'
+const TINTA = '#2c241b'
+const TINTA_SUAVE = '#3a3128'
+const MUSGO = '#736b62'
+const SERIF = "Georgia, 'EB Garamond', serif"
 
 const NOME_TIPO = { 'jurisprudência': 'Jurisprudência', 'doutrina': 'Doutrina', 'súmula': 'Súmula', 'lei': 'Legislação' }
 const NOME_CODIGO_LANDING = {
@@ -110,191 +20,253 @@ const NOME_CODIGO_LANDING = {
   ctb: 'Código de Trânsito Brasileiro', lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
 }
 
+// Revela a seção uma vez, quando ela entra na tela ao rolar.
+function useRevelar() {
+  const ref = useRef(null)
+  const [visivel, setVisivel] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entrada]) => { if (entrada.isIntersecting) { setVisivel(true); obs.disconnect() } },
+      { threshold: 0.25 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return [ref, visivel]
+}
+
+// Conta de 0 até o valor real quando a seção fica visível — o único
+// momento de movimento de verdade da página. Ele existe porque diz algo
+// (o número é real, não estático), não como decoração de entrada.
+function useContagem(alvo, ativo, duracaoMs = 1400) {
+  const [valor, setValor] = useState(0)
+  useEffect(() => {
+    if (!ativo || alvo == null) return
+    let inicio = null
+    let quadro
+    function passo(agora) {
+      if (inicio === null) inicio = agora
+      const progresso = Math.min((agora - inicio) / duracaoMs, 1)
+      const suavizado = 1 - Math.pow(1 - progresso, 3)
+      setValor(Math.round(alvo * suavizado))
+      if (progresso < 1) quadro = requestAnimationFrame(passo)
+    }
+    quadro = requestAnimationFrame(passo)
+    return () => cancelAnimationFrame(quadro)
+  }, [ativo, alvo, duracaoMs])
+  return valor
+}
+
+function Secao({ children, style, id }) {
+  return (
+    <section id={id} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', ...style }}>
+      {children}
+    </section>
+  )
+}
+
 export default function Landing({ onEntrar }) {
   const { theme } = useTheme()
-  const corpo = { fontFamily: theme.fontSerif, fontSize: 15, color: '#3a3128', lineHeight: 1.7 }
 
   const [numeros, setNumeros] = useState(null)
   useEffect(() => {
     supabase.rpc('contar_acervo_publico').then(({ data }) => { if (data) setNumeros(data) })
   }, [])
 
-  return (
-    <div style={{ background: '#fdfbf7', fontFamily: theme.fontSerif }}>
+  const [refStats, statsVisivel] = useRevelar()
 
-      {/* Header fixo no topo, sempre visível durante a rolagem */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: '#fdfbf7ee', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 28px', borderBottom: '1px solid #e4ddd0' }}>
+  return (
+    <div style={{ background: MARFIM, fontFamily: SERIF }}>
+
+      {/* Header fixo */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM + 'f2', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${TINTA}14` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-          <span style={{ fontFamily: theme.fontTitle, fontSize: 14, color: '#2c241b' }}>Themis Jur</span>
+          <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 26, height: 26, objectFit: 'contain' }} />
+          <span style={{ fontFamily: theme.fontTitle, fontSize: 14, color: TINTA }}>Themis Jur</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <SeletorTema compact />
-          <button onClick={onEntrar} style={{ background: 'none', border: 'none', color: '#736b62', fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: theme.fontSerif }}>
+          <button onClick={onEntrar} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF }}>
             Já tenho acesso
           </button>
         </div>
       </div>
 
-      {/* Hero */}
-      <Secao style={{ background: '#3d0012', padding: '90px 28px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', right: -60, top: -30, opacity: 0.15, animation: 'respirar 6s ease-in-out infinite' }}>
-          <svg width="340" height="240" viewBox="0 0 260 180" aria-hidden="true">
-            <line x1="130" y1="10" x2="130" y2="90" stroke="#e8c98a" strokeWidth="1.1" />
-            <line x1="80" y1="30" x2="180" y2="30" stroke="#e8c98a" strokeWidth="1.1" />
-            <path d="M64 30 A16 12 0 0 0 96 30" fill="none" stroke="#e8c98a" strokeWidth="0.8" />
-            <path d="M164 30 A16 12 0 0 0 196 30" fill="none" stroke="#e8c98a" strokeWidth="0.8" />
-            <line x1="105" y1="105" x2="155" y2="105" stroke="#e8c98a" strokeWidth="1.1" />
-          </svg>
-        </div>
-        <div style={{ position: 'relative', maxWidth: 560, margin: '0 auto' }}>
-          <div style={{ fontStyle: 'italic', fontSize: 13, color: '#c9a878', marginBottom: 14 }}>
-            Acervo curado de jurisprudência, doutrina e legislação
+      {/* ── HERO — a tipografia é o gráfico. A balança está desenhada atrás
+          do próprio texto, integrada, não num canto pequeno. ─────────── */}
+      <Secao style={{ background: VINHO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}>
+        <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"
+          style={{ position: 'absolute', inset: 0, opacity: 0.09 }} aria-hidden="true">
+          <line x1="500" y1="120" x2="500" y2="520" stroke={OURO_CLARO} strokeWidth="2" />
+          <line x1="260" y1="220" x2="740" y2="220" stroke={OURO_CLARO} strokeWidth="2" />
+          <path d="M120 220 A140 100 0 0 0 400 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
+          <path d="M600 220 A140 100 0 0 0 880 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
+          <line x1="380" y1="700" x2="620" y2="700" stroke={OURO_CLARO} strokeWidth="2" />
+        </svg>
+        <div style={{ position: 'relative', maxWidth: 900 }}>
+          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(48px, 8vw, 108px)', lineHeight: 0.98, color: MARFIM, marginBottom: 36, letterSpacing: -1 }}>
+            A tese certa,<br />na hora da peça.
           </div>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 34, lineHeight: 1.3, color: '#f2e9d8', marginBottom: 28 }}>
-            A tese certa, na hora da peça.
+          <div style={{ fontSize: 17, color: OURO_CLARO, fontStyle: 'italic', maxWidth: 480, lineHeight: 1.6, marginBottom: 40 }}>
+            Acervo curado de jurisprudência, doutrina e legislação — reunido por uma pessoa só, artigo por artigo.
           </div>
           <button onClick={() => document.getElementById('porque')?.scrollIntoView({ behavior: 'smooth' })}
-            style={{ background: 'transparent', border: '1px solid #e8c98a', color: '#e8c98a', fontSize: 13, padding: '11px 26px', cursor: 'pointer', fontFamily: theme.fontSerif }}>
+            style={{ background: 'transparent', border: `1px solid ${OURO_CLARO}`, color: OURO_CLARO, fontSize: 13, padding: '13px 30px', cursor: 'pointer', fontFamily: SERIF }}>
             Conhecer o acervo
           </button>
         </div>
       </Secao>
 
-      {/* Por que existe */}
-      <Secao id="porque" style={{ background: '#f6ede0', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', right: -60, bottom: -80, opacity: 0.14, animation: 'respirar 6s ease-in-out infinite' }}>
-          <svg width="280" height="280" viewBox="0 0 220 220" aria-hidden="true">
-            <circle cx="110" cy="110" r="90" fill="none" stroke="#a9812e" strokeWidth="0.8" />
-            <circle cx="110" cy="110" r="62" fill="none" stroke="#a9812e" strokeWidth="0.8" />
-            <circle cx="110" cy="110" r="34" fill="none" stroke="#a9812e" strokeWidth="0.8" />
-          </svg>
-        </div>
-        <MarcaCanto cor="#a9812e" />
-        <div style={{ position: 'relative', maxWidth: 560, margin: '0 auto' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontSize: 48, color: '#a9812e', lineHeight: 0.5, marginBottom: 14 }}>"</div>
-          <div style={{ ...corpo, fontSize: 17, marginBottom: 22 }}>
+      {/* ── CITAÇÃO — a aspas é a textura de fundo da seção inteira, não um
+          símbolo pequeno acima do texto. ──────────────────────────────── */}
+      <Secao id="porque" style={{ background: MARFIM_ESCURO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}>
+        <div aria-hidden="true" style={{
+          position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -58%)',
+          fontFamily: theme.fontTitle, fontSize: 'min(70vw, 900px)', lineHeight: 1, color: OURO, opacity: 0.07,
+          userSelect: 'none', pointerEvents: 'none',
+        }}>”</div>
+        <div style={{ position: 'relative', maxWidth: 680, margin: '0 auto' }}>
+          <div style={{ fontSize: 'clamp(20px, 3vw, 28px)', lineHeight: 1.55, color: TINTA, marginBottom: 32 }}>
             A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório.
           </div>
-          <div style={{ fontFamily: theme.fontTitle, fontSize: 15, color: '#2c241b' }}>Jessica Farias Fusquiani</div>
-          <div style={{ fontStyle: 'italic', fontSize: 13, color: '#736b62' }}>Idealizadora do Themis Jur</div>
+          <div style={{ fontFamily: theme.fontTitle, fontSize: 16, color: TINTA }}>Jessica Farias Fusquiani</div>
+          <div style={{ fontStyle: 'italic', fontSize: 13, color: MUSGO }}>Idealizadora do Themis Jur</div>
         </div>
       </Secao>
 
-      {/* O que tem de diferente */}
-      <Secao style={{ background: '#fdfbf7', borderTop: '4px solid #a9812e', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-        <MarcaCanto cor="#a9812e" />
-        <div style={{ position: 'relative', maxWidth: 720, margin: '0 auto' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 22, color: '#2c241b', marginBottom: 30 }}>O que tem de diferente</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
-            <ItemNumerado numero="01" cor="#a9812e" corpoStyle={corpo}
-              texto="Cada entrada reúne tese, fundamento e uma indicação de uso prático: não é ementa solta, é material pronto para consulta em peça." />
-            <ItemNumerado numero="02" cor="#a9812e" corpoStyle={corpo}
-              texto="Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo." />
-            <ItemNumerado numero="03" cor="#a9812e" corpoStyle={corpo}
-              texto="Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra." />
+      {/* ── O QUE TEM DE DIFERENTE — glosa marginal, como anotação à margem
+          de um volume impresso. Rótulo nomeado, não numerado (não é uma
+          sequência). ───────────────────────────────────────────────────── */}
+      <Secao style={{ background: MARFIM, padding: '80px 40px' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
+          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: TINTA, marginBottom: 56 }}>
+            O que tem de diferente
           </div>
+          {[
+            { rotulo: 'Fundamento', texto: 'Cada entrada reúne tese, fundamento legal e uma indicação de uso prático: não é ementa solta, é material pronto para consulta em peça.' },
+            { rotulo: 'Curadoria', texto: 'Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo.' },
+            { rotulo: 'Cruzamento', texto: 'Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.' },
+          ].map((item, i) => (
+            <div key={item.rotulo} style={{ display: 'flex', gap: 32, borderTop: i === 0 ? `1px solid ${TINTA}22` : 'none', borderBottom: `1px solid ${TINTA}22`, padding: '28px 0' }}>
+              <div style={{ width: 150, flexShrink: 0, fontFamily: theme.fontTitle, fontSize: 15, color: OURO, paddingTop: 2 }}>{item.rotulo}</div>
+              <div style={{ fontSize: 16, color: TINTA_SUAVE, lineHeight: 1.65, maxWidth: 480 }}>{item.texto}</div>
+            </div>
+          ))}
         </div>
       </Secao>
 
-      {/* Para quem é */}
-      <Secao style={{ background: '#fdfbf7', borderTop: '4px solid #7a1128', padding: '80px 28px', position: 'relative', overflow: 'hidden' }}>
-        <MarcaCanto cor="#7a1128" />
-        <div style={{ position: 'relative', maxWidth: 720, margin: '0 auto' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 22, color: '#2c241b', marginBottom: 30 }}>Para quem é</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
-            <ItemNumerado numero="01" cor="#7a1128" corpoStyle={corpo}
-              texto="Para quem inicia os estudos, o acervo oferece fonte primária no lugar do resumo de resumo." />
-            <ItemNumerado numero="02" cor="#7a1128" corpoStyle={corpo}
-              texto="Para quem já advoga, é citação pronta e tese comentada em meio à rotina." />
-            <ItemNumerado numero="03" cor="#7a1128" corpoStyle={corpo}
-              texto="Para quem leciona, o material já chega organizado por área e por tipo." />
+      {/* ── PARA QUEM É — mesmo dispositivo, rótulo pelo público. ───────── */}
+      <Secao style={{ background: VINHO, padding: '80px 40px' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
+          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: MARFIM, marginBottom: 56 }}>
+            Para quem é
           </div>
+          {[
+            { rotulo: 'Quem estuda', texto: 'O acervo oferece fonte primária no lugar do resumo de resumo, desde o início dos estudos.' },
+            { rotulo: 'Quem advoga', texto: 'Citação pronta e tese comentada em meio à rotina, sem precisar reconstruir o raciocínio do zero.' },
+            { rotulo: 'Quem leciona', texto: 'O material já chega organizado por área e por tipo, pronto para uso em sala.' },
+          ].map((item, i) => (
+            <div key={item.rotulo} style={{ display: 'flex', gap: 32, borderTop: i === 0 ? `1px solid ${OURO_CLARO}33` : 'none', borderBottom: `1px solid ${OURO_CLARO}33`, padding: '28px 0' }}>
+              <div style={{ width: 150, flexShrink: 0, fontFamily: theme.fontTitle, fontSize: 15, color: OURO_CLARO, paddingTop: 2 }}>{item.rotulo}</div>
+              <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65, maxWidth: 480 }}>{item.texto}</div>
+            </div>
+          ))}
         </div>
       </Secao>
 
-      {/* O acervo em números */}
-      <Secao style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '80px 28px' }}>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <RotuloComBarra texto="O acervo em números" cor="#2c4a6e" />
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 22, color: '#2c241b', marginBottom: 30 }}>
+      {/* ── NÚMEROS — o único momento de movimento da página: contagem real
+          ao vivo, disparada quando a seção entra na tela. ──────────────── */}
+      <Secao style={{ background: MARFIM, padding: '80px 40px' }} id="numeros">
+        <div ref={refStats} style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
+          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: TINTA, marginBottom: 12 }}>
             Curadoria real, não promessa vazia
           </div>
-          {!numeros ? (
-            <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic' }}>Carregando números do acervo…</div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 26 }}>
-              <div><div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 42, color: '#7a1128', lineHeight: 1 }}>{numeros.total_entradas}</div><div style={{ fontSize: 13, color: '#3a3128', marginTop: 8 }}>entradas curadas</div></div>
-              <div><div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 42, color: '#a9812e', lineHeight: 1 }}>{numeros.total_artigos_vigentes.toLocaleString('pt-BR')}</div><div style={{ fontSize: 13, color: '#3a3128', marginTop: 8 }}>artigos de lei vigentes</div></div>
-              <div><div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 42, color: '#2c4a6e', lineHeight: 1 }}>{numeros.total_codigos}</div><div style={{ fontSize: 13, color: '#3a3128', marginTop: 8 }}>códigos e diplomas legais</div></div>
-              <div><div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 42, color: '#3a3128', lineHeight: 1 }}>100%</div><div style={{ fontSize: 13, color: '#3a3128', marginTop: 8 }}>fonte real e rastreável</div></div>
+          <div style={{ fontSize: 14, color: MUSGO, fontStyle: 'italic', marginBottom: 56 }}>
+            Números do acervo, ao vivo — crescem sozinhos conforme mais entradas são curadas.
+          </div>
+          {numeros && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40 }}>
+              <NumeroGrande valor={numeros.total_entradas} ativo={statsVisivel} cor="#7a1128" label="entradas curadas" theme={theme} />
+              <NumeroGrande valor={numeros.total_artigos_vigentes} ativo={statsVisivel} cor={OURO} label="artigos de lei vigentes" theme={theme} />
+              <NumeroGrande valor={numeros.total_codigos} ativo={statsVisivel} cor="#2c4a6e" label="códigos e diplomas legais" theme={theme} />
+              <NumeroGrande valor={100} sufixo="%" ativo={statsVisivel} cor={TINTA} label="fonte real e rastreável" theme={theme} />
             </div>
           )}
         </div>
       </Secao>
 
-      {/* Composição por tipo + Legislação + Tribunais, lado a lado em tela larga */}
-      <Secao style={{ background: '#f6ede0', padding: '80px 28px' }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 48 }}>
-          <div>
-            <RotuloComBarra texto="Composição do acervo" cor="#a9812e" />
-            <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 16, color: '#2c241b', marginBottom: 18 }}>Por tipo de fonte</div>
-            {numeros && (() => {
-              const max = Math.max(...Object.values(numeros.por_tipo))
-              const cores = { 'jurisprudência': '#7a1128', 'doutrina': '#2c4a6e', 'súmula': '#a34a68', 'lei': '#a9812e' }
-              return Object.entries(numeros.por_tipo).sort((a, b) => b[1] - a[1]).map(([tipo, v]) => (
-                <BarraItem key={tipo} label={NOME_TIPO[tipo] || tipo} valor={v} max={max} cor={cores[tipo] || '#a9812e'} />
-              ))
-            })()}
+      {/* ── LEDGER — composição do acervo, como um sumário/índice impresso,
+          não cards. ─────────────────────────────────────────────────────── */}
+      <Secao style={{ background: MARFIM_ESCURO, padding: '80px 40px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
+          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: TINTA, marginBottom: 56 }}>
+            Do que é feito o acervo
           </div>
-          <div>
-            <RotuloComBarra texto="Legislação vigente" cor="#2c4a6e" />
-            <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 16, color: '#2c241b', marginBottom: 18 }}>Por código</div>
-            {numeros && (() => {
-              const max = Math.max(...Object.values(numeros.por_codigo))
-              return Object.entries(numeros.por_codigo).sort((a, b) => b[1] - a[1]).map(([codigo, v]) => (
-                <BarraItem key={codigo} label={NOME_CODIGO_LANDING[codigo] || codigo.toUpperCase()} valor={v} max={max} cor="#2c4a6e" />
-              ))
-            })()}
-          </div>
-          <div>
-            <RotuloComBarra texto="Jurisprudência e súmula" cor="#7a1128" />
-            <div style={{ fontFamily: theme.fontTitle, fontWeight: 600, fontSize: 16, color: '#2c241b', marginBottom: 18 }}>Por tribunal</div>
-            {numeros && (() => {
-              const max = Math.max(...Object.values(numeros.por_tribunal))
-              return Object.entries(numeros.por_tribunal).sort((a, b) => b[1] - a[1]).map(([trib, v]) => (
-                <BarraItem key={trib} label={trib} valor={v} max={max} cor="#7a1128" />
-              ))
-            })()}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 48 }}>
+            <Ledger titulo="Por tipo de fonte" dados={numeros?.por_tipo} nomear={k => NOME_TIPO[k] || k} cor="#7a1128" />
+            <Ledger titulo="Legislação vigente" dados={numeros?.por_codigo} nomear={k => NOME_CODIGO_LANDING[k] || k.toUpperCase()} cor="#2c4a6e" />
+            <Ledger titulo="Por tribunal" dados={numeros?.por_tribunal} nomear={k => k} cor={OURO} />
           </div>
         </div>
       </Secao>
 
-      {/* Do acervo, agora + CTA final */}
-      <Secao style={{ background: '#fdfbf7', borderTop: '4px solid #2c4a6e', padding: '80px 28px 100px' }}>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 22, color: '#2c241b', marginBottom: 28 }}>Do acervo, agora</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 44 }}>
-            <div style={{ borderTop: '2px solid #a34a68', paddingTop: 10 }}>
-              <div style={{ ...corpo, fontSize: 14 }}><b>União estável.</b> Comunicabilidade do patrimônio formado durante a relação, ainda que a contribuição não tenha sido financeira.</div>
-              <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', marginTop: 6 }}>STJ, REsp 1.234.567/SP, Família</div>
-            </div>
-            <div style={{ borderTop: '2px solid #7a1128', paddingTop: 10 }}>
-              <div style={{ ...corpo, fontSize: 14 }}><b>Pronúncia.</b> Dúvida sobre legítima defesa não autoriza absolvição sumária; apreciação cabe ao Tribunal do Júri.</div>
-              <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', marginTop: 6 }}>STJ, AgRg no AREsp 872.992/PE, Penal</div>
-            </div>
+      {/* ── DO ACERVO, AGORA + CTA FINAL ──────────────────────────────────── */}
+      <Secao style={{ background: VINHO, padding: '80px 40px' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
+          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: MARFIM, marginBottom: 48 }}>
+            Do acervo, agora
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <button onClick={onEntrar} style={{ background: 'transparent', border: '1px solid #7a1128', color: '#7a1128', fontSize: 15, padding: '13px 40px', cursor: 'pointer', fontFamily: theme.fontSerif }}>
-              Criar conta gratuita
-            </button>
-            <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', marginTop: 12 }}>
-              Acesso ao acervo completo, sem custo. Busca com IA é recurso da versão paga.
+          <div style={{ borderTop: `1px solid ${OURO_CLARO}33`, padding: '24px 0' }}>
+            <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65 }}>
+              <b style={{ color: MARFIM }}>União estável.</b> Comunicabilidade do patrimônio formado durante a relação, ainda que a contribuição não tenha sido financeira.
             </div>
+            <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 8 }}>STJ, REsp 1.234.567/SP, Família</div>
+          </div>
+          <div style={{ borderTop: `1px solid ${OURO_CLARO}33`, borderBottom: `1px solid ${OURO_CLARO}33`, padding: '24px 0', marginBottom: 56 }}>
+            <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65 }}>
+              <b style={{ color: MARFIM }}>Pronúncia.</b> Dúvida sobre legítima defesa não autoriza absolvição sumária; apreciação cabe ao Tribunal do Júri.
+            </div>
+            <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 8 }}>STJ, AgRg no AREsp 872.992/PE, Penal</div>
+          </div>
+          <button onClick={onEntrar} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 15, fontWeight: 'bold', padding: '15px 42px', cursor: 'pointer', fontFamily: SERIF }}>
+            Criar conta gratuita
+          </button>
+          <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 14 }}>
+            Acesso ao acervo completo, sem custo. Busca com IA é recurso da versão paga.
           </div>
         </div>
       </Secao>
 
+    </div>
+  )
+}
+
+function NumeroGrande({ valor, sufixo = '', ativo, cor, label, theme }) {
+  const contado = useContagem(valor, ativo)
+  return (
+    <div>
+      <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(40px, 5vw, 56px)', color: cor, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+        {contado.toLocaleString('pt-BR')}{sufixo}
+      </div>
+      <div style={{ fontSize: 13, color: TINTA_SUAVE, marginTop: 10 }}>{label}</div>
+    </div>
+  )
+}
+
+function Ledger({ titulo, dados, nomear, cor }) {
+  if (!dados) return null
+  const entradas = Object.entries(dados).sort((a, b) => b[1] - a[1])
+  return (
+    <div>
+      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: TINTA, marginBottom: 16, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</div>
+      {entradas.map(([chave, valor]) => (
+        <div key={chave} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: `1px solid ${TINTA}14`, fontSize: 14 }}>
+          <span style={{ color: TINTA_SUAVE }}>{nomear(chave)}</span>
+          <span style={{ color: cor, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>{valor.toLocaleString('pt-BR')}</span>
+        </div>
+      ))}
     </div>
   )
 }
