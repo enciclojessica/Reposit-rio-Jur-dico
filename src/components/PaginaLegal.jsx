@@ -26,7 +26,7 @@ export default function PaginaLegal({ documento, onFechar }) {
           {documento.titulo}
         </div>
         <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', marginBottom: 28 }}>
-          {documento.atualizadoEm ? `Última atualização: ${documento.atualizadoEm}` : 'Documento em preparação — alguns campos ainda serão preenchidos'}
+          {documento.atualizadoEm ? `Última atualização: ${documento.atualizadoEm}` : 'Documento em preparação. Alguns campos ainda serão preenchidos.'}
         </div>
 
         {documento.secoes.map((s, i) => (

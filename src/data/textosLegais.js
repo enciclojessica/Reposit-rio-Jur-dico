@@ -1,10 +1,9 @@
 // Conteúdo dos Termos de Uso e da Política de Privacidade, estruturado em
-// seções pra renderização em PaginaLegal.jsx. Foro (Praia Grande, São
-// Paulo) e e-mail de contato (themisjur.ia@gmail.com) preenchidos.
+// seções pra renderização em PaginaLegal.jsx.
 
 export const TERMOS_DE_USO = {
   titulo: 'Termos de Uso',
-  atualizadoEm: null, // preencher na publicação
+  atualizadoEm: '09/09/2026',
   secoes: [
     {
       titulo: '1. O que é o Themis Jur',
@@ -14,13 +13,13 @@ O conteúdo disponibilizado tem finalidade de apoio à pesquisa e ao estudo jur�
     },
     {
       titulo: '2. Cadastro e acesso',
-      corpo: `O acesso à plataforma hoje é restrito e ocorre por convite, enviado por um administrador. Não há cadastro público aberto no momento.
+      corpo: `O cadastro na plataforma é aberto: qualquer pessoa pode criar uma conta vinculada a e-mail e senha, informando nome completo e telefone. O acesso ao acervo completo (jurisprudência, doutrina e legislação) é gratuito para todo usuário cadastrado.
 
-Ao aceitar um convite, o usuário cria uma conta vinculada a e-mail e senha (ou login via provedor externo, como Google), e passa a integrar a plataforma com um dos seguintes papéis: leitor, editor ou administrador, conforme definido no convite.
+Recursos que utilizam inteligência artificial (busca assistida, extração de dados de petições) são reservados a contas com plano pago ou a administradores, conforme indicado na própria plataforma.
 
-O usuário é responsável por manter a confidencialidade de suas credenciais de acesso e por toda atividade realizada em sua conta.
+Além do cadastro aberto, um administrador pode convidar diretamente uma pessoa para integrar a plataforma com papel de editor, responsável pela curadoria de novo conteúdo.
 
-O Themis Jur pode revogar o acesso de qualquer usuário a seu exclusivo critério, especialmente em caso de violação destes Termos.`,
+O usuário é responsável por manter a confidencialidade de suas credenciais de acesso e por toda atividade realizada em sua conta. O Themis Jur pode revogar o acesso de qualquer usuário a seu exclusivo critério, especialmente em caso de violação destes Termos.`,
     },
     {
       titulo: '3. Uso permitido',
@@ -30,7 +29,7 @@ O Themis Jur pode revogar o acesso de qualquer usuário a seu exclusivo critéri
     },
     {
       titulo: '4. Propriedade intelectual',
-      corpo: `Textos de lei, jurisprudência e ementas oficiais são de domínio público ou de titularidade dos respectivos tribunais e órgãos — o Themis Jur não reivindica propriedade sobre esse conteúdo bruto.
+      corpo: `Textos de lei, jurisprudência e ementas oficiais são de domínio público ou de titularidade dos respectivos tribunais e órgãos; o Themis Jur não reivindica propriedade sobre esse conteúdo bruto.
 
 A curadoria, organização, comentários didáticos, aplicações práticas e a estrutura do repositório são de titularidade do Themis Jur e protegidos como obra intelectual.
 
@@ -38,11 +37,11 @@ Conteúdo inserido pelo próprio usuário (anotações pessoais, rascunhos de pe
     },
     {
       titulo: '5. Recursos com inteligência artificial',
-      corpo: `Alguns recursos (busca assistida, sugestão de conteúdo, extração de dados de petições) utilizam modelos de inteligência artificial de terceiros para processar o texto submetido pelo usuário. Esses recursos são auxiliares e sujeitos a erro — o usuário deve sempre revisar e confirmar qualquer sugestão gerada por IA antes de utilizá-la. O acesso a alguns desses recursos pode ser condicionado a plano pago, conforme indicado na plataforma.`,
+      corpo: `Alguns recursos (busca assistida, sugestão de conteúdo, extração de dados de petições) utilizam modelos de inteligência artificial de terceiros para processar o texto submetido pelo usuário. Esses recursos são auxiliares e sujeitos a erro: o usuário deve sempre revisar e confirmar qualquer sugestão gerada por IA antes de utilizá-la. Como descrito na seção 2, o acesso a esses recursos é condicionado a plano pago ou a papel de administrador.`,
     },
     {
       titulo: '6. Planos e cobrança',
-      corpo: `O acesso à plataforma pode ser gratuito ou pago, conforme definido para cada usuário. Eventuais condições de cobrança, quando aplicáveis, serão informadas previamente ao usuário.`,
+      corpo: `O cadastro e o acesso ao acervo completo são gratuitos. Recursos de inteligência artificial exigem plano pago; eventuais condições de cobrança serão informadas previamente ao usuário antes da contratação.`,
     },
     {
       titulo: '7. Limitação de responsabilidade',
@@ -67,7 +66,7 @@ O Themis Jur não se responsabiliza por decisões tomadas com base no conteúdo 
 
 export const POLITICA_PRIVACIDADE = {
   titulo: 'Política de Privacidade',
-  atualizadoEm: null,
+  atualizadoEm: '09/09/2026',
   secoes: [
     {
       titulo: '1. Controladora',
@@ -75,17 +74,17 @@ export const POLITICA_PRIVACIDADE = {
     },
     {
       titulo: '2. Quais dados coletamos',
-      corpo: `Dados de cadastro: nome e e-mail (fornecidos no cadastro ou obtidos via login social, quando utilizado); foto de perfil (se fornecida via login social); número e UF de inscrição na OAB (opcional, fornecido pelo próprio usuário para inserção automática em documentos exportados).
+      corpo: `Dados de cadastro: nome, telefone e e-mail (fornecidos no cadastro ou obtidos via login social, quando utilizado); foto de perfil (se fornecida via login social); número e UF de inscrição na OAB (opcional, fornecido pelo próprio usuário para inserção automática em documentos exportados).
 
 Dados de uso da plataforma: anotações pessoais feitas em entradas do repositório; entradas marcadas como favoritas; rascunhos de peças processuais elaborados no Editor; alertas de monitoramento configurados; histórico de entradas cadastradas ou editadas por membros com permissão de edição.
 
 Dados técnicos: registros de acesso (data, hora, endereço IP), coletados automaticamente pela infraestrutura de hospedagem; cookies de sessão, necessários para manter o usuário autenticado.
 
-O Themis Jur não coleta dados sensíveis (saúde, origem racial, convicção religiosa etc.) para fins próprios da plataforma. Caso o usuário insira esse tipo de informação em peças processuais ou anotações — o que pode ser necessário no exercício da advocacia —, ela é tratada com a mesma confidencialidade dos demais dados do usuário, sob sua exclusiva responsabilidade quanto ao conteúdo inserido.`,
+O Themis Jur não coleta dados sensíveis (saúde, origem racial, convicção religiosa etc.) para fins próprios da plataforma. Caso o usuário insira esse tipo de informação em peças processuais ou anotações (o que pode ser necessário no exercício da advocacia), ela é tratada com a mesma confidencialidade dos demais dados do usuário, sob sua exclusiva responsabilidade quanto ao conteúdo inserido.`,
     },
     {
       titulo: '3. Para que usamos esses dados',
-      corpo: `Autenticar o usuário e controlar seu nível de acesso (leitor, editor, administrador); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
+      corpo: `Autenticar o usuário e controlar seu nível de acesso (leitor, editor, administrador) e seu plano (gratuito ou pago); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
 
 Não utilizamos os dados pessoais do usuário para publicidade ou para venda a terceiros.`,
     },
@@ -93,7 +92,7 @@ Não utilizamos os dados pessoais do usuário para publicidade ou para venda a t
       titulo: '4. Com quem compartilhamos dados',
       corpo: `Para operar a plataforma, utilizamos os seguintes prestadores de serviço (operadores, nos termos da LGPD), que têm acesso aos dados estritamente na medida necessária à prestação do serviço contratado:
 
-Supabase — hospedagem do banco de dados e autenticação. Vercel — hospedagem da aplicação web. Resend — envio de e-mails transacionais e de alerta. Anthropic — processamento de texto nos recursos que usam inteligência artificial (busca assistida, extração de petições).
+Supabase: hospedagem do banco de dados e autenticação. Vercel: hospedagem da aplicação web. Resend: envio de e-mails transacionais e de alerta. Anthropic: processamento de texto nos recursos que usam inteligência artificial (busca assistida, extração de petições).
 
 Não compartilhamos dados pessoais com terceiros para finalidades próprias desses terceiros.`,
     },
@@ -121,3 +120,4 @@ A plataforma já oferece, na tela de Configurações, exportação dos próprios
     },
   ],
 }
+
