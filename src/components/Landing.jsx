@@ -61,7 +61,7 @@ function useContagem(alvo, ativo, duracaoMs = 1400) {
 
 function Secao({ children, style, id }) {
   return (
-    <section id={id} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', ...style }}>
+    <section id={id} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', scrollSnapAlign: 'start', ...style }}>
       {children}
     </section>
   )
@@ -78,7 +78,7 @@ export default function Landing({ onEntrar }) {
   const [refStats, statsVisivel] = useRevelar()
 
   return (
-    <div style={{ background: MARFIM, fontFamily: SERIF }}>
+    <div style={{ background: MARFIM, fontFamily: SERIF, height: '100vh', overflowY: 'auto', scrollSnapType: 'y proximity' }}>
 
       {/* Header fixo */}
       <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM + 'f2', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${TINTA}14` }}>
@@ -106,6 +106,8 @@ export default function Landing({ onEntrar }) {
           <line x1="380" y1="700" x2="620" y2="700" stroke={OURO_CLARO} strokeWidth="2" />
         </svg>
         <div style={{ position: 'relative', maxWidth: 900 }}>
+          <img src="/logo-temis-transparente.png" alt="Themis Jur"
+            style={{ width: 88, height: 88, objectFit: 'contain', marginBottom: 28, filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
           <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(48px, 8vw, 108px)', lineHeight: 0.98, color: MARFIM, marginBottom: 36, letterSpacing: -1 }}>
             A tese certa,<br />na hora da peça.
           </div>
