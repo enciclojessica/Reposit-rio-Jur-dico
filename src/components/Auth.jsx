@@ -3,14 +3,14 @@ import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { Lock, Mail, Eye, EyeOff, Moon, Sun, AlertCircle, CheckCircle, User, Phone } from 'lucide-react'
 
-export default function Auth() {
+export default function Auth({ telaInicial }) {
   const { theme, mode, toggle } = useTheme()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [nome, setNome]         = useState('')
   const [telefone, setTelefone] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const [screen, setScreen]     = useState('login') // login | register | forgot
+  const [screen, setScreen]     = useState(telaInicial === 'register' ? 'register' : 'login') // login | register | forgot
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
   const [success, setSuccess]   = useState('')

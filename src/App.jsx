@@ -156,6 +156,7 @@ export default function App() {
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
+  const [telaAuthInicial, setTelaAuthInicial] = useState('login')
   const [prefillEntry, setPrefillEntry] = useState(null)
   const [temaAlertaPrefill, setTemaAlertaPrefill] = useState(null)
   const [recuperandoSenha, setRecuperandoSenha] = useState(false)
@@ -659,7 +660,7 @@ async function handleSave(entry) {
         borderRadius: 8, padding: '8px 14px', color: theme.muted,
         fontSize: 13, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif",
       }}>← Voltar</button>
-      <Auth conviteToken={conviteToken} />
+      <Auth conviteToken={conviteToken} telaInicial={telaAuthInicial} />
     </div>
   )
 
@@ -667,7 +668,7 @@ async function handleSave(entry) {
   // apresentação, não o shell do app. Os deep links (?entrada=, ?lei=,
   // ?pagina=) já foram tratados mais acima e nunca chegam aqui.
   if (!session && !showLogin) return (
-    <Landing onEntrar={() => setShowLogin(true)} />
+    <Landing onEntrar={(tela) => { setTelaAuthInicial(tela || 'login'); setShowLogin(true) }} />
   )
 
   const sidebarItems = [

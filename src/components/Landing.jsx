@@ -114,7 +114,7 @@ export default function Landing({ onEntrar }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <SeletorTema compact />
-          <button onClick={onEntrar} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF }}>
+          <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF }}>
             Já tenho acesso
           </button>
         </div>
@@ -262,7 +262,7 @@ export default function Landing({ onEntrar }) {
             </div>
             <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 8 }}>STJ, AgRg no AREsp 872.992/PE, Penal</div>
           </div>
-          <button onClick={onEntrar} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 15, fontWeight: 'bold', padding: '15px 42px', cursor: 'pointer', fontFamily: SERIF }}>
+          <button onClick={() => onEntrar('register')} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 15, fontWeight: 'bold', padding: '15px 42px', cursor: 'pointer', fontFamily: SERIF }}>
             Criar conta gratuita
           </button>
           <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 14 }}>
