@@ -59,10 +59,36 @@ function useContagem(alvo, ativo, duracaoMs = 1400) {
   return valor
 }
 
-function Secao({ children, style, id }) {
+// Transição real, ligada à posição de rolagem: a seção entra com leve
+// zoom-out e opacidade baixa, e ganha nitidez/escala plena conforme
+// ocupa mais da tela — não é um "aparece uma vez e para", responde ao
+// scroll em tempo real, inclusive voltando ao rolar pra cima.
+function Secao({ children, decoracao, style, id }) {
+  const ref = useRef(null)
+  const [proporcao, setProporcao] = useState(0)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const passos = Array.from({ length: 21 }, (_, i) => i / 20)
+    const obs = new IntersectionObserver(
+      ([entrada]) => setProporcao(entrada.intersectionRatio),
+      { threshold: passos }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  const forca = Math.min(proporcao / 0.55, 1)
   return (
-    <section id={id} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', scrollSnapAlign: 'start', ...style }}>
-      {children}
+    <section ref={ref} id={id} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', scrollSnapAlign: 'start', ...style }}>
+      {decoracao}
+      <div style={{
+        opacity: 0.15 + 0.85 * forca,
+        transform: `scale(${0.9 + 0.1 * forca})`,
+        transition: 'opacity .05s linear, transform .05s linear',
+        position: 'relative',
+      }}>
+        {children}
+      </div>
     </section>
   )
 }
@@ -84,7 +110,7 @@ export default function Landing({ onEntrar }) {
       <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM + 'f2', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${TINTA}14` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 26, height: 26, objectFit: 'contain' }} />
-          <span style={{ fontFamily: theme.fontTitle, fontSize: 14, color: TINTA }}>Themis Jur</span>
+          <span style={{ fontFamily: SERIF, fontSize: 14, color: TINTA }}>Themis Jur</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <SeletorTema compact />
@@ -96,15 +122,17 @@ export default function Landing({ onEntrar }) {
 
       {/* ── HERO — a tipografia é o gráfico. A balança está desenhada atrás
           do próprio texto, integrada, não num canto pequeno. ─────────── */}
-      <Secao style={{ background: VINHO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}>
-        <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"
-          style={{ position: 'absolute', inset: 0, opacity: 0.09 }} aria-hidden="true">
-          <line x1="500" y1="120" x2="500" y2="520" stroke={OURO_CLARO} strokeWidth="2" />
-          <line x1="260" y1="220" x2="740" y2="220" stroke={OURO_CLARO} strokeWidth="2" />
-          <path d="M120 220 A140 100 0 0 0 400 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
-          <path d="M600 220 A140 100 0 0 0 880 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
-          <line x1="380" y1="700" x2="620" y2="700" stroke={OURO_CLARO} strokeWidth="2" />
-        </svg>
+      <Secao style={{ background: VINHO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}
+        decoracao={
+          <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"
+            style={{ position: 'absolute', inset: 0, opacity: 0.09 }} aria-hidden="true">
+            <line x1="500" y1="120" x2="500" y2="520" stroke={OURO_CLARO} strokeWidth="2" />
+            <line x1="260" y1="220" x2="740" y2="220" stroke={OURO_CLARO} strokeWidth="2" />
+            <path d="M120 220 A140 100 0 0 0 400 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
+            <path d="M600 220 A140 100 0 0 0 880 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
+            <line x1="380" y1="700" x2="620" y2="700" stroke={OURO_CLARO} strokeWidth="2" />
+          </svg>
+        }>
         <div style={{ position: 'relative', maxWidth: 900 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur"
             style={{ width: 88, height: 88, objectFit: 'contain', marginBottom: 28, filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
@@ -123,17 +151,19 @@ export default function Landing({ onEntrar }) {
 
       {/* ── CITAÇÃO — a aspas é a textura de fundo da seção inteira, não um
           símbolo pequeno acima do texto. ──────────────────────────────── */}
-      <Secao id="porque" style={{ background: MARFIM_ESCURO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}>
-        <div aria-hidden="true" style={{
-          position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -58%)',
-          fontFamily: theme.fontTitle, fontSize: 'min(70vw, 900px)', lineHeight: 1, color: OURO, opacity: 0.07,
-          userSelect: 'none', pointerEvents: 'none',
-        }}>”</div>
+      <Secao id="porque" style={{ background: MARFIM_ESCURO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}
+        decoracao={
+          <div aria-hidden="true" style={{
+            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -58%)',
+            fontFamily: theme.fontTitle, fontSize: 'min(70vw, 900px)', lineHeight: 1, color: OURO, opacity: 0.07,
+            userSelect: 'none', pointerEvents: 'none',
+          }}>”</div>
+        }>
         <div style={{ position: 'relative', maxWidth: 680, margin: '0 auto' }}>
           <div style={{ fontSize: 'clamp(20px, 3vw, 28px)', lineHeight: 1.55, color: TINTA, marginBottom: 32 }}>
             A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório.
           </div>
-          <div style={{ fontFamily: theme.fontTitle, fontSize: 16, color: TINTA }}>Jessica Farias Fusquiani</div>
+          <div style={{ fontFamily: SERIF, fontWeight: 'bold', fontSize: 16, color: TINTA }}>Jessica Farias Fusquiani</div>
           <div style={{ fontStyle: 'italic', fontSize: 13, color: MUSGO }}>Idealizadora do Themis Jur</div>
         </div>
       </Secao>
@@ -152,7 +182,7 @@ export default function Landing({ onEntrar }) {
             { rotulo: 'Cruzamento', texto: 'Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.' },
           ].map((item, i) => (
             <div key={item.rotulo} style={{ display: 'flex', gap: 32, borderTop: i === 0 ? `1px solid ${TINTA}22` : 'none', borderBottom: `1px solid ${TINTA}22`, padding: '28px 0' }}>
-              <div style={{ width: 150, flexShrink: 0, fontFamily: theme.fontTitle, fontSize: 15, color: OURO, paddingTop: 2 }}>{item.rotulo}</div>
+              <div style={{ width: 150, flexShrink: 0, fontFamily: SERIF, fontWeight: 'bold', fontSize: 15, color: OURO, paddingTop: 2 }}>{item.rotulo}</div>
               <div style={{ fontSize: 16, color: TINTA_SUAVE, lineHeight: 1.65, maxWidth: 480 }}>{item.texto}</div>
             </div>
           ))}
@@ -171,7 +201,7 @@ export default function Landing({ onEntrar }) {
             { rotulo: 'Quem leciona', texto: 'O material já chega organizado por área e por tipo, pronto para uso em sala.' },
           ].map((item, i) => (
             <div key={item.rotulo} style={{ display: 'flex', gap: 32, borderTop: i === 0 ? `1px solid ${OURO_CLARO}33` : 'none', borderBottom: `1px solid ${OURO_CLARO}33`, padding: '28px 0' }}>
-              <div style={{ width: 150, flexShrink: 0, fontFamily: theme.fontTitle, fontSize: 15, color: OURO_CLARO, paddingTop: 2 }}>{item.rotulo}</div>
+              <div style={{ width: 150, flexShrink: 0, fontFamily: SERIF, fontWeight: 'bold', fontSize: 15, color: OURO_CLARO, paddingTop: 2 }}>{item.rotulo}</div>
               <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65, maxWidth: 480 }}>{item.texto}</div>
             </div>
           ))}
@@ -262,11 +292,11 @@ function Ledger({ titulo, dados, nomear, cor }) {
   const entradas = Object.entries(dados).sort((a, b) => b[1] - a[1])
   return (
     <div>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: TINTA, marginBottom: 16, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</div>
+      <div style={{ fontFamily: SERIF, fontWeight: 'bold', fontSize: 15, color: TINTA, marginBottom: 16, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</div>
       {entradas.map(([chave, valor]) => (
         <div key={chave} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: `1px solid ${TINTA}14`, fontSize: 14 }}>
           <span style={{ color: TINTA_SUAVE }}>{nomear(chave)}</span>
-          <span style={{ color: cor, fontFamily: "'Playfair Display', serif", fontWeight: 600 }}>{valor.toLocaleString('pt-BR')}</span>
+          <span style={{ color: cor, fontFamily: SERIF, fontWeight: 'bold' }}>{valor.toLocaleString('pt-BR')}</span>
         </div>
       ))}
     </div>
