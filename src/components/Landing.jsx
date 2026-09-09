@@ -268,6 +268,11 @@ export default function Landing({ onEntrar }) {
           <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 14 }}>
             Acesso ao acervo completo, sem custo. Busca com IA é recurso da versão paga.
           </div>
+          <div style={{ fontSize: 11, marginTop: 40, opacity: 0.75 }}>
+            <a href="/?pagina=termos" style={{ color: OURO_CLARO, textDecoration: 'underline' }}>Termos de uso</a>
+            <span style={{ color: OURO_CLARO, margin: '0 6px' }}>e</span>
+            <a href="/?pagina=privacidade" style={{ color: OURO_CLARO, textDecoration: 'underline' }}>política de privacidade</a>
+          </div>
         </div>
       </Secao>
 
