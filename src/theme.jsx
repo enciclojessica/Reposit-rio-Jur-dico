@@ -12,7 +12,7 @@ const TEMAS = {
     raised:      '#ffffff',
     border:      '#e8e3dc',
     borderGold:  '#a9812e33',
-    gold:        '#a9812e',
+    gold:        '#8f6d27',
     goldDark:    '#7a5c1e',
     vinho:       '#7a1128',
     vinhoDark:   '#5e0018',

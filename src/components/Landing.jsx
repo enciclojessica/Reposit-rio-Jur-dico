@@ -4,7 +4,7 @@ import { supabase } from '../supabase'
 import SeletorTema from './SeletorTema'
 
 const VINHO = '#3d0012'
-const OURO = '#a9812e'
+const OURO = '#8f6d27'
 const OURO_CLARO = '#e8c98a'
 const MARFIM = '#fdfbf7'
 const MARFIM_ESCURO = '#f6ede0'

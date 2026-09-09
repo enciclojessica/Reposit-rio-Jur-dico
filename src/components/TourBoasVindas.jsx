@@ -44,7 +44,7 @@ export default function TourBoasVindas({ onFechar }) {
           </div>
         ))}
 
-        <button onClick={onFechar} style={{ width: '100%', marginTop: 24, background: theme.gold, border: 'none', borderRadius: 8, padding: '10px', color: '#2c241b', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+        <button onClick={onFechar} style={{ width: '100%', marginTop: 24, background: theme.gold, border: 'none', borderRadius: 8, padding: '10px', color: theme.isDark ? '#2c241b' : '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
           Entendi
         </button>
       </div>
