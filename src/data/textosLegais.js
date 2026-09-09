@@ -108,7 +108,7 @@ A plataforma já oferece, na tela de Configurações, exportação dos próprios
     },
     {
       titulo: '7. Segurança',
-      corpo: `Os dados são protegidos por controle de acesso por linha (Row Level Security) no banco de dados, de modo que cada usuário só acessa os dados pessoais que lhe pertencem (anotações, favoritos, rascunhos). O tráfego entre o navegador e os servidores é criptografado (HTTPS).`,
+      corpo: `Os dados são protegidos por controle de acesso por linha (Row Level Security) no banco de dados. Cada usuário acessa livremente apenas os dados pessoais que lhe pertencem (anotações, favoritos, rascunhos, histórico de leitura); o administrador da plataforma tem acesso a esses mesmos dados de qualquer usuário, para fins de administração, métricas de uso e suporte. O tráfego entre o navegador e os servidores é criptografado (HTTPS).`,
     },
     {
       titulo: '8. Alterações desta Política',
