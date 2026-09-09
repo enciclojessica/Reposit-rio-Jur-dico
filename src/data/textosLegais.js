@@ -1,7 +1,6 @@
 // Conteúdo dos Termos de Uso e da Política de Privacidade, estruturado em
-// seções pra renderização em PaginaLegal.jsx. São minutas de trabalho —
-// campos como e-mail de contato e foro ainda precisam ser preenchidos
-// pela usuária antes de considerar o texto definitivo.
+// seções pra renderização em PaginaLegal.jsx. Foro (Praia Grande, São
+// Paulo) e e-mail de contato (themisjur.ia@gmail.com) preenchidos.
 
 export const TERMOS_DE_USO = {
   titulo: 'Termos de Uso',
@@ -57,11 +56,11 @@ O Themis Jur não se responsabiliza por decisões tomadas com base no conteúdo 
     },
     {
       titulo: '9. Foro e lei aplicável',
-      corpo: `Estes Termos são regidos pela legislação brasileira. Fica eleito o foro da comarca de [a definir] para dirimir eventuais controvérsias, ressalvada disposição legal em contrário.`,
+      corpo: `Estes Termos são regidos pela legislação brasileira. Fica eleito o foro da comarca de Praia Grande, São Paulo, para dirimir eventuais controvérsias, ressalvada disposição legal em contrário.`,
     },
     {
       titulo: '10. Contato',
-      corpo: `Dúvidas sobre estes Termos podem ser enviadas para [e-mail de contato a definir].`,
+      corpo: `Dúvidas sobre estes Termos podem ser enviadas para themisjur.ia@gmail.com.`,
     },
   ],
 }
@@ -106,7 +105,7 @@ Não compartilhamos dados pessoais com terceiros para finalidades próprias dess
       titulo: '6. Direitos do titular',
       corpo: `Nos termos da LGPD, o usuário pode, a qualquer momento: confirmar a existência de tratamento e acessar seus dados; corrigir dados incompletos, inexatos ou desatualizados; solicitar a exclusão de seus dados pessoais, ressalvadas hipóteses de guarda obrigatória por lei; solicitar a portabilidade de seus dados a outro fornecedor de serviço; revogar consentimento, quando aplicável.
 
-A plataforma já oferece, na tela de Configurações, exportação dos próprios dados (entradas, anotações, rascunhos e demais dados vinculados à conta) em formato aberto (JSON). Solicitações adicionais podem ser feitas para [e-mail de contato a definir].`,
+A plataforma já oferece, na tela de Configurações, exportação dos próprios dados (entradas, anotações, rascunhos e demais dados vinculados à conta) em formato aberto (JSON). Solicitações adicionais podem ser feitas para themisjur.ia@gmail.com.`,
     },
     {
       titulo: '7. Segurança',
@@ -118,7 +117,7 @@ A plataforma já oferece, na tela de Configurações, exportação dos próprios
     },
     {
       titulo: '9. Contato',
-      corpo: `Para exercer os direitos descritos nesta Política ou esclarecer dúvidas sobre o tratamento de dados, entre em contato pelo e-mail [a definir].`,
+      corpo: `Para exercer os direitos descritos nesta Política ou esclarecer dúvidas sobre o tratamento de dados, entre em contato pelo e-mail themisjur.ia@gmail.com.`,
     },
   ],
 }
