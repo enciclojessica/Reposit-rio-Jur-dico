@@ -23,6 +23,19 @@ export default async function handler(req, res) {
   const { permitido } = await checarRateLimit(supabase, user.id, 'informativos', { limite: 15, janelaMs: 60_000 })
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
+  // Gate de papel: "Informativos" é ferramenta de curadoria (decide o que
+  // entra no acervo), não recurso de leitor pago — mesmo critério já usado
+  // no endpoint irmão auto-importar-informativos.js, não o de pago usado
+  // em busca.js/busca-semantica.js/pesquisa-juri.js (esses sim são
+  // recursos de leitor). O próprio componente Informativos.jsx já só
+  // deixa editor chegar no botão que chama essa rota; isso é o reforço
+  // do lado do servidor.
+  const { data: membro } = await supabase
+    .from('membros').select('role').eq('user_id', user.id).single()
+  if (membro?.role !== 'admin' && membro?.role !== 'editor') {
+    return res.status(403).json({ error: 'Apenas editores podem usar esta função.' })
+  }
+
   const tribunal = (req.query.tribunal || 'STF').toUpperCase()
   const edicao   = req.query.edicao?.trim() || ''
 

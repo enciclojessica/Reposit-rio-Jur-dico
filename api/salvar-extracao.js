@@ -18,6 +18,17 @@ export default async function handler(req, res) {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
 
+  // Falha corrigida: esse endpoint usa SERVICE_KEY (contorna RLS por
+  // completo), então a trava de is_editor_or_admin() já aplicada em
+  // entradas_insert no banco não vale aqui — precisa da mesma checagem
+  // feita explicitamente na própria rota.
+  const { data: membro } = await supabase
+    .from('membros').select('role').eq('user_id', user.id).single()
+  const podeEditar = membro?.role === 'admin' || membro?.role === 'editor'
+  if (!podeEditar) {
+    return res.status(403).json({ error: 'Apenas editores podem salvar entradas extraídas.' })
+  }
+
   const { dados } = req.body
   if (!dados) return res.status(400).json({ error: 'Dados ausentes.' })
 
