@@ -69,7 +69,7 @@ export default function ModalModelos({ onUsar, onFechar }) {
         </div>
 
         <div style={{ padding: '10px 20px', borderTop: `1px solid ${theme.border}`, fontSize: 10, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
-          Modelos são esqueletos estruturais — fundamentação, teses e precedentes vêm do seu Repositório.
+          Modelos são esqueletos estruturais: fundamentação, teses e precedentes vêm do seu Repositório.
         </div>
       </div>
     </div>

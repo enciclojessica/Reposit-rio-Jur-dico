@@ -344,7 +344,7 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
                   {labelCampoTese(entry.tipo, campo)}
                   {isIa && iasPendente && (
                     <span style={{ color: theme.gold, fontSize: 11, fontStyle: 'italic' }}>
-                      — sugestão de IA, pendente de revisão
+                      (sugestão de IA, pendente de revisão)
                     </span>
                   )}
                 </div>

@@ -337,7 +337,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
                     </div>
                     <div style={{ fontSize: 10, color: theme.muted, marginTop: 3, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
                       {[e.fonte, new Date(e.criado_em).toLocaleDateString('pt-BR')].filter(Boolean).join(', ')}
-                      {e.area === 'Informativo' ? ' — novo' : ''}
+                      {e.area === 'Informativo' ? ' (novo)' : ''}
                     </div>
                   </div>
                 </div>

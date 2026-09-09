@@ -112,7 +112,7 @@ export default function PainelMetricas({ entradas }) {
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>Painel de métricas</div>
         <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
-          Visão de negócio, uso real da plataforma — só você vê essa tela
+          Visão de negócio, uso real da plataforma. Só você vê essa tela
         </div>
       </div>
 
@@ -178,7 +178,7 @@ export default function PainelMetricas({ entradas }) {
           Nunca abertas ({nuncaAbertas.length})
         </div>
         <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 12 }}>
-          Ninguém abriu essas entradas desde que o histórico de leitura começou a ser registrado — não quer dizer que nunca foram lidas antes disso, só que não há registro. Pode ser tag ruim, difícil de achar, ou pouco relevante mesmo.
+          Ninguém abriu essas entradas desde que o histórico de leitura começou a ser registrado; não quer dizer que nunca foram lidas antes disso, só que não há registro. Pode ser tag ruim, difícil de achar, ou pouco relevante mesmo.
         </div>
         {nuncaAbertas.length === 0 ? (
           <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Toda entrada do acervo já foi aberta por alguém.</div>
@@ -204,7 +204,7 @@ export default function PainelMetricas({ entradas }) {
           Teses incompletas ({totalTesesIncompletas})
         </div>
         <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 12 }}>
-          Teses sem fundamentação legal ou sem ratio decidendi preenchidos — geralmente extração por IA que capturou o raciocínio mas não moveu a citação de lei pro campo certo
+          Teses sem fundamentação legal ou sem ratio decidendi preenchidos. Geralmente extração por IA que capturou o raciocínio mas não moveu a citação de lei pro campo certo
         </div>
         {temasIncompletos.length === 0 ? (
           <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Toda tese do acervo tem os dois campos preenchidos.</div>
@@ -239,7 +239,7 @@ export default function PainelMetricas({ entradas }) {
           ))}
         </div>
         <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 6 }}>
-          Começou a ser registrado agora — dias sem leitura ainda aparecem vazios, não é falha.
+          Começou a ser registrado agora; dias sem leitura ainda aparecem vazios, não é falha.
         </div>
       </div>
     </div>

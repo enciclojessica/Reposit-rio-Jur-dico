@@ -8,7 +8,7 @@ export const NOVIDADES_APP = [
   {
     data: '2026-09-05',
     titulo: 'Comparador de teses',
-    descricao: 'Escolha duas entradas do repositório e veja lado a lado — útil pra comparar a posição do STJ e do STF sobre o mesmo tema, por exemplo. Acessível pela navegação ou pelo botão "Comparar" dentro de qualquer entrada.',
+    descricao: 'Escolha duas entradas do repositório e veja lado a lado: útil pra comparar a posição do STJ e do STF sobre o mesmo tema, por exemplo. Acessível pela navegação ou pelo botão "Comparar" dentro de qualquer entrada.',
   },
   {
     data: '2026-09-05',
@@ -33,6 +33,6 @@ export const NOVIDADES_APP = [
   {
     data: '2026-09-05',
     titulo: 'Anotações e histórico sincronizam entre aparelhos',
-    descricao: 'Suas anotações pessoais, favoritos e histórico de leitura agora ficam salvos na sua conta, não só no navegador onde foram escritos — acesse do celular ou do computador sem perder nada.',
+    descricao: 'Suas anotações pessoais, favoritos e histórico de leitura agora ficam salvos na sua conta, não só no navegador onde foram escritos: acesse do celular ou do computador sem perder nada.',
   },
 ]

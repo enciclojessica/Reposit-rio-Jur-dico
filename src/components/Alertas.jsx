@@ -46,7 +46,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
     setDisparando(true)
     const timeoutId = setTimeout(() => {
       setDisparando(false)
-      notify('A verificação pode ter concluído do lado do servidor mesmo sem resposta aqui — confira seu e-mail ou recarregue a página.', 'err')
+      notify('A verificação pode ter concluído do lado do servidor mesmo sem resposta aqui; confira seu e-mail ou recarregue a página.', 'err')
     }, 25000)
     try {
       const { data: { session: s } } = await supabase.auth.getSession()
@@ -57,7 +57,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Falha ao disparar o radar.')
       clearTimeout(timeoutId)
-      notify(`Radar verificado — ${json.enviados} e-mail(s) enviado(s).`)
+      notify(`Radar verificado: ${json.enviados} e-mail(s) enviado(s).`)
     } catch (e) {
       clearTimeout(timeoutId)
       notify(e.message, 'err')

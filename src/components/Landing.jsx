@@ -140,7 +140,7 @@ export default function Landing({ onEntrar }) {
             A tese certa,<br />na hora da peça.
           </div>
           <div style={{ fontSize: 17, color: OURO_CLARO, fontStyle: 'italic', maxWidth: 480, lineHeight: 1.6, marginBottom: 40 }}>
-            Acervo curado de jurisprudência, doutrina e legislação — reunido por uma pessoa só, artigo por artigo.
+            Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo.
           </div>
           <button onClick={() => document.getElementById('porque')?.scrollIntoView({ behavior: 'smooth' })}
             style={{ background: 'transparent', border: `1px solid ${OURO_CLARO}`, color: OURO_CLARO, fontSize: 13, padding: '13px 30px', cursor: 'pointer', fontFamily: SERIF }}>
@@ -216,7 +216,7 @@ export default function Landing({ onEntrar }) {
             Curadoria real, não promessa vazia
           </div>
           <div style={{ fontSize: 14, color: MUSGO, fontStyle: 'italic', marginBottom: 56 }}>
-            Números do acervo, ao vivo — crescem sozinhos conforme mais entradas são curadas.
+            Números do acervo, ao vivo: crescem sozinhos conforme mais entradas são curadas.
           </div>
           {numeros && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40 }}>

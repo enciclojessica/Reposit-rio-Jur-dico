@@ -16,7 +16,7 @@ function IaStatusLabel({ status, theme }) {
   }
   return (
     <span style={{ fontSize: 11, fontStyle: 'italic', color: theme.gold, fontFamily: theme.fontSerif }}>
-      Sugerido por IA — revisar
+      Sugerido por IA: revisar
     </span>
   )
 }
@@ -190,7 +190,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
 
                   <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, fontStyle: 'italic', marginTop: 6 }}>
                     {partesCitacao.join(', ')}
-                    {partesCitacao.length > 0 && numTeses > 0 ? ' — ' : ''}
+                    {partesCitacao.length > 0 && numTeses > 0 ? ' · ' : ''}
                     {numTeses > 0 && `${numTeses} ${numTeses === 1 ? 'tese' : 'teses'}`}
                   </div>
 

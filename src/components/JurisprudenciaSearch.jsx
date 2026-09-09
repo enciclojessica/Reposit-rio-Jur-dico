@@ -164,9 +164,9 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       const entry = {
         area: AREAS[r.area] ? r.area : 'Cível',
         tipo: 'jurisprudência',
-        tema: `${r.tribunal} ${r.tipo} ${numeroTxt} — ${pesquisado}`,
+        tema: `${r.tribunal} ${r.tipo} ${numeroTxt}: ${pesquisado}`,
         fonte: r.tribunal,
-        referencia: `${r.tipo} ${numeroTxt}${relator ? ' — Rel. ' + relator : ''}`,
+        referencia: `${r.tipo} ${numeroTxt}${relator ? ', Rel. ' + relator : ''}`,
         url: r.url || null,
         status: 'vigente',
         tags: ['jurisprudência', r.tribunal?.toLowerCase(), 'pesquisa-juri'].filter(Boolean),

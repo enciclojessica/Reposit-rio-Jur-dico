@@ -122,7 +122,7 @@ export default function Membros({ session }) {
           <input
             value={novoEmail}
             onChange={e => setNovoEmail(e.target.value)}
-            placeholder="E-mail (opcional — apenas para referência)"
+            placeholder="E-mail (opcional, apenas para referência)"
             style={selStyle}
           />
           <select value={novoRole} onChange={e => setNovoRole(e.target.value)}
@@ -154,7 +154,7 @@ export default function Membros({ session }) {
             border: `1px solid ${theme.success}`, borderRadius: 8, padding: 14,
           }}>
             <div style={{ fontSize: 12, color: theme.success, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 8 }}>
-              Link gerado — válido por 7 dias
+              Link gerado, válido por 7 dias
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div style={{

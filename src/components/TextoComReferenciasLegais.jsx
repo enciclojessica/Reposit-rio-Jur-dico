@@ -25,7 +25,7 @@ export default function TextoComReferenciasLegais({ texto, theme, onAbrirArtigo,
     partes.push(
       <span key={i}
         onClick={() => onAbrirArtigo(ref.codigo, ref.numero)}
-        title={revogado ? 'Este artigo não está mais vigente — confira antes de citar em peça' : 'Abrir na Legislação'}
+        title={revogado ? 'Este artigo não está mais vigente. Confira antes de citar em peça' : 'Abrir na Legislação'}
         style={{
           color: revogado ? theme.error : theme.gold,
           textDecoration: 'underline', textDecorationStyle: 'dotted', cursor: 'pointer',

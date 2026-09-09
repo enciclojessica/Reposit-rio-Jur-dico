@@ -245,7 +245,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
                 <div style={{ fontSize: 13, color: theme.success, fontWeight: 700, marginBottom: 2 }}>
                   {autoResultado.salvas > 0
                     ? `✓ ${autoResultado.salvas} decisão(ões) salva(s) automaticamente`
-                    : '— ' + (autoResultado.mensagem || 'Nenhuma decisão relevante encontrada.')}
+                    : (autoResultado.mensagem || 'Nenhuma decisão relevante encontrada.')}
                 </div>
                 {autoResultado.salvas > 0 && (
                   <div style={{ fontSize: 11, color: theme.muted }}>

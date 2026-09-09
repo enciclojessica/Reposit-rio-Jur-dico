@@ -338,7 +338,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
             Legislação
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
-            {total > 0 ? `${total} artigos importados, clique em qualquer um para ver detalhes` : 'Nenhum artigo importado — use Importar, na navegação'}
+            {total > 0 ? `${total} artigos importados, clique em qualquer um para ver detalhes` : 'Nenhum artigo importado. Use Importar, na navegação'}
           </div>
         </div>
         {total > 0 && (
