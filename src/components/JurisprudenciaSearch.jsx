@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { AREAS } from '../shared'
-import { Search, Scale, BookmarkPlus, Check, AlertCircle } from 'lucide-react'
+import { Search, Scale, BookmarkPlus, Check, AlertCircle, Lock } from 'lucide-react'
 
 const TRIBUNAIS = ['Todos', 'STF', 'STJ', 'TST', 'TRFs', 'TJSP', 'TJRJ', 'TJMG']
 
@@ -108,7 +108,7 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
   )
 }
 
-export default function JurisprudenciaSearch({ session, theme }) {
+export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
   const [busca, setBusca]           = useState('')
   const [tribunal, setTribunal]     = useState('Todos')
   const [resultados, setResultados] = useState([])
@@ -119,7 +119,7 @@ export default function JurisprudenciaSearch({ session, theme }) {
   const [pesquisado, setPesquisado] = useState('')
 
   async function pesquisar() {
-    if (!busca.trim()) return
+    if (!busca.trim() || !podeUsarIA) return
     setCarregando(true)
     setErro(null)
     setResultados([])
@@ -225,19 +225,25 @@ export default function JurisprudenciaSearch({ session, theme }) {
           />
           <button
             onClick={pesquisar}
-            disabled={carregando || !busca.trim()}
+            disabled={carregando || !busca.trim() || !podeUsarIA}
+            title={podeUsarIA ? '' : 'Recurso da versão paga'}
             style={{
-              background: theme.gold, border: 'none', borderRadius: 6,
-              padding: '10px 18px', cursor: busca.trim() ? 'pointer' : 'default',
+              background: podeUsarIA ? theme.gold : theme.border, border: 'none', borderRadius: 6,
+              padding: '10px 18px', cursor: (busca.trim() && podeUsarIA) ? 'pointer' : 'not-allowed',
               display: 'flex', alignItems: 'center', gap: 6,
-              color: '#fdfbf7', fontWeight: 600, fontSize: 13,
-              fontFamily: 'Inter, sans-serif', opacity: busca.trim() ? 1 : 0.5,
+              color: podeUsarIA ? '#fdfbf7' : theme.muted, fontWeight: 600, fontSize: 13,
+              fontFamily: 'Inter, sans-serif', opacity: (busca.trim() && podeUsarIA) ? 1 : 0.5,
               flexShrink: 0,
             }}>
-            <Search size={14} />
-            {carregando ? 'Buscando…' : 'Buscar'}
+            {podeUsarIA ? <Search size={14} /> : <Lock size={14} />}
+            {!podeUsarIA ? 'Buscar' : (carregando ? 'Buscando…' : 'Buscar')}
           </button>
         </div>
+        {!podeUsarIA && (
+          <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginTop: 8 }}>
+            Pesquisa de jurisprudência por IA é um recurso da versão paga. Peça liberação ao administrador.
+          </div>
+        )}
       </div>
 
       {/* Filtro de tribunal */}

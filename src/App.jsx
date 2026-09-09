@@ -294,6 +294,22 @@ export default function App() {
           setConviteToken(null)
         }
         setAceitandoConvite(false)
+      } else {
+        // Cadastro público, sem convite: cria automaticamente como leitor
+        // gratuito (a política membros_self_insert_leitor_gratuito só
+        // permite exatamente isso — role='leitor', pago=false — qualquer
+        // tentativa de se dar mais que isso é bloqueada pelo próprio banco).
+        const { data: novoMembro, error: erroAuto } = await supabase
+          .from('membros')
+          .insert({
+            user_id: session.user.id,
+            email: session.user.email,
+            nome: session.user.user_metadata?.full_name || null,
+            role: 'leitor',
+            pago: false,
+          })
+          .select().single()
+        if (!erroAuto) setMembro(novoMembro)
       }
 
       setMembroLoading(false)
@@ -675,7 +691,7 @@ async function handleSave(entry) {
 case VIEWS.JURISPRUDENCIA:
         return (
           <div className="fade-up" style={{ padding: '20px 24px' }}>
-            <JurisprudenciaSearch session={session} theme={theme} />
+            <JurisprudenciaSearch session={session} theme={theme} podeUsarIA={podeUsarIA} />
           </div>
         )
 

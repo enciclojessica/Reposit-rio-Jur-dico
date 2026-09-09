@@ -17,6 +17,17 @@ export default async function handler(req, res) {
   const { permitido } = await checarRateLimit(supabase, user.id, 'busca-semantica', { limite: 30, janelaMs: 5 * 60_000 })
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde alguns minutos e tente novamente.' })
 
+  // Gate de recurso pago: cadastro é público, mas todo endpoint com custo
+  // de IA fica reservado a admin/pago. Cadastro público sem convite entra
+  // sempre como leitor não-pago (garantido pela RLS de membros), então
+  // esse gate é o que impede uso gratuito ilimitado de IA.
+  const { data: membro } = await supabase
+    .from('membros').select('role, pago').eq('user_id', user.id).single()
+  const podeUsarIA = membro?.role === 'admin' || !!membro?.pago
+  if (!podeUsarIA) {
+    return res.status(403).json({ error: 'Busca semântica é um recurso da versão paga. Peça liberação ao administrador.' })
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
 

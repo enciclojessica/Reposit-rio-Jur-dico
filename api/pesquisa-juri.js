@@ -25,6 +25,16 @@ export default async function handler(req, res) {
 
       const { permitido } = await checarRateLimit(supabase, user.id, 'pesquisa-juri', { limite: 15, janelaMs: 60_000 })
       if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
+
+      // Gate de recurso pago — só no caminho de usuário; o radar automático
+      // (isCron) continua rodando normalmente, não é uso opcional de
+      // alguém, é responsabilidade da própria curadoria.
+      const { data: membro } = await supabase
+        .from('membros').select('role, pago').eq('user_id', user.id).single()
+      const podeUsarIA = membro?.role === 'admin' || !!membro?.pago
+      if (!podeUsarIA) {
+        return res.status(403).json({ error: 'Pesquisa de jurisprudência por IA é um recurso da versão paga. Peça liberação ao administrador.' })
+      }
     }
 
     const { query, tribunal } = req.body || {}

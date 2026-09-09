@@ -286,10 +286,10 @@ export default function Landing({ onEntrar }) {
           </div>
           <div style={{ textAlign: 'center' }}>
             <button onClick={onEntrar} style={{ background: 'transparent', border: '1px solid #7a1128', color: '#7a1128', fontSize: 15, padding: '13px 40px', cursor: 'pointer', fontFamily: theme.fontSerif }}>
-              Pedir acesso
+              Criar conta gratuita
             </button>
             <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', marginTop: 12 }}>
-              Acesso por convite. Envie uma mensagem e a curadora entra em contato.
+              Acesso ao acervo completo, sem custo. Busca com IA é recurso da versão paga.
             </div>
           </div>
         </div>
