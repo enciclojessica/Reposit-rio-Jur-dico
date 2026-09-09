@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { Lock, Mail, Eye, EyeOff, Moon, Sun, AlertCircle, CheckCircle } from 'lucide-react'
+import { Lock, Mail, Eye, EyeOff, Moon, Sun, AlertCircle, CheckCircle, User, Phone } from 'lucide-react'
 
 export default function Auth() {
   const { theme, mode, toggle } = useTheme()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
+  const [nome, setNome]         = useState('')
+  const [telefone, setTelefone] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [screen, setScreen]     = useState('login') // login | register | forgot
   const [loading, setLoading]   = useState(false)
@@ -21,7 +23,10 @@ export default function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) setError(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message)
       } else if (screen === 'register') {
-        const { error } = await supabase.auth.signUp({ email, password })
+        const { error } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { full_name: nome.trim(), telefone: telefone.trim() } },
+        })
         if (error) setError(error.message)
         else setSuccess('Verifique seu e-mail para confirmar o cadastro.')
       } else if (screen === 'forgot') {
@@ -97,6 +102,30 @@ export default function Auth() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {/* Nome e telefone — só no cadastro */}
+            {screen === 'register' && (
+              <>
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Nome completo</div>
+                  <div style={{ position: 'relative' }}>
+                    <User size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
+                    <input type="text" value={nome} onChange={e => setNome(e.target.value)}
+                      placeholder="Seu nome completo" required autoComplete="name"
+                      style={{ ...inp, paddingLeft: 36 }} />
+                  </div>
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Telefone</div>
+                  <div style={{ position: 'relative' }}>
+                    <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
+                    <input type="tel" value={telefone} onChange={e => setTelefone(e.target.value)}
+                      placeholder="(00) 00000-0000" required autoComplete="tel"
+                      style={{ ...inp, paddingLeft: 36 }} />
+                  </div>
+                </div>
+              </>
+            )}
+
             {/* E-mail */}
             <div style={{ marginBottom: 14 }}>
               <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>E-mail</div>

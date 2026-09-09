@@ -204,7 +204,9 @@ export default function Membros({ session }) {
                       {ehVoce && <span style={{ fontSize: 11, color: theme.gold, marginLeft: 8, fontStyle: 'italic' }}>(você)</span>}
                     </div>
                     {m.email && m.nome && (
-                      <div style={{ fontSize: 11, color: theme.muted, marginTop: 2, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{m.email}</div>
+                      <div style={{ fontSize: 11, color: theme.muted, marginTop: 2, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                        {m.email}{m.telefone ? ` · ${m.telefone}` : ''}
+                      </div>
                     )}
                   </div>
 

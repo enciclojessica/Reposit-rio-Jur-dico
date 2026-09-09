@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { token, user_id, email, nome } = req.body
+  const { token, user_id, email, nome, telefone } = req.body
   if (!token || !user_id) return res.status(400).json({ error: 'Dados incompletos.' })
 
   // Service role — bypassa RLS para inserir o novo membro
@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     user_id,
     role: convite.role,
     nome: nome || null,
+    telefone: telefone || null,
     email: email || convite.email || null,
     invited_by: convite.invited_by,
   })

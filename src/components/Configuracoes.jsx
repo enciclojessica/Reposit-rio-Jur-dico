@@ -35,6 +35,7 @@ function TabPerfil({ session, membro }) {
   const { theme } = useTheme()
   const fileRef   = useRef()
   const [nome, setNome]           = useState(membro?.nome || '')
+  const [telefone, setTelefone]   = useState(membro?.telefone || '')
   const [oab, setOab]             = useState(membro?.oab_numero || '')
   const [uf, setUf]               = useState(membro?.oab_uf || '')
   const [avatarUrl, setAvatarUrl] = useState(membro?.avatar_url || '')
@@ -105,7 +106,7 @@ function TabPerfil({ session, membro }) {
     if (!session) return
     setSalvando(true); setMsg(null)
     const { error } = await supabase.from('membros').update({
-      nome, oab_numero: oab, oab_uf: uf, avatar_url: avatarUrl,
+      nome, telefone, oab_numero: oab, oab_uf: uf, avatar_url: avatarUrl,
     }).eq('user_id', session.user.id)
     setMsg(error ? { tipo: 'erro', texto: error.message } : { tipo: 'ok', texto: 'Perfil atualizado.' })
     setSalvando(false)
@@ -140,6 +141,7 @@ function TabPerfil({ session, membro }) {
       </Campo>
 
       <Campo label="Nome completo">{inp(nome, setNome, 'Seu nome completo')}</Campo>
+      <Campo label="Telefone">{inp(telefone, setTelefone, '(00) 00000-0000')}</Campo>
 
       <Campo label="E-mail">
         <input value={session?.user?.email || ''} disabled

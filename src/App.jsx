@@ -276,6 +276,7 @@ export default function App() {
               user_id: session.user.id,
               email: session.user.email,
               nome: session.user.user_metadata?.full_name || null,
+              telefone: session.user.user_metadata?.telefone || null,
             }),
           })
           const json = await res.json()
@@ -305,6 +306,7 @@ export default function App() {
             user_id: session.user.id,
             email: session.user.email,
             nome: session.user.user_metadata?.full_name || null,
+            telefone: session.user.user_metadata?.telefone || null,
             role: 'leitor',
             pago: false,
           })
