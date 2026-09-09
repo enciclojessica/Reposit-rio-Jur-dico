@@ -35,7 +35,7 @@ function gerarABNT(entry) {
   } catch { return '' }
 }
 
-export default function EntradaDetail({ entry: raw, session, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar, todasEntradas, onSelecionarRelacionada, modoFoco, onAlternarModoFoco }) {
+export default function EntradaDetail({ entry: raw, session, membro, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar, todasEntradas, onSelecionarRelacionada, modoFoco, onAlternarModoFoco }) {
   const { theme, mode } = useTheme()
 
   // Normalização defensiva total
@@ -191,8 +191,35 @@ export default function EntradaDetail({ entry: raw, session, onClose, onDelete, 
 
   const sm = STATUS_META[status] || STATUS_META['vigente']
 
+  // Identificação de quem exportou, pra rastreabilidade caso o PDF vaze —
+  // mesma lógica de data usada em qualquer outro lugar do app, calculada
+  // no momento da renderização (aproximado ao momento da exportação, não
+  // precisa ser exato ao segundo do clique em "Exportar PDF").
+  const identificacaoExportador = membro?.nome || session?.user?.email || 'usuário não identificado'
+  const dataExportacao = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+  const marcaDaguaTexto = `Themis Jur, extraído por ${identificacaoExportador}, ${dataExportacao}`
+
   return (
     <div className="print-area" style={{ paddingBottom: 40 }}>
+      {/* Timbre, aviso legal e marca d'água — só aparecem na impressão/PDF,
+          nunca na tela normal (redundante com o resto do app ali). A marca
+          d'água usa position:fixed (ver index.css), que o navegador repete
+          em toda página impressa, não só a primeira. */}
+      <div className="print-only" style={{ borderBottom: '2px solid #7a1128', paddingBottom: 10, marginBottom: 16 }}>
+        <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 18, color: '#3d0012' }}>Themis Jur</div>
+        <div style={{ fontSize: 11, fontStyle: 'italic', color: '#736b62' }}>Acervo curado de jurisprudência, doutrina e legislação, themisjur.com.br</div>
+        <div style={{ fontSize: 10, color: '#7a1128', marginTop: 6 }}>
+          Documento de uso pessoal. Reprodução, redistribuição ou disponibilização pública deste conteúdo sem autorização não são permitidas, nos termos dos Termos de Uso da plataforma.
+        </div>
+        <div style={{ fontSize: 10, color: '#736b62', marginTop: 2 }}>
+          Extraído por {identificacaoExportador} em {dataExportacao}.
+        </div>
+      </div>
+      {[0, 1, 2, 3].map(i => (
+        <div key={i} className="print-marca-dagua print-only" style={{ top: `${15 + i * 25}%`, left: `${10 + (i % 2) * 40}%` }}>
+          {marcaDaguaTexto}
+        </div>
+      ))}
       {/* Cabeçalho */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>

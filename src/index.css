@@ -93,5 +93,21 @@ textarea { resize: vertical; }
     padding: 0 !important; margin: 0 !important;
   }
   body { background: #fff !important; }
+
+  /* Escondido em tela, só aparece impresso. */
+  .print-only { display: block !important; }
+
+  /* Marca d'água de rastreabilidade: position:fixed se repete em toda
+     página impressa (não só a primeira) — não dá pra recortar fora
+     numa foto de uma página só. Opacidade baixa, não atrapalha a
+     leitura, mas aparece em qualquer trecho fotografado ou impresso. */
+  .print-marca-dagua {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-family: Georgia, 'EB Garamond', serif;
+    font-size: 13px; color: #00000022; white-space: nowrap;
+    z-index: 9999; pointer-events: none;
+  }
 }
+.print-only { display: none; }
 

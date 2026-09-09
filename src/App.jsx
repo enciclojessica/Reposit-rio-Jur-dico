@@ -808,6 +808,7 @@ case VIEWS.JURISPRUDENCIA:
               <EntradaDetail
                 entry={selected}
                 session={session}
+                membro={membro}
                 todasEntradas={entradas}
                 onSelecionarRelacionada={(e) => setSelected(e)}
                 modoFoco={modoFoco}
