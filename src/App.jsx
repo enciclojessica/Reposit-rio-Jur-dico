@@ -981,6 +981,16 @@ case VIEWS.JURISPRUDENCIA:
                 const { error } = await supabase.from('entradas').delete().in('id', ids)
                 if (error) notify('Erro ao excluir entradas.', 'err')
                 else { notify(ids.length + ' entrada(s) removida(s).'); }
+              } : null}
+              onTornarPublicasMultiple={isAdmin ? async (ids) => {
+                const OWNER = 'foxjessica01@gmail.com'
+                if (session?.user?.email !== OWNER) { notify('Sem permissão para esta ação.', 'err'); return }
+                const { error } = await supabase.from('entradas').update({ publica: true }).in('id', ids)
+                if (error) notify('Erro ao marcar entradas como públicas.', 'err')
+                else {
+                  notify(ids.length + ' entrada(s) marcada(s) como pública(s).')
+                  setEntradas(atuais => atuais.map(e => ids.includes(e.id) ? { ...e, publica: true } : e))
+                }
               } : null}/>
           </div>
         )

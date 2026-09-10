@@ -3,7 +3,7 @@ import { AREAS, corDaArea, AreaDot } from '../shared'
 import { TagPill } from './TagInput'
 import { tagsVisiveis } from '../utils/tagsVisiveis'
 import { useTheme } from '../theme'
-import { Trash2, Square, CheckSquare, Star } from 'lucide-react'
+import { Trash2, Square, CheckSquare, Star, Globe } from 'lucide-react'
 
 function IaStatusLabel({ status, theme }) {
   if (!status || status === 'manual') return null
@@ -21,7 +21,7 @@ function IaStatusLabel({ status, theme }) {
   )
 }
 
-export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMultiple, isAdmin, favoritos, onAlternarFavorito }) {
+export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMultiple, onTornarPublicasMultiple, isAdmin, favoritos, onAlternarFavorito }) {
   const { theme } = useTheme()
   const [modoTabela, setModoTabela] = useState(false)
   const [selecionados, setSelecionados] = useState(new Set())
@@ -47,6 +47,13 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
     if (selecionados.size === 0) return
     if (!window.confirm('Excluir ' + selecionados.size + ' entrada(s) selecionada(s)?')) return
     onDeleteMultiple([...selecionados])
+    setSelecionados(new Set())
+  }
+
+  const confirmarTornarPublicas = () => {
+    if (selecionados.size === 0) return
+    if (!window.confirm('Marcar ' + selecionados.size + ' entrada(s) selecionada(s) como públicas? Elas ficam visíveis pra quem não tem conta e podem ser indexadas pelo Google.')) return
+    onTornarPublicasMultiple([...selecionados])
     setSelecionados(new Set())
   }
 
@@ -106,10 +113,18 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
             {selecionados.size > 0 ? selecionados.size + ' selecionada(s)' : 'Selecionar tudo'}
           </button>
           {selecionados.size > 0 && (
-            <button onClick={confirmarExclusao}
-              style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.penal}66`, borderRadius: 6, padding: '5px 14px', color: theme.penal, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-              <Trash2 size={13} /> Excluir selecionadas
-            </button>
+            <>
+              {onTornarPublicasMultiple && (
+                <button onClick={confirmarTornarPublicas}
+                  style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.gold}66`, borderRadius: 6, padding: '5px 14px', color: theme.gold, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  <Globe size={13} /> Marcar públicas
+                </button>
+              )}
+              <button onClick={confirmarExclusao}
+                style={{ marginLeft: onTornarPublicasMultiple ? 0 : 'auto', display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.penal}66`, borderRadius: 6, padding: '5px 14px', color: theme.penal, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                <Trash2 size={13} /> Excluir selecionadas
+              </button>
+            </>
           )}
         </div>
       )}
