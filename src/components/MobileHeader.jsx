@@ -1,5 +1,4 @@
 import { Lock } from 'lucide-react'
-import { supabase } from '../supabase'
 import SeletorTema from './SeletorTema'
 import SinoNotificacoes from './SinoNotificacoes'
 import { ROLE_LABEL } from '../shared'
@@ -7,7 +6,7 @@ import { VIEWS } from '../data/views'
 
 export default function MobileHeader({
   theme, role, session, membro, setShowLogin,
-  setAreaFilter, setTipoFilter, setView, entradas, setSelected,
+  setAreaFilter, setTipoFilter, setView, entradas, setSelected, onSair,
 }) {
   return (
     <div className="no-print" style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -43,7 +42,7 @@ export default function MobileHeader({
           )
         )}
         {session
-          ? <button onClick={() => supabase.auth.signOut()} style={{ background: 'none', border: 'none', color: '#e8dfc8', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>Sair</button>
+          ? <button onClick={onSair} style={{ background: 'none', border: 'none', color: '#e8dfc8', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>Sair</button>
           : <button onClick={() => setShowLogin(true)} style={{ background: '#a9812e', border: 'none', borderRadius: 6, padding: '5px 14px', color: '#2c241b', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5 }}><Lock size={11} /> Acesso interno</button>
         }
       </div>

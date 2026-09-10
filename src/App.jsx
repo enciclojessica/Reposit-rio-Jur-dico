@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, Component } from 'react'
+import { useEffect, useState, useCallback, useRef, Component } from 'react'
 import { supabase } from './supabase'
 import { useTheme } from './theme'
 import Auth from './components/Auth'
@@ -130,6 +130,8 @@ export default function App() {
   }, [])
   const { theme, mode, isDark, toggle } = useTheme()
   const [session, setSession]       = useState(null)
+  const logoutManualRef = useRef(false)
+  const sessionAnteriorRef = useRef(false)
   const [authLoading, setAuthLoading] = useState(true)
   const [membro, setMembro]         = useState(null)   // { role, nome, email }
   const [membroLoading, setMembroLoading] = useState(false)
@@ -253,6 +255,18 @@ export default function App() {
       setSession(s)
       if (event === 'PASSWORD_RECOVERY') setRecuperandoSenha(true)
       else if (s) setShowLogin(false)
+      else if (event === 'SIGNED_OUT') {
+        // Distingue "cliquei em Sair" de "minha sessão expirou sozinha" —
+        // Supabase dispara o mesmo evento SIGNED_OUT nos dois casos. Sem
+        // essa distinção, quem tivesse a sessão expirada no meio do uso
+        // só via a tela de login voltar, sem entender por quê.
+        if (logoutManualRef.current) {
+          logoutManualRef.current = false
+        } else if (sessionAnteriorRef.current) {
+          notify('Sua sessão expirou. Entre novamente para continuar.', 'err')
+        }
+      }
+      sessionAnteriorRef.current = !!s
     })
     return () => { subscription.unsubscribe(); clearTimeout(timeoutSeguranca) }
   }, [])
@@ -1099,7 +1113,7 @@ case VIEWS.JURISPRUDENCIA:
                     )}
                   </div>
                 </div>
-                <button onClick={() => supabase.auth.signOut()} title="Sair"
+                <button onClick={() => { logoutManualRef.current = true; supabase.auth.signOut() }} title="Sair"
                   style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                   <LogOut size={14} /> Sair
                 </button>
@@ -1121,6 +1135,7 @@ case VIEWS.JURISPRUDENCIA:
             theme={theme} role={role} session={session} membro={membro} setShowLogin={setShowLogin}
             setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter} setView={setView}
             entradas={entradas} setSelected={setSelected}
+            onSair={() => { logoutManualRef.current = true; supabase.auth.signOut() }}
           />
         )}
         <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '16px 16px 80px' : 28 }}>
