@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import SeletorTema from './SeletorTema'
+import { Share2, Check } from 'lucide-react'
 
 const VINHO = '#3d0012'
 const OURO = '#8f6d27'
@@ -97,6 +98,23 @@ export default function Landing({ onEntrar }) {
   const { theme } = useTheme()
 
   const [numeros, setNumeros] = useState(null)
+  const [copiado, setCopiado] = useState(false)
+
+  // Web Share API no celular (abre o menu nativo, com WhatsApp/etc já
+  // disponíveis); em desktop, sem suporte geralmente, cai pra copiar o
+  // link direto, com a mesma confirmação visual já usada em Compartilhar
+  // de entrada (EntradaDetail.jsx) e de legislação (Legislacao.jsx).
+  async function compartilhar() {
+    const texto = 'Themis Jur: acervo curado de jurisprudência, doutrina e legislação.'
+    const url = 'https://themisjur.com.br'
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Themis Jur', text: texto, url }) } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${texto} ${url}`)
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 2000)
+    }
+  }
   useEffect(() => {
     supabase.rpc('contar_acervo_publico').then(({ data }) => { if (data) setNumeros(data) })
   }, [])
@@ -114,6 +132,9 @@ export default function Landing({ onEntrar }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <SeletorTema compact />
+          <button onClick={compartilhar} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, display: 'flex', alignItems: 'center', gap: 5 }}>
+            {copiado ? <><Check size={13} /> Copiado</> : <><Share2 size={13} /> Compartilhar</>}
+          </button>
           <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 12, fontStyle: 'italic', textDecoration: 'none', fontFamily: SERIF }}>
             Ver amostra
           </a>

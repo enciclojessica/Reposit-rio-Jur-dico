@@ -5,6 +5,20 @@ export default function MobileNav({
   theme, view, setView, maisAberto, setMaisAberto,
   isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha, temNovidadeNaoVista,
 }) {
+  // Mesma lógica de compartilhar da Landing (Web Share API no celular,
+  // com fallback pra copiar), só que aqui é pra quem já é membro
+  // convidar outra pessoa, não a porta de entrada de quem nunca viu o
+  // app.
+  async function compartilhar() {
+    const texto = 'Themis Jur: acervo curado de jurisprudência, doutrina e legislação.'
+    const url = 'https://themisjur.com.br'
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Themis Jur', text: texto, url }) } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${texto} ${url}`)
+    }
+  }
+
   // Itens fixos no mobile nav
   const navFixos = [
     { v: VIEWS.HOJE,   label: 'Início',   Icone: Home },
@@ -28,6 +42,7 @@ export default function MobileNav({
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
     ...(session  ? [{ v: VIEWS.NOVIDADES_APP, label: 'O que há de novo', dot: temNovidadeNaoVista }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
+    ...(session  ? [{ v: 'compartilhar', label: 'Compartilhar o Themis Jur', action: compartilhar }] : []),
   ]
   const maisAtivo = navMais.some(n => n.v === view)
 

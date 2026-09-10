@@ -6,6 +6,18 @@ export default function Sidebar({
   theme, view, setView, setAreaFilter, setTipoFilter,
   isAdmin, isEditor, setPrefillEntry, temNovidadeNaoVista,
 }) {
+  // Mesma lógica de compartilhar da Landing e do MobileNav — membro já
+  // logado convidando outra pessoa.
+  async function compartilhar() {
+    const texto = 'Themis Jur: acervo curado de jurisprudência, doutrina e legislação.'
+    const url = 'https://themisjur.com.br'
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Themis Jur', text: texto, url }) } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${texto} ${url}`)
+    }
+  }
+
   return (
     <div className="no-print" style={{
       width: 220, background: theme.surface,
@@ -45,6 +57,7 @@ export default function Sidebar({
           { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
           { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
           { id: 'novidades_app', label: 'O que há de novo', action: () => setView(VIEWS.NOVIDADES_APP), active: view === VIEWS.NOVIDADES_APP, dot: temNovidadeNaoVista },
+          { id: 'compartilhar', label: 'Compartilhar', action: compartilhar, active: false },
         ].map(n => (
           <button key={n.id} onClick={n.action} style={{
             width: '100%', background: n.active ? theme.gold + '12' : 'none',
