@@ -121,25 +121,36 @@ export default function Landing({ onEntrar }) {
 
   const [refStats, statsVisivel] = useRevelar()
 
+  const [estreito, setEstreito] = useState(typeof window !== 'undefined' ? window.innerWidth <= 560 : false)
+  useEffect(() => {
+    function onResize() { setEstreito(window.innerWidth <= 560) }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   return (
     <div style={{ background: MARFIM, fontFamily: SERIF, height: '100vh', overflowY: 'auto', scrollSnapType: 'y proximity' }}>
 
-      {/* Header fixo */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM + 'f2', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 32px', borderBottom: `1px solid ${TINTA}14` }}>
+      {/* Header fixo — opaco (sem desfoque translúcido, que criava um
+          borrão claro ao passar por cima das seções escuras do rodapé) */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: estreito ? '12px 16px' : '16px 32px', borderBottom: `1px solid ${TINTA}14` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 26, height: 26, objectFit: 'contain' }} />
-          <span style={{ fontFamily: SERIF, fontSize: 14, color: TINTA }}>Themis Jur</span>
+          {!estreito && <span style={{ fontFamily: SERIF, fontSize: 14, color: TINTA }}>Themis Jur</span>}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 14 }}>
           <SeletorTema compact />
-          <button onClick={compartilhar} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, display: 'flex', alignItems: 'center', gap: 5 }}>
-            {copiado ? <><Check size={13} /> Copiado</> : <><Share2 size={13} /> Compartilhar</>}
+          <button onClick={compartilhar} title="Compartilhar" style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, display: 'flex', alignItems: 'center', gap: 5 }}>
+            {copiado ? <Check size={15} /> : <Share2 size={15} />}
+            {!estreito && (copiado ? ' Copiado' : ' Compartilhar')}
           </button>
-          <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 12, fontStyle: 'italic', textDecoration: 'none', fontFamily: SERIF }}>
-            Ver amostra
-          </a>
-          <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF }}>
-            Já tenho acesso
+          {!estreito && (
+            <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 12, fontStyle: 'italic', textDecoration: 'none', fontFamily: SERIF }}>
+              Ver amostra
+            </a>
+          )}
+          <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, whiteSpace: 'nowrap' }}>
+            {estreito ? 'Entrar' : 'Já tenho acesso'}
           </button>
         </div>
       </div>
