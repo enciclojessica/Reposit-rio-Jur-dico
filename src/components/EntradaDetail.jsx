@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer, Maximize2, Minimize2 } from 'lucide-react'
 import { useTheme } from '../theme'
-import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese } from '../shared'
+import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { supabase } from '../supabase'
@@ -232,7 +232,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
         </div>
         {(entry.fonte || entry.referencia) && (
           <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
-            {[entry.fonte, entry.referencia].filter(Boolean).join(', ')}
+            {fonteReferenciaResumo(entry)}
           </div>
         )}
         {entry.url && (

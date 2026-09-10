@@ -32,7 +32,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fdfbf7', fontFamily: "Georgia, 'EB Garamond', serif" }}>
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#fdfbf7ee', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid #e4ddd0' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#fdfbf7ee', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', paddingTop: 'calc(16px + env(safe-area-inset-top))', borderBottom: '1px solid #e4ddd0' }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#736b62', fontSize: 13, textDecoration: 'none' }}>
           <ArrowLeft size={16} /> Themis Jur
         </a>

@@ -53,7 +53,7 @@ export default function LegislacaoPublica({ codigo, numero, onFechar }) {
 
   return (
     <div style={{ minHeight: '100vh', background: theme.bg, fontFamily: "Georgia, 'EB Garamond', serif" }}>
-      <div style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '12px 24px', paddingTop: 'calc(12px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}/>
           <div style={{ fontSize: 12, color: '#c9a878', fontStyle: 'italic' }}>Legislação, Themis Jur</div>

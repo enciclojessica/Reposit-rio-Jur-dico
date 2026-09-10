@@ -133,7 +133,7 @@ export default function Landing({ onEntrar }) {
 
       {/* Header fixo — opaco (sem desfoque translúcido, que criava um
           borrão claro ao passar por cima das seções escuras do rodapé) */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: estreito ? '12px 16px' : '16px 32px', borderBottom: `1px solid ${TINTA}14` }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: estreito ? '12px 16px' : '16px 32px', paddingTop: `calc(${estreito ? 12 : 16}px + env(safe-area-inset-top))`, borderBottom: `1px solid ${TINTA}14` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 26, height: 26, objectFit: 'contain' }} />
           {!estreito && <span style={{ fontFamily: SERIF, fontSize: 14, color: TINTA }}>Themis Jur</span>}

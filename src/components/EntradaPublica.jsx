@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AREAS, STATUS_META, corDaArea, labelCampoTese } from '../shared'
+import { AREAS, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo } from '../shared'
 import { TagPill } from './TagInput'
 import { Check, Copy, ExternalLink, AlertCircle } from 'lucide-react'
 import SeletorTema from './SeletorTema'
@@ -80,7 +80,8 @@ export default function EntradaPublica({ entradaId, onFechar }) {
       {/* Header */}
       <div style={{
         background: '#5e0018', borderBottom: '2px solid #a9812e',
-        padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '12px 24px', paddingTop: 'calc(12px + env(safe-area-inset-top))',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}/>
@@ -143,7 +144,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
                 {entry.tema}
               </h1>
               <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
-                {[entry.fonte, entry.referencia, `Compartilhado em ${new Date().toLocaleDateString('pt-BR')}`].filter(Boolean).join(', ')}
+                {fonteReferenciaResumo(entry, [`Compartilhado em ${new Date().toLocaleDateString('pt-BR')}`])}
               </div>
             </div>
 

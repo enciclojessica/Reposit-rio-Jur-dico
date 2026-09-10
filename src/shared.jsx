@@ -220,3 +220,17 @@ export function StatusBadge({ status, onClick, pequena }) {
     </span>
   )
 }
+
+// Monta "fonte, referência" evitando duplicar o autor quando a referência
+// ABNT já começa pelo mesmo nome que está em fonte (comum em doutrina:
+// fonte="Aury Lopes Jr.", referencia="LOPES JR., Aury. Direito..." — sem
+// essa checagem, aparecia "Aury Lopes Jr., LOPES JR., Aury. Direito...").
+export function fonteReferenciaResumo(entry, extras = []) {
+  const fonteRedundante = entry.fonte && entry.referencia &&
+    entry.fonte.length > 4 &&
+    entry.referencia.toLowerCase().includes(entry.fonte.toLowerCase())
+  const partes = fonteRedundante
+    ? [entry.referencia, ...extras]
+    : [entry.fonte, entry.referencia, ...extras]
+  return partes.filter(Boolean).join(', ')
+}
