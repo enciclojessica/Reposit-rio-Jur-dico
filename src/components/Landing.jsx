@@ -292,13 +292,56 @@ export default function Landing({ onEntrar }) {
           <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 14 }}>
             Acesso ao acervo completo, sem custo. Busca com IA é recurso da versão paga.
           </div>
-          <div style={{ fontSize: 11, marginTop: 40, opacity: 0.75 }}>
-            <a href="/?pagina=termos" style={{ color: OURO_CLARO, textDecoration: 'underline' }}>Termos de uso</a>
-            <span style={{ color: OURO_CLARO, margin: '0 6px' }}>e</span>
-            <a href="/?pagina=privacidade" style={{ color: OURO_CLARO, textDecoration: 'underline' }}>política de privacidade</a>
-          </div>
         </div>
       </Secao>
+
+      {/* ── RODAPÉ ─────────────────────────────────────────────────────────── */}
+      <div style={{ background: '#2a000d', padding: '56px 40px 28px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 32, marginBottom: 40 }}>
+            <div>
+              <div style={{ fontFamily: theme.fontTitle, fontSize: 17, color: MARFIM, marginBottom: 10 }}>Themis Jur</div>
+              <div style={{ fontSize: 13, color: OURO_CLARO, fontStyle: 'italic', lineHeight: 1.6, maxWidth: 220 }}>
+                Acervo curado de jurisprudência, doutrina e legislação, por uma pessoa só.
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7 }}>PRODUTO</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>O acervo em números</button>
+                <a href="/?vitrine=1" style={{ color: '#e8dfd0', fontSize: 13, textDecoration: 'none' }}>Ver amostra</a>
+                <button onClick={compartilhar} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>Compartilhar</button>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7 }}>CONTA</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>Entrar</button>
+                <button onClick={() => onEntrar('register')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>Criar conta gratuita</button>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7 }}>CONTATO</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <a href="mailto:themisjur.ia@gmail.com" style={{ color: '#e8dfd0', fontSize: 13, textDecoration: 'none' }}>E-mail</a>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${OURO_CLARO}22`, paddingTop: 20, fontSize: 12, color: '#a89a88', lineHeight: 1.6 }}>
+            O conteúdo do acervo tem finalidade de apoio ao estudo e à pesquisa jurídica; não constitui parecer jurídico, e a responsabilidade pela aplicação ao caso concreto é do usuário.
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginTop: 24, fontSize: 11, color: '#a89a88' }}>
+            <div>© 2026 Themis Jur. Feito no Brasil.</div>
+            <div>
+              <a href="/?pagina=termos" style={{ color: '#a89a88', textDecoration: 'underline' }}>Termos de uso</a>
+              <span style={{ margin: '0 6px' }}>e</span>
+              <a href="/?pagina=privacidade" style={{ color: '#a89a88', textDecoration: 'underline' }}>política de privacidade</a>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
   )
