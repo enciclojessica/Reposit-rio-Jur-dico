@@ -88,6 +88,9 @@ export default function EntradaPublica({ entradaId, onFechar }) {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
+          <a href="/?vitrine=1" style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            Ver mais do acervo
+          </a>
           {onFechar && (
             <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", cursor: 'pointer' }}>
               Voltar ao repositório

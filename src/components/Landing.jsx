@@ -114,6 +114,9 @@ export default function Landing({ onEntrar }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <SeletorTema compact />
+          <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 12, fontStyle: 'italic', textDecoration: 'none', fontFamily: SERIF }}>
+            Ver amostra
+          </a>
           <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF }}>
             Já tenho acesso
           </button>
