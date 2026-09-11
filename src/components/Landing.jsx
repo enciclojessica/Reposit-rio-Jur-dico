@@ -338,7 +338,7 @@ export default function Landing({ onEntrar }) {
           </div>
 
           <div style={{ borderTop: `1px solid ${OURO_CLARO}22`, paddingTop: 20, fontSize: 12, color: '#a89a88', lineHeight: 1.6 }}>
-            O conteúdo do acervo tem finalidade de apoio ao estudo e à pesquisa jurídica; não constitui parecer jurídico, e a responsabilidade pela aplicação ao caso concreto é do usuário.
+            O acervo e as sugestões de teses têm finalidade de apoio ao estudo e à pesquisa jurídica, e exigem conferência dos fatos, fundamentos e fontes pelo profissional antes do uso em peça. A responsabilidade pelo exercício profissional permanece do advogado, inclusive por atos praticados com dolo ou culpa, nos termos do art. 32 da Lei nº 8.906/94.
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginTop: 24, fontSize: 11, color: '#a89a88' }}>
