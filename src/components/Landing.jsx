@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
-import SeletorTema from './SeletorTema'
 import { Share2, Check } from 'lucide-react'
 
 const VINHO = '#3d0012'
@@ -139,7 +138,6 @@ export default function Landing({ onEntrar }) {
           {!estreito && <span style={{ fontFamily: SERIF, fontSize: 14, color: TINTA }}>Themis Jur</span>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 14 }}>
-          <SeletorTema compact />
           <button onClick={compartilhar} title="Compartilhar" style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, display: 'flex', alignItems: 'center', gap: 5 }}>
             {copiado ? <Check size={15} /> : <Share2 size={15} />}
             {!estreito && (copiado ? ' Copiado' : ' Compartilhar')}
