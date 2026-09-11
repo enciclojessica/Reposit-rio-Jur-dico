@@ -181,7 +181,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
 
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Radar de Atualizações
         </div>
         <div style={{ fontSize: 12, color: theme.muted, lineHeight: 1.6, fontFamily: 'Inter, sans-serif' }}>
@@ -270,7 +270,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                           <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.tipo}</span>
                           {e.fonte && <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.fonte}</span>}
                         </div>
-                        <div style={{ fontSize: 14, color: theme.text, fontFamily: 'Georgia, serif', lineHeight: 1.4, marginBottom: 4 }}>
+                        <div style={{ fontSize: 14, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.4, marginBottom: 4 }}>
                           {e.tema}
                         </div>
                         {teses[0]?.tese_assunto && (
@@ -299,12 +299,12 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
             <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 16 }}>
               Monitorar novo tema
             </div>
-            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Tema</div>
+            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Tema</div>
             <input value={tema} onChange={e => setTema(e.target.value)} onKeyDown={e => e.key === 'Enter' && adicionar()}
               placeholder="Ex: dano moral plano de saúde, responsabilidade civil bancária"
-              style={{ marginBottom: 12, fontFamily: "Georgia, 'EB Garamond', serif" }} />
+              style={{ marginBottom: 12, fontFamily: "'Inter', sans-serif" }} />
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8, fontFamily: "Georgia, 'EB Garamond', serif" }}>Tribunais</div>
+              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>Tribunais</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {TRIBUNAIS.map(t => {
                   const ativo = tribunais.includes(t.id)
@@ -323,8 +323,8 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Receber em</div>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: "Georgia, 'EB Garamond', serif", maxWidth: 320 }} />
+              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Receber em</div>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: "'Inter', sans-serif", maxWidth: 320 }} />
             </div>
             <button onClick={adicionar} disabled={salvando || !tema.trim() || !email.trim()} style={{
               background: salvando || !tema.trim() || !email.trim() ? theme.border : theme.gold,
@@ -355,10 +355,10 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                   borderRadius: 8, opacity: a.ativo ? 1 : 0.55, transition: 'all .15s',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: theme.text, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                    <div style={{ fontSize: 13, color: theme.text, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Inter', sans-serif" }}>
                       {a.tema}
                     </div>
-                    <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                    <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                       {[
                         (Array.isArray(a.tribunal) ? a.tribunal : [a.tribunal]).includes('todos') ? 'Todos os tribunais' : (Array.isArray(a.tribunal) ? a.tribunal.join(', ') : a.tribunal),
                         a.email,

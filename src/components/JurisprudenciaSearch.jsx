@@ -17,13 +17,13 @@ function badgeConfig(tendencia, area, theme) {
 function RelevanciaBar({ pct, cor, theme }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-      <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>
+      <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
         Relevância
       </span>
       <div style={{ flex: 1, height: 4, background: theme.border, borderRadius: 2 }}>
         <div style={{ height: '100%', width: pct + '%', background: cor, borderRadius: 2, transition: 'width .6s', opacity: 0.8 }} />
       </div>
-      <span style={{ fontSize: 11, color: cor, fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>
+      <span style={{ fontSize: 11, color: cor, fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
         {pct}%
       </span>
     </div>
@@ -68,19 +68,19 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
           <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
             {r.tribunal}, {r.tipo}{numero ? ` ${numero}` : ''}
             {!numero && (
-              <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginLeft: 8, fontWeight: 400 }}>
+              <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginLeft: 8, fontWeight: 400 }}>
                 (número não confirmado)
               </span>
             )}
           </div>
           {(relator || data) && (
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginTop: 2 }}>
               {[relator, data ? data.toLocaleDateString('pt-BR') : null].filter(Boolean).join(', ')}
             </div>
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <span style={{ fontSize: 12, color: badge.color, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <span style={{ fontSize: 12, color: badge.color, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
             {badge.label}
           </span>
           <button
@@ -99,7 +99,7 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
       </div>
 
       {/* Ementa */}
-      <div style={{ fontSize: 13, color: theme.textSub, fontFamily: "Georgia, 'EB Garamond', serif", lineHeight: 1.6 }}>
+      <div style={{ fontSize: 13, color: theme.textSub, fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
         {r.ementa}
       </div>
 
@@ -194,7 +194,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       <div style={{ marginBottom: 28, paddingTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <Scale size={22} color={theme.gold} />
-          <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
             Jurisprudência
           </span>
         </div>
@@ -219,7 +219,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
             placeholder="Ex: responsabilidade civil objetiva consumidor…"
             style={{
               flex: 1, background: 'none', border: 'none', outline: 'none',
-              color: theme.text, fontSize: 14, fontFamily: "Georgia, 'EB Garamond', serif",
+              color: theme.text, fontSize: 14, fontFamily: "'Inter', sans-serif",
               padding: '10px 0',
             }}
           />
@@ -240,7 +240,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
           </button>
         </div>
         {!podeUsarIA && (
-          <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginTop: 8 }}>
+          <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginTop: 8 }}>
             Pesquisa de jurisprudência por IA é um recurso da versão paga. Peça liberação ao administrador.
           </div>
         )}
@@ -251,7 +251,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
         {TRIBUNAIS.map(t => (
           <span key={t} onClick={() => setTribunal(t)}
             style={{
-              fontSize: 13, fontFamily: "Georgia, 'EB Garamond', serif", paddingBottom: 8,
+              fontSize: 13, fontFamily: "'Inter', sans-serif", paddingBottom: 8,
               cursor: 'pointer',
               borderBottom: tribunal === t ? `1.5px solid ${theme.gold}` : '1.5px solid transparent',
               color: tribunal === t ? theme.text : theme.muted,
@@ -265,10 +265,10 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       {/* Estado de carregando */}
       {carregando && (
         <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted }}>
-          <div style={{ fontSize: 14, fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 8 }}>
             Consultando STF, STJ e tribunais…
           </div>
-          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
             Isso pode levar alguns segundos
           </div>
         </div>
@@ -276,7 +276,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
 
       {/* Erro */}
       {erro && (
-        <div style={{ background: 'transparent', border: `1px solid ${theme.penal}55`, borderRadius: 8, padding: '12px 16px', color: theme.penal, fontSize: 13, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+        <div style={{ background: 'transparent', border: `1px solid ${theme.penal}55`, borderRadius: 8, padding: '12px 16px', color: theme.penal, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
           {erro}
         </div>
       )}
@@ -285,10 +285,10 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       {resultados.length > 0 && (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
               {resultados.length} resultado{resultados.length !== 1 ? 's' : ''} para "{pesquisado}"
             </div>
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 4 }}>
               {salvos.size > 0
                 ? `${salvos.size} salvo${salvos.size > 1 ? 's' : ''} no repositório`
                 : <>Clique em <BookmarkPlus size={12} /> para salvar</>}
@@ -314,7 +314,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       {!carregando && resultados.length === 0 && !erro && (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <Scale size={32} color={theme.muted} style={{ marginBottom: 12 }} />
-          <div style={{ fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", lineHeight: 1.6 }}>
+          <div style={{ fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
             Digite o tema, tese ou número do processo<br />
             para buscar jurisprudência em tempo real
           </div>

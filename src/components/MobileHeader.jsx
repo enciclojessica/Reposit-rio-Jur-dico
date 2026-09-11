@@ -16,12 +16,12 @@ export default function MobileHeader({
           onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }}
         />
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#f2e9d8', fontFamily: 'Playfair Display, serif', lineHeight: 1.1 }}>Themis Jur</div>
-          <div style={{ fontSize: 10, color: '#c9a878', fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>Inteligência jurídica</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#f2e9d8', fontFamily: 'Inter, sans-serif', lineHeight: 1.1 }}>Themis Jur</div>
+          <div style={{ fontSize: 10, color: '#c9a878', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Inteligência jurídica</div>
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {role && <span style={{ fontSize: 10, color: '#e8c98a', fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>{ROLE_LABEL[role]}</span>}
+        {role && <span style={{ fontSize: 10, color: '#e8c98a', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{ROLE_LABEL[role]}</span>}
         <SeletorTema compact />
         {session && (
           <SinoNotificacoes session={session} corIcone="#e8dfc8"
@@ -35,7 +35,7 @@ export default function MobileHeader({
               style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #a9812e', flexShrink: 0 }} />
           ) : (
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#a9812e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ color: '#5e0018', fontSize: 11, fontWeight: 700, fontFamily: 'Playfair Display, serif' }}>
+              <span style={{ color: '#5e0018', fontSize: 11, fontWeight: 700, fontFamily: 'Inter, sans-serif' }}>
                 {(membro?.nome || session.user.email || 'JF').slice(0, 2).toUpperCase()}
               </span>
             </div>

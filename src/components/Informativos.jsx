@@ -24,11 +24,11 @@ function DecisaoCard({ decisao, onImportar, importada }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Metadados */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ color: cor, fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <span style={{ color: cor, fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
             {decisao.area || 'Informativo'}
           </span>
           {decisao.orgao && (
-            <span style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <span style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
               {decisao.orgao}
             </span>
           )}
@@ -38,7 +38,7 @@ function DecisaoCard({ decisao, onImportar, importada }) {
         </div>
 
         {/* Título */}
-        <div style={{ fontSize: 14, color: theme.text, fontFamily: 'Playfair Display, serif', fontWeight: 600, lineHeight: 1.4, marginBottom: 8 }}>
+        <div style={{ fontSize: 14, color: theme.text, fontFamily: 'Inter, sans-serif', fontWeight: 600, lineHeight: 1.4, marginBottom: 8 }}>
           {decisao.titulo}
         </div>
 
@@ -181,7 +181,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
     <div style={{ paddingBottom: 40 }}>
       {/* Cabeçalho */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Informativos de Jurisprudência
         </div>
         <div style={{ fontSize: 12, color: theme.muted }}>
@@ -199,7 +199,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
               border: `1px solid ${tribunal === t.id ? theme.gold + '55' : theme.border}`,
               borderRadius: 8, padding: '8px 20px', fontSize: 13,
               fontWeight: tribunal === t.id ? 600 : 400,
-              cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif",
+              cursor: 'pointer', fontFamily: "'Inter', sans-serif",
             }}>
             {t.label}
             <span style={{ display: 'block', fontSize: 9, opacity: 0.6, marginTop: 1 }}>{t.sub}</span>
@@ -290,7 +290,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
                 Informativo {dados.tribunal} nº {dados.edicao}
               </span>
               {dados.data && (
-                <span style={{ fontSize: 12, color: theme.muted, marginLeft: 10, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                <span style={{ fontSize: 12, color: theme.muted, marginLeft: 10, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                   {new Date(dados.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </span>
               )}

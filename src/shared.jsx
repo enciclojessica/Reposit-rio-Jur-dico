@@ -112,7 +112,7 @@ export function Badge({ label, color, small }) {
     <span style={{
       color,
       fontSize: small ? 11 : 12,
-      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       fontStyle: 'italic',
       whiteSpace: 'nowrap',
     }}>{label}</span>
@@ -125,7 +125,7 @@ export function FieldLabel({ children }) {
     <div style={{
       fontSize: 12,
       color: theme.gold,
-      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       fontStyle: 'italic',
       marginBottom: 6,
       marginTop: 14,
@@ -211,7 +211,7 @@ export function StatusBadge({ status, onClick, pequena }) {
         border: `1px solid ${s.cor}55`,
         borderRadius: 20, padding: pequena ? '1px 9px' : '3px 11px',
         fontSize: pequena ? 11 : 12,
-        fontFamily: "Georgia, 'EB Garamond', serif",
+        fontFamily: "'Inter', sans-serif",
         fontStyle: 'italic',
         cursor: onClick ? 'pointer' : 'default',
         userSelect: 'none', whiteSpace: 'nowrap',

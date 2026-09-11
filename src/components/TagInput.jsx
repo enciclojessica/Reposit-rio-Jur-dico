@@ -24,7 +24,7 @@ export function TagPill({ tag, onRemove, pequena }) {
       border: `1px solid ${cor}3a`,
       borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
       fontSize: pequena ? 10 : 11,
-      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       whiteSpace: 'nowrap',
     }}>
       #{tag}
@@ -98,7 +98,7 @@ export default function TagInput({ tags = [], onChange, todasAsTags = [] }) {
           style={{
             border: 'none', outline: 'none', background: 'transparent',
             color: theme.text, fontSize: 12,
-            fontFamily: "Georgia, 'EB Garamond', serif",
+            fontFamily: "'Inter', sans-serif",
             flex: 1, minWidth: 120, padding: 0,
           }}
         />
@@ -120,7 +120,7 @@ export default function TagInput({ tags = [], onChange, todasAsTags = [] }) {
                     background: 'none', border: `1px solid ${theme.border}`,
                     borderRadius: 20, padding: '2px 10px', cursor: 'pointer',
                     fontSize: 11, color: theme.muted,
-                    fontFamily: "Georgia, 'EB Garamond', serif",
+                    fontFamily: "'Inter', sans-serif",
                   }}>#{t}</button>
               ))}
             </div>
@@ -132,7 +132,7 @@ export default function TagInput({ tags = [], onChange, todasAsTags = [] }) {
               style={{
                 padding: '8px 12px', fontSize: 12, color: theme.gold,
                 cursor: 'pointer', borderTop: sugestoes.length ? `1px solid ${theme.border}` : 'none',
-                fontFamily: "Georgia, 'EB Garamond', serif",
+                fontFamily: "'Inter', sans-serif",
               }}>
               + Criar tag <strong>#{input.trim().toLowerCase()}</strong>
             </div>

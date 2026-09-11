@@ -86,7 +86,7 @@ export default function InstalarApp() {
       animation: 'fadeUp .3s ease',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>
           Instalar Themis Jur no iPhone
         </div>
         <button onClick={() => setShowIOSGuia(false)}
@@ -103,7 +103,7 @@ export default function InstalarApp() {
         ].map(([n, text]) => (
           <div key={n} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 24, height: 24, borderRadius: '50%', background: theme.gold + '22', color: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{n}</div>
-            <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{text}</div>
+            <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{text}</div>
           </div>
         ))}
       </div>
@@ -119,7 +119,7 @@ export default function InstalarApp() {
       animation: 'fadeUp .3s ease',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>
           Instalar Themis Jur no celular
         </div>
         <button onClick={() => setShowAndroidGuia(false)}
@@ -136,7 +136,7 @@ export default function InstalarApp() {
         ].map(([n, text]) => (
           <div key={n} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 24, height: 24, borderRadius: '50%', background: theme.gold + '22', color: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{n}</div>
-            <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{text}</div>
+            <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{text}</div>
           </div>
         ))}
       </div>
@@ -166,7 +166,7 @@ export default function InstalarApp() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
         <button onClick={instalar}
-          style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", whiteSpace: 'nowrap' }}>
+          style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif", whiteSpace: 'nowrap' }}>
           Instalar
         </button>
         <button onClick={() => setVisivel(false)}

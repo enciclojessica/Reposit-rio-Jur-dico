@@ -266,7 +266,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
   return (
     <div style={{ paddingBottom: 40, maxWidth: 680 }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Extrair de Petição
         </div>
         <div style={{ fontSize: 12, color: theme.muted, lineHeight: 1.6, fontFamily: 'Inter, sans-serif' }}>
@@ -342,7 +342,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         <div style={{ ...card, padding: 28 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
             <Check size={20} color={theme.success} />
-            <div style={{ fontSize: 16, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>
               Extração concluída
             </div>
           </div>
@@ -356,20 +356,20 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
               <div style={{ fontSize: 24, fontWeight: 600, color: theme.success, fontFamily: theme.fontTitle }}>
                 {resultado.teses_salvas ?? 0}
               </div>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>tese(s) adicionadas</div>
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>tese(s) adicionadas</div>
             </div>
             <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: `1px solid ${theme.border}`, borderTop: `2px solid ${theme.civel}`, borderRadius: 6, padding: '12px 16px' }}>
               <div style={{ fontSize: 24, fontWeight: 600, color: theme.civel, fontFamily: theme.fontTitle }}>
                 {resultado.artigos_salvos ?? 0}
               </div>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>artigo(s) na legislação</div>
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>artigo(s) na legislação</div>
             </div>
             {((resultado.juris_salvas ?? 0) + (resultado.juris_atualizadas ?? 0)) > 0 && (
               <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: `1px solid ${theme.border}`, borderTop: `2px solid ${theme.doutrina}`, borderRadius: 6, padding: '12px 16px' }}>
                 <div style={{ fontSize: 24, fontWeight: 600, color: theme.doutrina, fontFamily: theme.fontTitle }}>
                   {(resultado.juris_salvas ?? 0) + (resultado.juris_atualizadas ?? 0)}
                 </div>
-                <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                   jurisprudência(s)
                   {resultado.juris_atualizadas > 0 && ` (${resultado.juris_atualizadas} com novo contexto)`}
                 </div>
@@ -387,18 +387,18 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             <div style={{ marginBottom: 20 }}>
               {resultado.detalhes.teses?.length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
                     Teses / Doutrina / Jurisprudência do Repositório
                   </div>
                   {resultado.detalhes.teses.map((t, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: theme.raised, borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: theme.success, background: theme.success + '18', borderRadius: 4, padding: '1px 6px', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: theme.success, background: theme.success + '18', borderRadius: 4, padding: '1px 6px', fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
                         NOVO
                       </span>
                       <span style={{ color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {t.tema}
                       </span>
-                      <span style={{ fontSize: 10, color: theme.muted, fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>
+                      <span style={{ fontSize: 10, color: theme.muted, fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
                         {t.area} · {t.tipo}
                       </span>
                     </div>
@@ -408,13 +408,13 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
               {resultado.detalhes.artigos?.length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
                     Artigos de Legislação
                   </div>
                   {resultado.detalhes.artigos.map((a, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: theme.raised, borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
                       <span style={{
-                        fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '1px 6px', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0,
+                        fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '1px 6px', fontFamily: "'Inter', sans-serif", flexShrink: 0,
                         color: a.status === 'novo' ? theme.success : '#0ea5e9',
                         background: (a.status === 'novo' ? theme.success : '#0ea5e9') + '18',
                       }}>
@@ -430,13 +430,13 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
               {resultado.detalhes.juris?.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
                     Jurisprudência citada na peça
                   </div>
                   {resultado.detalhes.juris.map((j, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: theme.raised, borderRadius: 6, marginBottom: 4, fontSize: 12 }}>
                       <span style={{
-                        fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '1px 6px', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0,
+                        fontSize: 9, fontWeight: 700, borderRadius: 4, padding: '1px 6px', fontFamily: "'Inter', sans-serif", flexShrink: 0,
                         color: j.status === 'novo' ? theme.success : '#a78bfa',
                         background: (j.status === 'novo' ? theme.success : '#a78bfa') + '18',
                       }}>

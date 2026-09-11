@@ -31,7 +31,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
     : []
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fdfbf7', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+    <div style={{ minHeight: '100vh', background: '#fdfbf7', fontFamily: "'Inter', sans-serif" }}>
       <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#fdfbf7ee', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', paddingTop: 'calc(16px + env(safe-area-inset-top))', borderBottom: '1px solid #e4ddd0' }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#736b62', fontSize: 13, textDecoration: 'none' }}>
           <ArrowLeft size={16} /> Themis Jur
@@ -45,7 +45,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
       </div>
 
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '40px 24px 80px' }}>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 28, color: '#2c241b', marginBottom: 8 }}>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 28, color: '#2c241b', marginBottom: 8 }}>
           Amostra do acervo
         </div>
         <div style={{ fontSize: 14, color: '#736b62', fontStyle: 'italic', marginBottom: 28 }}>

@@ -200,7 +200,7 @@ export default function ImportacaoLote({ session }) {
   return (
     <div style={{ paddingBottom: 40, maxWidth: 860 }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Importação em Lote
         </div>
         <div style={{ fontSize: 12, color: theme.muted }}>
@@ -368,7 +368,7 @@ export default function ImportacaoLote({ session }) {
       {etapa === 'concluido' && (
         <div style={{ ...card, textAlign: 'center', padding: 50 }}>
           <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>{resultados.erro === 0 ? <Check size={40} color={theme.success} /> : <AlertCircle size={40} color={theme.error} />}</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
             Importação concluída
           </div>
           <div style={{ fontSize: 14, color: theme.text, marginBottom: 6 }}>
@@ -380,11 +380,11 @@ export default function ImportacaoLote({ session }) {
 
           {resultados.errosMsgs && resultados.errosMsgs.length > 0 && (
             <div style={{ marginTop: 16, textAlign: 'left', background: theme.inputBg, border: `1px solid ${theme.error}44`, borderRadius: 8, padding: '12px 16px', maxHeight: 200, overflowY: 'auto' }}>
-              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                 Detalhes dos erros
               </div>
               {resultados.errosMsgs.map((msg, i) => (
-                <div key={i} style={{ fontSize: 11, color: theme.muted, fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 4, lineHeight: 1.5, wordBreak: 'break-word' }}>
+                <div key={i} style={{ fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif", marginBottom: 4, lineHeight: 1.5, wordBreak: 'break-word' }}>
                   {msg}
                 </div>
               ))}

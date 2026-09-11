@@ -114,7 +114,7 @@ export default function ImportarLegislacao() {
   return (
     <div style={{ paddingBottom: 40, maxWidth: 800 }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Importar Legislação
         </div>
         <div style={{ fontSize: 12, color: theme.muted }}>
@@ -133,7 +133,7 @@ export default function ImportarLegislacao() {
             <div style={{ fontSize: 12, color: theme.muted, marginBottom: 20 }}>
               Use os arquivos gerados: cpc_para_importar.xlsx, lei9099_para_importar.xlsx
             </div>
-            <label style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <label style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
               + Selecionar arquivo
               <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleArquivo} style={{ display: 'none' }} />
             </label>
@@ -151,12 +151,12 @@ export default function ImportarLegislacao() {
         <>
           <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
             <div style={{ ...card, marginBottom: 0, flex: 1, borderTop: `2px solid ${theme.success}` }}>
-              <div style={{ fontSize: 26, fontWeight: 700, color: theme.success, fontFamily: "Georgia, 'EB Garamond', serif" }}>{linhas.length}</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: theme.success, fontFamily: "'Inter', sans-serif" }}>{linhas.length}</div>
               <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>prontos para importar</div>
             </div>
             {erros.length > 0 && (
               <div style={{ ...card, marginBottom: 0, flex: 1, borderTop: `2px solid ${theme.error}` }}>
-                <div style={{ fontSize: 26, fontWeight: 700, color: theme.error, fontFamily: "Georgia, 'EB Garamond', serif" }}>{erros.length}</div>
+                <div style={{ fontSize: 26, fontWeight: 700, color: theme.error, fontFamily: "'Inter', sans-serif" }}>{erros.length}</div>
                 <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>linhas com erro (serão ignoradas)</div>
               </div>
             )}
@@ -176,7 +176,7 @@ export default function ImportarLegislacao() {
                 <tbody>
                   {linhas.slice(0, 50).map((l, i) => (
                     <tr key={i} style={{ borderBottom: `1px solid ${theme.border}22` }}>
-                      <td style={{ padding: '6px 12px', color: theme.gold, fontFamily: "Georgia, 'EB Garamond', serif", whiteSpace: 'nowrap', fontWeight: 700 }}>{l.codigo?.toUpperCase()}</td>
+                      <td style={{ padding: '6px 12px', color: theme.gold, fontFamily: "'Inter', sans-serif", whiteSpace: 'nowrap', fontWeight: 700 }}>{l.codigo?.toUpperCase()}</td>
                       <td style={{ padding: '6px 12px', color: theme.text, whiteSpace: 'nowrap' }}>{l.numero}</td>
                       <td style={{ padding: '6px 12px', color: theme.muted, whiteSpace: 'nowrap' }}>{l.inciso || '—'}</td>
                       <td style={{ padding: '6px 12px', color: theme.muted, whiteSpace: 'nowrap' }}>{l.paragrafo || '—'}</td>
@@ -196,8 +196,8 @@ export default function ImportarLegislacao() {
           </div>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <button onClick={reiniciar} style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif" }}>Cancelar</button>
-            <button onClick={importar} disabled={!linhas.length} style={{ background: theme.gold, color: '#fdfbf7', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <button onClick={reiniciar} style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>Cancelar</button>
+            <button onClick={importar} disabled={!linhas.length} style={{ background: theme.gold, color: '#fdfbf7', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
               Importar {linhas.length} artigo{linhas.length !== 1 ? 's' : ''}
             </button>
           </div>
@@ -222,7 +222,7 @@ export default function ImportarLegislacao() {
           <div style={{ marginBottom: 12, color: resultado?.erro === 0 ? theme.success : theme.gold, display: 'flex', justifyContent: 'center' }}>
             {resultado?.erro === 0 ? <Check size={36} /> : <AlertTriangle size={36} />}
           </div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
             Importação concluída
           </div>
           <div style={{ fontSize: 14, color: theme.text, marginBottom: 6 }}>
@@ -232,7 +232,7 @@ export default function ImportarLegislacao() {
           <div style={{ fontSize: 12, color: theme.muted, marginBottom: 20 }}>
             Use /cpc 300 no Editor de Peças para inserir artigos
           </div>
-          <button onClick={reiniciar} style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <button onClick={reiniciar} style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
             Importar mais
           </button>
         </div>

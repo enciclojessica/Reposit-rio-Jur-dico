@@ -19,7 +19,7 @@ export default function ModalModelos({ onUsar, onFechar }) {
         display: 'flex', flexDirection: 'column', boxShadow: theme.shadow, margin: 16,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: `1px solid ${theme.border}` }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Modelos de Peças</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>Modelos de Peças</div>
           <button onClick={onFechar} aria-label="Fechar" style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer' }}><X size={18} /></button>
         </div>
 
@@ -31,7 +31,7 @@ export default function ModalModelos({ onUsar, onFechar }) {
                 border: `1px solid ${categoria === c ? theme.gold : theme.border}`,
                 background: categoria === c ? theme.gold + '18' : 'none',
                 color: categoria === c ? theme.gold : theme.muted,
-                fontFamily: "Georgia, 'EB Garamond', serif",
+                fontFamily: "'Inter', sans-serif",
               }}>
               {c}
             </button>
@@ -54,13 +54,13 @@ export default function ModalModelos({ onUsar, onFechar }) {
               onMouseLeave={e => e.currentTarget.style.borderColor = theme.border}>
               <FileText size={18} color={theme.gold} style={{ flexShrink: 0, marginTop: 2 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Georgia, serif' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
                   {m.titulo}
                 </div>
                 <div style={{ fontSize: 11, color: theme.muted, marginTop: 4, lineHeight: 1.5, fontFamily: 'Inter, sans-serif' }}>
                   {m.descricao}
                 </div>
-                <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: 'italic' }}>
+                <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, fontFamily: "'Inter', sans-serif", fontStyle: 'italic' }}>
                   {m.categoria} · {m.rito}
                 </div>
               </div>

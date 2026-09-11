@@ -72,7 +72,7 @@ export default function MobileNav({
                 border: `1px solid ${view === item.v ? theme.gold + '44' : 'transparent'}`,
                 borderRadius: 8, position: 'relative',
                 color: view === item.v ? theme.gold : theme.muted,
-                cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", fontSize: 10,
+                cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontSize: 10,
               }}>
               {item.dot && <span style={{ position: 'absolute', top: 6, right: 10, width: 6, height: 6, borderRadius: '50%', background: theme.gold }} />}
               {item.label}
@@ -93,7 +93,7 @@ export default function MobileNav({
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
               padding: '10px 4px', background: 'none', border: 'none',
               color: view === item.v ? theme.gold : theme.muted,
-              cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", fontSize: 10,
+              cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontSize: 10,
               borderTop: view === item.v ? `2px solid ${theme.gold}` : '2px solid transparent',
             }}>
             <item.Icone size={18} style={{ marginBottom: 2 }} />
@@ -107,7 +107,7 @@ export default function MobileNav({
             flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
             padding: '10px 4px', background: 'none', border: 'none',
             color: maisAtivo ? theme.gold : theme.muted,
-            cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", fontSize: 10,
+            cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontSize: 10,
             borderTop: maisAtivo ? `2px solid ${theme.gold}` : '2px solid transparent',
           }}>
           <MoreHorizontal size={18} style={{ marginBottom: 2 }} />

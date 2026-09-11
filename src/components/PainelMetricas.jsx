@@ -160,7 +160,7 @@ export default function PainelMetricas({ entradas }) {
         </div>
         {distribuicaoAreas.map(({ area, count }) => (
           <div key={area} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 7 }}>
-            <div style={{ width: 110, flexShrink: 0, fontSize: 12, color: count === 0 ? theme.muted : theme.text, fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: count === 0 ? 'italic' : 'normal' }}>
+            <div style={{ width: 110, flexShrink: 0, fontSize: 12, color: count === 0 ? theme.muted : theme.text, fontFamily: "'Inter', sans-serif", fontStyle: count === 0 ? 'italic' : 'normal' }}>
               {area}
             </div>
             <div style={{ flex: 1, background: theme.border + '55', borderRadius: 3, height: 10, overflow: 'hidden' }}>
@@ -186,7 +186,7 @@ export default function PainelMetricas({ entradas }) {
           <>
             {nuncaAbertas.slice(0, 8).map(e => (
               <div key={e.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}` }}>
-                <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{e.tema}</div>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{e.tema}</div>
                 <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.area}, {e.tipo}</div>
               </div>
             ))}
@@ -212,7 +212,7 @@ export default function PainelMetricas({ entradas }) {
           <>
             {temasIncompletos.slice(0, 8).map(({ entrada, semFundamentacao, semRatio }) => (
               <div key={entrada.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}` }}>
-                <div style={{ fontSize: 13, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{entrada.tema}</div>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{entrada.tema}</div>
                 <div style={{ fontSize: 11, color: theme.error, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
                   {semFundamentacao > 0 && `${semFundamentacao} sem fundamentação`}
                   {semFundamentacao > 0 && semRatio > 0 && ', '}

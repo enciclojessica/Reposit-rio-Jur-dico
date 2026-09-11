@@ -229,7 +229,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
       fontSize: 13,
       width: '100%',
       outline: 'none',
-      fontFamily: 'Georgia, serif',
+      fontFamily: 'Inter, sans-serif',
       resize: multiline ? 'vertical' : 'none',
       boxSizing: 'border-box',
       transition: 'border-color .2s, background .2s',
@@ -250,7 +250,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
       fontSize: 13,
       width: '100%',
       outline: 'none',
-      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       resize: multiline ? 'vertical' : 'none',
       boxSizing: 'border-box',
     }
@@ -269,7 +269,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
     fontSize: 13,
     width: '100%',
     outline: 'none',
-    fontFamily: "Georgia, 'EB Garamond', serif",
+    fontFamily: "'Inter', sans-serif",
     boxSizing: 'border-box',
     marginBottom: 4,
   }
@@ -355,7 +355,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
               <AlertTriangle size={13} /> Pode já existir algo parecido no acervo
             </div>
             {possiveisDuplicatas.map(({ entrada, score }) => (
-              <div key={entrada.id} style={{ fontSize: 12, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif", padding: '3px 0' }}>
+              <div key={entrada.id} style={{ fontSize: 12, color: theme.text, fontFamily: "'Inter', sans-serif", padding: '3px 0' }}>
                 {entrada.tema} <span style={{ color: theme.muted, fontStyle: 'italic', fontSize: 10 }}>({entrada.area}, {Math.round(score * 100)}% parecido)</span>
               </div>
             ))}

@@ -33,7 +33,7 @@ export default function ImportarHub({ session, initialTab, onAbaChange, setView,
   if (!session) return (
     <div style={{ textAlign: 'center', padding: '80px 24px' }}>
       <Lock size={40} style={{ opacity: 0.2, display: 'block', margin: '0 auto 16px' }} />
-      <div style={{ fontSize: 16, color: t.text, fontFamily: 'Playfair Display, serif', marginBottom: 8 }}>
+      <div style={{ fontSize: 16, color: t.text, fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
         Acesso restrito
       </div>
       <div style={{ fontSize: 13, color: t.muted, fontFamily: 'Inter, sans-serif', marginBottom: 20 }}>
@@ -51,7 +51,7 @@ export default function ImportarHub({ session, initialTab, onAbaChange, setView,
     <div className="fade-up">
       {/* Título */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: t.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: t.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Importar
         </div>
         <div style={{ fontSize: 12, color: t.muted, fontFamily: 'Inter, sans-serif' }}>

@@ -50,7 +50,7 @@ export default function RedefinirSenha({ onConcluido }) {
           }}>
             <Lock size={24} color="#C5A059" />
           </div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: theme.text, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
             Definir nova senha
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
@@ -63,7 +63,7 @@ export default function RedefinirSenha({ onConcluido }) {
           borderRadius: 16, padding: 28, boxShadow: theme.shadow,
         }}>
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Nova senha</div>
+            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Nova senha</div>
             <div style={{ position: 'relative' }}>
               <input type={showPass ? 'text' : 'password'} value={senha} onChange={e => setSenha(e.target.value)}
                 placeholder="Mínimo de 6 caracteres" autoComplete="new-password" style={inp} />
@@ -74,7 +74,7 @@ export default function RedefinirSenha({ onConcluido }) {
           </div>
 
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>Confirmar nova senha</div>
+            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Confirmar nova senha</div>
             <input type={showPass ? 'text' : 'password'} value={confirma} onChange={e => setConfirma(e.target.value)}
               placeholder="Repita a nova senha" autoComplete="new-password" style={inp} />
           </div>

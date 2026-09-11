@@ -35,7 +35,7 @@ function ArtigoModal({ grupo, onFechar }) {
     setTimeout(() => setLinkCopiado(false), 2500)
   }
 
-  const rotuloSecao = { fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 5 }
+  const rotuloSecao = { fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 5 }
 
   return (
     <>
@@ -55,7 +55,7 @@ function ArtigoModal({ grupo, onFechar }) {
         {/* Header */}
         <div style={{ padding: '16px 20px', borderBottom: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ color: meta.cor, fontSize: 13, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <span style={{ color: meta.cor, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
               {meta.label}
             </span>
             <span style={{ fontSize: 17, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
@@ -75,12 +75,12 @@ function ArtigoModal({ grupo, onFechar }) {
 
         {/* Corpo */}
         <div style={{ overflowY: 'auto', flex: 1, padding: 20 }}>
-          <div style={{ fontSize: 12, color: meta.cor, fontStyle: 'italic', marginBottom: 12, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <div style={{ fontSize: 12, color: meta.cor, fontStyle: 'italic', marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
             {meta.nome}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
             {grupo.itens.map((item, i) => (
-              <div key={i} style={{ fontSize: 15, color: theme.text, lineHeight: 1.8, fontFamily: "Georgia, 'EB Garamond', serif", paddingLeft: (item.inciso || item.paragrafo) ? 16 : 0 }}>
+              <div key={i} style={{ fontSize: 15, color: theme.text, lineHeight: 1.8, fontFamily: "'Inter', sans-serif", paddingLeft: (item.inciso || item.paragrafo) ? 16 : 0 }}>
                 {item.texto}
               </div>
             ))}
@@ -92,14 +92,14 @@ function ArtigoModal({ grupo, onFechar }) {
               {caput.contexto && (
                 <div>
                   <div style={rotuloSecao}>Comentário didático</div>
-                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>{caput.contexto}</div>
+                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{caput.contexto}</div>
                 </div>
               )}
               {caput.aplicacao_pratica && (
                 <div>
                   <div style={{ ...rotuloSecao, color: meta.cor }}>Aplicação prática</div>
-                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontFamily: "Georgia, 'EB Garamond', serif" }}>{caput.aplicacao_pratica}</div>
-                  <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', marginTop: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontFamily: "'Inter', sans-serif" }}>{caput.aplicacao_pratica}</div>
+                  <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', marginTop: 6, fontFamily: "'Inter', sans-serif" }}>
                     Um exemplo de aplicação, entre outras hipóteses possíveis de incidência do dispositivo.
                   </div>
                 </div>
@@ -107,7 +107,7 @@ function ArtigoModal({ grupo, onFechar }) {
               {caput.resultado && (
                 <div>
                   <div style={rotuloSecao}>Resultado</div>
-                  <div style={{ fontSize: 13, color: theme.success, fontFamily: "Georgia, 'EB Garamond', serif" }}>{caput.resultado}</div>
+                  <div style={{ fontSize: 13, color: theme.success, fontFamily: "'Inter', sans-serif" }}>{caput.resultado}</div>
                 </div>
               )}
             </div>
@@ -151,37 +151,37 @@ function ArtigoCard({ grupo, onAbrir }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
-            <span style={{ color: meta.cor, fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <span style={{ color: meta.cor, fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
               {meta.label}
             </span>
             <span style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: theme.fontTitle }}>
               {grupo.titulo || `Art. ${grupo.numero}`}
             </span>
             {numSubItens > 0 && (
-              <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+              <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                 +{numSubItens} inciso{numSubItens !== 1 ? 's' : ''}/parágrafo{numSubItens !== 1 ? 's' : ''}
               </span>
             )}
           </div>
-          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>
             {caput?.texto}
           </div>
           {(caput?.contexto || caput?.aplicacao_pratica) && (
             <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {caput.contexto && (
-                <div style={{ fontSize: 12, color: theme.muted, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
                   <span style={{ fontStyle: 'italic', color: theme.gold }}>Comentário: </span>
                   {caput.contexto}
                 </div>
               )}
               {caput.aplicacao_pratica && (
-                <div style={{ fontSize: 12, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                <div style={{ fontSize: 12, color: theme.text, fontFamily: "'Inter', sans-serif" }}>
                   <span style={{ color: meta.cor, fontStyle: 'italic' }}>Aplicação: </span>
                   {caput.aplicacao_pratica}
                 </div>
               )}
               {caput.resultado && (
-                <div style={{ fontSize: 12, color: theme.success, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                <div style={{ fontSize: 12, color: theme.success, fontFamily: "'Inter', sans-serif" }}>
                   {caput.resultado}
                 </div>
               )}
@@ -337,7 +337,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
           <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>
             Legislação
           </div>
-          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
             {total > 0 ? `${total} artigos importados, clique em qualquer um para ver detalhes` : 'Nenhum artigo importado. Use Importar, na navegação'}
           </div>
         </div>
@@ -354,15 +354,15 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
 
       {total === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: theme.muted }}>
-          <div style={{ fontSize: 14, marginBottom: 6, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>Nenhuma legislação importada.</div>
-          <div style={{ fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>Use "Importar", na navegação, para adicionar o CPC, CDC e outros códigos.</div>
+          <div style={{ fontSize: 14, marginBottom: 6, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nenhuma legislação importada.</div>
+          <div style={{ fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Use "Importar", na navegação, para adicionar o CPC, CDC e outros códigos.</div>
         </div>
       ) : (
         <>
           {/* Filtros por código */}
           <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginBottom: 16, borderBottom: `1px solid ${theme.border}`, paddingBottom: 2 }}>
             <span onClick={() => setCodigoAtivo('todos')}
-              style={{ color: codigoAtivo === 'todos' ? theme.text : theme.muted, borderBottom: codigoAtivo === 'todos' ? `1.5px solid ${theme.gold}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: codigoAtivo === 'todos' ? 'normal' : 'italic' }}>
+              style={{ color: codigoAtivo === 'todos' ? theme.text : theme.muted, borderBottom: codigoAtivo === 'todos' ? `1.5px solid ${theme.gold}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: codigoAtivo === 'todos' ? 'normal' : 'italic' }}>
               Todos ({total})
             </span>
             {codigos.map(cod => {
@@ -370,7 +370,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
               const ativo = codigoAtivo === cod
               return (
                 <span key={cod} onClick={() => setCodigoAtivo(cod)}
-                  style={{ color: ativo ? meta.cor : theme.muted, borderBottom: ativo ? `1.5px solid ${meta.cor}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif", fontStyle: ativo ? 'normal' : 'italic' }}>
+                  style={{ color: ativo ? meta.cor : theme.muted, borderBottom: ativo ? `1.5px solid ${meta.cor}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: ativo ? 'normal' : 'italic' }}>
                   {meta.label}
                 </span>
               )
@@ -385,7 +385,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
               style={{ paddingLeft: 38 }} />
           </div>
 
-          <div style={{ fontSize: 12, color: theme.muted, marginBottom: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+          <div style={{ fontSize: 12, color: theme.muted, marginBottom: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
             {loading ? 'Buscando…' : `${gruposArtigos.length} artigo${gruposArtigos.length !== 1 ? 's' : ''} encontrado${gruposArtigos.length !== 1 ? 's' : ''}`}
           </div>
 
@@ -394,7 +394,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
               <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} />
             ))}
             {!loading && gruposArtigos.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>Nenhum artigo encontrado.</div>
+              <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
             )}
           </div>
         </>

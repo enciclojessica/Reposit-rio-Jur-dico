@@ -33,9 +33,9 @@ const TEMAS = {
     toastOk:     '#f0fdf4',
     toastErr:    '#fff0f0',
     btnMutedBg:  '#f5f1ea',
-    fontTitle:   "'Playfair Display', Georgia, serif",
-    fontSerif:   "Georgia, 'EB Garamond', serif",
-    fontBody:    "'Inter', system-ui, sans-serif",
+    fontTitle:   "'Inter', -apple-system, system-ui, sans-serif",
+    fontSerif:   "'Inter', -apple-system, system-ui, sans-serif",
+    fontBody:    "'Inter', -apple-system, system-ui, sans-serif",
   },
   escuro: {
     nome: 'Escuro', isDark: true,
@@ -66,9 +66,9 @@ const TEMAS = {
     toastOk:     '#0a2016',
     toastErr:    '#2a0810',
     btnMutedBg:  '#301a20',
-    fontTitle:   "'Playfair Display', Georgia, serif",
-    fontSerif:   "Georgia, 'EB Garamond', serif",
-    fontBody:    "'Inter', system-ui, sans-serif",
+    fontTitle:   "'Inter', -apple-system, system-ui, sans-serif",
+    fontSerif:   "'Inter', -apple-system, system-ui, sans-serif",
+    fontBody:    "'Inter', -apple-system, system-ui, sans-serif",
   },
 }
 

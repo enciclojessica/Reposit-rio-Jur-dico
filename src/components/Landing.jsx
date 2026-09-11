@@ -11,7 +11,7 @@ const MARFIM_ESCURO = '#f6ede0'
 const TINTA = '#2c241b'
 const TINTA_SUAVE = '#3a3128'
 const MUSGO = '#736b62'
-const SERIF = "Georgia, 'EB Garamond', serif"
+const SERIF = "'Inter', sans-serif"
 
 const NOME_TIPO = { 'jurisprudência': 'Jurisprudência', 'doutrina': 'Doutrina', 'súmula': 'Súmula', 'lei': 'Legislação' }
 const NOME_CODIGO_LANDING = {

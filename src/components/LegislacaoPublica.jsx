@@ -52,7 +52,7 @@ export default function LegislacaoPublica({ codigo, numero, onFechar }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.bg, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+    <div style={{ minHeight: '100vh', background: theme.bg, fontFamily: "'Inter', sans-serif" }}>
       <div style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '12px 24px', paddingTop: 'calc(12px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}/>
@@ -61,7 +61,7 @@ export default function LegislacaoPublica({ codigo, numero, onFechar }) {
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
           {onFechar && (
-            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", cursor: 'pointer' }}>
+            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>
               Voltar ao repositório
             </button>
           )}

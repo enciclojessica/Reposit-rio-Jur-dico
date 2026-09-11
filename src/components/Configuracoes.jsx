@@ -24,7 +24,7 @@ function Campo({ label, children }) {
   const { theme } = useTheme()
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "Georgia, 'EB Garamond', serif" }}>{label}</div>
+      <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>{label}</div>
       {children}
     </div>
   )
@@ -407,7 +407,7 @@ function TabBackup({ session, entradas }) {
         </div>
 
         {ultimo && (
-          <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
+          <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
             Último backup: {ultimo}
           </div>
         )}
@@ -585,7 +585,7 @@ export default function Configuracoes({ session, membro, entradas }) {
   return (
     <div style={{ maxWidth: 700, paddingBottom: 40 }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', marginBottom: 4 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
           Configurações
         </div>
         <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>
@@ -607,7 +607,7 @@ export default function Configuracoes({ session, membro, entradas }) {
       {aba === 'seguranca'    && <TabPreferencias session={session} membro={membro} />}
       {aba === 'backup'       && <TabBackup session={session} entradas={entradas} />}
 
-      <div style={{ marginTop: 32, paddingTop: 16, borderTop: `1px solid ${theme.border}`, fontSize: 11, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+      <div style={{ marginTop: 32, paddingTop: 16, borderTop: `1px solid ${theme.border}`, fontSize: 11, fontFamily: "'Inter', sans-serif" }}>
         <a href="/?pagina=termos" style={{ color: theme.muted, textDecoration: 'underline' }}>Termos de uso</a>
         <span style={{ color: theme.muted, margin: '0 6px' }}>·</span>
         <a href="/?pagina=privacidade" style={{ color: theme.muted, textDecoration: 'underline' }}>Política de privacidade</a>

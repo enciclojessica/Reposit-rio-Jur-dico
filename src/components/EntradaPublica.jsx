@@ -62,7 +62,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
   return (
     <div style={{
       minHeight: '100vh', background: theme.bg,
-      fontFamily: "Georgia, 'EB Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
     }}>
       {/* Header */}
       <div style={{
@@ -76,11 +76,11 @@ export default function EntradaPublica({ entradaId, onFechar }) {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
-          <a href="/?vitrine=1" style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <a href="/?vitrine=1" style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
             Ver mais do acervo
           </a>
           {onFechar && (
-            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", cursor: 'pointer' }}>
+            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>
               Voltar ao repositório
             </button>
           )}
@@ -90,7 +90,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px 60px' }}>
 
         {loading && (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: theme.gold, fontSize: 16, fontFamily: 'Playfair Display, serif' }}>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: theme.gold, fontSize: 16, fontFamily: 'Inter, sans-serif' }}>
             Carregando...
           </div>
         )}
@@ -127,10 +127,10 @@ export default function EntradaPublica({ entradaId, onFechar }) {
                 )}
                 {(entry.tags || []).map(t => <TagPill key={t} tag={t} pequena />)}
               </div>
-              <h1 style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Playfair Display, serif', lineHeight: 1.3, margin: '0 0 8px' }}>
+              <h1 style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.3, margin: '0 0 8px' }}>
                 {entry.tema}
               </h1>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                 {fonteReferenciaResumo(entry, [`Compartilhado em ${new Date().toLocaleDateString('pt-BR')}`])}
               </div>
             </div>

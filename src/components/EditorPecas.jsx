@@ -179,7 +179,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
           const cor = corDaArea(entry.area, theme)
           return (
             <div key={entry.id} style={{ borderBottom: `1px solid ${theme.border}`, padding: '10px 14px' }}>
-              <div style={{ fontSize: 12, color: theme.text, marginBottom: 6, lineHeight: 1.4, fontFamily: 'Georgia, serif' }}>
+              <div style={{ fontSize: 12, color: theme.text, marginBottom: 6, lineHeight: 1.4, fontFamily: 'Inter, sans-serif' }}>
                 <span style={{ color: cor, marginRight: 6, fontSize: 10 }}>▌</span>{entry.tema}
               </div>
               {(Array.isArray(entry.teses) ? entry.teses : []).map((t, i) => (
@@ -215,7 +215,7 @@ function ModalRascunhos({ rascunhos, atualId, onCarregar, onNovo, onExcluir, onF
         display: 'flex', flexDirection: 'column', boxShadow: theme.shadow, margin: 16,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: `1px solid ${theme.border}` }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Rascunhos</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>Rascunhos</div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onNovo} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>+ Novo</button>
             <button onClick={onFechar} aria-label="Fechar" style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer' }}><X size={18} /></button>
@@ -239,7 +239,7 @@ function ModalRascunhos({ rascunhos, atualId, onCarregar, onNovo, onExcluir, onF
                 border: `1px solid ${ativo ? theme.gold + '44' : theme.border}`,
               }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, color: theme.text, fontWeight: ativo ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Georgia, serif' }}>
+                  <div style={{ fontSize: 13, color: theme.text, fontWeight: ativo ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif' }}>
                     {r.titulo || 'Sem título'}{ativo && <span style={{ marginLeft: 8, fontSize: 9, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>ATUAL</span>}
                   </div>
                   <div style={{ fontSize: 11, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>{palavras} palavras · {data}</div>
@@ -484,7 +484,7 @@ export default function EditorPecas({ entradas, session }) {
 
       {/* Toolbar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 0 14px', flexWrap: 'wrap', flexShrink: 0 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif', flex: 1 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif', flex: 1 }}>
           Editor de Peças
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -528,7 +528,7 @@ export default function EditorPecas({ entradas, session }) {
           <div style={{ borderBottom: `1px solid ${theme.border}`, background: theme.cardBg, padding: '12px 16px', display: 'flex', gap: 10, flexShrink: 0 }}>
             <input value={titulo} onChange={e => setTitulo(e.target.value)}
               placeholder="Título da peça (ex: Petição Inicial, Indenização por Dano Moral)"
-              style={{ flex: 2, border: 'none', background: 'transparent', fontSize: 14, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, Georgia, serif', outline: 'none' }} />
+              style={{ flex: 2, border: 'none', background: 'transparent', fontSize: 14, fontWeight: 700, color: theme.text, fontFamily: 'Inter, sans-serif', outline: 'none' }} />
             <select value={rito} onChange={e => setRito(e.target.value)}
               style={{ flex: 1, border: `1px solid ${theme.border}`, borderRadius: 6, background: theme.raised, color: rito ? theme.text : theme.muted, fontSize: 12, padding: '4px 10px', fontFamily: 'Inter, sans-serif', outline: 'none', maxWidth: 180 }}>
               <option value="">Rito processual...</option>
@@ -602,7 +602,7 @@ export default function EditorPecas({ entradas, session }) {
                     {artigoSugestao.textoAberto ? 'Ocultar texto' : 'Ver texto do artigo'}
                   </button>
                   {artigoSugestao.textoAberto && (
-                    <div style={{ marginTop: 8, fontSize: 11, color: theme.text, lineHeight: 1.6, fontFamily: 'Georgia, serif', maxHeight: 140, overflowY: 'auto' }}>
+                    <div style={{ marginTop: 8, fontSize: 11, color: theme.text, lineHeight: 1.6, fontFamily: 'Inter, sans-serif', maxHeight: 140, overflowY: 'auto' }}>
                       {artigoSugestao.artigos.map((a, i) => (
                         <p key={i} style={{ marginBottom: 8 }}>
                           {a.inciso ? `${a.inciso}: ` : ''}{a.texto}
@@ -618,7 +618,7 @@ export default function EditorPecas({ entradas, session }) {
           <textarea ref={editorRef} value={conteudo} onChange={e => setConteudo(e.target.value)}
             onKeyUp={e => { handleSlashInput(e.target.value, e.target.selectionStart); handleArtigoNatural(e.target.value, e.target.selectionStart) }}
             placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "Sugerir para este trecho" para receber teses do repositório.\n• Use /cpc 300, /cdc 14, /lei9099 3 para inserir artigos direto do banco.\n• Ao escrever "art. 927 do Código Civil", uma sugestão de autocompletar aparece automaticamente.\n• Use ## para seções e **negrito**. O .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
-            style={{ flex: 1, border: 'none', background: theme.cardBg, padding: '20px', color: theme.text, fontSize: 14, lineHeight: 1.9, resize: 'none', outline: 'none', fontFamily: 'Georgia, serif', boxSizing: 'border-box', width: '100%' }}
+            style={{ flex: 1, border: 'none', background: theme.cardBg, padding: '20px', color: theme.text, fontSize: 14, lineHeight: 1.9, resize: 'none', outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', width: '100%' }}
             spellCheck />
 
           {/* Status bar */}
@@ -650,7 +650,7 @@ export default function EditorPecas({ entradas, session }) {
               display: 'flex', flexDirection: 'column', overflow: 'hidden',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Citações</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>Citações</span>
                 <button onClick={() => setPainelMobileAberto(false)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>×</button>
               </div>
               <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>

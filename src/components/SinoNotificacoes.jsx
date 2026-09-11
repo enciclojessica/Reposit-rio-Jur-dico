@@ -133,7 +133,7 @@ export default function SinoNotificacoes({ session, onNavegar, onAbrirEntrada, c
             borderRadius: '50%', width: 16, height: 16,
             fontSize: 9, fontWeight: 700,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: "Georgia, 'EB Garamond', serif",
+            fontFamily: "'Inter', sans-serif",
             border: `2px solid ${theme.surface}`,
           }}>
             {naoLidas > 9 ? '9+' : naoLidas}
@@ -154,12 +154,12 @@ export default function SinoNotificacoes({ session, onNavegar, onAbrirEntrada, c
         }}>
           {/* Header */}
           <div style={{ padding: '14px 16px', borderBottom: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: theme.text, fontFamily: "'Inter', sans-serif" }}>
               Notificações {naoLidas > 0 && <span style={{ color: '#ef4444', fontSize: 11 }}>· {naoLidas} nova{naoLidas !== 1 ? 's' : ''}</span>}
             </div>
             {naoLidas > 0 && (
               <button onClick={marcarTodasLidas}
-                style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 11, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
                 Marcar todas como lidas
               </button>
             )}

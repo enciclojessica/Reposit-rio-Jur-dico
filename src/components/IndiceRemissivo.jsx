@@ -32,8 +32,8 @@ function Secao({ titulo, grupos, onSelecionarTag, theme }) {
                   padding: '7px 0', cursor: 'pointer',
                   borderTop: i > 0 ? `0.5px solid ${theme.border}` : 'none',
                 }}>
-                <span style={{ fontSize: 14, color: theme.text, fontFamily: "Georgia, 'EB Garamond', serif" }}>{formatarTagIndice(tag)}</span>
-                <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif", flexShrink: 0 }}>{count}</span>
+                <span style={{ fontSize: 14, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{formatarTagIndice(tag)}</span>
+                <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>{count}</span>
               </div>
             ))}
           </div>
@@ -77,7 +77,7 @@ export default function IndiceRemissivo({ entradas, onSelecionarTag }) {
         <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>
           Índice remissivo
         </div>
-        <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+        <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
           Assuntos e legislação citada, separados, em ordem alfabética
         </div>
       </div>
@@ -87,11 +87,11 @@ export default function IndiceRemissivo({ entradas, onSelecionarTag }) {
         style={{
           width: '100%', background: theme.raised, border: `1px solid ${theme.border}`,
           borderRadius: 8, padding: '9px 12px', color: theme.text, fontSize: 13,
-          fontFamily: "Georgia, 'EB Garamond', serif", outline: 'none', marginBottom: 24, boxSizing: 'border-box',
+          fontFamily: "'Inter', sans-serif", outline: 'none', marginBottom: 24, boxSizing: 'border-box',
         }} />
 
       {total === 0 ? (
-        <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+        <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
           {busca.trim() ? 'Nenhuma tag encontrada.' : 'Nenhuma tag cadastrada ainda.'}
         </div>
       ) : (

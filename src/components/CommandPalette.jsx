@@ -58,17 +58,17 @@ export default function CommandPalette({ onFechar, setView, isAdmin, isEditor, s
           <Search size={15} color={theme.muted} />
           <input ref={inputRef} value={busca} onChange={e => setBusca(e.target.value)} onKeyDown={onKeyDown}
             placeholder="Ir para…"
-            style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: theme.text, fontSize: 14, fontFamily: "Georgia, 'EB Garamond', serif" }} />
+            style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: theme.text, fontSize: 14, fontFamily: "'Inter', sans-serif" }} />
         </div>
         <div style={{ maxHeight: 320, overflowY: 'auto', padding: '6px 0' }}>
           {itens.length === 0 && (
-            <div style={{ padding: '16px', fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>Nada encontrado.</div>
+            <div style={{ padding: '16px', fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nada encontrado.</div>
           )}
           {itens.map((item, i) => (
             <div key={item.label} onClick={() => ativar(item)} onMouseEnter={() => setSelecionado(i)}
               style={{
                 padding: '10px 16px', cursor: 'pointer', fontSize: 14,
-                fontFamily: "Georgia, 'EB Garamond', serif",
+                fontFamily: "'Inter', sans-serif",
                 color: i === selecionado ? theme.gold : theme.text,
                 background: i === selecionado ? theme.raised : 'transparent',
               }}>

@@ -94,7 +94,7 @@ export default function Membros({ session }) {
   const selStyle = {
     background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 6,
     padding: '8px 12px', color: theme.text, fontSize: 13,
-    fontFamily: "Georgia, 'EB Garamond', serif", outline: 'none', boxSizing: 'border-box',
+    fontFamily: "'Inter', sans-serif", outline: 'none', boxSizing: 'border-box',
   }
 
   if (loading) return (

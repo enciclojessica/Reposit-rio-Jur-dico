@@ -668,7 +668,7 @@ async function handleSave(entry) {
   )
 
   if (authLoading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 18 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Inter, sans-serif', fontSize: 18 }}>
       Carregando...
     </div>
   )
@@ -678,7 +678,7 @@ async function handleSave(entry) {
   )
 
   if (aceitandoConvite) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Playfair Display, serif', fontSize: 16, flexDirection: 'column', gap: 16 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Inter, sans-serif', fontSize: 16, flexDirection: 'column', gap: 16 }}>
       Ativando seu acesso…
     </div>
   )
@@ -689,7 +689,7 @@ async function handleSave(entry) {
         position: 'fixed', top: 16, left: 16, zIndex: 200,
         background: theme.raised, border: `1px solid ${theme.border}`,
         borderRadius: 8, padding: '8px 14px', color: theme.muted,
-        fontSize: 13, cursor: 'pointer', fontFamily: "Georgia, 'EB Garamond', serif",
+        fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif",
       }}>← Voltar</button>
       <Auth conviteToken={conviteToken} telaInicial={telaAuthInicial} />
     </div>
@@ -768,7 +768,7 @@ case VIEWS.JURISPRUDENCIA:
           <div className="fade-up">
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>Favoritos</div>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "Georgia, 'EB Garamond', serif" }}>
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                 Entradas que você marcou manualmente, só sua conta vê essa lista
               </div>
             </div>
@@ -811,7 +811,7 @@ case VIEWS.JURISPRUDENCIA:
           <div className="fade-up">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>←</button>
-              <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>
                 {prefillEntry ? 'Importar Jurisprudência' : 'Nova Entrada'}
               </div>
             </div>
@@ -825,7 +825,7 @@ case VIEWS.JURISPRUDENCIA:
           <div className="fade-up">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <button onClick={() => setView(VIEWS.DETAIL)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 20 }}>←</button>
-              <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Playfair Display, serif' }}>Editar Entrada</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>Editar Entrada</div>
             </div>
             <EntradaForm initial={selected} onSave={handleSave} onCancel={() => setView(VIEWS.DETAIL)} loading={saving} entradas={entradas}/>
           </div>
@@ -834,7 +834,7 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.DETAIL:
         return selected ? (
           <div className="fade-up">
-            <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "Georgia, 'EB Garamond', serif" }}>← Voltar à lista</button>
+            <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>← Voltar à lista</button>
             <ErrorBoundary>
               <EntradaDetail
                 entry={selected}
@@ -973,7 +973,7 @@ case VIEWS.JURISPRUDENCIA:
                 <select
                   value={tagFilter || ''}
                   onChange={ev => setTagFilter(ev.target.value || null)}
-                  style={{ width: '100%', background: tagFilter ? theme.gold + '12' : theme.raised, border: `1px solid ${tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '7px 12px', color: tagFilter ? theme.gold : theme.muted, fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", cursor: 'pointer', outline: 'none' }}>
+                  style={{ width: '100%', background: tagFilter ? theme.gold + '12' : theme.raised, border: `1px solid ${tagFilter ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '7px 12px', color: tagFilter ? theme.gold : theme.muted, fontSize: 12, fontFamily: "'Inter', sans-serif", cursor: 'pointer', outline: 'none' }}>
                   <option value=''>Filtrar por tag...</option>
                   {todasAsTags.map(t => (
                     <option key={t} value={t}>#{t}</option>
@@ -1034,7 +1034,7 @@ case VIEWS.JURISPRUDENCIA:
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 600,
         background: '#3d0012', color: '#e8c98a', textAlign: 'center',
         padding: '6px 12px', fontSize: 12, fontStyle: 'italic',
-        fontFamily: "Georgia, 'EB Garamond', serif",
+        fontFamily: "'Inter', sans-serif",
       }}>
         Sem conexão. Mostrando os últimos dados salvos no aparelho. Favoritos e anotações não sincronizam até a internet voltar.
       </div>
@@ -1075,13 +1075,13 @@ case VIEWS.JURISPRUDENCIA:
               <>
                 {isOwner && entradas.length > 0 && (
                   <button onClick={exportarTesesPlanilha} disabled={exportandoTeses} title="Exportar planilha"
-                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Download size={13} /> {exportandoTeses ? 'Exportando...' : 'Exportar'}
                   </button>
                 )}
                 {isAdmin && (
                   <button onClick={() => setConfirmLimpar(true)} title="Limpar repositório"
-                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: theme.error, cursor: 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: theme.error, cursor: 'pointer', fontSize: 12, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Trash2 size={13} />
                   </button>
                 )}
@@ -1116,7 +1116,7 @@ case VIEWS.JURISPRUDENCIA:
                   </div>
                 </div>
                 <button onClick={() => { logoutManualRef.current = true; supabase.auth.signOut() }} title="Sair"
-                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: "Georgia, 'EB Garamond', serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                   <LogOut size={14} /> Sair
                 </button>
               </>
@@ -1167,7 +1167,7 @@ case VIEWS.JURISPRUDENCIA:
         <div style={{ position: 'fixed', inset: 0, background: '#00000099', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div style={{ background: theme.surface, border: '1px solid #5a1f1f', borderRadius: 14, padding: 32, maxWidth: 380, width: '100%', textAlign: 'center', boxShadow: '0 16px 48px #000000cc' }}>
             <div style={{ marginBottom: 14, color: theme.penal, display: 'flex', justifyContent: 'center' }}><AlertTriangle size={32} /></div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, serif', marginBottom: 10 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: theme.text, fontFamily: 'Inter, sans-serif', marginBottom: 10 }}>
               Limpar todo o repositório?
             </div>
             <div style={{ fontSize: 12, color: theme.muted, marginBottom: 24, lineHeight: 1.7 }}>
@@ -1175,11 +1175,11 @@ case VIEWS.JURISPRUDENCIA:
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               <button onClick={() => setConfirmLimpar(false)}
-                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 22px', cursor: 'pointer', fontSize: 13, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 22px', cursor: 'pointer', fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
                 Cancelar
               </button>
               <button onClick={limparTodoRepositorio} disabled={limpandoRepo}
-                style={{ background: (mode === 'dark' ? '#2a0f10' : '#fff0f0'), border: `1px solid ${theme.penal}`, color: theme.penal, borderRadius: 8, padding: '10px 22px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "Georgia, 'EB Garamond', serif" }}>
+                style={{ background: (mode === 'dark' ? '#2a0f10' : '#fff0f0'), border: `1px solid ${theme.penal}`, color: theme.penal, borderRadius: 8, padding: '10px 22px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif" }}>
                 {limpandoRepo ? 'Limpando...' : 'Confirmar exclusão'}
               </button>
             </div>

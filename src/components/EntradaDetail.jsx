@@ -204,7 +204,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           d'água usa position:fixed (ver index.css), que o navegador repete
           em toda página impressa, não só a primeira. */}
       <div className="print-only" style={{ borderBottom: '2px solid #7a1128', paddingBottom: 10, marginBottom: 16 }}>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 18, color: '#3d0012' }}>Themis Jur</div>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 18, color: '#3d0012' }}>Themis Jur</div>
         <div style={{ fontSize: 11, fontStyle: 'italic', color: '#736b62' }}>Acervo curado de jurisprudência, doutrina e legislação, themisjur.com.br</div>
         <div style={{ fontSize: 10, color: '#7a1128', marginTop: 6 }}>
           Documento de uso pessoal. Reprodução, redistribuição ou disponibilização pública deste conteúdo sem autorização não são permitidas, nos termos dos Termos de Uso da plataforma.
