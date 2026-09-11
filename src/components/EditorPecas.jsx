@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../theme'
-import { AREAS, corDaArea } from '../shared'
+import { AREAS, corDaArea, gerarCitacaoABNT } from '../shared'
 import { exportarDocx } from '../utils/exportarDocx'
 import { supabase } from '../supabase'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
@@ -16,18 +16,7 @@ function citacaoInline(entry) {
   const ref = entry.referencia || entry.fonte || entry.tema
   return `(${(entry.fonte || 'FONTE').toUpperCase()}, ${ref})`
 }
-function citacaoABNT(entry) {
-  const fonte  = (entry.fonte  || '').toUpperCase()
-  const tema   = entry.tema    || ''
-  const ref    = entry.referencia || ''
-  const url    = entry.url     || ''
-  const acesso = new Date().toLocaleDateString('pt-BR')
-  const tipo   = entry.tipo    || 'jurisprudência'
-  if (tipo === 'lei')      return `BRASIL. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  if (tipo === 'doutrina') return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  if (tipo === 'súmula')   return `${fonte}. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-}
+
 
 // Inserir texto no cursor do textarea
 function inserirNoCursor(ref, conteudo, setConteudo, texto) {
@@ -135,7 +124,7 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
 
   function inserir(entry, tese) {
     let texto = ''
-    if (formato === 'abnt') texto = citacaoABNT(entry)
+    if (formato === 'abnt') texto = gerarCitacaoABNT(entry)
     else if (formato === 'tese' && tese) texto = `${tese.tese_assunto} ${citacaoInline(entry)}`
     else texto = citacaoInline(entry)
     inserirNoCursor(editorRef, conteudo, setConteudo, texto)

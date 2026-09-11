@@ -221,16 +221,53 @@ export function StatusBadge({ status, onClick, pequena }) {
   )
 }
 
+// Checa se referencia já menciona o mesmo autor/tribunal que está em
+// fonte, mesmo com nome em ordem diferente ("Aury Lopes Jr." em fonte vs
+// "LOPES JR., Aury" em referencia, formato ABNT sobrenome-primeiro) — por
+// isso não compara a string inteira, procura a palavra mais distintiva de
+// fonte (a mais longa, geralmente o sobrenome) dentro de referencia.
+function fonteJaMencionadaEm(fonte, referencia) {
+  if (!fonte || !referencia) return false
+  const palavras = fonte.replace(/[,.]/g, '').split(/\s+/).filter(p => p.length > 3)
+  if (palavras.length === 0) return false
+  const maisLonga = palavras.reduce((a, b) => b.length > a.length ? b : a)
+  return referencia.toLowerCase().includes(maisLonga.toLowerCase())
+}
+
 // Monta "fonte, referência" evitando duplicar o autor quando a referência
 // ABNT já começa pelo mesmo nome que está em fonte (comum em doutrina:
 // fonte="Aury Lopes Jr.", referencia="LOPES JR., Aury. Direito..." — sem
 // essa checagem, aparecia "Aury Lopes Jr., LOPES JR., Aury. Direito...").
 export function fonteReferenciaResumo(entry, extras = []) {
-  const fonteRedundante = entry.fonte && entry.referencia &&
-    entry.fonte.length > 4 &&
-    entry.referencia.toLowerCase().includes(entry.fonte.toLowerCase())
+  const fonteRedundante = fonteJaMencionadaEm(entry.fonte, entry.referencia)
   const partes = fonteRedundante
     ? [entry.referencia, ...extras]
     : [entry.fonte, entry.referencia, ...extras]
   return partes.filter(Boolean).join(', ')
+}
+
+// Citação ABNT — usada no repositório, na versão pública e no Editor de
+// Peças. Nunca insere tema (rótulo da tese escrito pela curadora, não é
+// referência bibliográfica) — só fonte e referencia, com a mesma checagem
+// de redundância de fonteReferenciaResumo (evita duplicar o autor quando
+// referencia já o repete).
+export function gerarCitacaoABNT(entry) {
+  const fonte  = (entry.fonte || '').toUpperCase()
+  const ref    = entry.referencia || ''
+  const tema   = entry.tema || ''
+  const url    = entry.url || ''
+  const acesso = new Date().toLocaleDateString('pt-BR')
+  const tipo   = entry.tipo || 'jurisprudência'
+  const sufixo = `${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
+
+  if (tipo === 'lei') {
+    const base = ref || tema
+    const ponto = base.trim().endsWith('.') ? '' : '.'
+    return `BRASIL. ${base}${ponto}${sufixo}`
+  }
+
+  const fonteRedundante = fonteJaMencionadaEm(entry.fonte, ref)
+  const corpo = fonteRedundante ? ref : [fonte, ref || tema].filter(Boolean).join('. ')
+  const pontoFinal = corpo.trim().endsWith('.') ? '' : '.'
+  return `${corpo}${pontoFinal}${sufixo}`
 }

@@ -1,24 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AREAS, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo } from '../shared'
+import { AREAS, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo, gerarCitacaoABNT } from '../shared'
 import { TagPill } from './TagInput'
 import { Check, Copy, ExternalLink, AlertCircle } from 'lucide-react'
 import SeletorTema from './SeletorTema'
 import { Lock } from 'lucide-react'
-
-function gerarABNT(entry) {
-  const fonte  = (entry.fonte || '').toUpperCase()
-  const tema   = entry.tema   || ''
-  const ref    = entry.referencia || ''
-  const url    = entry.url    || ''
-  const acesso = new Date().toLocaleDateString('pt-BR')
-  const tipo   = entry.tipo   || 'jurisprudência'
-  if (tipo === 'lei')      return `BRASIL. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  if (tipo === 'doutrina') return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  if (tipo === 'súmula')   return `${fonte}. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-}
 
 export default function EntradaPublica({ entradaId, onFechar }) {
   const { theme, mode } = useTheme()
@@ -64,7 +51,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
 
   function copiarABNT() {
     if (!entry) return
-    navigator.clipboard.writeText(gerarABNT(entry))
+    navigator.clipboard.writeText(gerarCitacaoABNT(entry))
     setCopiadoABNT(true)
     setTimeout(() => setCopiadoABNT(false), 2000)
   }
@@ -187,7 +174,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
             {/* Citação ABNT */}
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, marginTop: 8 }}>
               <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8 }}>Citação ABNT NBR 6023:2018</div>
-              <div style={{ fontSize: 13, color: theme.textSub, lineHeight: 1.8 }}>{gerarABNT(entry)}</div>
+              <div style={{ fontSize: 13, color: theme.textSub, lineHeight: 1.8 }}>{gerarCitacaoABNT(entry)}</div>
             </div>
           </>
         )}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer, Maximize2, Minimize2 } from 'lucide-react'
 import { useTheme } from '../theme'
-import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo } from '../shared'
+import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo, gerarCitacaoABNT } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { supabase } from '../supabase'
@@ -20,20 +20,7 @@ function arr(v) {
   return []
 }
 
-function gerarABNT(entry) {
-  try {
-    const fonte = s(entry.fonte).toUpperCase()
-    const tipo  = s(entry.tipo)
-    const acesso = new Date().toLocaleDateString('pt-BR')
-    const url   = s(entry.url)
-    const ref   = s(entry.referencia)
-    const tema  = s(entry.tema)
-    if (tipo === 'lei')      return `BRASIL. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-    if (tipo === 'súmula')   return `${fonte}. ${ref || tema}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-    if (tipo === 'doutrina') return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-    return `${fonte}. ${tema}. ${ref}.${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
-  } catch { return '' }
-}
+
 
 export default function EntradaDetail({ entry: raw, session, membro, onClose, onDelete, onEdit, readOnly, onStatusChange, onDuplicar, onAbrirArtigoLegislacao, favorito, onAlternarFavorito, onComparar, todasEntradas, onSelecionarRelacionada, modoFoco, onAlternarModoFoco }) {
   const { theme, mode } = useTheme()
@@ -126,7 +113,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
   }, [session?.user?.id, entry.id])
 
   const am = { color: corDaArea(entry.area, theme) }
-  const abnt = gerarABNT(entry)
+  const abnt = gerarCitacaoABNT(entry)
 
   async function alterarStatus(novo) {
     setSalvandoStatus(true)
