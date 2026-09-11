@@ -8,7 +8,9 @@ export default function NovidadesApp({ session }) {
 
   useEffect(() => {
     if (!session?.user?.id) return
-    supabase.from('membros').update({ novidades_vista_em: new Date().toISOString() }).eq('user_id', session.user.id)
+    // Mesmo bug de fire-and-forget do historico_leitura: sem .then(),
+    // supabase-js nunca dispara a requisição de verdade.
+    supabase.from('membros').update({ novidades_vista_em: new Date().toISOString() }).eq('user_id', session.user.id).then(() => {})
   }, [session?.user?.id])
 
   return (

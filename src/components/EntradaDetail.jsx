@@ -113,11 +113,16 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
 
   // Histórico de leitura — alimenta "Continuar de onde parei" no Hoje.
   // Fora do fluxo visível pro usuário, silencioso, best-effort.
+  // O .then() no final não é cosmético: sem ele, o supabase-js nunca
+  // dispara a requisição de verdade (PostgrestFilterBuilder só executa
+  // quando algo chama .then()/await nele — sem isso, a chamada existe
+  // só como objeto construído, a rede nunca é acionada). Foi assim que
+  // essa tabela ficou vazia desde que essa funcionalidade foi criada.
   useEffect(() => {
     if (!session?.user?.id || !entry.id) return
     supabase.from('historico_leitura').upsert({
       user_id: session.user.id, entrada_id: entry.id, visto_em: new Date().toISOString(),
-    }, { onConflict: 'user_id,entrada_id' })
+    }, { onConflict: 'user_id,entrada_id' }).then(() => {})
   }, [session?.user?.id, entry.id])
 
   const am = { color: corDaArea(entry.area, theme) }

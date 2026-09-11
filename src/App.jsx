@@ -457,10 +457,12 @@ export default function App() {
     // Salvar no histórico
     setHistoricoBusca(prev => [search, ...prev.filter(h => h !== search)].slice(0, 5))
     if (session?.user?.id) {
+      // Mesmo bug de fire-and-forget: sem .then(), a requisição nunca
+      // dispara de verdade no supabase-js.
       supabase.from('historico_busca').upsert(
         { user_id: session.user.id, termo: search, buscado_em: new Date().toISOString() },
         { onConflict: 'user_id,termo' }
-      )
+      ).then(() => {})
     }
     try {
       const { data: { session: sessaoAtual } } = await supabase.auth.getSession()
