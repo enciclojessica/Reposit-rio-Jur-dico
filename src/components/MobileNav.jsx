@@ -87,7 +87,7 @@ export default function MobileNav({
         display: 'flex', paddingBottom: 'env(safe-area-inset-bottom)',
       }}>
         {navFixos.map(item => (
-          <button key={item.v}
+          <button key={item.v} data-tour={`m_${item.v}`}
             onClick={() => { setView(item.v); setMaisAberto(false) }}
             style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',

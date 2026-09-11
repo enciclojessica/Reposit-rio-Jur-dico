@@ -46,6 +46,7 @@ export default function Sidebar({
         {[
           { id: 'hoje',   label: 'Início',          action: () => setView(VIEWS.HOJE), active: view === VIEWS.HOJE },
           { id: 'home',   label: 'Repositório',     action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
+          { id: 'busca',  label: 'Busca com IA',    action: () => setView(VIEWS.BUSCA),     active: view === VIEWS.BUSCA },
           { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
           { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
           { id: 'indice', label: 'Índice remissivo', action: () => setView(VIEWS.INDICE),    active: view === VIEWS.INDICE },
@@ -59,7 +60,7 @@ export default function Sidebar({
           { id: 'novidades_app', label: 'O que há de novo', action: () => setView(VIEWS.NOVIDADES_APP), active: view === VIEWS.NOVIDADES_APP, dot: temNovidadeNaoVista },
           { id: 'compartilhar', label: 'Compartilhar', action: compartilhar, active: false },
         ].map(n => (
-          <button key={n.id} onClick={n.action} style={{
+          <button key={n.id} data-tour={n.id} onClick={n.action} style={{
             width: '100%', background: n.active ? theme.gold + '12' : 'none',
             border: 'none', borderLeft: `3px solid ${n.active ? theme.gold : 'transparent'}`,
             padding: '11px 20px', display: 'flex', alignItems: 'center', gap: 10,
@@ -95,7 +96,7 @@ export default function Sidebar({
         {isEditor && (
           <>
             <div style={{ margin: '8px 16px', borderTop: `1px solid ${theme.border}` }}/>
-            <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }} style={{
+            <button onClick={() => { setPrefillEntry(null); setView(VIEWS.ADD) }} data-tour="add" style={{
               width: '100%', background: view === VIEWS.ADD ? theme.gold + '12' : 'none',
               border: 'none', borderLeft: `3px solid ${view === VIEWS.ADD ? theme.gold : 'transparent'}`,
               padding: '11px 20px', textAlign: 'left', cursor: 'pointer',

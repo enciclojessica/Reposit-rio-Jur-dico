@@ -15,7 +15,7 @@ import ComparadorTeses from './components/ComparadorTeses'
 import PainelMetricas from './components/PainelMetricas'
 import NovidadesApp from './components/NovidadesApp'
 import { NOVIDADES_APP } from './data/novidadesApp'
-import TourBoasVindas from './components/TourBoasVindas'
+import TourGuiado from './components/TourGuiado'
 import CommandPalette from './components/CommandPalette'
 import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
@@ -1049,7 +1049,7 @@ case VIEWS.JURISPRUDENCIA:
       />
     )}
     {membro && !membro.tour_visto && (
-      <TourBoasVindas onFechar={async () => {
+      <TourGuiado isMobile={isMobile} isEditor={isEditor} onFechar={async () => {
         setMembro(prev => ({ ...prev, tour_visto: true }))
         await supabase.from('membros').update({ tour_visto: true }).eq('user_id', session.user.id)
       }} />
