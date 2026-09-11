@@ -128,7 +128,10 @@ export default function Landing({ onEntrar }) {
       <div style={{ background: VINHO, padding: estreito ? '48px 20px 56px' : '80px 40px 88px' }}>
         <div style={{ maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur"
-            style={{ width: estreito ? 64 : 88, height: estreito ? 64 : 88, objectFit: 'contain', marginBottom: 28, filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
+            style={{ display: 'block', width: estreito ? 64 : 88, height: estreito ? 64 : 88, objectFit: 'contain', margin: '0 auto 16px', filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
+          <div style={{ fontSize: estreito ? 16 : 19, fontWeight: 700, color: OURO_CLARO, letterSpacing: 1, marginBottom: 28 }}>
+            Themis Jur
+          </div>
           <div style={{ fontSize: estreito ? 34 : 'clamp(38px, 5.5vw, 64px)', fontWeight: 800, lineHeight: 1.08, color: MARFIM, letterSpacing: -1.5, marginBottom: 24 }}>
             A tese certa, na hora da peça.
           </div>
