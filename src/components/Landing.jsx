@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
-import { Share2, Check } from 'lucide-react'
+import { Share2, Check, ArrowRight } from 'lucide-react'
 
 const VINHO = '#3d0012'
+const VINHO_CLARO = '#7a1128'
 const OURO = '#8f6d27'
 const OURO_CLARO = '#e8c98a'
 const MARFIM = '#fdfbf7'
 const MARFIM_ESCURO = '#f6ede0'
 const TINTA = '#2c241b'
-const TINTA_SUAVE = '#3a3128'
 const MUSGO = '#736b62'
-const SERIF = "'Inter', sans-serif"
+const BORDA = '#e4ddd0'
+const FONTE = "'Inter', -apple-system, sans-serif"
 
 const NOME_TIPO = { 'jurisprudência': 'Jurisprudência', 'doutrina': 'Doutrina', 'súmula': 'Súmula', 'lei': 'Legislação' }
 const NOME_CODIGO_LANDING = {
@@ -20,7 +21,8 @@ const NOME_CODIGO_LANDING = {
   ctb: 'Código de Trânsito Brasileiro', lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
 }
 
-// Revela a seção uma vez, quando ela entra na tela ao rolar.
+// Revela um bloco uma vez, quando entra na tela ao rolar — usado pra
+// disparar a contagem dos números reais.
 function useRevelar() {
   const ref = useRef(null)
   const [visivel, setVisivel] = useState(false)
@@ -37,10 +39,9 @@ function useRevelar() {
   return [ref, visivel]
 }
 
-// Conta de 0 até o valor real quando a seção fica visível — o único
-// momento de movimento de verdade da página. Ele existe porque diz algo
-// (o número é real, não estático), não como decoração de entrada.
-function useContagem(alvo, ativo, duracaoMs = 1400) {
+// Conta de 0 até o valor real quando o bloco fica visível — os números
+// são reais (vêm do banco), a contagem só deixa isso visível.
+function useContagem(alvo, ativo, duracaoMs = 1200) {
   const [valor, setValor] = useState(0)
   useEffect(() => {
     if (!ativo || alvo == null) return
@@ -59,50 +60,12 @@ function useContagem(alvo, ativo, duracaoMs = 1400) {
   return valor
 }
 
-// Transição real, ligada à posição de rolagem: a seção entra com leve
-// zoom-out e opacidade baixa, e ganha nitidez/escala plena conforme
-// ocupa mais da tela — não é um "aparece uma vez e para", responde ao
-// scroll em tempo real, inclusive voltando ao rolar pra cima.
-function Secao({ children, decoracao, style, id }) {
-  const ref = useRef(null)
-  const [proporcao, setProporcao] = useState(0)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const passos = Array.from({ length: 21 }, (_, i) => i / 20)
-    const obs = new IntersectionObserver(
-      ([entrada]) => setProporcao(entrada.intersectionRatio),
-      { threshold: passos }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-  const forca = Math.min(proporcao / 0.55, 1)
-  return (
-    <section ref={ref} id={id} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', scrollSnapAlign: 'start', ...style }}>
-      {decoracao}
-      <div style={{
-        opacity: 0.15 + 0.85 * forca,
-        transform: `scale(${0.9 + 0.1 * forca})`,
-        transition: 'opacity .05s linear, transform .05s linear',
-        position: 'relative',
-      }}>
-        {children}
-      </div>
-    </section>
-  )
-}
-
 export default function Landing({ onEntrar }) {
   const { theme } = useTheme()
 
   const [numeros, setNumeros] = useState(null)
   const [copiado, setCopiado] = useState(false)
 
-  // Web Share API no celular (abre o menu nativo, com WhatsApp/etc já
-  // disponíveis); em desktop, sem suporte geralmente, cai pra copiar o
-  // link direto, com a mesma confirmação visual já usada em Compartilhar
-  // de entrada (EntradaDetail.jsx) e de legislação (Legislacao.jsx).
   async function compartilhar() {
     const texto = 'Themis Jur: acervo curado de jurisprudência, doutrina e legislação.'
     const url = 'https://themisjur.com.br'
@@ -127,210 +90,202 @@ export default function Landing({ onEntrar }) {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  return (
-    <div style={{ background: MARFIM, fontFamily: SERIF, height: '100vh', overflowY: 'auto', scrollSnapType: 'y proximity' }}>
+  const botaoPrimario = {
+    background: VINHO, border: 'none', color: MARFIM, fontSize: 14, fontWeight: 600,
+    padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE,
+    display: 'inline-flex', alignItems: 'center', gap: 8,
+  }
+  const botaoSecundario = {
+    background: 'transparent', border: `1px solid ${BORDA}`, color: TINTA, fontSize: 14, fontWeight: 500,
+    padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE,
+  }
 
-      {/* Header fixo — opaco (sem desfoque translúcido, que criava um
-          borrão claro ao passar por cima das seções escuras do rodapé) */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: estreito ? '12px 16px' : '16px 32px', paddingTop: `calc(${estreito ? 12 : 16}px + env(safe-area-inset-top))`, borderBottom: `1px solid ${TINTA}14` }}>
+  return (
+    <div style={{ background: MARFIM, fontFamily: FONTE, minHeight: '100vh' }}>
+
+      {/* Header */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM + 'f5', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: estreito ? '14px 16px' : '16px 40px', paddingTop: `calc(${estreito ? 14 : 16}px + env(safe-area-inset-top))`, borderBottom: `1px solid ${BORDA}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 26, height: 26, objectFit: 'contain' }} />
-          {!estreito && <span style={{ fontFamily: SERIF, fontSize: 14, color: TINTA }}>Themis Jur</span>}
+          <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+          <span style={{ fontSize: 16, fontWeight: 700, color: TINTA }}>Themis Jur</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 14 }}>
-          <button onClick={compartilhar} title="Compartilhar" style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, display: 'flex', alignItems: 'center', gap: 5 }}>
-            {copiado ? <Check size={15} /> : <Share2 size={15} />}
-            {!estreito && (copiado ? ' Copiado' : ' Compartilhar')}
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 20 }}>
           {!estreito && (
-            <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 12, fontStyle: 'italic', textDecoration: 'none', fontFamily: SERIF }}>
-              Ver amostra
-            </a>
+            <>
+              <button onClick={compartilhar} title="Compartilhar" style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 13, cursor: 'pointer', fontFamily: FONTE, display: 'flex', alignItems: 'center', gap: 5 }}>
+                {copiado ? <Check size={14} /> : <Share2 size={14} />}
+                {copiado ? 'Copiado' : 'Compartilhar'}
+              </button>
+              <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 13, textDecoration: 'none' }}>Ver amostra</a>
+              <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: TINTA, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: FONTE }}>
+                Entrar
+              </button>
+            </>
           )}
-          <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: SERIF, whiteSpace: 'nowrap' }}>
-            {estreito ? 'Entrar' : 'Já tenho acesso'}
+          <button onClick={() => onEntrar('register')} style={{ ...botaoPrimario, padding: estreito ? '9px 16px' : '10px 20px', fontSize: 13 }}>
+            {estreito ? 'Criar conta' : 'Criar conta gratuita'}
           </button>
         </div>
       </div>
 
-      {/* ── HERO — a tipografia é o gráfico. A balança está desenhada atrás
-          do próprio texto, integrada, não num canto pequeno. ─────────── */}
-      <Secao style={{ background: VINHO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}
-        decoracao={
-          <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"
-            style={{ position: 'absolute', inset: 0, opacity: 0.09 }} aria-hidden="true">
-            <line x1="500" y1="120" x2="500" y2="520" stroke={OURO_CLARO} strokeWidth="2" />
-            <line x1="260" y1="220" x2="740" y2="220" stroke={OURO_CLARO} strokeWidth="2" />
-            <path d="M120 220 A140 100 0 0 0 400 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
-            <path d="M600 220 A140 100 0 0 0 880 220" fill="none" stroke={OURO_CLARO} strokeWidth="1.4" />
-            <line x1="380" y1="700" x2="620" y2="700" stroke={OURO_CLARO} strokeWidth="2" />
-          </svg>
-        }>
-        <div style={{ position: 'relative', maxWidth: 900 }}>
-          <img src="/logo-temis-transparente.png" alt="Themis Jur"
-            style={{ width: 88, height: 88, objectFit: 'contain', marginBottom: 28, filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(48px, 8vw, 108px)', lineHeight: 0.98, color: MARFIM, marginBottom: 36, letterSpacing: -1 }}>
-            A tese certa,<br />na hora da peça.
-          </div>
-          <div style={{ fontSize: 17, color: OURO_CLARO, fontStyle: 'italic', maxWidth: 480, lineHeight: 1.6, marginBottom: 40 }}>
-            Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo.
-          </div>
-          <button onClick={() => document.getElementById('porque')?.scrollIntoView({ behavior: 'smooth' })}
-            style={{ background: 'transparent', border: `1px solid ${OURO_CLARO}`, color: OURO_CLARO, fontSize: 13, padding: '13px 30px', cursor: 'pointer', fontFamily: SERIF }}>
+      {/* Hero */}
+      <div style={{ padding: estreito ? '56px 20px 48px' : '96px 40px 72px', maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ fontSize: estreito ? 34 : 'clamp(38px, 5.5vw, 64px)', fontWeight: 800, lineHeight: 1.08, color: TINTA, letterSpacing: -1.5, marginBottom: 24 }}>
+          A tese certa, na hora da peça.
+        </div>
+        <div style={{ fontSize: estreito ? 15 : 18, color: MUSGO, maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
+          Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo, com fonte real e rastreável em cada entrada.
+        </div>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={() => onEntrar('register')} style={botaoPrimario}>
+            Criar conta gratuita <ArrowRight size={16} />
+          </button>
+          <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={botaoSecundario}>
             Conhecer o acervo
           </button>
         </div>
-      </Secao>
+      </div>
 
-      {/* ── CITAÇÃO — a aspas é a textura de fundo da seção inteira, não um
-          símbolo pequeno acima do texto. ──────────────────────────────── */}
-      <Secao id="porque" style={{ background: MARFIM_ESCURO, position: 'relative', overflow: 'hidden', padding: '0 40px' }}
-        decoracao={
-          <div aria-hidden="true" style={{
-            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -58%)',
-            fontFamily: theme.fontTitle, fontSize: 'min(70vw, 900px)', lineHeight: 1, color: OURO, opacity: 0.07,
-            userSelect: 'none', pointerEvents: 'none',
-          }}>”</div>
-        }>
-        <div style={{ position: 'relative', maxWidth: 680, margin: '0 auto' }}>
-          <div style={{ fontSize: 'clamp(20px, 3vw, 28px)', lineHeight: 1.55, color: TINTA, marginBottom: 32 }}>
-            A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório.
-          </div>
-          <div style={{ fontFamily: SERIF, fontWeight: 'bold', fontSize: 16, color: TINTA }}>Jessica Farias Fusquiani</div>
-          <div style={{ fontStyle: 'italic', fontSize: 13, color: MUSGO }}>Idealizadora do Themis Jur</div>
-        </div>
-      </Secao>
-
-      {/* ── O QUE TEM DE DIFERENTE — glosa marginal, como anotação à margem
-          de um volume impresso. Rótulo nomeado, não numerado (não é uma
-          sequência). ───────────────────────────────────────────────────── */}
-      <Secao style={{ background: MARFIM, padding: '80px 40px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: TINTA, marginBottom: 56 }}>
-            O que tem de diferente
-          </div>
-          {[
-            { rotulo: 'Fundamento', texto: 'Cada entrada reúne tese, fundamento legal e uma indicação de uso prático: não é ementa solta, é material pronto para consulta em peça.' },
-            { rotulo: 'Curadoria', texto: 'Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo.' },
-            { rotulo: 'Cruzamento', texto: 'Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.' },
-          ].map((item, i) => (
-            <div key={item.rotulo} style={{ display: 'flex', gap: 32, borderTop: i === 0 ? `1px solid ${TINTA}22` : 'none', borderBottom: `1px solid ${TINTA}22`, padding: '28px 0' }}>
-              <div style={{ width: 150, flexShrink: 0, fontFamily: SERIF, fontWeight: 'bold', fontSize: 15, color: OURO, paddingTop: 2 }}>{item.rotulo}</div>
-              <div style={{ fontSize: 16, color: TINTA_SUAVE, lineHeight: 1.65, maxWidth: 480 }}>{item.texto}</div>
-            </div>
-          ))}
-        </div>
-      </Secao>
-
-      {/* ── PARA QUEM É — mesmo dispositivo, rótulo pelo público. ───────── */}
-      <Secao style={{ background: VINHO, padding: '80px 40px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: MARFIM, marginBottom: 56 }}>
-            Para quem é
-          </div>
-          {[
-            { rotulo: 'Quem estuda', texto: 'O acervo oferece fonte primária no lugar do resumo de resumo, desde o início dos estudos.' },
-            { rotulo: 'Quem advoga', texto: 'Citação pronta e tese comentada em meio à rotina, sem precisar reconstruir o raciocínio do zero.' },
-            { rotulo: 'Quem leciona', texto: 'O material já chega organizado por área e por tipo, pronto para uso em sala.' },
-          ].map((item, i) => (
-            <div key={item.rotulo} style={{ display: 'flex', gap: 32, borderTop: i === 0 ? `1px solid ${OURO_CLARO}33` : 'none', borderBottom: `1px solid ${OURO_CLARO}33`, padding: '28px 0' }}>
-              <div style={{ width: 150, flexShrink: 0, fontFamily: SERIF, fontWeight: 'bold', fontSize: 15, color: OURO_CLARO, paddingTop: 2 }}>{item.rotulo}</div>
-              <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65, maxWidth: 480 }}>{item.texto}</div>
-            </div>
-          ))}
-        </div>
-      </Secao>
-
-      {/* ── NÚMEROS — o único momento de movimento da página: contagem real
-          ao vivo, disparada quando a seção entra na tela. ──────────────── */}
-      <Secao style={{ background: MARFIM, padding: '80px 40px' }} id="numeros">
-        <div ref={refStats} style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: TINTA, marginBottom: 12 }}>
-            Curadoria real, não promessa vazia
-          </div>
-          <div style={{ fontSize: 14, color: MUSGO, fontStyle: 'italic', marginBottom: 56 }}>
-            Números do acervo, ao vivo: crescem sozinhos conforme mais entradas são curadas.
-          </div>
+      {/* Números — cards horizontais, rótulo em cima, número grande embaixo */}
+      <div id="numeros" style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
+        <div ref={refStats} style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 1, background: BORDA, border: `1px solid ${BORDA}`, borderRadius: 12, overflow: 'hidden' }}>
           {numeros && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40 }}>
-              <NumeroGrande valor={numeros.total_entradas} ativo={statsVisivel} cor="#7a1128" label="entradas curadas" theme={theme} />
-              <NumeroGrande valor={numeros.total_artigos_vigentes} ativo={statsVisivel} cor={OURO} label="artigos de lei vigentes" theme={theme} />
-              <NumeroGrande valor={numeros.total_codigos} ativo={statsVisivel} cor="#2c4a6e" label="códigos e diplomas legais" theme={theme} />
-              <NumeroGrande valor={100} sufixo="%" ativo={statsVisivel} cor={TINTA} label="fonte real e rastreável" theme={theme} />
-            </div>
+            <>
+              <NumeroCard valor={numeros.total_entradas} ativo={statsVisivel} label="entradas curadas" />
+              <NumeroCard valor={numeros.total_artigos_vigentes} ativo={statsVisivel} label="artigos de lei vigentes" />
+              <NumeroCard valor={numeros.total_codigos} ativo={statsVisivel} label="códigos e diplomas legais" />
+              <NumeroCard valor={100} sufixo="%" ativo={statsVisivel} label="fonte real e rastreável" />
+            </>
           )}
         </div>
-      </Secao>
+      </div>
 
-      {/* ── LEDGER — composição do acervo, como um sumário/índice impresso,
-          não cards. ─────────────────────────────────────────────────────── */}
-      <Secao style={{ background: MARFIM_ESCURO, padding: '80px 40px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: TINTA, marginBottom: 56 }}>
-            Do que é feito o acervo
+      {/* O que tem de diferente — grade de 3 colunas, barra de cor + título + texto */}
+      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
+        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
+          O que tem de diferente
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(3, 1fr)', gap: 40 }}>
+          {[
+            { titulo: 'Fundamento real', texto: 'Cada entrada reúne tese, fundamento legal e uma indicação de uso prático: não é ementa solta, é material pronto pra consulta em peça.' },
+            { titulo: 'Curadoria de verdade', texto: 'Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo.' },
+            { titulo: 'Fontes cruzadas', texto: 'Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.' },
+          ].map(item => (
+            <div key={item.titulo}>
+              <div style={{ width: 32, height: 3, background: VINHO, borderRadius: 2, marginBottom: 16 }} />
+              <div style={{ fontSize: 17, fontWeight: 700, color: TINTA, marginBottom: 8 }}>{item.titulo}</div>
+              <div style={{ fontSize: 14, color: MUSGO, lineHeight: 1.65 }}>{item.texto}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Para quem é — mesmo padrão de grade */}
+      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
+        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
+          Para quem é
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(3, 1fr)', gap: 40 }}>
+          {[
+            { titulo: 'Quem estuda', texto: 'O acervo oferece fonte primária no lugar do resumo de resumo, desde o início dos estudos.' },
+            { titulo: 'Quem advoga', texto: 'Citação pronta e tese comentada em meio à rotina, sem precisar reconstruir o raciocínio do zero.' },
+            { titulo: 'Quem leciona', texto: 'O material já chega organizado por área e por tipo, pronto pra uso em sala.' },
+          ].map(item => (
+            <div key={item.titulo}>
+              <div style={{ width: 32, height: 3, background: OURO, borderRadius: 2, marginBottom: 16 }} />
+              <div style={{ fontSize: 17, fontWeight: 700, color: TINTA, marginBottom: 8 }}>{item.titulo}</div>
+              <div style={{ fontSize: 14, color: MUSGO, lineHeight: 1.65 }}>{item.texto}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Citação */}
+      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 760, margin: '0 auto' }}>
+        <div style={{ background: MARFIM_ESCURO, borderRadius: 16, padding: estreito ? '32px 24px' : '48px', border: `1px solid ${BORDA}` }}>
+          <div style={{ fontSize: estreito ? 17 : 20, lineHeight: 1.6, color: TINTA, marginBottom: 24 }}>
+            "A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório."
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 48 }}>
-            <Ledger titulo="Por tipo de fonte" dados={numeros?.por_tipo} nomear={k => NOME_TIPO[k] || k} cor="#7a1128" />
-            <Ledger titulo="Legislação vigente" dados={numeros?.por_codigo} nomear={k => NOME_CODIGO_LANDING[k] || k.toUpperCase()} cor="#2c4a6e" />
-            <Ledger titulo="Por tribunal" dados={numeros?.por_tribunal} nomear={k => k} cor={OURO} />
+          <div style={{ fontSize: 14, fontWeight: 700, color: TINTA }}>Jessica Farias Fusquiani</div>
+          <div style={{ fontSize: 13, color: MUSGO }}>Idealizadora do Themis Jur</div>
+        </div>
+      </div>
+
+      {/* Do que é feito o acervo — 3 listas lado a lado */}
+      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
+        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
+          Do que é feito o acervo
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(3, 1fr)', gap: 48 }}>
+          <Ledger titulo="Por tipo de fonte" dados={numeros?.por_tipo} nomear={k => NOME_TIPO[k] || k} cor={VINHO_CLARO} />
+          <Ledger titulo="Legislação vigente" dados={numeros?.por_codigo} nomear={k => NOME_CODIGO_LANDING[k] || k.toUpperCase()} cor="#2c4a6e" />
+          <Ledger titulo="Por tribunal" dados={numeros?.por_tribunal} nomear={k => k} cor={OURO} />
+        </div>
+      </div>
+
+      {/* Do acervo, agora — exemplos reais */}
+      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
+        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
+          Do acervo, agora
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(2, 1fr)', gap: 20 }}>
+          <div style={{ border: `1px solid ${BORDA}`, borderRadius: 12, padding: 24 }}>
+            <div style={{ fontSize: 15, color: TINTA, lineHeight: 1.6 }}>
+              <b>União estável.</b> Comunicabilidade do patrimônio formado durante a relação, ainda que a contribuição não tenha sido financeira.
+            </div>
+            <div style={{ fontSize: 12, color: MUSGO, marginTop: 10 }}>STJ, REsp 1.234.567/SP, Família</div>
+          </div>
+          <div style={{ border: `1px solid ${BORDA}`, borderRadius: 12, padding: 24 }}>
+            <div style={{ fontSize: 15, color: TINTA, lineHeight: 1.6 }}>
+              <b>Pronúncia.</b> Dúvida sobre legítima defesa não autoriza absolvição sumária; apreciação cabe ao Tribunal do Júri.
+            </div>
+            <div style={{ fontSize: 12, color: MUSGO, marginTop: 10 }}>STJ, AgRg no AREsp 872.992/PE, Penal</div>
           </div>
         </div>
-      </Secao>
+      </div>
 
-      {/* ── DO ACERVO, AGORA + CTA FINAL ──────────────────────────────────── */}
-      <Secao style={{ background: VINHO, padding: '80px 40px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', width: '100%' }}>
-          <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(28px, 4vw, 40px)', color: MARFIM, marginBottom: 48 }}>
-            Do acervo, agora
+      {/* CTA final */}
+      <div style={{ padding: estreito ? '0 20px 80px' : '0 40px 120px', maxWidth: 760, margin: '0 auto' }}>
+        <div style={{ background: VINHO, borderRadius: 16, padding: estreito ? '40px 24px' : '56px', textAlign: 'center' }}>
+          <div style={{ fontSize: estreito ? 22 : 28, fontWeight: 800, color: MARFIM, marginBottom: 12, letterSpacing: -0.5 }}>
+            Acesso ao acervo completo, sem custo
           </div>
-          <div style={{ borderTop: `1px solid ${OURO_CLARO}33`, padding: '24px 0' }}>
-            <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65 }}>
-              <b style={{ color: MARFIM }}>União estável.</b> Comunicabilidade do patrimônio formado durante a relação, ainda que a contribuição não tenha sido financeira.
-            </div>
-            <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 8 }}>STJ, REsp 1.234.567/SP, Família</div>
+          <div style={{ fontSize: 14, color: OURO_CLARO, marginBottom: 28 }}>
+            Busca com IA é recurso da versão paga.
           </div>
-          <div style={{ borderTop: `1px solid ${OURO_CLARO}33`, borderBottom: `1px solid ${OURO_CLARO}33`, padding: '24px 0', marginBottom: 56 }}>
-            <div style={{ fontSize: 16, color: '#e8dfd0', lineHeight: 1.65 }}>
-              <b style={{ color: MARFIM }}>Pronúncia.</b> Dúvida sobre legítima defesa não autoriza absolvição sumária; apreciação cabe ao Tribunal do Júri.
-            </div>
-            <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 8 }}>STJ, AgRg no AREsp 872.992/PE, Penal</div>
-          </div>
-          <button onClick={() => onEntrar('register')} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 15, fontWeight: 'bold', padding: '15px 42px', cursor: 'pointer', fontFamily: SERIF }}>
+          <button onClick={() => onEntrar('register')} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 15, fontWeight: 700, padding: '14px 32px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE }}>
             Criar conta gratuita
           </button>
-          <div style={{ fontSize: 12, color: OURO_CLARO, fontStyle: 'italic', marginTop: 14 }}>
-            Acesso ao acervo completo, sem custo. Busca com IA é recurso da versão paga.
-          </div>
         </div>
-      </Secao>
+      </div>
 
-      {/* ── RODAPÉ ─────────────────────────────────────────────────────────── */}
-      <div style={{ background: '#2a000d', padding: '56px 40px 28px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      {/* Rodapé */}
+      <div style={{ background: '#2a000d', padding: estreito ? '40px 20px 24px' : '56px 40px 28px' }}>
+        <div style={{ maxWidth: 1040, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 32, marginBottom: 40 }}>
             <div>
-              <div style={{ fontFamily: theme.fontTitle, fontSize: 17, color: MARFIM, marginBottom: 10 }}>Themis Jur</div>
-              <div style={{ fontSize: 13, color: OURO_CLARO, fontStyle: 'italic', lineHeight: 1.6, maxWidth: 220 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: MARFIM, marginBottom: 10 }}>Themis Jur</div>
+              <div style={{ fontSize: 13, color: OURO_CLARO, lineHeight: 1.6, maxWidth: 220 }}>
                 Acervo curado de jurisprudência, doutrina e legislação, por uma pessoa só.
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7 }}>PRODUTO</div>
+              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7, textTransform: 'uppercase' }}>Produto</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>O acervo em números</button>
+                <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>O acervo em números</button>
                 <a href="/?vitrine=1" style={{ color: '#e8dfd0', fontSize: 13, textDecoration: 'none' }}>Ver amostra</a>
-                <button onClick={compartilhar} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>Compartilhar</button>
+                <button onClick={compartilhar} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>Compartilhar</button>
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7 }}>CONTA</div>
+              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7, textTransform: 'uppercase' }}>Conta</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>Entrar</button>
-                <button onClick={() => onEntrar('register')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: SERIF, textAlign: 'left', padding: 0 }}>Criar conta gratuita</button>
+                <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>Entrar</button>
+                <button onClick={() => onEntrar('register')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>Criar conta gratuita</button>
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7 }}>CONTATO</div>
+              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7, textTransform: 'uppercase' }}>Contato</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <a href="mailto:themisjur.ia@gmail.com" style={{ color: '#e8dfd0', fontSize: 13, textDecoration: 'none' }}>E-mail</a>
               </div>
@@ -356,14 +311,14 @@ export default function Landing({ onEntrar }) {
   )
 }
 
-function NumeroGrande({ valor, sufixo = '', ativo, cor, label, theme }) {
+function NumeroCard({ valor, sufixo = '', ativo, label }) {
   const contado = useContagem(valor, ativo)
   return (
-    <div>
-      <div style={{ fontFamily: theme.fontTitle, fontWeight: 700, fontSize: 'clamp(40px, 5vw, 56px)', color: cor, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+    <div style={{ background: MARFIM, padding: '28px 20px' }}>
+      <div style={{ fontSize: 11, color: OURO, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, color: TINTA, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
         {contado.toLocaleString('pt-BR')}{sufixo}
       </div>
-      <div style={{ fontSize: 13, color: TINTA_SUAVE, marginTop: 10 }}>{label}</div>
     </div>
   )
 }
@@ -373,11 +328,11 @@ function Ledger({ titulo, dados, nomear, cor }) {
   const entradas = Object.entries(dados).sort((a, b) => b[1] - a[1])
   return (
     <div>
-      <div style={{ fontFamily: SERIF, fontWeight: 'bold', fontSize: 15, color: TINTA, marginBottom: 16, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</div>
+      <div style={{ fontWeight: 700, fontSize: 15, color: TINTA, marginBottom: 16, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</div>
       {entradas.map(([chave, valor]) => (
         <div key={chave} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: `1px solid ${TINTA}14`, fontSize: 14 }}>
-          <span style={{ color: TINTA_SUAVE }}>{nomear(chave)}</span>
-          <span style={{ color: cor, fontFamily: SERIF, fontWeight: 'bold' }}>{valor.toLocaleString('pt-BR')}</span>
+          <span style={{ color: MUSGO }}>{nomear(chave)}</span>
+          <span style={{ color: cor, fontWeight: 700 }}>{valor.toLocaleString('pt-BR')}</span>
         </div>
       ))}
     </div>
