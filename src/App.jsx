@@ -918,7 +918,7 @@ case VIEWS.JURISPRUDENCIA:
               </div>
               {/* Toggle exata / semântica */}
               <button onClick={() => { setModoSemantico(m => !m); setResultadosSem(null); setErroSem('') }}
-                title={modoSemantico ? 'Modo: busca semântica (IA) — clique para voltar à busca exata' : 'Modo: busca exata — clique para ativar busca semântica por IA'}
+                title={modoSemantico ? 'Modo: busca semântica (IA); clique para voltar à busca exata' : 'Modo: busca exata; clique para ativar busca semântica por IA'}
                 style={{ flexShrink: 0, background: modoSemantico ? theme.gold + '18' : 'transparent', color: modoSemantico ? theme.gold : theme.muted, border: `1px solid ${modoSemantico ? theme.gold + '55' : theme.border}`, borderRadius: 8, padding: '0 16px', height: 40, fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: modoSemantico ? 600 : 400, whiteSpace: 'nowrap' }}>
                 {modoSemantico ? 'IA' : 'IA'}
               </button>
@@ -1036,7 +1036,7 @@ case VIEWS.JURISPRUDENCIA:
         padding: '6px 12px', fontSize: 12, fontStyle: 'italic',
         fontFamily: "Georgia, 'EB Garamond', serif",
       }}>
-        Sem conexão. Mostrando os últimos dados salvos no aparelho — favoritos e anotações não sincronizam até a internet voltar.
+        Sem conexão. Mostrando os últimos dados salvos no aparelho. Favoritos e anotações não sincronizam até a internet voltar.
       </div>
     )}
     {paletaAberta && (

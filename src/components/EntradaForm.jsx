@@ -28,7 +28,7 @@ function IaBadge({ status, theme }) {
       display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11,
       color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginLeft: 8,
     }}>
-      <AlertTriangle size={11} /> Gerado por IA — revise antes de salvar
+      <AlertTriangle size={11} /> Gerado por IA: revise antes de salvar
     </span>
   )
 }
@@ -297,7 +297,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
               {extraindo ? 'Extraindo e analisando o acórdão…' : 'Importar PDF do acórdão'}
             </div>
             <div style={{ fontSize: 11, color: theme.muted }}>
-              {pdfNome ? ('Arquivo: ' + pdfNome) : ('Upload do PDF — extrai metadados, teses, fundamento da decisao e aplicacao pratica. Max. ' + MAX_PDF_MB + 'MB.')}
+              {pdfNome ? ('Arquivo: ' + pdfNome) : ('Upload do PDF. Extrai metadados, teses, fundamento da decisao e aplicacao pratica. Max. ' + MAX_PDF_MB + 'MB.')}
             </div>
           </div>
           <label style={{
@@ -344,7 +344,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
           {TIPOS.map(t => <option key={t}>{t}</option>)}
         </select>
         <FieldLabel>Tema / Assunto</FieldLabel>
-        {inp(entry.tema, v => setF('tema', v), 'Ex: Dano moral — requisitos e configuracao')}
+        {inp(entry.tema, v => setF('tema', v), 'Ex: Dano moral, requisitos e configuracao')}
         <div style={{ fontSize: 10, color: entry.tema.length > 120 ? theme.error : theme.muted, textAlign: 'right', marginTop: 2 }}>
           {entry.tema.length}/150 caracteres
         </div>

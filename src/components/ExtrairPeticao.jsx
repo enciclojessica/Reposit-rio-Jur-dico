@@ -21,7 +21,7 @@ async function extrairTextoDocx(file) {
 
   const zip = await window._JSZip.loadAsync(arrayBuffer)
   const xmlFile = zip.file('word/document.xml')
-  if (!xmlFile) throw new Error('Arquivo Word inválido — word/document.xml ausente.')
+  if (!xmlFile) throw new Error('Arquivo Word inválido: word/document.xml ausente.')
 
   const xml = await xmlFile.async('text')
   const paragraphs = []
@@ -73,7 +73,7 @@ async function fetchSeguro(url, opts) {
   try {
     return JSON.parse(texto)
   } catch (e) {
-    throw new Error(`JSON inválido de ${url.split('?')[0]}: ${e.message} — início da resposta: ${texto.slice(0, 120)}`)
+    throw new Error(`JSON inválido de ${url.split('?')[0]}: ${e.message}, início da resposta: ${texto.slice(0, 120)}`)
   }
 }
 
@@ -162,7 +162,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
           { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } },
           { type: 'text', text: 'Extraia o conhecimento jurídico desta peça. Retorne APENAS o JSON.' },
         ]
-        setProgresso('PDF pronto. Enviando para análise — pode levar até 40 segundos...')
+        setProgresso('PDF pronto. Enviando para análise, pode levar até 40 segundos...')
       }
 
       // ── 4. Chamar Claude via proxy autenticado (chave nunca sai do servidor) ──
@@ -220,7 +220,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
         try {
           dados = JSON.parse(match[0])
         } catch (e) {
-          setErro('JSON malformado na resposta da IA: ' + e.message + ' — trecho: ' + match[0].slice(0, 150))
+          setErro('JSON malformado na resposta da IA: ' + e.message + ', trecho: ' + match[0].slice(0, 150))
           setEtapa('erro'); return
         }
       }
@@ -421,7 +421,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
                         {a.status === 'novo' ? 'NOVO' : 'ATUALIZADO'}
                       </span>
                       <span style={{ color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1 }}>
-                        Art. {a.numero} — {a.codigo.toUpperCase()}
+                        Art. {a.numero}, {a.codigo.toUpperCase()}
                       </span>
                     </div>
                   ))}
@@ -443,7 +443,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
                         {j.status === 'novo' ? 'NOVO' : 'CONTEXTO NOVO'}
                       </span>
                       <span style={{ color: theme.text, fontFamily: 'Inter, sans-serif', flex: 1 }}>
-                        {j.tribunal} — {j.ref}
+                        {j.tribunal}, {j.ref}
                       </span>
                     </div>
                   ))}

@@ -80,7 +80,7 @@ function gerarTemplate() {
   ]
   const exemplo = [
     'Cível', 'jurisprudência',
-    'Responsabilidade civil por dano moral — negativação indevida',
+    'Responsabilidade civil por dano moral, negativação indevida',
     'STJ', 'REsp 1.234.567/SP', 'https://www.stj.jus.br', 'vigente', 'consumidor, banco',
     'A inscrição indevida em cadastro de inadimplentes gera dano moral in re ipsa.',
     'Art. 186 CC; Art. 42 CDC', 'Súmula 385 STJ',
@@ -171,11 +171,11 @@ export default function ImportacaoLote({ session }) {
           .from('entradas')
           .update({ ...payload, criado_por: undefined })
           .eq('id', existentes[0].id)
-        if (error) { erro++; errosMsgs.push(`Linha ${i + 2}: "${payload.tema.slice(0, 50)}" — ${error.message}`) }
+        if (error) { erro++; errosMsgs.push(`Linha ${i + 2}: "${payload.tema.slice(0, 50)}", erro: ${error.message}`) }
         else atualizados++
       } else {
         const { error } = await supabase.from('entradas').insert(payload)
-        if (error) { erro++; errosMsgs.push(`Linha ${i + 2}: "${payload.tema.slice(0, 50)}" — ${error.message}`) }
+        if (error) { erro++; errosMsgs.push(`Linha ${i + 2}: "${payload.tema.slice(0, 50)}", erro: ${error.message}`) }
         else inseridos++
       }
       setProgresso(Math.round(((i + 1) / validas.length) * 100))
@@ -255,7 +255,7 @@ export default function ImportacaoLote({ session }) {
                 </thead>
                 <tbody>
                   {[
-                    ['tema', '✓', 'Texto livre', 'Dano moral — banco de dados'],
+                    ['tema', '✓', 'Texto livre', 'Dano moral, banco de dados'],
                     ['area', '', 'Cível · Penal · Constitucional · Trabalhista · Tributário · Administrativo · Consumidor · Família · Previdenciário · Ambiental · Internacional · Digital', 'Cível'],
                     ['tipo', '', 'jurisprudência · doutrina · súmula · lei', 'jurisprudência'],
                     ['fonte', '', 'Texto livre', 'STJ'],
@@ -293,7 +293,7 @@ export default function ImportacaoLote({ session }) {
             {invalidas > 0 && (
               <div style={{ ...card, marginBottom: 0, flex: 1, minWidth: 140, borderTop: `2px solid ${theme.error}` }}>
                 <div style={{ fontSize: 26, fontWeight: 700, color: theme.error, fontFamily: 'Inter, sans-serif' }}>{invalidas}</div>
-                <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>com erros — serão ignoradas</div>
+                <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>com erros; serão ignoradas</div>
               </div>
             )}
           </div>
@@ -321,7 +321,7 @@ export default function ImportacaoLote({ session }) {
                         <td style={{ padding: '8px 12px', color: corDaArea(parsed.area, theme), borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.area}</td>
                         <td style={{ padding: '8px 12px', color: theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.tipo}</td>
                         <td style={{ padding: '8px 12px', color: theme.text, borderBottom: `1px solid ${theme.border}22`, maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {parsed.tema || <span style={{ color: theme.error }}>— sem tema —</span>}
+                          {parsed.tema || <span style={{ color: theme.error }}>(sem tema)</span>}
                           {temErro && <div style={{ fontSize: 10, color: theme.error }}>{erros[idx].join(' · ')}</div>}
                         </td>
                         <td style={{ padding: '8px 12px', color: theme.muted, borderBottom: `1px solid ${theme.border}22`, whiteSpace: 'nowrap' }}>{parsed.fonte}</td>

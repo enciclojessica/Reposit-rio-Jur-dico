@@ -527,14 +527,14 @@ export default function EditorPecas({ entradas, session }) {
           {/* Cabeçalho do editor: título + rito */}
           <div style={{ borderBottom: `1px solid ${theme.border}`, background: theme.cardBg, padding: '12px 16px', display: 'flex', gap: 10, flexShrink: 0 }}>
             <input value={titulo} onChange={e => setTitulo(e.target.value)}
-              placeholder="Título da peça (ex: Petição Inicial — Indenização por Dano Moral)"
+              placeholder="Título da peça (ex: Petição Inicial, Indenização por Dano Moral)"
               style={{ flex: 2, border: 'none', background: 'transparent', fontSize: 14, fontWeight: 700, color: theme.text, fontFamily: 'Playfair Display, Georgia, serif', outline: 'none' }} />
             <select value={rito} onChange={e => setRito(e.target.value)}
               style={{ flex: 1, border: `1px solid ${theme.border}`, borderRadius: 6, background: theme.raised, color: rito ? theme.text : theme.muted, fontSize: 12, padding: '4px 10px', fontFamily: 'Inter, sans-serif', outline: 'none', maxWidth: 180 }}>
               <option value="">Rito processual...</option>
-              <option value="JEC — Lei 9.099/95">JEC — Lei 9.099/95</option>
-              <option value="Rito Ordinário — CPC">Rito Ordinário — CPC</option>
-              <option value="Rito Sumaríssimo — CLT">Rito Sumaríssimo — CLT</option>
+              <option value="JEC, Lei 9.099/95">JEC, Lei 9.099/95</option>
+              <option value="Rito Ordinário, CPC">Rito Ordinário, CPC</option>
+              <option value="Rito Sumaríssimo, CLT">Rito Sumaríssimo, CLT</option>
               <option value="Ação Penal Pública">Ação Penal Pública</option>
               <option value="Ação Penal Privada">Ação Penal Privada</option>
             </select>
@@ -617,7 +617,7 @@ export default function EditorPecas({ entradas, session }) {
 
           <textarea ref={editorRef} value={conteudo} onChange={e => setConteudo(e.target.value)}
             onKeyUp={e => { handleSlashInput(e.target.value, e.target.selectionStart); handleArtigoNatural(e.target.value, e.target.selectionStart) }}
-            placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "Sugerir para este trecho" para receber teses do repositório.\n• Use /cpc 300, /cdc 14, /lei9099 3 para inserir artigos direto do banco.\n• Ao escrever "art. 927 do Código Civil", uma sugestão de autocompletar aparece automaticamente.\n• Use ## para seções e **negrito** — o .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
+            placeholder={`Redija a peça aqui.\n\n• Selecione um trecho → "Sugerir para este trecho" para receber teses do repositório.\n• Use /cpc 300, /cdc 14, /lei9099 3 para inserir artigos direto do banco.\n• Ao escrever "art. 927 do Código Civil", uma sugestão de autocompletar aparece automaticamente.\n• Use ## para seções e **negrito**. O .docx preserva a formatação.\n\nRascunho salvo automaticamente.`}
             style={{ flex: 1, border: 'none', background: theme.cardBg, padding: '20px', color: theme.text, fontSize: 14, lineHeight: 1.9, resize: 'none', outline: 'none', fontFamily: 'Georgia, serif', boxSizing: 'border-box', width: '100%' }}
             spellCheck />
 
