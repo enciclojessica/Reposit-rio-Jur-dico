@@ -95,10 +95,6 @@ export default function Landing({ onEntrar }) {
     padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE,
     display: 'inline-flex', alignItems: 'center', gap: 8,
   }
-  const botaoSecundario = {
-    background: 'transparent', border: `1px solid ${BORDA}`, color: TINTA, fontSize: 14, fontWeight: 500,
-    padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE,
-  }
 
   return (
     <div style={{ background: MARFIM, fontFamily: FONTE, minHeight: '100vh' }}>
@@ -128,26 +124,30 @@ export default function Landing({ onEntrar }) {
         </div>
       </div>
 
-      {/* Hero */}
-      <div style={{ padding: estreito ? '56px 20px 48px' : '96px 40px 72px', maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ fontSize: estreito ? 34 : 'clamp(38px, 5.5vw, 64px)', fontWeight: 800, lineHeight: 1.08, color: TINTA, letterSpacing: -1.5, marginBottom: 24 }}>
-          A tese certa, na hora da peça.
-        </div>
-        <div style={{ fontSize: estreito ? 15 : 18, color: MUSGO, maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
-          Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo, com fonte real e rastreável em cada entrada.
-        </div>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => onEntrar('register')} style={botaoPrimario}>
-            Criar conta gratuita <ArrowRight size={16} />
-          </button>
-          <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={botaoSecundario}>
-            Conhecer o acervo
-          </button>
+      {/* Hero — vinho, logo grande centralizada, como era antes */}
+      <div style={{ background: VINHO, padding: estreito ? '48px 20px 56px' : '80px 40px 88px' }}>
+        <div style={{ maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
+          <img src="/logo-temis-transparente.png" alt="Themis Jur"
+            style={{ width: estreito ? 64 : 88, height: estreito ? 64 : 88, objectFit: 'contain', marginBottom: 28, filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
+          <div style={{ fontSize: estreito ? 34 : 'clamp(38px, 5.5vw, 64px)', fontWeight: 800, lineHeight: 1.08, color: MARFIM, letterSpacing: -1.5, marginBottom: 24 }}>
+            A tese certa, na hora da peça.
+          </div>
+          <div style={{ fontSize: estreito ? 15 : 18, color: OURO_CLARO, maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
+            Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo, com fonte real e rastreável em cada entrada.
+          </div>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => onEntrar('register')} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 14, fontWeight: 700, padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              Criar conta gratuita <ArrowRight size={16} />
+            </button>
+            <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'transparent', border: `1px solid ${OURO_CLARO}66`, color: OURO_CLARO, fontSize: 14, fontWeight: 500, padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE }}>
+              Conhecer o acervo
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Números — cards horizontais, rótulo em cima, número grande embaixo */}
-      <div id="numeros" style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
+      <div id="numeros" style={{ padding: estreito ? '48px 20px 64px' : '64px 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
         <div ref={refStats} style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 1, background: BORDA, border: `1px solid ${BORDA}`, borderRadius: 12, overflow: 'hidden' }}>
           {numeros && (
             <>
