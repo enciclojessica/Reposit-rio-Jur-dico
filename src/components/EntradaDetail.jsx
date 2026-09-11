@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer, Maximize2, Minimize2 } from 'lucide-react'
+import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer, Maximize2, Minimize2, Search } from 'lucide-react'
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo, gerarCitacaoABNT } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
@@ -42,7 +42,8 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
     tags:       arr(raw?.tags),
   }
 
-  const iasPendente = entry.ia_status === 'ia_pendente'
+  const [iaStatus, setIaStatus]            = useState(entry.ia_status)
+  const iasPendente = iaStatus === 'ia_pendente'
 
   // Referências legais citadas nas teses (fundamentacao_legal, ratio_decidendi),
   // pra checar quais artigos já não estão mais vigentes. Uma consulta só,
@@ -124,6 +125,11 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
       if (onStatusChange) onStatusChange(entry.id, novo)
     }
     setSalvandoStatus(false)
+  }
+
+  async function confirmarRevisaoIA() {
+    const { error } = await supabase.from('entradas').update({ ia_status: 'ia_revisado' }).eq('id', entry.id)
+    if (!error) setIaStatus('ia_revisado')
   }
 
   function copyFichamento() {
@@ -233,11 +239,24 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
             {entry.url}
           </a>
         )}
+        {!entry.url && ['jurisprudência', 'súmula'].includes(entry.tipo) && (entry.fonte || entry.referencia) && (
+          <a href={`https://www.google.com/search?q=${encodeURIComponent([entry.fonte, entry.referencia].filter(Boolean).join(' '))}`}
+            target="_blank" rel="noreferrer"
+            style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, fontFamily: theme.fontSerif, textDecoration: 'none' }}>
+            <Search size={12} /> Buscar fonte oficial (sem link salvo)
+          </a>
+        )}
       </div>
 
       {/* Ações */}
       {!modoFoco && (
       <div className="no-print" style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+        {!readOnly && iasPendente && (
+          <button onClick={confirmarRevisaoIA} title="Marca essa entrada como já revisada, tira o aviso de pendente"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.gold}66`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontStyle: 'italic', color: theme.gold, cursor: 'pointer', fontFamily: theme.fontSerif }}>
+            <Check size={13} /> Marcar como revisado
+          </button>
+        )}
         {/* Status */}
         {!readOnly && (
           <div style={{ position: 'relative' }}>

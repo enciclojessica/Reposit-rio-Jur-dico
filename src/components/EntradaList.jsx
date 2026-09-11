@@ -21,6 +21,16 @@ function IaStatusLabel({ status, theme }) {
   )
 }
 
+// Aviso discreto pra quem cura o acervo: jurisprudência/súmula sem link de
+// fonte, pra saber quais ainda precisam de URL sem abrir uma por uma.
+function SemLinkLabel({ theme }) {
+  return (
+    <span style={{ fontSize: 11, fontStyle: 'italic', color: theme.penal, fontFamily: theme.fontSerif }}>
+      Sem link de fonte
+    </span>
+  )
+}
+
 export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMultiple, onTornarPublicasMultiple, isAdmin, favoritos, onAlternarFavorito }) {
   const { theme } = useTheme()
   const [modoTabela, setModoTabela] = useState(false)
@@ -209,9 +219,12 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     {numTeses > 0 && `${numTeses} ${numTeses === 1 ? 'tese' : 'teses'}`}
                   </div>
 
-                  {(tagsVisiveis(e).length > 0 || e.ia_status) && (
+                  {(tagsVisiveis(e).length > 0 || e.ia_status || (isAdmin && ['jurisprudência', 'súmula'].includes(e.tipo) && !e.url)) && (
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginTop: 6 }}>
                       <IaStatusLabel status={e.ia_status} theme={theme} />
+                      {isAdmin && ['jurisprudência', 'súmula'].includes(e.tipo) && !e.url && (
+                        <SemLinkLabel theme={theme} />
+                      )}
                       {tagsVisiveis(e).map(t => <TagPill key={t} tag={t} pequena />)}
                     </div>
                   )}
