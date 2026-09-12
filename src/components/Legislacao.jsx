@@ -80,8 +80,13 @@ function ArtigoModal({ grupo, onFechar }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
             {grupo.itens.map((item, i) => (
-              <div key={i} style={{ fontSize: 15, color: theme.text, lineHeight: 1.8, fontFamily: "'Inter', sans-serif", paddingLeft: (item.inciso || item.paragrafo) ? 16 : 0 }}>
+              <div key={i} style={{ fontSize: 15, color: item.vigente === false ? theme.muted : theme.text, lineHeight: 1.8, fontFamily: "'Inter', sans-serif", paddingLeft: (item.inciso || item.paragrafo) ? 16 : 0, textDecoration: item.vigente === false ? 'line-through' : 'none' }}>
                 {item.texto}
+                {item.vigente === false && (
+                  <span style={{ display: 'inline-block', marginLeft: 8, fontSize: 10, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', textDecoration: 'none' }}>
+                    Revogado
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -126,6 +131,7 @@ function ArtigoCard({ grupo, onAbrir }) {
   const [hover, setHover] = useState(false)
   const caput = grupo.caput
   const numSubItens = grupo.itens.length - 1
+  const revogado = caput?.vigente === false
 
   function copiar(e) {
     e.stopPropagation()
@@ -144,9 +150,10 @@ function ArtigoCard({ grupo, onAbrir }) {
       style={{
         background: theme.cardBg,
         border: `1px solid ${hover ? meta.cor + '66' : theme.border}`,
-        borderTop: `2px solid ${meta.cor}`,
+        borderTop: `2px solid ${revogado ? theme.muted : meta.cor}`,
         borderRadius: 6, padding: '14px 16px',
         cursor: 'pointer', transition: 'all .15s',
+        opacity: revogado ? 0.7 : 1,
       }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -157,13 +164,18 @@ function ArtigoCard({ grupo, onAbrir }) {
             <span style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: theme.fontTitle }}>
               {grupo.titulo || `Art. ${grupo.numero}`}
             </span>
+            {revogado && (
+              <span style={{ fontSize: 10, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Revogado
+              </span>
+            )}
             {numSubItens > 0 && (
               <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
                 +{numSubItens} inciso{numSubItens !== 1 ? 's' : ''}/parágrafo{numSubItens !== 1 ? 's' : ''}
               </span>
             )}
           </div>
-          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: "'Inter', sans-serif", textDecoration: revogado ? 'line-through' : 'none' }}>
             {caput?.texto}
           </div>
           {(caput?.contexto || caput?.aplicacao_pratica) && (
@@ -208,6 +220,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
   const [total, setTotal]                        = useState(0)
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
   const [exportando, setExportando] = useState(false)
+  const [mostrarRevogados, setMostrarRevogados] = useState(false)
 
   useEffect(() => {
     if (!preFiltro) return
@@ -253,15 +266,16 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
   useEffect(() => {
     const delay = setTimeout(buscarArtigos, 300)
     return () => clearTimeout(delay)
-  }, [codigoAtivo, busca])
+  }, [codigoAtivo, busca, mostrarRevogados])
 
   async function buscarArtigos() {
     setLoading(true)
-    let q = supabase.from('legislacao').select('*').eq('vigente', true)
+    let q = supabase.from('legislacao').select('*')
       .order('numero',   { ascending: true })
       .order('inciso',    { ascending: true, nullsFirst: true })
       .order('paragrafo', { ascending: true, nullsFirst: true })
       .limit(500)
+    if (!mostrarRevogados) q = q.eq('vigente', true)
 
     if (codigoAtivo !== 'todos') q = q.eq('codigo', codigoAtivo)
 
@@ -279,11 +293,12 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
   async function exportarPlanilha() {
     setExportando(true)
     try {
-      let q = supabase.from('legislacao').select('*').eq('vigente', true)
+      let q = supabase.from('legislacao').select('*')
         .order('codigo', { ascending: true })
         .order('numero', { ascending: true })
         .order('inciso',    { ascending: true, nullsFirst: true })
         .order('paragrafo', { ascending: true, nullsFirst: true })
+      if (!mostrarRevogados) q = q.eq('vigente', true)
 
       if (codigoAtivo !== 'todos') q = q.eq('codigo', codigoAtivo)
 
@@ -300,7 +315,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
         return '"' + s.split('"').join('""') + '"'
       }
 
-      const cabecalho = ['Codigo', 'Diploma', 'Artigo', 'Inciso', 'Paragrafo', 'Texto']
+      const cabecalho = ['Codigo', 'Diploma', 'Artigo', 'Inciso', 'Paragrafo', 'Texto', 'Status']
       const linhas = data.map(function(a) {
         return [
           (a.codigo || '').toUpperCase(),
@@ -309,6 +324,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
           a.inciso    || '',
           a.paragrafo || '',
           a.texto     || '',
+          a.vigente === false ? 'Revogado' : 'Vigente',
         ]
       })
 
@@ -360,21 +376,35 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
       ) : (
         <>
           {/* Filtros por código */}
-          <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginBottom: 16, borderBottom: `1px solid ${theme.border}`, paddingBottom: 2 }}>
-            <span onClick={() => setCodigoAtivo('todos')}
-              style={{ color: codigoAtivo === 'todos' ? theme.text : theme.muted, borderBottom: codigoAtivo === 'todos' ? `1.5px solid ${theme.gold}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: codigoAtivo === 'todos' ? 'normal' : 'italic' }}>
-              Todos ({total})
-            </span>
-            {codigos.map(cod => {
-              const meta = CODIGOS_META[cod] || { cor: theme.muted, label: cod.toUpperCase() }
-              const ativo = codigoAtivo === cod
-              return (
-                <span key={cod} onClick={() => setCodigoAtivo(cod)}
-                  style={{ color: ativo ? meta.cor : theme.muted, borderBottom: ativo ? `1.5px solid ${meta.cor}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: ativo ? 'normal' : 'italic' }}>
-                  {meta.label}
-                </span>
-              )
-            })}
+          <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginBottom: 16, borderBottom: `1px solid ${theme.border}`, paddingBottom: 2, alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
+              <span onClick={() => setCodigoAtivo('todos')}
+                style={{ color: codigoAtivo === 'todos' ? theme.text : theme.muted, borderBottom: codigoAtivo === 'todos' ? `1.5px solid ${theme.gold}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: codigoAtivo === 'todos' ? 'normal' : 'italic' }}>
+                Todos ({total})
+              </span>
+              {codigos.map(cod => {
+                const meta = CODIGOS_META[cod] || { cor: theme.muted, label: cod.toUpperCase() }
+                const ativo = codigoAtivo === cod
+                return (
+                  <span key={cod} onClick={() => setCodigoAtivo(cod)}
+                    style={{ color: ativo ? meta.cor : theme.muted, borderBottom: ativo ? `1.5px solid ${meta.cor}` : '1.5px solid transparent', paddingBottom: 8, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: ativo ? 'normal' : 'italic' }}>
+                    {meta.label}
+                  </span>
+                )
+              })}
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8, fontSize: 12, color: mostrarRevogados ? theme.gold : theme.muted, fontFamily: "'Inter', sans-serif", cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              <span style={{
+                width: 14, height: 14, borderRadius: 3, flexShrink: 0,
+                border: `1px solid ${mostrarRevogados ? theme.gold : theme.border}`,
+                background: mostrarRevogados ? theme.gold : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {mostrarRevogados && <Check size={10} color={theme.surface} />}
+              </span>
+              <input type="checkbox" checked={mostrarRevogados} onChange={e => setMostrarRevogados(e.target.checked)} style={{ display: 'none' }} />
+              Mostrar revogados
+            </label>
           </div>
 
           {/* Busca */}
