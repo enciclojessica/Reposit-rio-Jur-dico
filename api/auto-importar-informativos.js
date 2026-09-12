@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader)
     if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
     userId = user.id
-    const { permitido } = await checarRateLimit(supabase, userId, 'auto-importar-informativos', { limite: 10, janelaMs: 60_000 })
+    const { permitido } = await checarRateLimit(supabase, { userId }, 'auto-importar-informativos', { limite: 10, janelaMs: 60_000 })
     if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
   }
 

@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
 
-  const { permitido } = await checarRateLimit(supabase, user.id, 'busca', { limite: 30, janelaMs: 5 * 60_000 })
+  const { permitido } = await checarRateLimit(supabase, { userId: user.id }, 'busca', { limite: 30, janelaMs: 5 * 60_000 })
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde alguns minutos e tente novamente.' })
 
   const apiKey = process.env.ANTHROPIC_API_KEY

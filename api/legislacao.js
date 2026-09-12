@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -7,6 +8,14 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+
+  // Rota pública (sem login) — os Termos de Uso proíbem scraping/extração em
+  // massa do acervo; isso não impede alguém decidido, mas fecha o caminho
+  // trivial. Limite generoso para não atrapalhar uso normal do app (várias
+  // consultas por navegação), mas alto o bastante pra travar scraping.
+  const ip = (req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'desconhecido').trim()
+  const { permitido } = await checarRateLimit(supabase, { ip }, 'legislacao', { limite: 120, janelaMs: 60_000 })
+  if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
   // ── Sitemap dinâmico (rota /sitemap.xml via rewrite no vercel.json) ─────
   // Vive aqui, e não em api/sitemap.js, porque o plano Hobby da Vercel

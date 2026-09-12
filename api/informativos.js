@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
 
-  const { permitido } = await checarRateLimit(supabase, user.id, 'informativos', { limite: 15, janelaMs: 60_000 })
+  const { permitido } = await checarRateLimit(supabase, { userId: user.id }, 'informativos', { limite: 15, janelaMs: 60_000 })
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
   // Gate de papel: "Informativos" é ferramenta de curadoria (decide o que

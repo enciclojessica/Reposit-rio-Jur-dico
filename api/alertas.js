@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
   // Autenticar via JWT do Supabase enviado no header
@@ -13,6 +14,9 @@ export default async function handler(req, res) {
   // Verificar usuário pelo token
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido.' })
+
+  const { permitido } = await checarRateLimit(supabase, { userId: user.id }, 'alertas', { limite: 30, janelaMs: 60_000 })
+  if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
   if (req.method === 'GET') {
     const { data, error } = await supabase

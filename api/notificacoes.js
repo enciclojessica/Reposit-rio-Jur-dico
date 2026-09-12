@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { checarRateLimit } from '../lib/rateLimit.js'
 
 export default async function handler(req, res) {
   const token = req.headers.authorization?.replace('Bearer ', '')
@@ -7,6 +8,9 @@ export default async function handler(req, res) {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return res.status(401).json({ error: 'Token inválido.' })
+
+  const { permitido } = await checarRateLimit(supabase, { userId: user.id }, 'notificacoes', { limite: 60, janelaMs: 60_000 })
+  if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
   // GET — listar notificações
   if (req.method === 'GET') {

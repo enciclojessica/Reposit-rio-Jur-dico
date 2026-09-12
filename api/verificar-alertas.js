@@ -62,13 +62,27 @@ export default async function handler(req, res) {
   let enviados = 0
   const erros  = []
 
+  // Trava de custo: cada tema processado é 1 chamada de IA com busca web.
+  // Sem isso, o crescimento da base de usuários/alertas faz esse cron ficar
+  // proporcionalmente mais caro e mais lento, sem limite. Ao atingir o teto,
+  // os alertas restantes ficam pra próxima execução (não atualizamos
+  // ultima_verificacao deles, então entram de novo na fila automaticamente).
+  const MAX_TEMAS_POR_EXECUCAO = 200
+  let temasProcessados = 0
+
   for (const [email, temasDoUsuario] of Object.entries(porEmail)) {
+    if (temasProcessados >= MAX_TEMAS_POR_EXECUCAO) {
+      console.warn(`[verificar-alertas] Teto de ${MAX_TEMAS_POR_EXECUCAO} temas atingido — ${email} e demais ficam para a próxima execução.`)
+      break
+    }
     console.log(`[verificar-alertas] Processando ${temasDoUsuario.length} tema(s) para ${email}...`)
     try {
       const userId = temasDoUsuario[0]?.user_id
       const resultadosPorTema = []
 
       for (const alerta of temasDoUsuario) {
+        if (temasProcessados >= MAX_TEMAS_POR_EXECUCAO) break
+        temasProcessados++
         const res2 = await fetch(`${baseUrl}/api/pesquisa-juri`, {
           method: 'POST',
           headers: {
@@ -148,8 +162,8 @@ export default async function handler(req, res) {
   // ter novidade relevante, gastando 2 chamadas de IA com busca na web por
   // disparo. Continua disponível manualmente em Importar > Informativos.
 
-  console.log(`[verificar-alertas] Concluído — ${enviados} e-mail(s) enviado(s), ${erros.length} erro(s).`)
-  return res.status(200).json({ ok: true, enviados, erros })
+  console.log(`[verificar-alertas] Concluído — ${enviados} e-mail(s) enviado(s), ${erros.length} erro(s), ${temasProcessados} tema(s) processado(s).`)
+  return res.status(200).json({ ok: true, enviados, erros, temasProcessados, teto: MAX_TEMAS_POR_EXECUCAO })
 }
 
 function montarEmail(resultadosPorTema, { lacunas = [] } = {}) {

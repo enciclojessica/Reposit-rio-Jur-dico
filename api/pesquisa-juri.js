@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       const { data: { user }, error: authErr } = await supabase.auth.getUser(authHeader)
       if (authErr || !user) return res.status(401).json({ error: 'Token inválido ou expirado.' })
 
-      const { permitido } = await checarRateLimit(supabase, user.id, 'pesquisa-juri', { limite: 15, janelaMs: 60_000 })
+      const { permitido } = await checarRateLimit(supabase, { userId: user.id }, 'pesquisa-juri', { limite: 15, janelaMs: 60_000 })
       if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
       // Gate de recurso pago — só no caminho de usuário; o radar automático
