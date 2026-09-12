@@ -737,7 +737,11 @@ case VIEWS.JURISPRUDENCIA:
         )
 
       case VIEWS.LEG_VIEW:
-        return <div className="fade-up"><Legislacao preFiltro={legislacaoPreFiltro} onPreFiltroConsumido={() => setLegislacaoPreFiltro(null)} /></div>
+        return <div className="fade-up"><Legislacao
+          preFiltro={legislacaoPreFiltro} onPreFiltroConsumido={() => setLegislacaoPreFiltro(null)}
+          entradas={entradas}
+          onAbrirEntrada={(entrada) => { setSelected(entrada); setView(VIEWS.DETAIL) }}
+        /></div>
 
 
 

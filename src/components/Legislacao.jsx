@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Download, Search, Check, Copy, Link2 } from 'lucide-react'
+import { Download, Search, Check, Copy, Link2, FileText } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { extrairReferenciasLegais } from '../data/legislacaoNomes'
+import { corDaArea } from '../shared'
 
 const CODIGOS_META = {
   cpc:     { label: 'CPC',          nome: 'Código de Processo Civil',       cor: '#2c5a6e' },
@@ -13,12 +15,35 @@ const CODIGOS_META = {
 }
 
 // ── Modal de detalhe ────────────────────────────────────────────────────────
-function ArtigoModal({ grupo, onFechar }) {
+function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
   const { theme } = useTheme()
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase(), nome: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
   const [linkCopiado, setLinkCopiado] = useState(false)
   const caput = grupo.caput
+
+  // Teses do acervo cuja fundamentação legal ou ratio decidendi cita este
+  // artigo — mesmo parser usado no sentido inverso (tese → artigo) em
+  // EntradaDetail.jsx, aqui aplicado a todas as entradas pra achar quem
+  // cita ESTE dispositivo.
+  const tesesRelacionadas = useMemo(() => {
+    if (!entradas?.length) return []
+    const achadas = []
+    for (const entrada of entradas) {
+      const teses = Array.isArray(entrada.teses) ? entrada.teses : []
+      const cita = teses.some(t => {
+        const refs = [
+          ...extrairReferenciasLegais(t?.fundamentacao_legal || ''),
+          ...extrairReferenciasLegais(t?.ratio_decidendi || ''),
+        ]
+        return refs.some(r => r.codigo === grupo.codigo && r.numero === grupo.numero)
+      })
+      if (cita) achadas.push(entrada)
+    }
+    return achadas
+      .sort((a, b) => new Date(b.criado_em || 0) - new Date(a.criado_em || 0))
+      .slice(0, 8)
+  }, [entradas, grupo.codigo, grupo.numero])
 
   function copiar() {
     const corpo = grupo.itens.map(i => i.texto).join('\n')
@@ -117,6 +142,35 @@ function ArtigoModal({ grupo, onFechar }) {
               )}
             </div>
           )}
+
+          {tesesRelacionadas.length > 0 && (
+            <div style={{ borderTop: `1px solid ${theme.border}`, marginTop: 20, paddingTop: 16 }}>
+              <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 10 }}>
+                Teses do acervo que citam este artigo
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {tesesRelacionadas.map(entrada => (
+                  <div key={entrada.id}
+                    onClick={() => { onAbrirEntrada?.(entrada); onFechar() }}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 8,
+                      padding: '8px 10px', borderRadius: 6,
+                      border: `1px solid ${theme.border}`, cursor: 'pointer',
+                    }}>
+                    <FileText size={13} color={corDaArea(entrada.area, theme)} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 11, color: corDaArea(entrada.area, theme), fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+                        {entrada.area} · {entrada.fonte}
+                      </div>
+                      <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {entrada.tema}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -124,7 +178,7 @@ function ArtigoModal({ grupo, onFechar }) {
 }
 
 // ── Card do artigo ───────────────────────────────────────────────────────────
-function ArtigoCard({ grupo, onAbrir }) {
+function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
   const { theme } = useTheme()
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
@@ -174,6 +228,11 @@ function ArtigoCard({ grupo, onAbrir }) {
                 +{numSubItens} inciso{numSubItens !== 1 ? 's' : ''}/parágrafo{numSubItens !== 1 ? 's' : ''}
               </span>
             )}
+            {citacoes > 0 && (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+                <FileText size={11} /> {citacoes} tese{citacoes !== 1 ? 's' : ''}
+              </span>
+            )}
           </div>
           <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: "'Inter', sans-serif", textDecoration: revogado ? 'line-through' : 'none' }}>
             {caput?.texto}
@@ -210,7 +269,7 @@ function ArtigoCard({ grupo, onAbrir }) {
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
-export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
+export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, onAbrirEntrada }) {
   const { theme } = useTheme()
   const [codigoAtivo, setCodigoAtivo]           = useState(preFiltro?.codigo || 'todos')
   const [busca, setBusca]                        = useState(preFiltro?.numero ? String(preFiltro.numero) : '')
@@ -221,6 +280,25 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
   const [exportando, setExportando] = useState(false)
   const [mostrarRevogados, setMostrarRevogados] = useState(false)
+
+  // Mapa "codigo|numero" → nº de teses do acervo que citam aquele artigo,
+  // computado uma vez por mudança em entradas (não a cada busca/filtro), pra
+  // mostrar um indicador discreto em cada card sem reprocessar toda hora.
+  const mapaCitacoes = useMemo(() => {
+    const mapa = new Map()
+    for (const entrada of entradas || []) {
+      const teses = Array.isArray(entrada.teses) ? entrada.teses : []
+      const refsDaEntrada = new Set()
+      for (const t of teses) {
+        for (const r of [
+          ...extrairReferenciasLegais(t?.fundamentacao_legal || ''),
+          ...extrairReferenciasLegais(t?.ratio_decidendi || ''),
+        ]) refsDaEntrada.add(`${r.codigo}|${r.numero}`)
+      }
+      refsDaEntrada.forEach(chave => mapa.set(chave, (mapa.get(chave) || 0) + 1))
+    }
+    return mapa
+  }, [entradas])
 
   useEffect(() => {
     if (!preFiltro) return
@@ -421,7 +499,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {gruposArtigos.map((g) => (
-              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} />
+              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} citacoes={mapaCitacoes.get(`${g.codigo}|${g.numero}`) || 0} />
             ))}
             {!loading && gruposArtigos.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
@@ -432,7 +510,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido }) {
 
       {/* Modal */}
       {artigoSelecionado && (
-        <ArtigoModal grupo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} />
+        <ArtigoModal grupo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} entradas={entradas} onAbrirEntrada={onAbrirEntrada} />
       )}
     </div>
   )
