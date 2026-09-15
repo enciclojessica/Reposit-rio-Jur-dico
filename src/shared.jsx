@@ -251,14 +251,51 @@ export function fonteReferenciaResumo(entry, extras = []) {
 // referência bibliográfica) — só fonte e referencia, com a mesma checagem
 // de redundância de fonteReferenciaResumo (evita duplicar o autor quando
 // referencia já o repete).
+//
+// Mapa de siglas de tribunal -> nome por extenso, usado para montar o
+// prefixo "BRASIL. <Tribunal>." exigido pela NBR 6023 em jurisprudência e
+// súmula (entidade coletiva = o país, autor institucional = o tribunal).
+const TRIBUNAIS_ABREV = {
+  'STJ':   'Superior Tribunal de Justiça',
+  'STF':   'Supremo Tribunal Federal',
+  'TST':   'Tribunal Superior do Trabalho',
+  'TSE':   'Tribunal Superior Eleitoral',
+  'STM':   'Superior Tribunal Militar',
+  'TJSP':  'Tribunal de Justiça do Estado de São Paulo',
+  'TJRJ':  'Tribunal de Justiça do Estado do Rio de Janeiro',
+  'TJRS':  'Tribunal de Justiça do Estado do Rio Grande do Sul',
+  'TJMG':  'Tribunal de Justiça do Estado de Minas Gerais',
+  'TJDFT': 'Tribunal de Justiça do Distrito Federal e dos Territórios',
+  'FONAJE':'Fórum Nacional de Juizados Especiais',
+}
+
+// Separa a sigla do tribunal (primeiro token de "fonte", antes da vírgula)
+// do restante da string (seção, data de julgamento etc.), para não repetir
+// a sigla depois de já ter sido expandida no prefixo "BRASIL. <Tribunal>.".
+// Quando "fonte" não começa por uma sigla conhecida (ex: já vem por
+// extenso, como em fontes de TJ digitadas na íntegra), devolve o texto
+// original inteiro em "resto" e nenhum tribunalExtenso.
+function separarTribunalDoResto(fonte) {
+  if (!fonte) return { tribunalExtenso: null, resto: '' }
+  const partes = fonte.split(',')
+  const primeiro = partes[0].trim()
+  const extenso = TRIBUNAIS_ABREV[primeiro.toUpperCase()]
+  if (extenso) {
+    return { tribunalExtenso: extenso, resto: partes.slice(1).join(',').trim() }
+  }
+  return { tribunalExtenso: null, resto: fonte }
+}
+
 export function gerarCitacaoABNT(entry) {
-  const fonte  = (entry.fonte || '').toUpperCase()
+  const fonte  = entry.fonte || ''
   const ref    = entry.referencia || ''
   const tema   = entry.tema || ''
   const url    = entry.url || ''
   const acesso = new Date().toLocaleDateString('pt-BR')
   const tipo   = entry.tipo || 'jurisprudência'
-  const sufixo = `${url ? ` Disponível em: ${url}.` : ''} Acesso em: ${acesso}.`
+  // "Acesso em" só se aplica a fonte eletrônica (NBR 6023) — sem URL, não
+  // há o que citar como acesso online, então o sufixo fica vazio.
+  const sufixo = url ? ` Disponível em: ${url}. Acesso em: ${acesso}.` : ''
 
   if (tipo === 'lei') {
     const base = ref || tema
@@ -266,8 +303,19 @@ export function gerarCitacaoABNT(entry) {
     return `BRASIL. ${base}${ponto}${sufixo}`
   }
 
-  const fonteRedundante = fonteJaMencionadaEm(entry.fonte, ref)
-  const corpo = fonteRedundante ? ref : [fonte, ref || tema].filter(Boolean).join('. ')
+  if (tipo === 'jurisprudência' || tipo === 'súmula') {
+    // NBR 6023 para jurisprudência: entidade coletiva (BRASIL), tribunal
+    // por extenso, identificação do julgado/súmula, órgão julgador e data.
+    const { tribunalExtenso, resto } = separarTribunalDoResto(fonte)
+    const restoRedundante = fonteJaMencionadaEm(resto, ref)
+    const corpo = [ref || tema, restoRedundante ? '' : resto].filter(Boolean).join('. ')
+    const pontoFinal = corpo.trim().endsWith('.') ? '' : '.'
+    const prefixo = `BRASIL. ${tribunalExtenso ? `${tribunalExtenso}. ` : ''}`
+    return `${prefixo}${corpo}${pontoFinal}${sufixo}`
+  }
+
+  const fonteRedundante = fonteJaMencionadaEm(fonte, ref)
+  const corpo = fonteRedundante ? ref : [fonte.toUpperCase(), ref || tema].filter(Boolean).join('. ')
   const pontoFinal = corpo.trim().endsWith('.') ? '' : '.'
   return `${corpo}${pontoFinal}${sufixo}`
 }
