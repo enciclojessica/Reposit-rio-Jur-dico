@@ -274,6 +274,8 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
   const [codigoAtivo, setCodigoAtivo]           = useState(preFiltro?.codigo || 'todos')
   const [busca, setBusca]                        = useState(preFiltro?.numero ? String(preFiltro.numero) : '')
   const [artigos, setArtigos]                    = useState([])
+  const [totalResultados, setTotalResultados]     = useState(0)
+  const [carregandoMais, setCarregandoMais]       = useState(false)
   const [loading, setLoading]                    = useState(true)
   const [codigos, setCodigos]                    = useState([])
   const [total, setTotal]                        = useState(0)
@@ -351,26 +353,41 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
     return () => clearTimeout(delay)
   }, [codigoAtivo, busca, mostrarRevogados])
 
-  async function buscarArtigos() {
-    setLoading(true)
-    let q = supabase.from('legislacao').select('*')
+  const PAGINA = 500
+
+  function baseQuery() {
+    let q = supabase.from('legislacao').select('*', { count: 'exact' })
       .order('numero',   { ascending: true })
       .order('inciso',    { ascending: true, nullsFirst: true })
       .order('paragrafo', { ascending: true, nullsFirst: true })
-      .limit(500)
     if (!mostrarRevogados) q = q.eq('vigente', true)
-
     if (codigoAtivo !== 'todos') q = q.eq('codigo', codigoAtivo)
-
     if (busca.trim()) {
       const num = parseInt(busca)
       if (!isNaN(num)) q = q.eq('numero', num)
       else              q = q.textSearch('texto', busca, { type: 'websearch', config: 'portuguese' })
     }
+    return q
+  }
 
-    const { data } = await q
+  async function buscarArtigos() {
+    setLoading(true)
+    const { data, count } = await baseQuery().range(0, PAGINA - 1)
     setArtigos(data || [])
+    setTotalResultados(count || 0)
     setLoading(false)
+  }
+
+  // Resultados além da primeira página (500) não vêm automaticamente — o
+  // Postgrest limita cada resposta a 1000 linhas e, mesmo abaixo disso,
+  // trazer tudo de uma vez deixaria a tela pesada com códigos grandes
+  // (CC sozinho tem quase 4 mil linhas). "Carregar mais" busca o próximo
+  // bloco e junta ao que já está na tela, em vez de recarregar do zero.
+  async function carregarMais() {
+    setCarregandoMais(true)
+    const { data } = await baseQuery().range(artigos.length, artigos.length + PAGINA - 1)
+    setArtigos(prev => [...prev, ...(data || [])])
+    setCarregandoMais(false)
   }
 
   async function exportarPlanilha() {
@@ -512,7 +529,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
           </div>
 
           <div style={{ fontSize: 12, color: theme.muted, marginBottom: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
-            {loading ? 'Buscando…' : `${gruposArtigos.length} artigo${gruposArtigos.length !== 1 ? 's' : ''} encontrado${gruposArtigos.length !== 1 ? 's' : ''}`}
+            {loading ? 'Buscando…' : `${gruposArtigos.length} artigo${gruposArtigos.length !== 1 ? 's' : ''} encontrado${gruposArtigos.length !== 1 ? 's' : ''}${artigos.length < totalResultados ? ` (mostrando as primeiras ${artigos.length} linhas de ${totalResultados})` : ''}`}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -521,6 +538,19 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
             ))}
             {!loading && gruposArtigos.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
+            )}
+            {!loading && artigos.length < totalResultados && (
+              <button
+                onClick={carregarMais}
+                disabled={carregandoMais}
+                style={{
+                  marginTop: 8, padding: '10px 16px', borderRadius: 6,
+                  border: `1px solid ${theme.gold}`, background: 'transparent',
+                  color: theme.gold, fontSize: 13, fontFamily: "'Inter', sans-serif",
+                  cursor: carregandoMais ? 'default' : 'pointer', opacity: carregandoMais ? 0.6 : 1,
+                }}>
+                {carregandoMais ? 'Carregando…' : `Carregar mais (${totalResultados - artigos.length} restantes)`}
+              </button>
             )}
           </div>
         </>
