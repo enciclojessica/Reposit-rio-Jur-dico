@@ -40,7 +40,11 @@ export function detectarCodigoNoTexto(janela) {
 // coluna legislacao.numero armazena, o sufixo mora em "titulo".
 // Usado para linkar citações de lei dentro de uma tese ao artigo real, se
 // ele já estiver importado no repositório.
-const REGEX_ARTIGO = /art(?:igo)?\.?\s*(\d+)[º°]?/gi
+// Números de artigo no formato brasileiro usam ponto como separador de
+// milhar (ex: "art. 1.658"), não como fim de frase — sem tratar isso, "art.
+// 1.658" era lido como artigo 1 (parando no primeiro ponto), colando a
+// referência no artigo errado sempre que o número passava de 999.
+const REGEX_ARTIGO = /art(?:igo)?\.?\s*(\d{1,3}(?:\.\d{3})*)[º°]?/gi
 
 export function extrairReferenciasLegais(texto) {
   if (!texto) return []
@@ -52,7 +56,7 @@ export function extrairReferenciasLegais(texto) {
   let m
   REGEX_ARTIGO.lastIndex = 0
   while ((m = REGEX_ARTIGO.exec(texto)) !== null) {
-    const numero = parseInt(m[1], 10)
+    const numero = parseInt(m[1].replace(/\./g, ''), 10)
     if (numero) ocorrencias.push({ numero, matchTexto: m[0], start: m.index, end: m.index + m[0].length })
   }
 
