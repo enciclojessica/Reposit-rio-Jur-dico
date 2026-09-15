@@ -308,12 +308,17 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
   }, [preFiltro])
 
   useEffect(() => {
-    supabase.from('legislacao').select('codigo').eq('vigente', true).then(({ data }) => {
-      if (data) {
-        const uniq = [...new Set(data.map(d => d.codigo))]
-        setCodigos(uniq)
-        setTotal(data.length)
-      }
+    // Total: conta com agregação no banco (count: 'exact', head: true), sem
+    // trazer linhas — evita o teto padrão de 1000 linhas por requisição do
+    // PostgREST, que travava esse número assim que o acervo passava disso.
+    supabase.from('legislacao').select('*', { count: 'exact', head: true }).eq('vigente', true)
+      .then(({ count }) => setTotal(count || 0))
+    // Códigos distintos: precisa de função no banco (SELECT DISTINCT), já
+    // que buscar todas as linhas só pra extrair os códigos únicos sofreria
+    // do mesmo teto de 1000 linhas e, pior, traria códigos incompletos
+    // (só os primeiros na ordem física de inserção da tabela).
+    supabase.rpc('legislacao_codigos_vigentes').then(({ data }) => {
+      if (data) setCodigos(data.map(d => d.codigo))
     })
   }, [])
 
@@ -380,8 +385,21 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
 
       if (codigoAtivo !== 'todos') q = q.eq('codigo', codigoAtivo)
 
-      const { data } = await q
-      if (!data || data.length === 0) { setExportando(false); return }
+      // O PostgREST limita cada requisição a 1000 linhas por padrão — sem
+      // paginação, uma exportação "Todos" perderia a maior parte do acervo
+      // silenciosamente, sem nenhum aviso de que o arquivo ficou incompleto.
+      const PAGINA = 1000
+      let data = []
+      let pagina = 0
+      while (true) {
+        const { data: bloco, error } = await q.range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1)
+        if (error) throw error
+        if (!bloco || bloco.length === 0) break
+        data = data.concat(bloco)
+        if (bloco.length < PAGINA) break
+        pagina++
+      }
+      if (data.length === 0) { setExportando(false); return }
 
       const meta = CODIGOS_META
       const sep = ';'
