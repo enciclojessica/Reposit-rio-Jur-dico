@@ -45,6 +45,51 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
   const [iaStatus, setIaStatus]            = useState(entry.ia_status)
   const iasPendente = iaStatus === 'ia_pendente'
 
+  // Contrapontos: entradas ligadas manualmente como "o outro lado" do mesmo
+  // tema (ex: uma súmula que favorece o consumidor e outra que favorece o
+  // credor sobre a mesma questão) — vínculo deliberado do editor, não
+  // inferido automaticamente, porque adivinhar "posições opostas" por
+  // palavra-chave erraria fácil em conteúdo jurídico.
+  const [contrapontos, setContrapontos] = useState([])
+  const [buscaContraponto, setBuscaContraponto] = useState('')
+  const [ligandoContraponto, setLigandoContraponto] = useState(false)
+
+  async function carregarContrapontos() {
+    if (!entry.id) return
+    const { data } = await supabase
+      .from('contrapontos').select('contraponto_id').eq('entrada_id', entry.id)
+    const ids = (data || []).map(d => d.contraponto_id)
+    setContrapontos((todasEntradas || []).filter(e => ids.includes(e.id)))
+  }
+  useEffect(() => { carregarContrapontos() }, [entry.id])
+
+  async function ligarContraponto(outraEntrada) {
+    setLigandoContraponto(true)
+    await supabase.from('contrapontos').insert([
+      { entrada_id: entry.id, contraponto_id: outraEntrada.id },
+      { entrada_id: outraEntrada.id, contraponto_id: entry.id },
+    ])
+    setBuscaContraponto('')
+    setLigandoContraponto(false)
+    carregarContrapontos()
+  }
+
+  async function desligarContraponto(outraEntrada) {
+    await supabase.from('contrapontos').delete()
+      .in('entrada_id', [entry.id, outraEntrada.id])
+      .in('contraponto_id', [entry.id, outraEntrada.id])
+    carregarContrapontos()
+  }
+
+  const opcoesContraponto = useMemo(() => {
+    if (!buscaContraponto.trim()) return []
+    const q = buscaContraponto.toLowerCase()
+    const jaLigados = new Set(contrapontos.map(c => c.id))
+    return (todasEntradas || [])
+      .filter(e => e.id !== entry.id && !jaLigados.has(e.id) && e.tema?.toLowerCase().includes(q))
+      .slice(0, 8)
+  }, [buscaContraponto, todasEntradas, contrapontos, entry.id])
+
   // Referências legais citadas nas teses (fundamentacao_legal, ratio_decidendi),
   // pra checar quais artigos já não estão mais vigentes. Uma consulta só,
   // pra todas as referências da entrada inteira, não uma por campo.
@@ -418,6 +463,53 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Veja o outro lado — contrapontos ligados manualmente */}
+      {!modoFoco && (
+        <div className="no-print" style={{ marginTop: 28 }}>
+          <div style={secao}>Veja o outro lado</div>
+          {contrapontos.length === 0 && (
+            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 8 }}>
+              Nenhuma entrada ligada como contraponto ainda.
+            </div>
+          )}
+          {contrapontos.map(c => (
+            <div key={c.id} style={{ padding: '10px 0', borderBottom: `0.5px solid ${theme.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ cursor: onSelecionarRelacionada ? 'pointer' : 'default', flex: 1 }} onClick={() => onSelecionarRelacionada?.(c)}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                  <ArrowLeftRight size={11} style={{ color: theme.gold, flexShrink: 0 }} />
+                  <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{c.area}, {c.tipo}</span>
+                </div>
+                <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{c.tema}</div>
+              </div>
+              {!readOnly && (
+                <button onClick={() => desligarContraponto(c)} title="Desfazer este vínculo" style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 11, padding: 4, fontFamily: 'Inter, sans-serif' }}>✕</button>
+              )}
+            </div>
+          ))}
+          {!readOnly && (
+            <div style={{ marginTop: 8 }}>
+              <input
+                value={buscaContraponto}
+                onChange={e => setBuscaContraponto(e.target.value)}
+                placeholder="Ligar como contraponto: buscar por tema..."
+                disabled={ligandoContraponto}
+                style={{ width: '100%', fontSize: 12, padding: '7px 10px', borderRadius: 6, border: `1px solid ${theme.border}`, background: theme.raised, color: theme.text, fontFamily: 'Inter, sans-serif' }}
+              />
+              {opcoesContraponto.length > 0 && (
+                <div style={{ marginTop: 4, border: `1px solid ${theme.border}`, borderRadius: 6, overflow: 'hidden' }}>
+                  {opcoesContraponto.map(o => (
+                    <div key={o.id} onClick={() => ligarContraponto(o)}
+                      style={{ padding: '8px 10px', fontSize: 12, color: theme.text, cursor: 'pointer', borderBottom: `0.5px solid ${theme.border}`, fontFamily: 'Inter, sans-serif' }}>
+                      {o.tema} <span style={{ color: theme.muted, fontSize: 10 }}>· {o.area}, {o.tipo}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
