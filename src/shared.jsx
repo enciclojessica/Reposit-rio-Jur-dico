@@ -319,3 +319,25 @@ export function gerarCitacaoABNT(entry) {
   const pontoFinal = corpo.trim().endsWith('.') ? '' : '.'
   return `${corpo}${pontoFinal}${sufixo}`
 }
+
+// Busca TODAS as linhas de uma consulta Supabase, paginando em blocos de
+// 1000 — o PostgREST limita cada resposta a esse teto por padrão, e sem
+// paginação qualquer tabela que cresça além disso trunca silenciosamente
+// (foi exatamente o bug corrigido em Legislacao.jsx quando o acervo de
+// legislação passou de mil linhas). criarConsulta deve ser uma função que
+// devolve uma consulta NOVA a cada chamada (não a mesma reutilizada), já
+// que builders do supabase-js são de uso único depois de aguardados.
+export async function buscarTodasLinhas(criarConsulta) {
+  const PAGINA = 1000
+  let linhas = []
+  let pagina = 0
+  while (true) {
+    const { data, error } = await criarConsulta().range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1)
+    if (error) throw error
+    if (!data || data.length === 0) break
+    linhas = linhas.concat(data)
+    if (data.length < PAGINA) break
+    pagina++
+  }
+  return linhas
+}

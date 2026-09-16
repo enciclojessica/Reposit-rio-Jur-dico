@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AREAS, corDaArea } from '../shared'
+import { AREAS, corDaArea, buscarTodasLinhas } from '../shared'
 import SeletorTema from './SeletorTema'
 import { ChevronRight, ArrowLeft } from 'lucide-react'
 
@@ -15,11 +15,11 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
   const [areaFiltro, setAreaFiltro] = useState('todas')
 
   useEffect(() => {
-    supabase
+    buscarTodasLinhas(() => supabase
       .from('entradas')
       .select('id, area, tipo, tema, fonte')
       .order('criado_em', { ascending: false })
-      .then(({ data }) => setEntradas(data || []))
+    ).then(data => setEntradas(data || []))
   }, [])
 
   const areasComConteudo = entradas

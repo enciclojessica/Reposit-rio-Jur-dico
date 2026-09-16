@@ -38,7 +38,7 @@ import { Lock, LogOut, Download, Trash2, AlertTriangle } from 'lucide-react'
 import SinoNotificacoes from './components/SinoNotificacoes'
 import SeletorTema from './components/SeletorTema'
 import { exportarRepositorioDocx } from './utils/exportarRepositorio'
-import { AREAS, ROLE_COR, ROLE_LABEL } from './shared'
+import { AREAS, ROLE_COR, ROLE_LABEL, buscarTodasLinhas } from './shared'
 import { TagPill } from './components/TagInput'
 import { VIEWS } from './data/views'
 import Sidebar from './components/Sidebar'
@@ -78,8 +78,8 @@ function useIsMobile() {
 
 async function gerarPlanilhaTeses() {
   // Busca todas as entradas do repositório e gera planilha XLSX
-  const { data } = await supabase
-    .from('entradas').select('area,tipo,tema,fonte,referencia,teses,tags,status').order('area')
+  const data = await buscarTodasLinhas(() => supabase
+    .from('entradas').select('area,tipo,tema,fonte,referencia,teses,tags,status').order('area'))
   if (!data?.length) { alert('Nenhuma entrada no repositório.'); return }
 
   const XLSX = (await import('xlsx'))
@@ -434,9 +434,9 @@ export default function App() {
   }, [view, isEditor, maisAberto])
 
   const loadEntradas = useCallback(async () => {
-    const { data } = await supabase
-      .from('entradas').select('*').order('criado_em', { ascending: false })
-    if (data) setEntradas(data)
+    const data = await buscarTodasLinhas(() => supabase
+      .from('entradas').select('*').order('criado_em', { ascending: false }))
+    setEntradas(data)
   }, [])
 
   useEffect(() => {
