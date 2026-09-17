@@ -207,7 +207,7 @@ export default function Landing({ onEntrar }) {
       <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 760, margin: '0 auto' }}>
         <div style={{ background: MARFIM_ESCURO, borderRadius: 16, padding: estreito ? '32px 24px' : '48px', border: `1px solid ${BORDA}` }}>
           <div style={{ fontSize: estreito ? 17 : 20, lineHeight: 1.6, color: TINTA, marginBottom: 24 }}>
-            "A curadoria começou por necessidade prática: reunir num só lugar o que antes ficava espalhado entre anotações e pastas soltas. O que era organização pessoal virou repositório."
+            "O Themis Jur nasceu de uma necessidade concreta: organizar, num só lugar, o material que a rotina de estudo e prática forense exige consultar todos os dias. A curadoria de cada entrada segue o mesmo rigor que se espera de uma pesquisa jurídica bem feita."
           </div>
           <div style={{ fontSize: 14, fontWeight: 700, color: TINTA }}>Jessica Farias Fusquiani</div>
           <div style={{ fontSize: 13, color: MUSGO }}>Idealizadora do Themis Jur</div>
