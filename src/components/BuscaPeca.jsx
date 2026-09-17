@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
@@ -266,10 +268,39 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
               ⚠ Algumas teses sugeridas podem estar marcadas como superadas no repositório. Verifique o status antes de usar.
             </div>
           )}
-          <div style={{
-            fontSize: 13, color: theme.text, lineHeight: 1.8,
-            whiteSpace: 'pre-wrap', fontFamily: 'monospace',
-          }}>{resultIA}</div>
+          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7 }}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => <h1 style={{ fontFamily: theme.fontTitle, fontSize: 19, fontWeight: 700, color: theme.text, margin: '4px 0 10px' }}>{children}</h1>,
+                h2: ({ children }) => <h2 style={{ fontFamily: theme.fontTitle, fontSize: 16, fontWeight: 700, color: theme.text, margin: '18px 0 8px' }}>{children}</h2>,
+                h3: ({ children }) => <h3 style={{ fontFamily: theme.fontTitle, fontSize: 14, fontWeight: 600, color: theme.goldDark || theme.gold, margin: '14px 0 6px' }}>{children}</h3>,
+                p: ({ children }) => <p style={{ margin: '0 0 10px', fontFamily: "'Inter', sans-serif" }}>{children}</p>,
+                strong: ({ children }) => <strong style={{ fontWeight: 700, color: theme.text }}>{children}</strong>,
+                em: ({ children }) => <em>{children}</em>,
+                hr: () => <hr style={{ border: 'none', borderTop: `1px solid ${theme.border}`, margin: '16px 0' }} />,
+                blockquote: ({ children }) => (
+                  <blockquote style={{ borderLeft: `3px solid ${theme.gold}`, margin: '0 0 12px', padding: '2px 14px', color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                    {children}
+                  </blockquote>
+                ),
+                ul: ({ children }) => <ul style={{ margin: '0 0 10px', paddingLeft: 20, fontFamily: "'Inter', sans-serif" }}>{children}</ul>,
+                ol: ({ children }) => <ol style={{ margin: '0 0 10px', paddingLeft: 20, fontFamily: "'Inter', sans-serif" }}>{children}</ol>,
+                li: ({ children }) => <li style={{ marginBottom: 4 }}>{children}</li>,
+                table: ({ children }) => (
+                  <div style={{ overflowX: 'auto', marginBottom: 14, border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>{children}</table>
+                  </div>
+                ),
+                thead: ({ children }) => <thead style={{ background: theme.raised }}>{children}</thead>,
+                th: ({ children }) => <th style={{ textAlign: 'left', padding: '8px 12px', fontFamily: 'Inter, sans-serif', fontWeight: 600, color: theme.text, borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{children}</th>,
+                td: ({ children }) => <td style={{ padding: '8px 12px', borderBottom: `1px solid ${theme.border}`, verticalAlign: 'top', color: theme.text }}>{children}</td>,
+                code: ({ children }) => <code style={{ background: theme.raised, padding: '1px 5px', borderRadius: 4, fontSize: 12 }}>{children}</code>,
+              }}
+            >
+              {resultIA}
+            </ReactMarkdown>
+          </div>
         </div>
       )}
     </div>
