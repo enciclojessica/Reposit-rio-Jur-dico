@@ -33,7 +33,7 @@ function ResultadoFts({ entradas, theme }) {
           {Array.isArray(e.teses) && e.teses.length > 0 && (
             <ul style={{ margin: 0, paddingLeft: 18 }}>
               {e.teses.map((t, i) => (
-                <li key={i} style={{ fontSize: 12.5, color: theme.text, lineHeight: 1.6, marginBottom: 4 }}>{t}</li>
+                <li key={i} style={{ fontSize: 12.5, color: theme.text, lineHeight: 1.6, marginBottom: 4 }}>{t?.tese_assunto || t?.ratio_decidendi || ''}</li>
               ))}
             </ul>
           )}

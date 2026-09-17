@@ -869,7 +869,13 @@ case VIEWS.JURISPRUDENCIA:
         ) : null
 
       case VIEWS.BUSCA:
-        return <div className="fade-up"><BuscaPeca entradas={entradas} podeUsarIA={podeUsarIA}/></div>
+        return (
+          <div className="fade-up">
+            <ErrorBoundary>
+              <BuscaPeca entradas={entradas} podeUsarIA={podeUsarIA}/>
+            </ErrorBoundary>
+          </div>
+        )
 
       default:
         return (
