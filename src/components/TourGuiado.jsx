@@ -8,11 +8,11 @@ import { useTheme } from '../theme'
 // interface de verdade.
 
 const PASSOS_DESKTOP = [
-  { alvo: 'home',   titulo: 'Repositório', texto: 'O acervo inteiro, filtrável por área e tipo. É o ponto de partida pra qualquer pesquisa.' },
+  { alvo: 'home',   titulo: 'Acervo', texto: 'Teses, súmulas, jurisprudência, doutrina e o texto integral da legislação, tudo num lugar só — use as abas no topo da tela pra alternar entre o repositório curado e os códigos completos.' },
   { alvo: 'busca',  titulo: 'Busca com IA', texto: 'Descreva a peça que está escrevendo e o sistema sugere teses do acervo que podem ajudar. Recurso pago.' },
   { alvo: 'indice', titulo: 'Índice remissivo', texto: 'Lista alfabética de todas as tags do repositório. Útil quando você ainda não sabe o termo exato pra buscar.' },
   { alvo: 'favoritos', titulo: 'Favoritos', texto: 'Marque qualquer entrada com a estrela pra achar rápido depois, sem precisar buscar de novo.' },
-  { alvo: 'juri',   titulo: 'Jurisprudência', texto: 'Pesquise jurisprudência e doutrina direto das fontes, e adicione ao acervo com um clique. Recurso pago.' },
+  { alvo: 'juri',   titulo: 'Pesquisa Externa', texto: 'Pesquise jurisprudência e doutrina direto das fontes, fora do acervo, e adicione ao repositório com um clique. Recurso pago.' },
   { alvo: 'add',    titulo: 'Nova entrada', texto: 'Cadastre uma nova entrada no acervo, com teses e fundamentação legal.', apenasEditor: true },
 ]
 

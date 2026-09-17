@@ -29,6 +29,7 @@ import ImportacaoLote from './components/ImportacaoLote'
 import ImportarLegislacao from './components/ImportarLegislacao'
 import ImportarHub from './components/ImportarHub'
 import Legislacao from './components/Legislacao'
+import AcervoTabs from './components/AcervoTabs'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
 import JurisprudenciaSearch from './components/JurisprudenciaSearch'
@@ -737,11 +738,16 @@ case VIEWS.JURISPRUDENCIA:
         )
 
       case VIEWS.LEG_VIEW:
-        return <div className="fade-up"><Legislacao
-          preFiltro={legislacaoPreFiltro} onPreFiltroConsumido={() => setLegislacaoPreFiltro(null)}
-          entradas={entradas}
-          onAbrirEntrada={(entrada) => { setSelected(entrada); setView(VIEWS.DETAIL) }}
-        /></div>
+        return (
+          <div className="fade-up">
+            <AcervoTabs theme={theme} ativo="legislacao" onMudar={aba => setView(aba === 'legislacao' ? VIEWS.LEG_VIEW : VIEWS.HOME)} />
+            <Legislacao
+              preFiltro={legislacaoPreFiltro} onPreFiltroConsumido={() => setLegislacaoPreFiltro(null)}
+              entradas={entradas}
+              onAbrirEntrada={(entrada) => { setSelected(entrada); setView(VIEWS.DETAIL) }}
+            />
+          </div>
+        )
 
 
 
@@ -880,6 +886,7 @@ case VIEWS.JURISPRUDENCIA:
       default:
         return (
           <div>
+            <AcervoTabs theme={theme} ativo="repositorio" onMudar={aba => setView(aba === 'legislacao' ? VIEWS.LEG_VIEW : VIEWS.HOME)} />
             {/* Barra de busca com toggle semântico */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
               <div style={{ position: 'relative', flex: 1 }}>

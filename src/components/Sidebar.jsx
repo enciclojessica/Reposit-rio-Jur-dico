@@ -1,5 +1,35 @@
 import { VIEWS } from '../data/views'
 
+// Rótulo discreto de seção — só pra agrupar visualmente os itens do menu,
+// sem virar um item clicável nem ocupar destaque.
+function SecaoLabel({ theme, children }) {
+  return (
+    <div style={{
+      padding: '16px 20px 6px', fontSize: 10, fontWeight: 600,
+      textTransform: 'uppercase', letterSpacing: 1.2,
+      color: theme.muted, opacity: 0.65, fontFamily: 'Inter, sans-serif',
+    }}>
+      {children}
+    </div>
+  )
+}
+
+function NavBtn({ theme, id, label, onClick, active, dot }) {
+  return (
+    <button data-tour={id} onClick={onClick} style={{
+      width: '100%', background: active ? theme.gold + '12' : 'none',
+      border: 'none', borderLeft: `3px solid ${active ? theme.gold : 'transparent'}`,
+      padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10,
+      cursor: 'pointer', color: active ? theme.text : theme.muted,
+      fontSize: 13, textAlign: 'left', transition: 'all .15s',
+      fontFamily: 'Inter, sans-serif',
+    }}>
+      {label}
+      {dot && <span style={{ width: 6, height: 6, borderRadius: '50%', background: theme.gold, flexShrink: 0 }} />}
+    </button>
+  )
+}
+
 // Sidebar desktop — estritamente navegação + bloco de assinatura,
 // conforme especificação. Controles de sessão vivem no header (App.jsx).
 export default function Sidebar({
@@ -43,55 +73,36 @@ export default function Sidebar({
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-        {[
-          { id: 'hoje',   label: 'Início',          action: () => setView(VIEWS.HOJE), active: view === VIEWS.HOJE },
-          { id: 'home',   label: 'Repositório',     action: () => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }, active: view === VIEWS.HOME },
-          { id: 'busca',  label: 'Busca com IA',    action: () => setView(VIEWS.BUSCA),     active: view === VIEWS.BUSCA },
-          { id: 'editor', label: 'Editor de Peças', action: () => setView(VIEWS.EDITOR),    active: view === VIEWS.EDITOR },
-          { id: 'leg',    label: 'Legislação',      action: () => setView(VIEWS.LEG_VIEW),  active: view === VIEWS.LEG_VIEW },
-          { id: 'indice', label: 'Índice remissivo', action: () => setView(VIEWS.INDICE),    active: view === VIEWS.INDICE },
-          { id: 'favoritos', label: 'Favoritos',     action: () => setView(VIEWS.FAVORITOS), active: view === VIEWS.FAVORITOS },
-          { id: 'comparar', label: 'Comparador',     action: () => setView(VIEWS.COMPARAR),  active: view === VIEWS.COMPARAR },
-          { id: 'juri',   label: 'Jurisprudência',   action: () => setView(VIEWS.JURISPRUDENCIA), active: view === VIEWS.JURISPRUDENCIA },
-          { id: 'alertas', label: 'Alertas',        action: () => setView(VIEWS.ALERTAS),   active: view === VIEWS.ALERTAS },
-          { id: 'dash',   label: 'Dashboard',       action: () => setView(VIEWS.DASHBOARD), active: view === VIEWS.DASHBOARD },
-          { id: 'import', label: 'Importar',        action: () => setView(VIEWS.IMPORTAR),  active: [VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view) },
-          { id: 'config', label: 'Configurações',   action: () => setView(VIEWS.CONFIG),    active: view === VIEWS.CONFIG },
-          { id: 'novidades_app', label: 'O que há de novo', action: () => setView(VIEWS.NOVIDADES_APP), active: view === VIEWS.NOVIDADES_APP, dot: temNovidadeNaoVista },
-          { id: 'compartilhar', label: 'Compartilhar', action: compartilhar, active: false },
-        ].map(n => (
-          <button key={n.id} data-tour={n.id} onClick={n.action} style={{
-            width: '100%', background: n.active ? theme.gold + '12' : 'none',
-            border: 'none', borderLeft: `3px solid ${n.active ? theme.gold : 'transparent'}`,
-            padding: '11px 20px', display: 'flex', alignItems: 'center', gap: 10,
-            cursor: 'pointer', color: n.active ? theme.text : theme.muted,
-            fontSize: 13, textAlign: 'left', transition: 'all .15s',
-            fontFamily: 'Inter, sans-serif',
-          }}>
-            {n.label}
-            {n.dot && <span style={{ width: 6, height: 6, borderRadius: '50%', background: theme.gold, flexShrink: 0 }} />}
-          </button>
-        ))}
+        <NavBtn theme={theme} id="hoje" label="Início" onClick={() => setView(VIEWS.HOJE)} active={view === VIEWS.HOJE} />
+
+        <SecaoLabel theme={theme}>Consultar</SecaoLabel>
+        <NavBtn theme={theme} id="home" label="Acervo" onClick={() => { setAreaFilter('all'); setTipoFilter('all'); setView(VIEWS.HOME) }} active={view === VIEWS.HOME || view === VIEWS.LEG_VIEW} />
+        <NavBtn theme={theme} id="busca" label="Busca com IA" onClick={() => setView(VIEWS.BUSCA)} active={view === VIEWS.BUSCA} />
+        <NavBtn theme={theme} id="juri" label="Pesquisa Externa" onClick={() => setView(VIEWS.JURISPRUDENCIA)} active={view === VIEWS.JURISPRUDENCIA} />
+        <NavBtn theme={theme} id="indice" label="Índice remissivo" onClick={() => setView(VIEWS.INDICE)} active={view === VIEWS.INDICE} />
+
+        <SecaoLabel theme={theme}>Trabalhar</SecaoLabel>
+        <NavBtn theme={theme} id="editor" label="Editor de Peças" onClick={() => setView(VIEWS.EDITOR)} active={view === VIEWS.EDITOR} />
+        <NavBtn theme={theme} id="comparar" label="Comparador" onClick={() => setView(VIEWS.COMPARAR)} active={view === VIEWS.COMPARAR} />
+        <NavBtn theme={theme} id="favoritos" label="Favoritos" onClick={() => setView(VIEWS.FAVORITOS)} active={view === VIEWS.FAVORITOS} />
+
+        <SecaoLabel theme={theme}>Acompanhar</SecaoLabel>
+        <NavBtn theme={theme} id="alertas" label="Alertas" onClick={() => setView(VIEWS.ALERTAS)} active={view === VIEWS.ALERTAS} />
+        <NavBtn theme={theme} id="dash" label="Dashboard" onClick={() => setView(VIEWS.DASHBOARD)} active={view === VIEWS.DASHBOARD} />
 
         {isAdmin && (
-          <button onClick={() => setView(VIEWS.MEMBROS)} style={{
-            width: '100%', background: view === VIEWS.MEMBROS ? theme.gold + '12' : 'none',
-            border: 'none', borderLeft: `3px solid ${view === VIEWS.MEMBROS ? theme.gold : 'transparent'}`,
-            padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
-            color: view === VIEWS.MEMBROS ? theme.text : theme.muted, fontSize: 13,
-            fontFamily: 'Inter, sans-serif', transition: 'all .15s',
-          }}>Membros</button>
+          <>
+            <SecaoLabel theme={theme}>Administração</SecaoLabel>
+            <NavBtn theme={theme} id="membros" label="Membros" onClick={() => setView(VIEWS.MEMBROS)} active={view === VIEWS.MEMBROS} />
+            <NavBtn theme={theme} id="metricas" label="Métricas" onClick={() => setView(VIEWS.METRICAS)} active={view === VIEWS.METRICAS} />
+          </>
         )}
 
-        {isAdmin && (
-          <button onClick={() => setView(VIEWS.METRICAS)} style={{
-            width: '100%', background: view === VIEWS.METRICAS ? theme.gold + '12' : 'none',
-            border: 'none', borderLeft: `3px solid ${view === VIEWS.METRICAS ? theme.gold : 'transparent'}`,
-            padding: '11px 20px', textAlign: 'left', cursor: 'pointer',
-            color: view === VIEWS.METRICAS ? theme.text : theme.muted, fontSize: 13,
-            fontFamily: 'Inter, sans-serif', transition: 'all .15s',
-          }}>Métricas</button>
-        )}
+        <SecaoLabel theme={theme}>Sistema</SecaoLabel>
+        <NavBtn theme={theme} id="import" label="Importar" onClick={() => setView(VIEWS.IMPORTAR)} active={[VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view)} />
+        <NavBtn theme={theme} id="config" label="Configurações" onClick={() => setView(VIEWS.CONFIG)} active={view === VIEWS.CONFIG} />
+        <NavBtn theme={theme} id="novidades_app" label="O que há de novo" onClick={() => setView(VIEWS.NOVIDADES_APP)} active={view === VIEWS.NOVIDADES_APP} dot={temNovidadeNaoVista} />
+        <NavBtn theme={theme} id="compartilhar" label="Compartilhar" onClick={compartilhar} active={false} />
 
         {isEditor && (
           <>
@@ -106,6 +117,7 @@ export default function Sidebar({
           </>
         )}
       </div>
+
 
       {/* Footer — apenas o bloco de assinatura, conforme especificação */}
       <div style={{ padding: '14px 20px', borderTop: `1px solid ${theme.border}` }}>

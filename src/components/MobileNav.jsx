@@ -28,13 +28,12 @@ export default function MobileNav({
   ]
   // Itens no menu "mais"
   const navMais = [
-    { v: VIEWS.HOME,        label: 'Repositório' },
+    { v: VIEWS.HOME,        label: 'Acervo' }, // Repositório + Legislação fundidos — abas dentro da própria tela
     { v: VIEWS.DASHBOARD,   label: 'Dashboard' },
-    { v: VIEWS.LEG_VIEW,       label: 'Legislação' },
     { v: VIEWS.INDICE,         label: 'Índice remissivo' },
     { v: VIEWS.FAVORITOS,      label: 'Favoritos' },
     { v: VIEWS.COMPARAR,       label: 'Comparador de teses' },
-    { v: VIEWS.JURISPRUDENCIA, label: 'Jurisprudência' },
+    { v: VIEWS.JURISPRUDENCIA, label: 'Pesquisa Externa' },
     { v: VIEWS.ALERTAS,     label: 'Alertas' },
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
@@ -44,7 +43,10 @@ export default function MobileNav({
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
     ...(session  ? [{ v: 'compartilhar', label: 'Compartilhar o Themis Jur', action: compartilhar }] : []),
   ]
-  const maisAtivo = navMais.some(n => n.v === view)
+  // O item "Acervo" (VIEWS.HOME) também deve destacar quando a pessoa
+  // está na aba Legislação dentro do Acervo — são a mesma tela por fora.
+  const isItemAtivo = v => v === view || (v === VIEWS.HOME && view === VIEWS.LEG_VIEW)
+  const maisAtivo = navMais.some(n => isItemAtivo(n.v))
 
   return (
     <div className="no-print" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50 }}>
@@ -68,10 +70,10 @@ export default function MobileNav({
               onClick={() => { if (item.action) { item.action(); setMaisAberto(false) } else { setView(item.v); setMaisAberto(false) } }}
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: '10px 4px', background: view === item.v ? theme.gold + '22' : 'none',
-                border: `1px solid ${view === item.v ? theme.gold + '44' : 'transparent'}`,
+                padding: '10px 4px', background: isItemAtivo(item.v) ? theme.gold + '22' : 'none',
+                border: `1px solid ${isItemAtivo(item.v) ? theme.gold + '44' : 'transparent'}`,
                 borderRadius: 8, position: 'relative',
-                color: view === item.v ? theme.gold : theme.muted,
+                color: isItemAtivo(item.v) ? theme.gold : theme.muted,
                 cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontSize: 10,
               }}>
               {item.dot && <span style={{ position: 'absolute', top: 6, right: 10, width: 6, height: 6, borderRadius: '50%', background: theme.gold }} />}
