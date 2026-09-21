@@ -1,8 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
+// A chave service_role NUNCA vai no código. Rode com:
+//   SUPABASE_SERVICE_ROLE_KEY=... node scripts/inserir_questoes_gran.mjs
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Defina SUPABASE_SERVICE_ROLE_KEY no ambiente.')
+  process.exit(1)
+}
+
 const supabase = createClient(
   'https://wedfgqigtyrsrmmxsmuo.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlZGZncWlndHlyc3JtbXhzbXVvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTcwNzE3MSwiZXhwIjoyMDk1MjgzMTcxfQ.Dkqg0Yuyian-538LXUhTBnwcMl3SnrCBXVrp9jaUQXQ'
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 const questoes = [

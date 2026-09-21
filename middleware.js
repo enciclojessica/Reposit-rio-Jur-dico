@@ -1,7 +1,7 @@
 export const config = { matcher: '/' }
 
 const SUPABASE_URL = 'https://wedfgqigtyrsrmmxsmuo.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlZGZncWlndHlyc3JtbXhzbXVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDcxNzEsImV4cCI6MjA5NTI4MzE3MX0.yojX35SIMb6X0QRWMhInbeE0GUy57uWqGF101LWVlGg'
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_trbw3qLdZLKMcuJLtnlmeA_1u-Knn6D'
 const SITE_URL = 'https://themisjur.com.br'
 const IMG_PADRAO = `${SITE_URL}/logo-temis.png`
 
@@ -37,7 +37,7 @@ function paginaOg({ titulo, descricao, url, imagem }) {
 async function buscarEntrada(id) {
   const r = await fetch(
     `${SUPABASE_URL}/rest/v1/entradas?id=eq.${encodeURIComponent(id)}&publica=eq.true&select=tema,zotero,area,tipo`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    { headers: { apikey: SUPABASE_PUBLISHABLE_KEY } }
   )
   if (!r.ok) return null
   const rows = await r.json()
@@ -47,7 +47,7 @@ async function buscarEntrada(id) {
 async function buscarArtigo(codigo, numero) {
   const r = await fetch(
     `${SUPABASE_URL}/rest/v1/legislacao?codigo=eq.${encodeURIComponent(codigo)}&numero=eq.${encodeURIComponent(numero)}&vigente=eq.true&select=titulo,texto&limit=1`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    { headers: { apikey: SUPABASE_PUBLISHABLE_KEY } }
   )
   if (!r.ok) return null
   const rows = await r.json()

@@ -324,7 +324,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
             </div>
             <div style={{ marginBottom: 14 }}>
               <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Receber em</div>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" style={{ fontFamily: "'Inter', sans-serif", maxWidth: 320 }} />
+              <input type="email" value={email} readOnly title="Os alertas são enviados ao e-mail da sua conta" placeholder="seu@email.com" style={{ fontFamily: "'Inter', sans-serif", maxWidth: 320 }} />
             </div>
             <button onClick={adicionar} disabled={salvando || !tema.trim() || !email.trim()} style={{
               background: salvando || !tema.trim() || !email.trim() ? theme.border : theme.gold,

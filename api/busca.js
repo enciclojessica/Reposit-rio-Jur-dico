@@ -5,6 +5,9 @@ import { checarRateLimit } from '../lib/rateLimit.js'
 import { ANTHROPIC_MODEL, ANTHROPIC_MODEL_RAPIDO } from '../lib/anthropicModel.js'
 
 const MODELOS_PERMITIDOS = [ANTHROPIC_MODEL, ANTHROPIC_MODEL_RAPIDO]
+const CAMPOS_PERMITIDOS = ['model', 'max_tokens', 'system', 'messages', 'temperature']
+const BETAS_PERMITIDOS = ['pdfs-2024-09-25']
+const MAX_MENSAGENS = 20
 const MAX_TOKENS_TETO = 10000 // maior uso legítimo hoje é 8000 (ExtrairPeticao); dá folga sem deixar em aberto
 
 export default async function handler(req, res) {
@@ -28,7 +31,10 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada.' })
 
   // 'beta' e 'feature' são campos de controle nossos, não vão no corpo enviado à Anthropic
-  const { beta, feature, ...body } = req.body || {}
+  const { beta, feature, ...bruto } = req.body || {}
+  // Só repassa campos conhecidos: impede o cliente de injetar `tools` (ex.: web_search,
+  // cobrado por uso), `stream` ou qualquer parâmetro que altere o custo da chamada.
+  const body = Object.fromEntries(Object.entries(bruto).filter(([k]) => CAMPOS_PERMITIDOS.includes(k)))
 
   // Gate de recurso pago: cadastro é público, mas todo endpoint com custo
   // de IA fica reservado a admin/pago — cobre Busca com IA, Editor e
@@ -45,6 +51,13 @@ export default async function handler(req, res) {
   }
   if (typeof body.max_tokens === 'number' && body.max_tokens > MAX_TOKENS_TETO) {
     body.max_tokens = MAX_TOKENS_TETO
+  }
+
+  if (!Array.isArray(body.messages) || body.messages.length === 0 || body.messages.length > MAX_MENSAGENS) {
+    return res.status(400).json({ error: 'messages inválido.' })
+  }
+  if (beta && !BETAS_PERMITIDOS.includes(beta)) {
+    return res.status(400).json({ error: 'Recurso beta não permitido.' })
   }
 
   const headers = {

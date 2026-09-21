@@ -8,6 +8,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { segredoConfere } from "../lib/segredo.js";
 
 let supabaseSingleton;
 function getSupabase() {
@@ -117,7 +118,7 @@ export default async function handler(req, res) {
   // sem login nenhum, contornando cadastro e paywall. MCP_API_KEY precisa
   // ser configurada nas variáveis de ambiente do Vercel.
   const chave = req.headers.authorization?.replace('Bearer ', '')
-  if (!process.env.MCP_API_KEY || chave !== process.env.MCP_API_KEY) {
+  if (!segredoConfere(chave, process.env.MCP_API_KEY)) {
     res.status(401).json({ error: "Não autenticado." });
     return;
   }
@@ -136,7 +137,8 @@ export default async function handler(req, res) {
     await transport.handleRequest(req, res, req.body);
   } catch (err) {
     if (!res.headersSent) {
-      res.status(500).json({ error: err.message });
+      console.error('[mcp]', err.message);
+      res.status(500).json({ error: 'Erro interno.' });
     }
   }
 }

@@ -4,6 +4,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 import { checarRateLimit } from '../lib/rateLimit.js'
+import { segredoConfere } from '../lib/segredo.js'
 import { normalizarArea } from '../lib/normalizarArea.js'
 
 export default async function handler(req, res) {
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
 
     // ── Autenticar: CRON_SECRET (radar automático) OU JWT de usuário ──────
     const authHeader = req.headers.authorization?.replace('Bearer ', '')
-    const isCron = process.env.CRON_SECRET && authHeader === process.env.CRON_SECRET
+    const isCron = segredoConfere(authHeader, process.env.CRON_SECRET)
 
     if (!isCron) {
       if (!authHeader) return res.status(401).json({ error: 'Não autenticado.' })

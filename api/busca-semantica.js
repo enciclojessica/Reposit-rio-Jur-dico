@@ -34,6 +34,8 @@ export default async function handler(req, res) {
   const { query, entradas } = req.body
   if (!query?.trim() || !entradas?.length)
     return res.status(400).json({ error: 'query e entradas são obrigatórios.' })
+  if (typeof query !== 'string' || query.length > 500 || !Array.isArray(entradas) || entradas.length > 400)
+    return res.status(400).json({ error: 'Consulta ou lista de entradas fora do limite.' })
 
   const indice = entradas.map(e => ({
     id: e.id, area: e.area, tipo: e.tipo, tema: e.tema,

@@ -4,6 +4,7 @@
 // Resend. Disparado pelo Vercel Cron (ver vercel.json) — protegido por
 // CRON_SECRET, não é chamável publicamente sem o segredo.
 import { createClient } from '@supabase/supabase-js'
+import { segredoConfere } from '../lib/segredo.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -12,7 +13,7 @@ export default async function handler(req, res) {
 
   // Autenticação: CRON_SECRET (disparo automático) OU admin logado (teste manual)
   const secret = req.headers['authorization']?.replace('Bearer ', '')
-  const isCron = process.env.CRON_SECRET && secret === process.env.CRON_SECRET
+  const isCron = segredoConfere(secret, process.env.CRON_SECRET)
 
   const supabase = createClient(
     process.env.SUPABASE_URL,

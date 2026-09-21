@@ -28,11 +28,19 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { tema, tribunal, email } = req.body
-    if (!tema || !email) return res.status(400).json({ error: 'tema e email são obrigatórios.' })
-    const tribunais = Array.isArray(tribunal) && tribunal.length ? tribunal : ['todos']
+    const { tema, tribunal } = req.body || {}
+    if (typeof tema !== 'string' || !tema.trim()) return res.status(400).json({ error: 'tema é obrigatório.' })
+    if (tema.length > 200) return res.status(400).json({ error: 'tema muito longo (máx. 200 caracteres).' })
+    // O alerta só pode ser enviado ao e-mail da própria conta: aceitar um
+    // e-mail arbitrário permitiria usar o domínio para spam contra terceiros.
+    if (!user.email) return res.status(400).json({ error: 'Conta sem e-mail verificado.' })
+    const tribunais = (Array.isArray(tribunal) ? tribunal : [])
+      .filter(t => typeof t === 'string' && t.length <= 20).slice(0, 10)
+    const { count } = await supabase.from('alertas')
+      .select('*', { count: 'exact', head: true }).eq('user_id', user.id)
+    if ((count ?? 0) >= 20) return res.status(400).json({ error: 'Limite de 20 alertas por conta.' })
     const { data, error } = await supabase.from('alertas').insert({
-      user_id: user.id, tema, tribunal: tribunais, email,
+      user_id: user.id, tema: tema.trim(), tribunal: tribunais.length ? tribunais : ['todos'], email: user.email,
     }).select().single()
     if (error) return res.status(500).json({ error: error.message })
     return res.status(201).json({ alerta: data })
@@ -49,7 +57,8 @@ export default async function handler(req, res) {
 
   if (req.method === 'PATCH') {
     // Ativar/desativar
-    const { id, ativo } = req.body
+    const { id, ativo } = req.body || {}
+    if (!id || typeof ativo !== 'boolean') return res.status(400).json({ error: 'id e ativo (booleano) são obrigatórios.' })
     const { error } = await supabase.from('alertas')
       .update({ ativo }).eq('id', id).eq('user_id', user.id)
     if (error) return res.status(500).json({ error: error.message })

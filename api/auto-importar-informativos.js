@@ -5,6 +5,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { ANTHROPIC_MODEL } from '../lib/anthropicModel.js'
 import { checarRateLimit } from '../lib/rateLimit.js'
+import { segredoConfere } from '../lib/segredo.js'
 
 export default async function handler(req, res) {
   try {
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
 
   // ── Autenticar: CRON_SECRET (chamada automatizada) OU JWT de usuário ──
   const authHeader = req.headers.authorization?.replace('Bearer ', '')
-  const isCron = process.env.CRON_SECRET && authHeader === process.env.CRON_SECRET
+  const isCron = segredoConfere(authHeader, process.env.CRON_SECRET)
 
   let userId
   if (isCron) {
