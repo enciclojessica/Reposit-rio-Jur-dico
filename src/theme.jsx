@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { flushSync } from 'react-dom'
 
 const ThemeContext = createContext()
 
@@ -78,19 +79,39 @@ export function ThemeProvider({ children }) {
     return saved === 'escuro'
   })
 
+  // Durante a impressão/exportar PDF o papel é branco: no tema escuro os textos
+  // (claros) saíam apagados. Força o tema claro só enquanto o diálogo de
+  // impressão está aberto e devolve a preferência do usuário ao terminar.
+  const [imprimindo, setImprimindo] = useState(false)
+  useEffect(() => {
+    const antes  = () => flushSync(() => setImprimindo(true))
+    const depois = () => setImprimindo(false)
+    window.addEventListener('beforeprint', antes)
+    window.addEventListener('afterprint', depois)
+    return () => {
+      window.removeEventListener('beforeprint', antes)
+      window.removeEventListener('afterprint', depois)
+    }
+  }, [])
+
+  const escuroEfetivo = isDark && !imprimindo
+
   useEffect(() => {
     localStorage.setItem('sintese_tema', isDark ? 'escuro' : 'claro')
-    document.body.setAttribute('data-dark', isDark ? 'true' : 'false')
   }, [isDark])
 
-  const theme = isDark ? TEMAS.escuro : TEMAS.claro
-  const mode  = isDark ? 'dark' : 'light'
+  useEffect(() => {
+    document.body.setAttribute('data-dark', escuroEfetivo ? 'true' : 'false')
+  }, [escuroEfetivo])
+
+  const theme = escuroEfetivo ? TEMAS.escuro : TEMAS.claro
+  const mode  = escuroEfetivo ? 'dark' : 'light'
 
   return (
     <ThemeContext.Provider value={{
-      theme, mode, isDark,
+      theme, mode, isDark: escuroEfetivo,
       toggle: () => setIsDark(d => !d),
-      temaId: isDark ? 'escuro' : 'claro',
+      temaId: escuroEfetivo ? 'escuro' : 'claro',
     }}>
       {children}
     </ThemeContext.Provider>

@@ -36,7 +36,7 @@ function paginaOg({ titulo, descricao, url, imagem }) {
 
 async function buscarEntrada(id) {
   const r = await fetch(
-    `${SUPABASE_URL}/rest/v1/entradas?id=eq.${encodeURIComponent(id)}&publica=eq.true&select=tema,zotero,area,tipo`,
+    `${SUPABASE_URL}/rest/v1/entradas?id=eq.${encodeURIComponent(id)}&publica=eq.true&select=tema,area,tipo,fonte,referencia`,
     { headers: { apikey: SUPABASE_PUBLISHABLE_KEY } }
   )
   if (!r.ok) return null
@@ -69,7 +69,7 @@ export default async function middleware(request) {
       if (entrada) {
         return new Response(paginaOg({
           titulo: entrada.tema,
-          descricao: entrada.zotero?.titulo_ementa || `${entrada.area}, ${entrada.tipo}, Themis Jur`,
+          descricao: entrada.referencia || entrada.fonte || `${entrada.area}, ${entrada.tipo}, Themis Jur`,
           url: url.toString(),
         }), { headers: { 'content-type': 'text/html; charset=utf-8' } })
       }

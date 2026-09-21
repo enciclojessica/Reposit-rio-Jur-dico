@@ -847,7 +847,7 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.DETAIL:
         return selected ? (
           <div className="fade-up">
-            <button onClick={() => setView(origemDetalhe || VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>{origemDetalhe === VIEWS.BUSCA ? '← Voltar à busca' : '← Voltar à lista'}</button>
+            <button className="no-print" onClick={() => setView(origemDetalhe || VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>{origemDetalhe === VIEWS.BUSCA ? '← Voltar à busca' : '← Voltar à lista'}</button>
             <ErrorBoundary>
               <EntradaDetail
                 entry={selected}
