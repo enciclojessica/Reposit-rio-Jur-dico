@@ -7,7 +7,11 @@ import { ANTHROPIC_MODEL } from '../../lib/anthropicModel'
 import { Check, Copy, Search, RefreshCw, Sparkles, X, AlertTriangle, Lock } from 'lucide-react'
 import { corDaArea } from '../shared'
 
-function ResultadoFts({ entradas, theme }) {
+// A tela é desmontada quando o usuário abre uma entrada. Este cache em memória
+// devolve a consulta e os resultados ao voltar, para a busca não se perder.
+let cacheBusca = { query: '', resultadosFts: null }
+
+export function ResultadoFts({ entradas, theme, onAbrir }) {
   if (!entradas.length) {
     return (
       <div style={{ padding: '24px 4px', color: theme.muted, fontSize: 13 }}>
@@ -19,10 +23,17 @@ function ResultadoFts({ entradas, theme }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {entradas.map(e => (
-        <div key={e.id} style={{
-          background: theme.cardBg, border: `1px solid ${theme.border}`,
-          borderRadius: 10, padding: 14,
-        }}>
+        <div key={e.id}
+          role={onAbrir ? 'button' : undefined}
+          tabIndex={onAbrir ? 0 : undefined}
+          aria-label={onAbrir ? `Abrir no acervo: ${e.tema}` : undefined}
+          onClick={onAbrir ? () => onAbrir(e) : undefined}
+          onKeyDown={onAbrir ? (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); onAbrir(e) } } : undefined}
+          style={{
+            background: theme.cardBg, border: `1px solid ${theme.border}`,
+            borderRadius: 10, padding: 14,
+            cursor: onAbrir ? 'pointer' : 'default',
+          }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontSize: 12, fontStyle: 'italic', color: corDaArea(e.area, theme), fontFamily: "'Inter', sans-serif" }}>{e.area}</span>
             <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{e.tipo}</span>
@@ -40,7 +51,10 @@ function ResultadoFts({ entradas, theme }) {
             </ul>
           )}
           {e.url && (
-            <a href={e.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: theme.gold }}>Ver fonte ↗</a>
+            <a href={e.url} target="_blank" rel="noreferrer" onClick={ev => ev.stopPropagation()} style={{ fontSize: 11, color: theme.gold, marginRight: 12 }}>Ver fonte ↗</a>
+          )}
+          {onAbrir && (
+            <span style={{ fontSize: 11, color: theme.gold, fontFamily: "'Inter', sans-serif" }}>Abrir no acervo →</span>
           )}
         </div>
       ))}
@@ -48,13 +62,15 @@ function ResultadoFts({ entradas, theme }) {
   )
 }
 
-export default function BuscaPeca({ entradas, podeUsarIA }) {
+export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
   const { theme, mode } = useTheme()
-  const [query, setQuery] = useState('')
+  const [query, setQueryState] = useState(cacheBusca.query)
+  const setQuery = (v) => { cacheBusca.query = v; setQueryState(v) }
 
   // Busca sem IA (full-text, gratuita) — padrão da tela
   const [buscandoFts, setBuscandoFts] = useState(false)
-  const [resultadosFts, setResultadosFts] = useState(null) // null = ainda não buscou
+  const [resultadosFts, setResultadosFtsState] = useState(cacheBusca.resultadosFts) // null = ainda não buscou
+  const setResultadosFts = (v) => { cacheBusca.resultadosFts = v; setResultadosFtsState(v) }
   const [erroFts, setErroFts] = useState('')
 
   // Busca com IA (recurso pago) — opcional
@@ -119,6 +135,17 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
     }
     setLoadingIA(false)
   }
+
+  function abrirEntrada(e) {
+    if (!onAbrirEntrada) return
+    onAbrirEntrada(entradas.find(x => x.id === e.id) || e)
+  }
+
+  // Entradas do acervo mencionadas no texto da IA (a IA recebe o repositório
+  // sem ids, então o cruzamento é pelo início do tema, como no aviso de superadas).
+  const entradasCitadas = resultIA
+    ? entradas.filter(e => e.tema && resultIA.includes(e.tema.slice(0, 20))).slice(0, 8)
+    : []
 
   function copyResult() {
     navigator.clipboard.writeText(resultIA)
@@ -221,7 +248,7 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
           <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 10, fontFamily: "'Inter', sans-serif" }}>
             {resultadosFts.length} resultado(s)
           </div>
-          <ResultadoFts entradas={resultadosFts} theme={theme} />
+          <ResultadoFts entradas={resultadosFts} theme={theme} onAbrir={onAbrirEntrada ? abrirEntrada : undefined} />
         </>
       )}
 
@@ -301,6 +328,24 @@ export default function BuscaPeca({ entradas, podeUsarIA }) {
               {resultIA}
             </ReactMarkdown>
           </div>
+          {onAbrirEntrada && entradasCitadas.length > 0 && (
+            <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${theme.border}` }}>
+              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>
+                Entradas do acervo mencionadas na resposta
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {entradasCitadas.map(e => (
+                  <button key={e.id} onClick={() => abrirEntrada(e)} style={{
+                    textAlign: 'left', background: theme.raised, border: `1px solid ${theme.border}`,
+                    color: theme.text, borderRadius: 8, padding: '8px 12px', fontSize: 12.5,
+                    cursor: 'pointer', fontFamily: "'Inter', sans-serif",
+                  }}>
+                    {e.tema} <span style={{ color: theme.gold }}>→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

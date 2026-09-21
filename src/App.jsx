@@ -152,11 +152,14 @@ export default function App() {
   const [resultadosSem, setResultadosSem] = useState(null) // null = não buscado ainda
   const [erroSem, setErroSem]           = useState('')
   const [selected, setSelected]     = useState(null)
+  // Tela de onde a entrada foi aberta (ex.: Busca para Peça), para o "Voltar" retornar a ela
+  const [origemDetalhe, setOrigemDetalhe] = useState(null)
   const [legislacaoPreFiltro, setLegislacaoPreFiltro] = useState(null)
   const [comparadorPrefilA, setComparadorPrefilA] = useState(null)
   const [paletaAberta, setPaletaAberta] = useState(false)
   const [modoFoco, setModoFoco] = useState(false)
   useEffect(() => { if (view !== VIEWS.DETAIL) setModoFoco(false) }, [view])
+  useEffect(() => { if (view !== VIEWS.DETAIL && view !== VIEWS.EDIT) setOrigemDetalhe(null) }, [view])
   const [saving, setSaving]         = useState(false)
   const [toast, setToast]           = useState(null)
   const [showLogin, setShowLogin]   = useState(false)
@@ -844,7 +847,7 @@ case VIEWS.JURISPRUDENCIA:
       case VIEWS.DETAIL:
         return selected ? (
           <div className="fade-up">
-            <button onClick={() => setView(VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>← Voltar à lista</button>
+            <button onClick={() => setView(origemDetalhe || VIEWS.HOME)} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 13, marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>{origemDetalhe === VIEWS.BUSCA ? '← Voltar à busca' : '← Voltar à lista'}</button>
             <ErrorBoundary>
               <EntradaDetail
                 entry={selected}
@@ -854,7 +857,7 @@ case VIEWS.JURISPRUDENCIA:
                 onSelecionarRelacionada={(e) => setSelected(e)}
                 modoFoco={modoFoco}
                 onAlternarModoFoco={() => setModoFoco(f => !f)}
-                onClose={() => setView(VIEWS.HOME)}
+                onClose={() => setView(origemDetalhe || VIEWS.HOME)}
                 onDelete={isAdmin ? handleDelete : null}
                 onEdit={isEditor ? () => setView(VIEWS.EDIT) : null}
                 onDuplicar={isEditor ? handleDuplicar : null}
@@ -878,7 +881,7 @@ case VIEWS.JURISPRUDENCIA:
         return (
           <div className="fade-up">
             <ErrorBoundary>
-              <BuscaPeca entradas={entradas} podeUsarIA={podeUsarIA}/>
+              <BuscaPeca entradas={entradas} podeUsarIA={podeUsarIA} onAbrirEntrada={(e) => { setSelected(e); setOrigemDetalhe(VIEWS.BUSCA); setView(VIEWS.DETAIL) }}/>
             </ErrorBoundary>
           </div>
         )
