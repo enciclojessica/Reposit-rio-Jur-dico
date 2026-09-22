@@ -1,10 +1,31 @@
 import { createClient } from '@supabase/supabase-js'
 import { checarRateLimit } from '../lib/rateLimit.js'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY
-)
+// Rota pública: legislação é de leitura livre para qualquer visitante (política
+// `legislacao_public_read`), então a chave de serviço não é necessária aqui.
+// Usa a mesma publishable key exposta ao navegador em src/supabase.js — ela já
+// é pública por natureza, e assim esta rota fica limitada pelo RLS como
+// qualquer cliente comum, em vez de driblar as políticas com a service key.
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_trbw3qLdZLKMcuJLtnlmeA_1u-Knn6D'
+
+const supabase = createClient(process.env.SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+
+// O Supabase limita cada SELECT a 1000 linhas por padrão. As consultas desta
+// rota (sitemap, contagem por código) precisam do total, não de uma página;
+// esta função varre com .range() até esgotar os resultados.
+const PAGINA = 1000
+async function buscarTudo(construirQuery) {
+  let tudo = []
+  let de = 0
+  while (true) {
+    const { data, error } = await construirQuery(supabase.from('legislacao'), de, de + PAGINA - 1)
+    if (error) return { data: null, error }
+    tudo = tudo.concat(data || [])
+    if (!data || data.length < PAGINA) break
+    de += PAGINA
+  }
+  return { data: tudo, error: null }
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
@@ -28,18 +49,24 @@ export default async function handler(req, res) {
       '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;',
     }[c]))
 
-    const { data: entradas, error: erroEntradas } = await supabase
-      .from('entradas')
-      .select('id, atualizado_em')
-      .eq('publica', true)
-      .order('atualizado_em', { ascending: false })
+    let entradas = []
+    let de = 0
+    while (true) {
+      const { data, error } = await supabase
+        .from('entradas')
+        .select('id, atualizado_em')
+        .eq('publica', true)
+        .order('atualizado_em', { ascending: false })
+        .range(de, de + PAGINA - 1)
+      if (error) { console.error('sitemap: erro ao buscar entradas públicas:', error.message); break }
+      entradas = entradas.concat(data || [])
+      if (!data || data.length < PAGINA) break
+      de += PAGINA
+    }
 
-    if (erroEntradas) console.error('sitemap: erro ao buscar entradas públicas:', erroEntradas.message)
-
-    const { data: artigos, error: erroArtigos } = await supabase
-      .from('legislacao')
-      .select('codigo, numero')
-      .eq('vigente', true)
+    const { data: artigos, error: erroArtigos } = await buscarTudo(
+      (q, ini, fim) => q.select('codigo, numero').eq('vigente', true).range(ini, fim)
+    )
 
     if (erroArtigos) console.error('sitemap: erro ao buscar artigos de legislação:', erroArtigos.message)
 
@@ -108,10 +135,9 @@ ${urls.map((u) => `  <url>
   }
 
   // Listar códigos disponíveis
-  const { data, error } = await supabase
-    .from('legislacao')
-    .select('codigo')
-    .eq('vigente', true)
+  const { data, error } = await buscarTudo(
+    (q, ini, fim) => q.select('codigo').eq('vigente', true).range(ini, fim)
+  )
 
   if (error) return res.status(500).json({ error: error.message })
 
