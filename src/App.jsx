@@ -32,6 +32,7 @@ import Legislacao from './components/Legislacao'
 import AcervoTabs from './components/AcervoTabs'
 import ExtrairPeticao from './components/ExtrairPeticao'
 import InstalarApp from './components/InstalarApp'
+import AtualizacaoApp from './components/AtualizacaoApp'
 import JurisprudenciaSearch from './components/JurisprudenciaSearch'
 import Configuracoes from './components/Configuracoes'
 import { exportarPlanilhaTeses } from './utils/exportarTeses'
@@ -1175,6 +1176,7 @@ case VIEWS.JURISPRUDENCIA:
       </div>
 
       <InstalarApp />
+      <AtualizacaoApp />
 
       {toast && (
         <div style={{ position: 'fixed', bottom: isMobile ? 80 : 24, right: 16, background: toast.type === 'err' ? theme.toastErr : theme.toastOk, border: `1px solid ${toast.type === 'err' ? theme.error : theme.success}`, borderRadius: 8, padding: '10px 16px', color: theme.text, fontSize: 13, boxShadow: theme.shadow, zIndex: 100, maxWidth: 320 }}>

@@ -6,13 +6,21 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      // registerType 'autoUpdate' + skipWaiting/clientsClaim (abaixo) já
-      // garantem que a versão nova do SW assume imediatamente a cada deploy,
-      // sem precisar de self-destruct manual. selfDestroying ficou ligado
-      // aqui antes (provavelmente pra limpar um cache travado) e nunca foi
-      // desligado — isso fazia o app nunca funcionar offline de verdade,
-      // apesar da tela "Instalar" prometer isso.
+      registerType: 'prompt',
+      // 'autoUpdate' recarregava a página sozinho quando via um SW novo, mas
+      // só checava por versão nova no boot do app (registro do SW roda uma
+      // vez ao carregar). Num PWA instalado, reabrir o app costuma retomar
+      // o processo que já estava rodando em segundo plano, sem um load novo
+      // de verdade — então a checagem nunca disparava e o app seguia rodando
+      // a build antiga indefinidamente (foi o que aconteceu com a rotação de
+      // chaves de 21/09: o app ficou preso na `anon` legada, já desativada,
+      // e caiu no erro do Supabase "Legacy API keys are disabled").
+      // 'prompt', com verificação periódica de atualização em
+      // AtualizacaoApp.jsx (a cada 15 min e sempre que o app volta ao
+      // primeiro plano), resolve os dois problemas: detecta a versão nova
+      // mesmo com o app parado em segundo plano, e avisa a usuária em vez
+      // de recarregar sozinho, no meio de uma peça em edição.
+      injectRegister: false,
       includeAssets: ['logo.png', 'icon-*.png'],
       manifest: {
         name: 'Themis Jur',
