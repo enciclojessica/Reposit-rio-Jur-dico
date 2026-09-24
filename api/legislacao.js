@@ -107,15 +107,27 @@ ${urls.map((u) => `  <url>
 
   const { codigo, numero, q } = req.query
 
-  // Busca por comando: /cpc 300
+  // Busca por comando: /cpc 300, ou /cc 1358-d para artigos com sufixo de
+  // letra (ex.: 1.358-A a 1.358-U do CC, 54-A a 54-G do CDC, 359-A a 359-U
+  // do CP). Vários desses números-base têm mais de um artigo real
+  // compartilhando o mesmo `numero` na tabela (só o `titulo` os distingue,
+  // ex. "Art. 1358-D"); sem o sufixo, a consulta devolve todas as linhas
+  // desses artigos misturadas, exatamente como antes desta correção.
   if (codigo && numero) {
-    const { data, error } = await supabase
+    const m = String(numero).match(/^(\d+)(?:-([a-zA-Z](?:-[a-zA-Z])?))?$/)
+    if (!m) return res.status(400).json({ error: 'Número de artigo inválido.' })
+    const base   = parseInt(m[1])
+    const sufixo = m[2] ? m[2].toUpperCase() : null
+
+    let query = supabase
       .from('legislacao')
       .select('*')
       .eq('codigo', codigo.toLowerCase())
-      .eq('numero', parseInt(numero))
+      .eq('numero', base)
       .eq('vigente', true)
-      .order('inciso', { ascending: true })
+    if (sufixo) query = query.eq('titulo', `Art. ${base}-${sufixo}`)
+
+    const { data, error } = await query.order('inciso', { ascending: true })
 
     if (error) return res.status(500).json({ error: error.message })
     return res.status(200).json({ artigos: data || [] })

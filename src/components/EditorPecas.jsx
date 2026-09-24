@@ -349,9 +349,14 @@ export default function EditorPecas({ entradas, session }) {
     if (!arg || arg.length < 1) return
     setSlashLoading(true)
     try {
+      // Aceita sufixo de letra (ex.: 1358-a, 1358a) para artigos como
+      // 1.358-A a 1.358-U (CC), 54-A a 54-G (CDC), 359-A a 359-U (CP).
+      const artigoComSufixo = /^\d+(-?[a-zA-Z](?:-[a-zA-Z])?)?$/.test(arg)
+        ? arg.replace(/^(\d+)-?([a-zA-Z].*)?$/, (_, n, s) => s ? `${n}-${s}` : n)
+        : null
       const url = cmd === 'leg'
         ? `/api/legislacao?q=${encodeURIComponent(arg)}`
-        : /^\d+$/.test(arg) ? `/api/legislacao?codigo=${cmd}&numero=${arg}` : null
+        : artigoComSufixo ? `/api/legislacao?codigo=${cmd}&numero=${artigoComSufixo}` : null
       if (!url) { setSlashLoading(false); return }
       const res  = await fetch(url)
       const json = await res.json()
@@ -381,9 +386,12 @@ export default function EditorPecas({ entradas, session }) {
   // aparecem próximos um do outro.
   function handleArtigoNatural(texto, posicaoCursor) {
     const janela = texto.slice(Math.max(0, posicaoCursor - 90), posicaoCursor)
-    const m = janela.match(/\bart(?:igo)?s?\.?\s*(\d{1,4})\s*º?\s*$/i)
+    // Captura também o sufixo de letra (ex.: "art. 1.358-D"), presente em
+    // vários artigos que compartilham o número-base com outros no banco.
+    const m = janela.match(/\bart(?:igo)?s?\.?\s*(\d{1,4})\s*(-\s*[a-zA-Z](?:\s*-\s*[a-zA-Z])?)?\s*º?\s*$/i)
     if (!m) { setArtigoSugestao(null); return }
-    const numero = m[1]
+    const sufixoNatural = m[2] ? m[2].replace(/\s+/g, '').replace(/^-/, '') : null
+    const numero = m[1] + (sufixoNatural ? '-' + sufixoNatural : '')
     const codigo = detectarCodigoNoTexto(janela)
     if (!codigo) { setArtigoSugestao(null); return }
 
