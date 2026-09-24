@@ -19,6 +19,48 @@ function autocompletar(janela) {
   return m[1] + (sufixo ? '-' + sufixo : '')
 }
 
+// As mesmas usadas no sitemap (api/legislacao.js), no link "Compartilhar"
+// (Legislacao.jsx) e na leitura do link público (App.jsx / middleware.js).
+function extrairSufixoDoTitulo(titulo) {
+  return titulo?.match(/^Art\.\s*[\d.]+-(.+)$/)?.[1]
+}
+function parseArtigoDaUrl(raw) {
+  const m = String(raw).match(/^(\d+)(?:-([a-zA-Z](?:-[a-zA-Z])?))?$/)
+  if (!m) return null
+  return { numero: m[1], sufixo: m[2] ? m[2].toUpperCase() : null }
+}
+
+describe('extrair sufixo do titulo para montar o link', () => {
+  it('extrai sufixo simples', () => {
+    expect(extrairSufixoDoTitulo('Art. 1358-D')).toBe('D')
+  })
+  it('extrai sufixo duplo', () => {
+    expect(extrairSufixoDoTitulo('Art. 359-M-A')).toBe('M-A')
+  })
+  it('artigo sem sufixo não tem match', () => {
+    expect(extrairSufixoDoTitulo('Art. 300')).toBeUndefined()
+  })
+  it('tolera titulo ausente', () => {
+    expect(extrairSufixoDoTitulo(null)).toBeUndefined()
+    expect(extrairSufixoDoTitulo(undefined)).toBeUndefined()
+  })
+})
+
+describe('ler ?art= da URL pública (App.jsx / middleware.js)', () => {
+  it('separa número e sufixo', () => {
+    expect(parseArtigoDaUrl('1358-D')).toEqual({ numero: '1358', sufixo: 'D' })
+  })
+  it('sem sufixo, sufixo fica null', () => {
+    expect(parseArtigoDaUrl('300')).toEqual({ numero: '300', sufixo: null })
+  })
+  it('normaliza minúsculas e sufixo duplo', () => {
+    expect(parseArtigoDaUrl('359-m-a')).toEqual({ numero: '359', sufixo: 'M-A' })
+  })
+  it('entrada inválida não quebra', () => {
+    expect(parseArtigoDaUrl('abc')).toBeNull()
+  })
+})
+
 describe('comando de barra (/cc 1358-d)', () => {
   it('mantém número simples sem sufixo', () => {
     expect(comandoBarra('300')).toBe('300')

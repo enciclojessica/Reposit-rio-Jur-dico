@@ -15,7 +15,7 @@ const CODIGOS_META = {
   lei9099: { label: 'Lei 9.099/95', cor: '#8a5a2e' },
 }
 
-export default function LegislacaoPublica({ codigo, numero, onFechar }) {
+export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) {
   const { theme } = useTheme()
   const [grupos, setGrupos]   = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,9 +25,16 @@ export default function LegislacaoPublica({ codigo, numero, onFechar }) {
 
   useEffect(() => {
     async function carregar() {
-      const { data, error } = await supabase
+      // Vários artigos com sufixo de letra (ex.: CC 1.358-A a 1.358-U, CDC
+      // 54-A a 54-G, CP 359-A a 359-U) compartilham o mesmo `numero` no
+      // banco — só o `titulo` os distingue. Com o sufixo vindo na URL
+      // (?art=1358-D), filtra direto pelo artigo certo em vez de trazer os
+      // ~20 artigos reais daquele número juntos.
+      let query = supabase
         .from('legislacao').select('*')
         .eq('codigo', codigo).eq('numero', numero).eq('vigente', true)
+      query = sufixo ? query.eq('titulo', `Art. ${numero}-${sufixo}`) : query
+      const { data, error } = await query
         .order('paragrafo', { ascending: true, nullsFirst: true })
 
       if (error || !data || data.length === 0) { setErro('Artigo não encontrado, ou ainda não importado no repositório.'); setLoading(false); return }
@@ -42,7 +49,7 @@ export default function LegislacaoPublica({ codigo, numero, onFechar }) {
       setLoading(false)
     }
     carregar()
-  }, [codigo, numero])
+  }, [codigo, numero, sufixo])
 
   function copiar(grupo) {
     const corpo = grupo.itens.map(i => i.texto).join('\n')

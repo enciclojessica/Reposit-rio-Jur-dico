@@ -44,9 +44,17 @@ async function buscarEntrada(id) {
   return rows?.[0] || null
 }
 
-async function buscarArtigo(codigo, numero) {
+async function buscarArtigo(codigo, numeroBruto) {
+  // Vários artigos com sufixo de letra (ex.: CC 1.358-A a 1.358-U) compartilham
+  // o mesmo `numero` na tabela — só o `titulo` os distingue. Sem isso, uma URL
+  // como ?art=1358-D falharia na comparação com a coluna numérica `numero`.
+  const m = String(numeroBruto).match(/^(\d+)(?:-([a-zA-Z](?:-[a-zA-Z])?))?$/)
+  if (!m) return null
+  const numero = m[1]
+  const sufixo = m[2] ? m[2].toUpperCase() : null
+  const filtroTitulo = sufixo ? `&titulo=eq.${encodeURIComponent(`Art. ${numero}-${sufixo}`)}` : ''
   const r = await fetch(
-    `${SUPABASE_URL}/rest/v1/legislacao?codigo=eq.${encodeURIComponent(codigo)}&numero=eq.${encodeURIComponent(numero)}&vigente=eq.true&select=titulo,texto&limit=1`,
+    `${SUPABASE_URL}/rest/v1/legislacao?codigo=eq.${encodeURIComponent(codigo)}&numero=eq.${encodeURIComponent(numero)}${filtroTitulo}&vigente=eq.true&select=titulo,texto&limit=1`,
     { headers: { apikey: SUPABASE_PUBLISHABLE_KEY } }
   )
   if (!r.ok) return null

@@ -222,7 +222,11 @@ export default function App() {
     const leiParam = params.get('lei')
     const artParam = params.get('art')
     if (leiParam && artParam) {
-      setLegislacaoPublica({ codigo: leiParam, numero: parseInt(artParam, 10) })
+      // artParam pode vir com sufixo de letra (ex.: "1358-D"), presente em
+      // artigos que compartilham o numero-base com outros no banco (só o
+      // titulo os distingue) — ver mesma lógica em api/legislacao.js.
+      const m = String(artParam).match(/^(\d+)(?:-([a-zA-Z](?:-[a-zA-Z])?))?$/)
+      setLegislacaoPublica({ codigo: leiParam, numero: parseInt(m?.[1] || artParam, 10), sufixo: m?.[2]?.toUpperCase() || null })
       window.history.replaceState({}, '', window.location.pathname)
     }
     const paginaParam = params.get('pagina')
@@ -661,6 +665,7 @@ async function handleSave(entry) {
     <LegislacaoPublica
       codigo={legislacaoPublica.codigo}
       numero={legislacaoPublica.numero}
+      sufixo={legislacaoPublica.sufixo}
       onFechar={() => setLegislacaoPublica(null)}
     />
   )

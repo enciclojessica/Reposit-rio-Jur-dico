@@ -54,7 +54,12 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
   }
 
   function compartilharLink() {
-    const url = `${window.location.origin}/?lei=${grupo.codigo}&art=${grupo.numero}`
+    // grupo.titulo pode ser "Art. 1358-D" — vários artigos com sufixo de
+    // letra compartilham o numero-base com outros no banco, então o link
+    // precisa do sufixo para apontar exatamente a este artigo, não a todos
+    // os que dividem o mesmo número.
+    const sufixo = grupo.titulo?.match(/^Art\.\s*[\d.]+-(.+)$/)?.[1]
+    const url = `${window.location.origin}/?lei=${grupo.codigo}&art=${grupo.numero}${sufixo ? `-${sufixo}` : ''}`
     navigator.clipboard.writeText(url)
     setLinkCopiado(true)
     setTimeout(() => setLinkCopiado(false), 2500)

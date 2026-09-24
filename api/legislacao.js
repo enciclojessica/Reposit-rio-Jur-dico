@@ -65,15 +65,21 @@ export default async function handler(req, res) {
     }
 
     const { data: artigos, error: erroArtigos } = await buscarTudo(
-      (q, ini, fim) => q.select('codigo, numero').eq('vigente', true).range(ini, fim)
+      (q, ini, fim) => q.select('codigo, numero, titulo').eq('vigente', true).range(ini, fim)
     )
 
     if (erroArtigos) console.error('sitemap: erro ao buscar artigos de legislação:', erroArtigos.message)
 
     // legislacao tem várias linhas por artigo (caput + incisos + parágrafos);
-    // o sitemap só quer uma URL por artigo, não por linha.
+    // o sitemap só quer uma URL por artigo, não por linha. Vários artigos
+    // com sufixo de letra (ex.: CC 1.358-A a 1.358-U, CDC 54-A a 54-G, CP
+    // 337 e 359 com até 20 sufixos) compartilham o mesmo `numero` — só o
+    // `titulo` os distingue — então a chave de dedupe inclui o titulo, e a
+    // URL carrega o sufixo (?art=1358-D) para apontar ao artigo certo em
+    // vez de a uma página com todos os artigos daquele número misturados.
+    const REGEX_SUFIXO = /^Art\.\s*[\d.]+-(.+)$/
     const artigosUnicos = [...new Map(
-      (artigos || []).map((a) => [`${a.codigo}|${a.numero}`, a])
+      (artigos || []).map((a) => [`${a.codigo}|${a.numero}|${a.titulo || ''}`, a])
     ).values()]
 
     const urls = [
@@ -84,11 +90,14 @@ export default async function handler(req, res) {
         changefreq: 'weekly',
         priority: '0.7',
       })),
-      ...artigosUnicos.map((a) => ({
-        loc: `${BASE_URL}/?lei=${a.codigo}&art=${a.numero}`,
-        changefreq: 'monthly',
-        priority: '0.5',
-      })),
+      ...artigosUnicos.map((a) => {
+        const sufixo = a.titulo?.match(REGEX_SUFIXO)?.[1]
+        return {
+          loc: `${BASE_URL}/?lei=${a.codigo}&art=${a.numero}${sufixo ? `-${sufixo}` : ''}`,
+          changefreq: 'monthly',
+          priority: '0.5',
+        }
+      }),
     ]
 
     const body = `<?xml version="1.0" encoding="UTF-8"?>
