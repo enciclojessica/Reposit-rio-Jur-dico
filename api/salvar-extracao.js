@@ -71,26 +71,47 @@ export default async function handler(req, res) {
     if (!a.codigo?.trim() || !a.numero) continue
     const codigo = a.codigo.toLowerCase()
     const numero = parseInt(a.numero)
+    const inciso = a.inciso || null
+    const paragrafo = a.paragrafo || null
 
-    const { data: existiaAntes } = await supabase.from('legislacao')
-      .select('id').eq('codigo', codigo).eq('numero', numero).limit(1)
-    const jaExistia = (existiaAntes?.length || 0) > 0
+    // Vários artigos com sufixo de letra (ex.: CC 1.358-A a 1.358-U, CDC
+    // 54-A a 54-G, CP 359-A a 359-U) compartilham o mesmo `numero` no
+    // banco — só o `titulo` os distingue, e a extração de peça não capta
+    // esse campo. Apagar por (codigo, numero) sozinho, como este endpoint
+    // fazia antes, apagaria os outros artigos reais do mesmo número junto.
+    // Por isso a busca de "já existe" é sempre pela chave completa
+    // (codigo, numero, inciso, paragrafo): só atualiza quando encontra
+    // exatamente UMA linha correspondente; do contrário insere uma linha
+    // nova, sem apagar nada — na dúvida, nunca apaga conteúdo já curado.
+    let existeQuery = supabase.from('legislacao').select('id')
+      .eq('codigo', codigo).eq('numero', numero)
+    existeQuery = inciso ? existeQuery.eq('inciso', inciso) : existeQuery.is('inciso', null)
+    existeQuery = paragrafo ? existeQuery.eq('paragrafo', paragrafo) : existeQuery.is('paragrafo', null)
+    const { data: existentes } = await existeQuery
 
-    await supabase.from('legislacao').delete().eq('codigo', codigo).eq('numero', numero)
+    const linhaUnica = existentes?.length === 1 ? existentes[0] : null
+    const ambiguo = (existentes?.length || 0) > 1
 
-    const { error } = await supabase.from('legislacao').insert({
+    const campos = {
       codigo, numero,
-      inciso:            a.inciso    || null,
-      paragrafo:         a.paragrafo || null,
-      texto:             a.texto     || '',
+      inciso, paragrafo,
+      texto:             a.texto || '',
       aplicacao_pratica: a.aplicacao_pratica || null,
       contexto:          a.contexto  || null,
       resultado:         null,
       origem,
       vigente:           true,
-    })
+    }
+
+    let error
+    if (linhaUnica) {
+      ;({ error } = await supabase.from('legislacao').update(campos).eq('id', linhaUnica.id))
+    } else {
+      ;({ error } = await supabase.from('legislacao').insert(campos))
+      if (ambiguo && !error) erros.push(`Art. ${a.numero} ${a.codigo}: número compartilhado por mais de um artigo (ex.: sufixo de letra) — inserido como linha nova em vez de atualizar, revisar manualmente.`)
+    }
     if (error) erros.push(`Art. ${a.numero} ${a.codigo}: ${error.message}`)
-    else { artigosSalvos++; detalheArtigos.push({ codigo, numero, status: jaExistia ? 'atualizado' : 'novo' }) }
+    else { artigosSalvos++; detalheArtigos.push({ codigo, numero, status: linhaUnica ? 'atualizado' : 'novo' }) }
   }
 
   // Salvar jurisprudências extraídas da peça
