@@ -4,6 +4,7 @@ import { useTheme } from '../theme'
 import { NOME_CODIGO } from '../data/legislacaoNomes'
 import { Check, Copy } from 'lucide-react'
 import SeletorTema from './SeletorTema'
+import { compararDispositivos } from '../../lib/ordemDispositivos'
 
 const CODIGOS_META = {
   cpc:     { label: 'CPC',          cor: '#2c5a6e' },
@@ -45,6 +46,7 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
         if (!mapa.has(chave)) mapa.set(chave, { titulo: item.titulo, itens: [] })
         mapa.get(chave).itens.push(item)
       }
+      for (const g of mapa.values()) g.itens.sort(compararDispositivos)
       setGrupos([...mapa.values()])
       setLoading(false)
     }

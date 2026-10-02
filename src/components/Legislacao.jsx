@@ -4,6 +4,7 @@ import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { corDaArea } from '../shared'
+import { compararDispositivos } from '../../lib/ordemDispositivos'
 
 const CODIGOS_META = {
   cpc:     { label: 'CPC',          nome: 'Código de Processo Civil',       cor: '#2c5a6e' },
@@ -340,14 +341,9 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
     }
     const grupos = [...mapa.values()]
     for (const g of grupos) {
-      g.itens.sort((a, b) => {
-        const pa = a.paragrafo === 'único' ? 0.5 : parseFloat(a.paragrafo) || 0
-        const pb = b.paragrafo === 'único' ? 0.5 : parseFloat(b.paragrafo) || 0
-        if (pa !== pb) return pa - pb
-        if (!a.inciso && b.inciso) return -1
-        if (a.inciso && !b.inciso) return 1
-        return 0
-      })
+      // Ordem da lei: caput, incisos (numeral romano, não alfabético),
+      // parágrafos e, dentro de cada um, seus incisos e alíneas.
+      g.itens.sort(compararDispositivos)
       g.caput = g.itens.find(i => !i.inciso && !i.paragrafo) || g.itens[0]
     }
     return grupos

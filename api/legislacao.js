@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { checarRateLimit } from '../lib/rateLimit.js'
+import { ordenarDispositivos } from '../lib/ordemDispositivos.js'
 
 // Rota pública: legislação é de leitura livre para qualquer visitante (política
 // `legislacao_public_read`), então a chave de serviço não é necessária aqui.
@@ -139,7 +140,9 @@ ${urls.map((u) => `  <url>
     const { data, error } = await query.order('inciso', { ascending: true })
 
     if (error) return res.status(500).json({ error: error.message })
-    return res.status(200).json({ artigos: data || [] })
+    // A ordem do banco é alfabética (XIV antes de XV, IX antes de V); reordena
+    // na ordem da lei antes de devolver pro Editor.
+    return res.status(200).json({ artigos: ordenarDispositivos(data || []) })
   }
 
   // Busca textual: /leg responsabilidade civil
