@@ -57,6 +57,14 @@ describe('estrutura completa de um artigo', () => {
     ])
   })
 
+  it('alíneas ligadas direto ao parágrafo (sem inciso) vêm depois dele, em ordem a, b, c', () => {
+    const l = [
+      { paragrafo: '1', inciso: 'c' }, { paragrafo: '2', inciso: null }, { paragrafo: '1', inciso: 'a' },
+      { paragrafo: '1', inciso: null }, { paragrafo: '1', inciso: 'b' },
+    ]
+    expect(ordem(l)).toEqual(['1|', '1|a', '1|b', '1|c', '2|'])
+  })
+
   it('é estável: itens iguais mantêm a ordem em que vieram', () => {
     const a = { paragrafo: null, inciso: null, id: 1 }
     const b = { paragrafo: null, inciso: null, id: 2 }
