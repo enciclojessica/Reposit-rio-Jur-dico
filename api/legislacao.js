@@ -121,8 +121,9 @@ ${urls.map((u) => `  <url>
   // letra (ex.: 1.358-A a 1.358-U do CC, 54-A a 54-G do CDC, 359-A a 359-U
   // do CP). Vários desses números-base têm mais de um artigo real
   // compartilhando o mesmo `numero` na tabela (só o `titulo` os distingue,
-  // ex. "Art. 1358-D"); sem o sufixo, a consulta devolve todas as linhas
-  // desses artigos misturadas, exatamente como antes desta correção.
+  // ex. "Art. 1358-D"); sem o sufixo, a consulta devolve apenas o artigo
+  // principal (linhas cujo `titulo` não é "Art. N-X"); os artigos com letra
+  // (7-A, 7-B...) só vêm quando o sufixo é pedido.
   if (codigo && numero) {
     const m = String(numero).match(/^(\d+)(?:-([a-zA-Z](?:-[a-zA-Z])?))?$/)
     if (!m) return res.status(400).json({ error: 'Número de artigo inválido.' })
@@ -142,7 +143,8 @@ ${urls.map((u) => `  <url>
     if (error) return res.status(500).json({ error: error.message })
     // A ordem do banco é alfabética (XIV antes de XV, IX antes de V); reordena
     // na ordem da lei antes de devolver pro Editor.
-    return res.status(200).json({ artigos: ordenarDispositivos(data || []) })
+    const linhas = sufixo ? (data || []) : (data || []).filter(l => !/^Art\. \d+-[A-Z]/.test(l.titulo || ''))
+    return res.status(200).json({ artigos: ordenarDispositivos(linhas) })
   }
 
   // Busca textual: /leg responsabilidade civil
