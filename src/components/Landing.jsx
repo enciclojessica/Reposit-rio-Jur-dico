@@ -2,17 +2,15 @@ import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import { Share2, Check, ArrowRight } from 'lucide-react'
+import SeletorTema from './SeletorTema'
 
-const VINHO = '#3d0012'
-const VINHO_CLARO = '#7a1128'
-const OURO = '#8f6d27'
-const OURO_CLARO = '#e8c98a'
-const MARFIM = '#fdfbf7'
-const MARFIM_ESCURO = '#f6ede0'
-const TINTA = '#2c241b'
-const MUSGO = '#736b62'
-const BORDA = '#e4ddd0'
-const FONTE = "'Inter', -apple-system, sans-serif"
+const FAIXA = '#5e0018'
+const FAIXA_BORDA = '#a9812e'
+const FAIXA_TITULO = '#f2e9d8'
+const FAIXA_SUB = '#c9a878'
+const FONTE = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+const FONTE_TITULO = "'Playfair Display', Georgia, serif"
+const FONTE_TEXTO = "Georgia, 'Times New Roman', serif"
 
 const NOME_TIPO = { 'jurisprudência': 'Jurisprudência', 'doutrina': 'Doutrina', 'súmula': 'Súmula', 'lei': 'Legislação' }
 const NOME_CODIGO_LANDING = {
@@ -84,257 +82,248 @@ export default function Landing({ onEntrar }) {
   const [refStats, statsVisivel] = useRevelar()
 
   const [estreito, setEstreito] = useState(typeof window !== 'undefined' ? window.innerWidth <= 560 : false)
+  const [medio, setMedio] = useState(typeof window !== 'undefined' ? window.innerWidth <= 920 : false)
   useEffect(() => {
-    function onResize() { setEstreito(window.innerWidth <= 560) }
+    function onResize() { setEstreito(window.innerWidth <= 560); setMedio(window.innerWidth <= 920) }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
+  const contorno = { width: 'min(1120px, 100% - 40px)', margin: '0 auto' }
+  const secao = (alt) => ({
+    padding: 'clamp(52px, 8vw, 88px) 0',
+    background: alt ? theme.bgDeep : 'transparent',
+    borderTop: alt ? `1px solid ${theme.border}` : 'none',
+    borderBottom: alt ? `1px solid ${theme.border}` : 'none',
+  })
   const botaoPrimario = {
-    background: VINHO, border: 'none', color: MARFIM, fontSize: 14, fontWeight: 600,
-    padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE,
-    display: 'inline-flex', alignItems: 'center', gap: 8,
+    background: theme.gold, border: '1px solid transparent', color: '#fdfbf7', fontSize: 15, fontWeight: 600,
+    padding: '13px 22px', borderRadius: 6, cursor: 'pointer', fontFamily: FONTE,
+    display: 'inline-flex', alignItems: 'center', gap: 8, lineHeight: 1.2,
   }
+  const botaoNeutro = {
+    ...botaoPrimario, background: theme.bgDeep, color: theme.text, border: `1px solid ${theme.border}`,
+  }
+  const linkFaixa = { color: FAIXA_SUB, fontSize: 13, fontWeight: 500, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTE, display: 'inline-flex', alignItems: 'center', gap: 5, padding: 0 }
 
   return (
-    <div style={{ background: MARFIM, fontFamily: FONTE, minHeight: '100vh' }}>
+    <div style={{ background: theme.bg, color: theme.text, fontFamily: FONTE_TEXTO, fontSize: 17, lineHeight: 1.7, minHeight: '100vh' }}>
 
-      {/* Header */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 20, background: MARFIM + 'f5', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: estreito ? '14px 16px' : '16px 40px', paddingTop: `calc(${estreito ? 14 : 16}px + env(safe-area-inset-top))`, borderBottom: `1px solid ${BORDA}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-          <span style={{ fontSize: 16, fontWeight: 700, color: TINTA }}>Themis Jur</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 20 }}>
-          {!estreito && (
-            <>
-              <button onClick={compartilhar} title="Compartilhar" style={{ background: 'none', border: 'none', color: MUSGO, fontSize: 13, cursor: 'pointer', fontFamily: FONTE, display: 'flex', alignItems: 'center', gap: 5 }}>
-                {copiado ? <Check size={14} /> : <Share2 size={14} />}
-                {copiado ? 'Copiado' : 'Compartilhar'}
-              </button>
-              <a href="/?vitrine=1" style={{ color: MUSGO, fontSize: 13, textDecoration: 'none' }}>Ver amostra</a>
-              <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: TINTA, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: FONTE }}>
-                Entrar
-              </button>
-            </>
-          )}
-          <button onClick={() => onEntrar('register')} style={{ ...botaoPrimario, padding: estreito ? '9px 16px' : '10px 20px', fontSize: 13 }}>
-            {estreito ? 'Criar conta' : 'Criar conta gratuita'}
-          </button>
-        </div>
-      </div>
-
-      {/* Hero — vinho, logo grande centralizada, como era antes */}
-      <div style={{ background: VINHO, padding: estreito ? '48px 20px 56px' : '80px 40px 88px' }}>
-        <div style={{ maxWidth: 1040, margin: '0 auto', textAlign: 'center' }}>
-          <img src="/logo-temis-transparente.png" alt="Themis Jur"
-            style={{ display: 'block', width: estreito ? 64 : 88, height: estreito ? 64 : 88, objectFit: 'contain', margin: '0 auto 16px', filter: 'drop-shadow(0 4px 14px rgba(0,0,0,0.35))' }} />
-          <div style={{ fontSize: estreito ? 16 : 19, fontWeight: 700, color: OURO_CLARO, letterSpacing: 1, marginBottom: 28 }}>
-            Themis Jur
-          </div>
-          <div style={{ fontSize: estreito ? 34 : 'clamp(38px, 5.5vw, 64px)', fontWeight: 800, lineHeight: 1.08, color: MARFIM, letterSpacing: -1.5, marginBottom: 24 }}>
-            A tese certa, na hora da peça.
-          </div>
-          <div style={{ fontSize: estreito ? 15 : 18, color: OURO_CLARO, maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
-            Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo, com fonte real e rastreável em cada entrada.
-          </div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => onEntrar('register')} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 14, fontWeight: 700, padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              Criar conta gratuita <ArrowRight size={16} />
+      {/* Faixa de navegação vinho */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 20, background: FAIXA, borderBottom: `2px solid ${FAIXA_BORDA}`, paddingTop: 'env(safe-area-inset-top)' }}>
+        <div style={{ ...contorno, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 64 }}>
+          <a href="#topo" aria-label="Themis Jur, início" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
+            <img src="/logo-temis-transparente.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+            <span>
+              <span style={{ display: 'block', fontFamily: FONTE_TITULO, fontSize: 18, fontWeight: 600, lineHeight: 1.2, color: FAIXA_TITULO }}>Themis Jur</span>
+              <span style={{ display: 'block', fontFamily: FONTE, fontSize: 11, fontStyle: 'italic', color: FAIXA_SUB }}>Inteligência jurídica</span>
+            </span>
+          </a>
+          <nav aria-label="Seções da página" style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 22 }}>
+            {!estreito && (
+              <>
+                <a href="#numeros" style={linkFaixa}>O acervo</a>
+                <a href="#diferenciais" style={linkFaixa}>Diferenciais</a>
+                <a href="/?vitrine=1" style={linkFaixa}>Ver amostra</a>
+                <button type="button" onClick={compartilhar} style={linkFaixa}>
+                  {copiado ? <Check size={14} strokeWidth={1.75} /> : <Share2 size={14} strokeWidth={1.75} />}
+                  {copiado ? 'Copiado' : 'Compartilhar'}
+                </button>
+                <button type="button" onClick={() => onEntrar('login')} style={{ ...linkFaixa, color: FAIXA_TITULO }}>Entrar</button>
+              </>
+            )}
+            <SeletorTema onDark />
+            <button type="button" onClick={() => onEntrar('register')} style={{ ...botaoPrimario, padding: '9px 16px', fontSize: 13 }}>
+              {estreito ? 'Criar conta' : 'Criar conta gratuita'}
             </button>
-            <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'transparent', border: `1px solid ${OURO_CLARO}66`, color: OURO_CLARO, fontSize: 14, fontWeight: 500, padding: '13px 26px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE }}>
-              Conhecer o acervo
-            </button>
-          </div>
+          </nav>
         </div>
-      </div>
+      </header>
 
-      {/* Números — cards horizontais, rótulo em cima, número grande embaixo */}
-      <div id="numeros" style={{ padding: estreito ? '48px 20px 64px' : '64px 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
-        <div ref={refStats} style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 1, background: BORDA, border: `1px solid ${BORDA}`, borderRadius: 12, overflow: 'hidden' }}>
-          {numeros && (
-            <>
-              <NumeroCard valor={numeros.total_entradas} ativo={statsVisivel} label="entradas curadas" />
-              <NumeroCard valor={numeros.total_artigos_vigentes} ativo={statsVisivel} label="artigos de lei vigentes" />
-              <NumeroCard valor={numeros.total_codigos} ativo={statsVisivel} label="códigos e diplomas legais" />
-              <NumeroCard valor={100} sufixo="%" ativo={statsVisivel} label="fonte real e rastreável" />
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* O que tem de diferente — grade de 3 colunas, barra de cor + título + texto */}
-      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
-        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
-          O que tem de diferente
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(3, 1fr)', gap: 40 }}>
-          {[
-            { titulo: 'Fundamento real', texto: 'Cada entrada reúne tese, fundamento legal e uma indicação de uso prático: não é ementa solta, é material pronto pra consulta em peça.' },
-            { titulo: 'Curadoria de verdade', texto: 'Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo.' },
-            { titulo: 'Fontes cruzadas', texto: 'Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.' },
-          ].map(item => (
-            <div key={item.titulo}>
-              <div style={{ width: 32, height: 3, background: VINHO, borderRadius: 2, marginBottom: 16 }} />
-              <div style={{ fontSize: 17, fontWeight: 700, color: TINTA, marginBottom: 8 }}>{item.titulo}</div>
-              <div style={{ fontSize: 14, color: MUSGO, lineHeight: 1.65 }}>{item.texto}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Para quem é — mesmo padrão de grade */}
-      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
-        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
-          Para quem é
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(3, 1fr)', gap: 40 }}>
-          {[
-            { titulo: 'Quem estuda', texto: 'O acervo oferece fonte primária no lugar do resumo de resumo, desde o início dos estudos.' },
-            { titulo: 'Quem advoga', texto: 'Citação pronta e tese comentada em meio à rotina, sem precisar reconstruir o raciocínio do zero.' },
-            { titulo: 'Quem leciona', texto: 'O material já chega organizado por área e por tipo, pronto pra uso em sala.' },
-          ].map(item => (
-            <div key={item.titulo}>
-              <div style={{ width: 32, height: 3, background: OURO, borderRadius: 2, marginBottom: 16 }} />
-              <div style={{ fontSize: 17, fontWeight: 700, color: TINTA, marginBottom: 8 }}>{item.titulo}</div>
-              <div style={{ fontSize: 14, color: MUSGO, lineHeight: 1.65 }}>{item.texto}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Citação */}
-      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 760, margin: '0 auto' }}>
-        <div style={{ background: MARFIM_ESCURO, borderRadius: 16, padding: estreito ? '32px 24px' : '48px', border: `1px solid ${BORDA}` }}>
-          <div style={{ fontSize: estreito ? 17 : 20, lineHeight: 1.6, color: TINTA, marginBottom: 24 }}>
-            "O Themis Jur nasceu de uma necessidade concreta: organizar, num só lugar, o material que a rotina de estudo e prática forense exige consultar todos os dias. A curadoria de cada entrada segue o mesmo rigor que se espera de uma pesquisa jurídica bem feita."
-          </div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: TINTA }}>Jessica Farias Fusquiani</div>
-          <div style={{ fontSize: 13, color: MUSGO }}>Idealizadora do Themis Jur</div>
-        </div>
-      </div>
-
-      {/* Do que é feito o acervo — 3 listas lado a lado */}
-      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
-        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
-          Do que é feito o acervo
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(3, 1fr)', gap: 48 }}>
-          <Ledger titulo="Por tipo de fonte" dados={numeros?.por_tipo} nomear={k => NOME_TIPO[k] || k} cor={VINHO_CLARO} />
-          <Ledger titulo="Legislação vigente" dados={numeros?.por_codigo} nomear={k => NOME_CODIGO_LANDING[k] || k.toUpperCase()} cor="#2c4a6e" />
-          <Ledger titulo="Por tribunal" dados={numeros?.por_tribunal} nomear={k => k} cor={OURO} />
-        </div>
-      </div>
-
-      {/* Do acervo, agora — exemplos reais */}
-      <div style={{ padding: estreito ? '0 20px 64px' : '0 40px 96px', maxWidth: 1040, margin: '0 auto' }}>
-        <div style={{ fontSize: estreito ? 24 : 32, fontWeight: 800, color: TINTA, marginBottom: 40, letterSpacing: -0.5 }}>
-          Do acervo, agora
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : 'repeat(2, 1fr)', gap: 20 }}>
-          <div style={{ border: `1px solid ${BORDA}`, borderRadius: 12, padding: 24 }}>
-            <div style={{ fontSize: 15, color: TINTA, lineHeight: 1.6 }}>
-              <b>União estável.</b> Comunicabilidade do patrimônio formado durante a relação, ainda que a contribuição não tenha sido financeira.
-            </div>
-            <div style={{ fontSize: 12, color: MUSGO, marginTop: 10 }}>STJ, REsp 1.234.567/SP, Família</div>
-          </div>
-          <div style={{ border: `1px solid ${BORDA}`, borderRadius: 12, padding: 24 }}>
-            <div style={{ fontSize: 15, color: TINTA, lineHeight: 1.6 }}>
-              <b>Pronúncia.</b> Dúvida sobre legítima defesa não autoriza absolvição sumária; apreciação cabe ao Tribunal do Júri.
-            </div>
-            <div style={{ fontSize: 12, color: MUSGO, marginTop: 10 }}>STJ, AgRg no AREsp 872.992/PE, Penal</div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA final */}
-      <div style={{ padding: estreito ? '0 20px 80px' : '0 40px 120px', maxWidth: 760, margin: '0 auto' }}>
-        <div style={{ background: VINHO, borderRadius: 16, padding: estreito ? '40px 24px' : '56px', textAlign: 'center' }}>
-          <div style={{ fontSize: estreito ? 22 : 28, fontWeight: 800, color: MARFIM, marginBottom: 12, letterSpacing: -0.5 }}>
-            Acesso ao acervo completo, sem custo
-          </div>
-          <div style={{ fontSize: 14, color: OURO_CLARO, marginBottom: 28 }}>
-            Busca com IA é recurso da versão paga.
-          </div>
-          <button onClick={() => onEntrar('register')} style={{ background: OURO_CLARO, border: 'none', color: VINHO, fontSize: 15, fontWeight: 700, padding: '14px 32px', borderRadius: 8, cursor: 'pointer', fontFamily: FONTE }}>
-            Criar conta gratuita
-          </button>
-        </div>
-      </div>
-
-      {/* Rodapé */}
-      <div style={{ background: '#2a000d', padding: estreito ? '40px 20px 24px' : '56px 40px 28px' }}>
-        <div style={{ maxWidth: 1040, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 32, marginBottom: 40 }}>
+      <main id="topo">
+        {/* Herói em duas colunas */}
+        <div style={{ padding: 'clamp(48px, 8vw, 96px) 0 clamp(48px, 7vw, 88px)' }}>
+          <div style={{ ...contorno, display: 'grid', gridTemplateColumns: medio ? '1fr' : '1.05fr 0.95fr', gap: 'clamp(32px, 5vw, 64px)', alignItems: 'center' }}>
             <div>
-              <div style={{ fontSize: 17, fontWeight: 700, color: MARFIM, marginBottom: 10 }}>Themis Jur</div>
-              <div style={{ fontSize: 13, color: OURO_CLARO, lineHeight: 1.6, maxWidth: 220 }}>
-                Acervo curado de jurisprudência, doutrina e legislação, por uma pessoa só.
+              <Rotulo theme={theme}>Repositório jurídico curado</Rotulo>
+              <h1 style={{ margin: '18px 0 20px', fontFamily: FONTE_TITULO, fontSize: 'clamp(35px, 5.6vw, 59px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.005em', color: theme.text }}>
+                A tese certa, <em style={{ fontStyle: 'italic', fontWeight: 500, color: theme.vinho }}>na hora da peça.</em>
+              </h1>
+              <p style={{ margin: 0, maxWidth: 540, fontSize: 'clamp(17px, 2vw, 19px)', color: theme.textSub }}>
+                Acervo curado de jurisprudência, doutrina e legislação, reunido por uma pessoa só, artigo por artigo, com fonte real e rastreável em cada entrada.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
+                <button type="button" onClick={() => onEntrar('register')} style={botaoPrimario}>
+                  Criar conta gratuita <ArrowRight size={16} strokeWidth={1.75} />
+                </button>
+                <button type="button" onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={botaoNeutro}>
+                  Conhecer o acervo
+                </button>
               </div>
             </div>
-            <div>
-              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7, textTransform: 'uppercase' }}>Produto</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button onClick={() => document.getElementById('numeros')?.scrollIntoView({ behavior: 'smooth' })} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>O acervo em números</button>
-                <a href="/?vitrine=1" style={{ color: '#e8dfd0', fontSize: 13, textDecoration: 'none' }}>Ver amostra</a>
-                <button onClick={compartilhar} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>Compartilhar</button>
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7, textTransform: 'uppercase' }}>Conta</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button onClick={() => onEntrar('login')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>Entrar</button>
-                <button onClick={() => onEntrar('register')} style={{ background: 'none', border: 'none', color: '#e8dfd0', fontSize: 13, cursor: 'pointer', fontFamily: FONTE, textAlign: 'left', padding: 0 }}>Criar conta gratuita</button>
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 11, color: OURO_CLARO, letterSpacing: 1, marginBottom: 14, opacity: 0.7, textTransform: 'uppercase' }}>Contato</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <a href="mailto:themisjur.ia@gmail.com" style={{ color: '#e8dfd0', fontSize: 13, textDecoration: 'none' }}>E-mail</a>
+
+            <div id="numeros" ref={refStats} style={{ scrollMarginTop: 80, background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, overflow: 'hidden', position: 'relative' }}>
+              <div style={{ height: 2, width: 35, background: theme.gold, position: 'absolute', left: 24, top: 0 }} />
+              <div style={{ padding: '22px 24px 8px', fontFamily: FONTE, fontSize: 12, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: theme.gold }}>O acervo, em números</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: theme.border, borderTop: `1px solid ${theme.border}`, minHeight: 120 }}>
+                {numeros && (
+                  <>
+                    <NumeroCard theme={theme} valor={numeros.total_entradas} ativo={statsVisivel} label="entradas curadas" />
+                    <NumeroCard theme={theme} valor={numeros.total_artigos_vigentes} ativo={statsVisivel} label="artigos de lei vigentes" />
+                    <NumeroCard theme={theme} valor={numeros.total_codigos} ativo={statsVisivel} label="códigos e diplomas" />
+                    <NumeroCard theme={theme} valor={100} sufixo="%" ativo={statsVisivel} label="fonte rastreável" />
+                  </>
+                )}
               </div>
             </div>
           </div>
+        </div>
 
-          <div style={{ borderTop: `1px solid ${OURO_CLARO}22`, paddingTop: 20, fontSize: 12, color: '#a89a88', lineHeight: 1.6 }}>
-            O acervo e as sugestões de teses têm finalidade de apoio ao estudo e à pesquisa jurídica, e exigem conferência dos fatos, fundamentos e fontes pelo profissional antes do uso em peça. A responsabilidade pelo exercício profissional permanece do advogado, inclusive por atos praticados com dolo ou culpa, nos termos do art. 32 da Lei nº 8.906/94.
+        {/* Diferenciais */}
+        <div id="diferenciais" style={{ ...secao(true), scrollMarginTop: 72 }}>
+          <div style={contorno}>
+            <Cabecalho theme={theme} rotulo="Diferenciais" titulo="O que tem de diferente" />
+            <GradeCartoes estreito={estreito} medio={medio} itens={[
+              { titulo: 'Fundamento real', texto: 'Cada entrada reúne tese, fundamento legal e uma indicação de uso prático: não é ementa solta, é material pronto para consulta em peça.' },
+              { titulo: 'Curadoria de verdade', texto: 'Por enquanto, a curadoria é de uma pessoa só. Cada fonte passa por conferência antes de entrar no acervo.' },
+              { titulo: 'Fontes cruzadas', texto: 'Legislação, jurisprudência e doutrina convivem no mesmo espaço, e uma remete à outra.' },
+            ]} theme={theme} />
           </div>
+        </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12, marginTop: 24, fontSize: 11, color: '#a89a88' }}>
-            <div>© 2026 Themis Jur. Feito no Brasil.</div>
-            <div>
-              <a href="/?pagina=termos" style={{ color: '#a89a88', textDecoration: 'underline' }}>Termos de uso</a>
-              <span style={{ margin: '0 6px' }}>e</span>
-              <a href="/?pagina=privacidade" style={{ color: '#a89a88', textDecoration: 'underline' }}>política de privacidade</a>
+        {/* Para quem é */}
+        <div style={secao(false)}>
+          <div style={contorno}>
+            <Cabecalho theme={theme} rotulo="Público" titulo="Para quem é" />
+            <GradeCartoes estreito={estreito} medio={medio} itens={[
+              { titulo: 'Quem estuda', texto: 'O acervo oferece fonte primária no lugar do resumo de resumo, desde o início dos estudos.' },
+              { titulo: 'Quem advoga', texto: 'Citação pronta e tese comentada em meio à rotina, sem precisar reconstruir o raciocínio do zero.' },
+              { titulo: 'Quem leciona', texto: 'O material já chega organizado por área e por tipo, pronto para uso em sala.' },
+            ]} theme={theme} />
+          </div>
+        </div>
+
+        {/* Curadoria */}
+        <div style={secao(true)}>
+          <div style={{ ...contorno, maxWidth: 760 }}>
+            <Rotulo theme={theme}>Curadoria</Rotulo>
+            <blockquote style={{ margin: '18px 0 24px', fontFamily: FONTE_TITULO, fontSize: estreito ? 20 : 24, fontWeight: 500, lineHeight: 1.5, color: theme.text }}>
+              &ldquo;O Themis Jur nasceu de uma necessidade concreta: organizar, num só lugar, o material que a rotina de estudo e prática forense exige consultar todos os dias. A curadoria de cada entrada segue o mesmo rigor que se espera de uma pesquisa jurídica bem feita.&rdquo;
+            </blockquote>
+            <div style={{ fontFamily: FONTE, fontSize: 14, fontWeight: 600, color: theme.text }}>Jessica Farias Fusquiani</div>
+            <div style={{ fontFamily: FONTE, fontSize: 13, color: theme.muted }}>Idealizadora do Themis Jur</div>
+          </div>
+        </div>
+
+        {/* Do que é feito o acervo */}
+        <div style={secao(false)}>
+          <div style={contorno}>
+            <Cabecalho theme={theme} rotulo="Acervo" titulo="Do que é feito o acervo" />
+            <div style={{ display: 'grid', gridTemplateColumns: medio ? '1fr' : 'repeat(3, 1fr)', gap: 40 }}>
+              <Ledger theme={theme} titulo="Por tipo de fonte" dados={numeros?.por_tipo} nomear={k => NOME_TIPO[k] || k} cor={theme.vinho} />
+              <Ledger theme={theme} titulo="Legislação vigente" dados={numeros?.por_codigo} nomear={k => NOME_CODIGO_LANDING[k] || k.toUpperCase()} cor={theme.civel} />
+              <Ledger theme={theme} titulo="Por tribunal" dados={numeros?.por_tribunal} nomear={k => k} cor={theme.gold} />
             </div>
           </div>
         </div>
-      </div>
 
+        {/* Chamada final */}
+        <div style={secao(true)}>
+          <div style={{ ...contorno, textAlign: 'center' }}>
+            <Rotulo theme={theme}>Comece hoje</Rotulo>
+            <h2 style={{ maxWidth: 560, margin: '16px auto', fontFamily: FONTE_TITULO, fontSize: 'clamp(29px, 4vw, 43px)', fontWeight: 600, lineHeight: 1.2, color: theme.text }}>
+              Acesso ao acervo completo, sem custo
+            </h2>
+            <p style={{ maxWidth: 520, margin: '0 auto', color: theme.textSub }}>Busca com IA é recurso da versão paga.</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
+              <button type="button" onClick={() => onEntrar('register')} style={botaoPrimario}>
+                Criar conta gratuita <ArrowRight size={16} strokeWidth={1.75} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Rodapé vinho */}
+      <footer style={{ padding: '38px 0 44px', background: FAIXA, borderTop: `2px solid ${FAIXA_BORDA}`, fontFamily: FONTE, fontSize: 13, color: FAIXA_SUB }}>
+        <div style={{ ...contorno, display: 'grid', gridTemplateColumns: medio ? '1fr' : '1.2fr 1fr', gap: 22, alignItems: 'start' }}>
+          <div>
+            <span style={{ display: 'block', marginBottom: 3, fontSize: 11.5, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAIXA_BORDA }}>Plataforma e curadoria</span>
+            <b style={{ display: 'block', fontFamily: FONTE_TITULO, fontSize: 18, fontWeight: 600, color: FAIXA_TITULO }}>Farias Fusquiani</b>
+            <p style={{ margin: '14px 0 0', maxWidth: 560, lineHeight: 1.6 }}>
+              O acervo e as sugestões de teses têm finalidade de apoio ao estudo e à pesquisa jurídica, e exigem conferência dos fatos, fundamentos e fontes pelo profissional antes do uso em peça. A responsabilidade pelo exercício profissional permanece do advogado, nos termos do art. 32 da Lei nº 8.906/94.
+            </p>
+          </div>
+          <nav aria-label="Rodapé" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 22px', justifyContent: medio ? 'flex-start' : 'flex-end' }}>
+            <a href="#numeros" style={linkRodape}>O acervo</a>
+            <a href="/?vitrine=1" style={linkRodape}>Ver amostra</a>
+            <button type="button" onClick={() => onEntrar('login')} style={{ ...linkRodape, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: FONTE, fontSize: 13 }}>Entrar</button>
+            <a href="mailto:themisjur.ia@gmail.com" style={linkRodape}>Contato</a>
+            <a href="/?pagina=termos" style={linkRodape}>Termos de uso</a>
+            <a href="/?pagina=privacidade" style={linkRodape}>Privacidade</a>
+          </nav>
+        </div>
+        <div style={{ ...contorno, marginTop: 22 }}>&copy; {new Date().getFullYear()} Farias Fusquiani. Todos os direitos reservados.</div>
+      </footer>
     </div>
   )
 }
 
-function NumeroCard({ valor, sufixo = '', ativo, label }) {
+const linkRodape = { color: FAIXA_SUB, textDecoration: 'none' }
+
+function Rotulo({ theme, children }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12, fontFamily: FONTE, fontSize: 12, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: theme.gold }}>
+      <span style={{ width: 32, height: 1, background: theme.gold }} />
+      {children}
+    </span>
+  )
+}
+
+function Cabecalho({ theme, rotulo, titulo }) {
+  return (
+    <div style={{ maxWidth: 640, marginBottom: 'clamp(28px, 4vw, 44px)' }}>
+      <Rotulo theme={theme}>{rotulo}</Rotulo>
+      <h2 style={{ margin: '14px 0 0', fontFamily: FONTE_TITULO, fontSize: 'clamp(27px, 3.6vw, 40px)', fontWeight: 600, lineHeight: 1.2, color: theme.text }}>{titulo}</h2>
+    </div>
+  )
+}
+
+function GradeCartoes({ itens, theme, estreito, medio }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: estreito ? '1fr' : medio ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 16 }}>
+      {itens.map(item => (
+        <article key={item.titulo} style={{ position: 'relative', padding: '26px 24px', background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 10 }}>
+          <div style={{ position: 'absolute', left: 24, top: 0, width: 35, height: 2, background: theme.gold }} />
+          <h3 style={{ margin: '0 0 8px', fontFamily: FONTE_TITULO, fontSize: 20, fontWeight: 600, lineHeight: 1.25, color: theme.text }}>{item.titulo}</h3>
+          <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.65, color: theme.textSub }}>{item.texto}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+function NumeroCard({ theme, valor, sufixo = '', ativo, label }) {
   const contado = useContagem(valor, ativo)
   return (
-    <div style={{ background: MARFIM, padding: '28px 20px' }}>
-      <div style={{ fontSize: 11, color: OURO, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, color: TINTA, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+    <div style={{ background: theme.cardBg, padding: '22px 24px' }}>
+      <div style={{ fontFamily: FONTE, fontSize: 11, color: theme.muted, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontFamily: FONTE_TITULO, fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 600, color: theme.text, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
         {contado.toLocaleString('pt-BR')}{sufixo}
       </div>
     </div>
   )
 }
 
-function Ledger({ titulo, dados, nomear, cor }) {
+function Ledger({ theme, titulo, dados, nomear, cor }) {
   if (!dados) return null
   const entradas = Object.entries(dados).sort((a, b) => b[1] - a[1])
   return (
     <div>
-      <div style={{ fontWeight: 700, fontSize: 15, color: TINTA, marginBottom: 16, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</div>
+      <h3 style={{ margin: '0 0 12px', fontFamily: FONTE_TITULO, fontWeight: 600, fontSize: 19, color: theme.text, borderBottom: `2px solid ${cor}`, paddingBottom: 8 }}>{titulo}</h3>
       {entradas.map(([chave, valor]) => (
-        <div key={chave} style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: `1px solid ${TINTA}14`, fontSize: 14 }}>
-          <span style={{ color: MUSGO }}>{nomear(chave)}</span>
+        <div key={chave} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '9px 0', borderBottom: `1px solid ${theme.border}`, fontFamily: FONTE, fontSize: 14 }}>
+          <span style={{ color: theme.textSub }}>{nomear(chave)}</span>
           <span style={{ color: cor, fontWeight: 700 }}>{valor.toLocaleString('pt-BR')}</span>
         </div>
       ))}
