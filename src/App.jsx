@@ -43,6 +43,7 @@ import { exportarRepositorioDocx } from './utils/exportarRepositorio'
 import { AREAS, ROLE_COR, ROLE_LABEL, buscarTodasLinhas } from './shared'
 import { TagPill } from './components/TagInput'
 import { VIEWS } from './data/views'
+import { TITULOS_VIEWS } from './data/titulosViews'
 import Sidebar from './components/Sidebar'
 import MobileHeader from './components/MobileHeader'
 import MobileNav from './components/MobileNav'
@@ -1093,10 +1094,14 @@ case VIEWS.JURISPRUDENCIA:
         {/* Topbar desktop */}
         {!isMobile && !modoFoco && (
           <div className="no-print" style={{
-            height: 56, background: theme.surface, borderBottom: `1px solid ${theme.border}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+            height: 76, background: theme.bg, borderBottom: `1px solid ${theme.border}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '0 28px', gap: 12, flexShrink: 0,
           }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+              {TITULOS_VIEWS[view] || 'Themis Jur'}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             {session ? (
               <>
                 {isOwner && entradas.length > 0 && (
@@ -1111,21 +1116,19 @@ case VIEWS.JURISPRUDENCIA:
                     <Trash2 size={13} />
                   </button>
                 )}
-                <SeletorTema compact />
-                <div style={{ width: 1, height: 20, background: theme.border }} />
+                <SeletorTema />
                 <SinoNotificacoes
                   session={session}
                   onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
                   onAbrirEntrada={id => { const e = entradas.find(x => x.id === id); if (e) { setSelected(e); setView(VIEWS.DETAIL) } }}
                 />
-                <div style={{ width: 1, height: 20, background: theme.border }} />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   {membro?.avatar_url ? (
                     <img src={membro.avatar_url} alt="avatar"
-                      style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${theme.border}` }} />
+                      style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', border: '1px solid #a9812e' }} />
                   ) : (
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: theme.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ color: '#fff', fontSize: 12, fontWeight: 700, fontFamily: theme.fontTitle }}>
+                    <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#7a1128', border: '1px solid #a9812e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ color: '#f2e9d8', fontSize: 12, fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>
                         {(membro?.nome || session.user.email || 'JF').slice(0, 2).toUpperCase()}
                       </span>
                     </div>
@@ -1142,8 +1145,8 @@ case VIEWS.JURISPRUDENCIA:
                   </div>
                 </div>
                 <button onClick={() => { logoutManualRef.current = true; supabase.auth.signOut() }} title="Sair"
-                  style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 12, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <LogOut size={14} /> Sair
+                  style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '9px 14px', color: theme.text, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <LogOut size={15} strokeWidth={1.75} aria-hidden="true" /> Sair
                 </button>
               </>
             ) : (
@@ -1156,6 +1159,7 @@ case VIEWS.JURISPRUDENCIA:
                 <Lock size={13} /> Acesso Interno
               </button>
             )}
+            </div>
           </div>
         )}
         {isMobile && !modoFoco && (

@@ -52,9 +52,9 @@ describe('Sidebar', () => {
 
   it('mostra "+ Nova Entrada" apenas para editor', () => {
     renderSidebar({ isEditor: false })
-    expect(screen.queryByText('+ Nova Entrada')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /nova entrada/i })).not.toBeInTheDocument()
     renderSidebar({ isEditor: true })
-    expect(screen.getByText('+ Nova Entrada')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /nova entrada/i })).toBeInTheDocument()
   })
 
   it('mostra o bloco de assinatura no rodapé', () => {

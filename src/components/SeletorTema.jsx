@@ -1,34 +1,28 @@
+import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '../theme'
 
-export default function SeletorTema({ compact = false }) {
+// Botão quadrado de 34px, igual ao do app de questões.
+export default function SeletorTema({ onDark = false }) {
   const { isDark, toggle, theme } = useTheme()
+  const Icone = isDark ? Sun : Moon
+  const cor = onDark ? '#e8dfc8' : theme.muted
+  const borda = onDark ? '#a9812e' : theme.border
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      title={isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+      aria-label={isDark ? 'Mudar para o tema claro' : 'Mudar para o tema escuro'}
+      title={isDark ? 'Tema claro' : 'Tema escuro'}
       style={{
-        background: theme.raised,
-        border: `1px solid ${theme.border}`,
-        borderRadius: 20,
-        padding: compact ? '4px 10px' : '5px 12px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        color: theme.muted,
-        fontSize: 12,
-        fontFamily: theme.fontBody || 'Inter, sans-serif',
-        flexShrink: 0,
-        transition: 'all .15s',
+        width: 34, height: 34, flexShrink: 0,
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        background: onDark ? 'transparent' : theme.raised,
+        border: `1px solid ${borda}`, borderRadius: 6,
+        color: cor, cursor: 'pointer', transition: 'border-color .15s, color .15s',
       }}
     >
-      <span style={{ fontSize: 14 }}>{isDark ? '☀' : '☾'}</span>
-      {!compact && (
-        <span style={{ color: theme.text, fontWeight: 500 }}>
-          {isDark ? 'Claro' : 'Escuro'}
-        </span>
-      )}
+      <Icone size={16} strokeWidth={1.75} aria-hidden="true" />
     </button>
   )
 }

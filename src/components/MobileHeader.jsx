@@ -1,4 +1,4 @@
-import { Lock } from 'lucide-react'
+import { Lock, LogOut } from 'lucide-react'
 import SeletorTema from './SeletorTema'
 import SinoNotificacoes from './SinoNotificacoes'
 import { ROLE_LABEL } from '../shared'
@@ -22,7 +22,7 @@ export default function MobileHeader({
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {role && <span style={{ fontSize: 10, color: '#e8c98a', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{ROLE_LABEL[role]}</span>}
-        <SeletorTema compact />
+        <SeletorTema onDark />
         {session && (
           <SinoNotificacoes session={session} corIcone="#e8dfc8"
             onNavegar={v => setView(VIEWS[v.toUpperCase()] || VIEWS.HOME)}
@@ -42,7 +42,7 @@ export default function MobileHeader({
           )
         )}
         {session
-          ? <button onClick={onSair} style={{ background: 'none', border: 'none', color: '#e8dfc8', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>Sair</button>
+          ? <button onClick={onSair} aria-label="Sair da conta" title="Sair" style={{ width: 34, height: 34, background: 'transparent', border: '1px solid #a9812e', borderRadius: 6, color: '#e8dfc8', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><LogOut size={15} strokeWidth={1.75} aria-hidden="true" /></button>
           : <button onClick={() => setShowLogin(true)} style={{ background: '#a9812e', border: 'none', borderRadius: 6, padding: '5px 14px', color: '#2c241b', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5 }}><Lock size={11} /> Acesso interno</button>
         }
       </div>
