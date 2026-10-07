@@ -3,6 +3,7 @@ import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 import { Share2, Check, ArrowRight } from 'lucide-react'
 import SeletorTema from './SeletorTema'
+import AmostraAcervo from './AmostraAcervo'
 
 const FAIXA = '#5e0018'
 const FAIXA_BORDA = '#a9812e'
@@ -123,6 +124,7 @@ export default function Landing({ onEntrar }) {
             {!estreito && (
               <>
                 <a href="#numeros" style={linkFaixa}>O acervo</a>
+                <a href="#amostra" style={linkFaixa}>Amostra</a>
                 <a href="#diferenciais" style={linkFaixa}>Diferenciais</a>
                 <a href="/?vitrine=1" style={linkFaixa}>Ver amostra</a>
                 <button type="button" onClick={compartilhar} style={linkFaixa}>
@@ -179,8 +181,21 @@ export default function Landing({ onEntrar }) {
           </div>
         </div>
 
+        {/* Amostra real do acervo */}
+        <div id="amostra" style={{ ...secao(true), scrollMarginTop: 72 }}>
+          <div style={contorno}>
+            <Cabecalho theme={theme} rotulo="Amostra" titulo="Veja o acervo por dentro" />
+            <p style={{ margin: '-20px 0 28px', maxWidth: 640, color: theme.textSub }}>
+              Três entradas reais do repositório, uma de cada tipo de fonte. Escolha a aba e veja como cada tese chega pronta para consulta, com o fundamento legal e a referência.
+            </p>
+            <div style={{ maxWidth: 820 }}>
+              <AmostraAcervo theme={theme} onCadastrar={() => onEntrar('register')} />
+            </div>
+          </div>
+        </div>
+
         {/* Diferenciais */}
-        <div id="diferenciais" style={{ ...secao(true), scrollMarginTop: 72 }}>
+        <div id="diferenciais" style={{ ...secao(false), scrollMarginTop: 72 }}>
           <div style={contorno}>
             <Cabecalho theme={theme} rotulo="Diferenciais" titulo="O que tem de diferente" />
             <GradeCartoes estreito={estreito} medio={medio} itens={[
@@ -192,7 +207,7 @@ export default function Landing({ onEntrar }) {
         </div>
 
         {/* Para quem é */}
-        <div style={secao(false)}>
+        <div style={secao(true)}>
           <div style={contorno}>
             <Cabecalho theme={theme} rotulo="Público" titulo="Para quem é" />
             <GradeCartoes estreito={estreito} medio={medio} itens={[
@@ -204,7 +219,7 @@ export default function Landing({ onEntrar }) {
         </div>
 
         {/* Curadoria */}
-        <div style={secao(true)}>
+        <div style={secao(false)}>
           <div style={{ ...contorno, maxWidth: 760 }}>
             <Rotulo theme={theme}>Curadoria</Rotulo>
             <blockquote style={{ margin: '18px 0 24px', fontFamily: FONTE_TITULO, fontSize: estreito ? 20 : 24, fontWeight: 500, lineHeight: 1.5, color: theme.text }}>
@@ -216,7 +231,7 @@ export default function Landing({ onEntrar }) {
         </div>
 
         {/* Do que é feito o acervo */}
-        <div style={secao(false)}>
+        <div style={secao(true)}>
           <div style={contorno}>
             <Cabecalho theme={theme} rotulo="Acervo" titulo="Do que é feito o acervo" />
             <div style={{ display: 'grid', gridTemplateColumns: medio ? '1fr' : 'repeat(3, 1fr)', gap: 40 }}>
@@ -228,7 +243,7 @@ export default function Landing({ onEntrar }) {
         </div>
 
         {/* Chamada final */}
-        <div style={secao(true)}>
+        <div style={secao(false)}>
           <div style={{ ...contorno, textAlign: 'center' }}>
             <Rotulo theme={theme}>Comece hoje</Rotulo>
             <h2 style={{ maxWidth: 560, margin: '16px auto', fontFamily: FONTE_TITULO, fontSize: 'clamp(29px, 4vw, 43px)', fontWeight: 600, lineHeight: 1.2, color: theme.text }}>
