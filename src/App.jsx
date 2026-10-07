@@ -231,8 +231,8 @@ export default function App() {
     }
     const paginaParam = params.get('pagina')
     if (paginaParam === 'termos' || paginaParam === 'privacidade') {
+      // Mantém a URL (?pagina=...) para que ela seja indexável sem redirecionamento.
       setPaginaLegal(paginaParam)
-      window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
 
@@ -673,7 +673,7 @@ async function handleSave(entry) {
   if (paginaLegal) return (
     <PaginaLegal
       documento={paginaLegal === 'termos' ? TERMOS_DE_USO : POLITICA_PRIVACIDADE}
-      onFechar={() => setPaginaLegal(null)}
+      onFechar={() => { setPaginaLegal(null); window.history.replaceState({}, '', window.location.pathname) }}
     />
   )
 

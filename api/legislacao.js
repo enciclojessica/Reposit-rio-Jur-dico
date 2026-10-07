@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { checarRateLimit } from '../lib/rateLimit.js'
 import { ordenarDispositivos } from '../lib/ordemDispositivos.js'
+import { gerarSitemapXml } from '../lib/sitemap.js'
 
 // Rota pública: legislação é de leitura livre para qualquer visitante (política
 // `legislacao_public_read`), então a chave de serviço não é necessária aqui.
@@ -39,80 +40,15 @@ export default async function handler(req, res) {
   const { permitido } = await checarRateLimit(supabase, { ip }, 'legislacao', { limite: 120, janelaMs: 60_000 })
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
-  // ── Sitemap dinâmico (rota /sitemap.xml via rewrite no vercel.json) ─────
+  // ── Sitemap (rota /sitemap.xml via rewrite no vercel.json) ──────────────
   // Vive aqui, e não em api/sitemap.js, porque o plano Hobby da Vercel
   // limita a 12 Serverless Functions por deployment e o projeto já usa
-  // as 12 (ver vercel.json). Sem relação temática com legislação; é só
-  // o slot disponível.
+  // as 12 (ver vercel.json). O conteúdo é estático (home e páginas legais):
+  // o acervo é fechado e não vai para o índice. Ver lib/sitemap.js.
   if (req.query.sitemap) {
-    const BASE_URL = 'https://themisjur.com.br'
-    const escapeXml = (str) => String(str || '').replace(/[<>&'"]/g, (c) => ({
-      '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;',
-    }[c]))
-
-    let entradas = []
-    let de = 0
-    while (true) {
-      const { data, error } = await supabase
-        .from('entradas')
-        .select('id, atualizado_em')
-        .eq('publica', true)
-        .order('atualizado_em', { ascending: false })
-        .range(de, de + PAGINA - 1)
-      if (error) { console.error('sitemap: erro ao buscar entradas públicas:', error.message); break }
-      entradas = entradas.concat(data || [])
-      if (!data || data.length < PAGINA) break
-      de += PAGINA
-    }
-
-    const { data: artigos, error: erroArtigos } = await buscarTudo(
-      (q, ini, fim) => q.select('codigo, numero, titulo').eq('vigente', true).range(ini, fim)
-    )
-
-    if (erroArtigos) console.error('sitemap: erro ao buscar artigos de legislação:', erroArtigos.message)
-
-    // legislacao tem várias linhas por artigo (caput + incisos + parágrafos);
-    // o sitemap só quer uma URL por artigo, não por linha. Vários artigos
-    // com sufixo de letra (ex.: CC 1.358-A a 1.358-U, CDC 54-A a 54-G, CP
-    // 337 e 359 com até 20 sufixos) compartilham o mesmo `numero` — só o
-    // `titulo` os distingue — então a chave de dedupe inclui o titulo, e a
-    // URL carrega o sufixo (?art=1358-D) para apontar ao artigo certo em
-    // vez de a uma página com todos os artigos daquele número misturados.
-    const REGEX_SUFIXO = /^Art\.\s*[\d.]+-(.+)$/
-    const artigosUnicos = [...new Map(
-      (artigos || []).map((a) => [`${a.codigo}|${a.numero}|${a.titulo || ''}`, a])
-    ).values()]
-
-    const urls = [
-      { loc: `${BASE_URL}/`, changefreq: 'daily', priority: '1.0' },
-      ...(entradas || []).map((e) => ({
-        loc: `${BASE_URL}/?entrada=${e.id}`,
-        lastmod: e.atualizado_em ? new Date(e.atualizado_em).toISOString().slice(0, 10) : undefined,
-        changefreq: 'weekly',
-        priority: '0.7',
-      })),
-      ...artigosUnicos.map((a) => {
-        const sufixo = a.titulo?.match(REGEX_SUFIXO)?.[1]
-        return {
-          loc: `${BASE_URL}/?lei=${a.codigo}&art=${a.numero}${sufixo ? `-${sufixo}` : ''}`,
-          changefreq: 'monthly',
-          priority: '0.5',
-        }
-      }),
-    ]
-
-    const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url>
-    <loc>${escapeXml(u.loc)}</loc>${u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : ''}
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
-  </url>`).join('\n')}
-</urlset>
-`
     res.setHeader('Content-Type', 'application/xml; charset=utf-8')
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400')
-    return res.status(200).send(body)
+    return res.status(200).send(gerarSitemapXml())
   }
 
   const { codigo, numero, q } = req.query
