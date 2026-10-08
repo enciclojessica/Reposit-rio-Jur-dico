@@ -1098,14 +1098,14 @@ case VIEWS.JURISPRUDENCIA:
               <>
                 {isOwner && entradas.length > 0 && (
                   <button onClick={exportarTesesPlanilha} disabled={exportandoTeses} title="Exportar planilha"
-                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Download size={13} /> {exportandoTeses ? 'Exportando...' : 'Exportar'}
+                    style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '9px 14px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Download size={15} strokeWidth={1.75} aria-hidden="true" /> {exportandoTeses ? 'Exportando...' : 'Exportar'}
                   </button>
                 )}
                 {isAdmin && (
                   <button onClick={() => setConfirmLimpar(true)} title="Limpar repositório"
-                    style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 10px', color: theme.error, cursor: 'pointer', fontSize: 12, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Trash2 size={13} />
+                    style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '9px 12px', color: theme.error, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Trash2 size={15} strokeWidth={1.75} aria-hidden="true" />
                   </button>
                 )}
                 <SeletorTema />

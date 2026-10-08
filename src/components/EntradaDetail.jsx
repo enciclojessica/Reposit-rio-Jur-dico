@@ -222,11 +222,12 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
     if (!error) setPublica(false)
   }
 
+  // Mesmo desenho do botão neutro do app de questões: fundo cinza-claro, borda fina, 13px em peso 600.
   const btn = (destaque) => ({
-    border: `1px solid ${destaque || theme.border}`, borderRadius: 6, padding: '8px 14px',
-    fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-    display: 'flex', alignItems: 'center', gap: 6,
-    background: 'transparent', color: theme.textSub,
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+    border: `1px solid ${destaque || theme.border}`, borderRadius: 6, padding: '10px 18px',
+    fontSize: 13, fontWeight: 600, lineHeight: 1.2, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+    background: theme.btnMutedBg, color: theme.text,
   })
 
   const label = { fontSize: 12, fontWeight: 500, color: theme.textSub, fontFamily: theme.fontSerif, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }
@@ -298,15 +299,15 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
       <div className="no-print" style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         {!readOnly && iasPendente && (
           <button onClick={confirmarRevisaoIA} title="Marca essa entrada como já revisada, tira o aviso de pendente"
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.gold}66`, borderRadius: 20, padding: '4px 12px', fontSize: 12, color: theme.gold, cursor: 'pointer', fontFamily: theme.fontSerif }}>
-            <Check size={13} /> Marcar como revisado
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: theme.bg, border: `1px solid ${theme.gold}66`, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 500, color: theme.gold, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+            <Check size={16} /> Marcar como revisado
           </button>
         )}
         {/* Status */}
         {!readOnly && (
           <div style={{ position: 'relative' }}>
             <span onClick={() => setShowStatus(m => !m)}
-              style={{ color: sm.cor, border: `1px solid ${sm.cor}55`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontFamily: theme.fontSerif, cursor: 'pointer', userSelect: 'none', display: 'inline-block' }}>
+              style={{ background: theme.bg, color: sm.cor, border: `1px solid ${sm.cor}55`, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 500, fontFamily: 'Inter, sans-serif', cursor: 'pointer', userSelect: 'none', display: 'inline-block' }}>
               {sm.label}
             </span>
             {showStatus && (
@@ -315,7 +316,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
                   <button key={k} onClick={() => alterarStatus(k)}
                     style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: status === k ? meta.cor+'14' : 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: status === k ? meta.cor : theme.text, fontFamily: theme.fontSerif, textAlign: 'left' }}>
                     {meta.label}
-                    {status === k && <Check size={13} style={{ marginLeft: 'auto' }} />}
+                    {status === k && <Check size={16} style={{ marginLeft: 'auto' }} />}
                   </button>
                 ))}
               </div>
@@ -326,28 +327,28 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
         {onAlternarFavorito && (
           <button onClick={() => onAlternarFavorito(entry.id)}
             title={favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-            style={{ ...btn(favorito ? theme.gold : theme.border), color: favorito ? theme.gold : theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Star size={13} fill={favorito ? theme.gold : 'none'} /> {favorito ? 'Favorito' : 'Favoritar'}
+            style={{ ...btn(favorito ? theme.gold : theme.border), color: favorito ? theme.gold : theme.text }}>
+            <Star size={16} fill={favorito ? theme.gold : 'none'} /> {favorito ? 'Favorito' : 'Favoritar'}
           </button>
         )}
 
         {onComparar && (
-          <button onClick={() => onComparar(entry)} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <ArrowLeftRight size={13} /> Comparar
+          <button onClick={() => onComparar(entry)} style={{ ...btn() }}>
+            <ArrowLeftRight size={16} /> Comparar
           </button>
         )}
 
-        <button onClick={() => window.print()} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Printer size={13} /> Exportar PDF
+        <button onClick={() => window.print()} style={{ ...btn() }}>
+          <Printer size={16} /> Exportar PDF
         </button>
 
         {onAlternarModoFoco && (
-          <button onClick={onAlternarModoFoco} style={{ ...btn(), color: theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Maximize2 size={13} /> Modo de leitura
+          <button onClick={onAlternarModoFoco} style={{ ...btn() }}>
+            <Maximize2 size={16} /> Modo de leitura
           </button>
         )}
 
-        <button onClick={copyFichamento} style={{ ...btn(), color: copied ? theme.success : theme.textSub }}>
+        <button onClick={copyFichamento} style={{ ...btn(), color: copied ? theme.success : theme.text }}>
           {copied ? 'Copiado' : 'Fichamento'}
         </button>
 
@@ -355,7 +356,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           <button onClick={copyAbnt}
             onMouseEnter={() => setShowPreviewAbnt(true)}
             onMouseLeave={() => setShowPreviewAbnt(false)}
-            style={{ ...btn(), color: copiedAbnt ? theme.success : theme.gold }}>
+            style={{ ...btn(), color: copiedAbnt ? theme.success : theme.text }}>
             {copiedAbnt ? 'Copiado' : 'ABNT'}
           </button>
           {showPreviewAbnt && abnt && (
@@ -366,13 +367,13 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           )}
         </div>
 
-        <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.textSub, display: 'flex', alignItems: 'center', gap: 6 }}>
-          {linkCopiado ? <><Check size={13} /> Copiado</> : <><Link2 size={13} /> Compartilhar</>}
+        <button onClick={compartilhar} style={{ ...btn(), color: linkCopiado ? theme.success : theme.text }}>
+          {linkCopiado ? <><Check size={16} /> Copiado</> : <><Link2 size={16} /> Compartilhar</>}
         </button>
         {publica && (
           <button onClick={tornarPrivada} title="Qualquer pessoa com o link ainda consegue acessar até você tornar privada de novo"
-            style={{ ...btn(theme.success), fontSize: 11, color: theme.success, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Unlock size={12} /> Pública, tornar privada
+            style={{ ...btn(theme.success), fontSize: 12, color: theme.success }}>
+            <Unlock size={16} /> Pública, tornar privada
           </button>
         )}
         {erroCompartilhar && (

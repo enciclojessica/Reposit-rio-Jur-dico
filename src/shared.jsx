@@ -156,11 +156,12 @@ export function BtnGold({ onClick, children, disabled, style = {} }) {
       style={{
         background: disabled ? theme.border : theme.gold,
         color: disabled ? theme.muted : '#fdfbf7',
-        border: 'none',
+        border: `1px solid ${disabled ? theme.border : 'transparent'}`,
         borderRadius: 6,
-        padding: '10px 20px',
+        padding: '10px 18px',
         fontSize: 13,
         fontWeight: 600,
+        lineHeight: 1.2,
         fontFamily: "'Inter', system-ui, sans-serif",
         cursor: disabled ? 'not-allowed' : 'pointer',
         ...style,
@@ -175,12 +176,14 @@ export function BtnMuted({ onClick, children, style = {} }) {
     <button
       onClick={onClick}
       style={{
-        background: 'transparent',
-        color: theme.textSub,
+        background: theme.btnMutedBg,
+        color: theme.text,
         border: `1px solid ${theme.border}`,
         borderRadius: 6,
-        padding: '10px 16px',
+        padding: '10px 18px',
         fontSize: 13,
+        fontWeight: 600,
+        lineHeight: 1.2,
         fontFamily: "'Inter', system-ui, sans-serif",
         cursor: 'pointer',
         ...style,
