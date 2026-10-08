@@ -156,8 +156,8 @@ function PainelCitacoes({ entradas, editorRef, conteudo, setConteudo, rito }) {
         <button onClick={sugerirParaTrecho} disabled={sugerindo || !conteudo.trim()} style={{
           width: '100%', background: sugerindo ? theme.border : theme.gold,
           color: sugerindo ? theme.muted : (theme.isDark ? '#0f0a0b' : '#fff'),
-          border: 'none', borderRadius: 6, padding: '8px 0', fontSize: 11, fontWeight: 600,
-          cursor: sugerindo ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600,
+          cursor: sugerindo ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           fontFamily: 'Inter, sans-serif',
         }}>
           {sugerindo ? <><RotateCcw size={12} style={{ animation: 'spin 1s linear infinite' }} /> Analisando...</> : <><Sparkles size={12} /> Sugerir para este trecho</>}
@@ -217,7 +217,7 @@ function ModalRascunhos({ rascunhos, atualId, onCarregar, onNovo, onExcluir, onF
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', borderBottom: `1px solid ${theme.border}` }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: theme.gold, fontFamily: 'Inter, sans-serif' }}>Rascunhos</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={onNovo} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>+ Novo</button>
+            <button onClick={onNovo} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>+ Novo</button>
             <button onClick={onFechar} aria-label="Fechar" style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer' }}><X size={18} /></button>
           </div>
         </div>
@@ -602,11 +602,11 @@ export default function EditorPecas({ entradas, session }) {
                     {NOME_CODIGO[artigoSugestao.codigo]}
                   </div>
                   <button onClick={completarCitacaoArtigo}
-                    style={{ width: '100%', background: theme.gold, border: 'none', color: theme.isDark ? '#0f0a0b' : '#fff', borderRadius: 6, padding: '7px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
+                    style={{ width: '100%', background: theme.gold, border: 'none', color: theme.isDark ? '#0f0a0b' : '#fff', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
                     Completar citação
                   </button>
                   <button onClick={() => setArtigoSugestao(s => ({ ...s, textoAberto: !s.textoAberto }))}
-                    style={{ width: '100%', background: 'none', border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 6, padding: '6px 10px', fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                    style={{ width: '100%', background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                     {artigoSugestao.textoAberto ? 'Ocultar texto' : 'Ver texto do artigo'}
                   </button>
                   {artigoSugestao.textoAberto && (

@@ -181,7 +181,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
     return { total, porArea, porTipo, meses, topFontes, lacunas, totalTeses, recentes, maisUsadas }
   }, [entradas, theme])
 
-  const card = { background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 10, padding: 18 }
+  const card = { background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 18 }
   const secLabel = { fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 16 }
 
   return (

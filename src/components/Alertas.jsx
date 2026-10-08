@@ -215,7 +215,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
             </div>
           </div>
           <button onClick={dispararRadarAgora} disabled={disparando}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: disparando ? theme.border : theme.gold, border: 'none', color: disparando ? theme.muted : '#0b0f1a', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: disparando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 8, background: disparando ? theme.border : theme.gold, border: 'none', color: disparando ? theme.muted : '#0b0f1a', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: disparando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0 }}>
             <RefreshCw size={13} style={{ animation: disparando ? 'spin 1s linear infinite' : 'none' }} />
             {disparando ? 'Verificando...' : 'Disparar agora'}
           </button>
@@ -329,8 +329,8 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
             <button onClick={adicionar} disabled={salvando || !tema.trim() || !email.trim()} style={{
               background: salvando || !tema.trim() || !email.trim() ? theme.border : theme.gold,
               color: salvando || !tema.trim() || !email.trim() ? theme.muted : (theme.isDark ? '#0f0a0b' : '#fff'),
-              border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6,
+              border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <Bell size={14} /> {salvando ? 'Salvando...' : 'Cadastrar alerta'}
             </button>

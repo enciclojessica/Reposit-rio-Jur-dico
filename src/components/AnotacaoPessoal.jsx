@@ -168,7 +168,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
   return (
     <div style={{ marginTop: 10 }}>
       <button onClick={() => setAberto(a => !a)}
-        style={{ fontSize: 12, background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, color: nota ? theme.gold : theme.muted, padding: '5px 12px', cursor: 'pointer', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 5 }}>
+        style={{ fontSize: 13, lineHeight: 1.2, fontWeight: 600, background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, color: nota ? theme.gold : theme.text, padding: '10px 18px', cursor: 'pointer', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 8 }}>
         <PenLine size={11} /> {carregando ? 'Carregando…' : (nota ? 'Ver anotação' : 'Adicionar anotação')}
       </button>
       {aberto && !carregando && (

@@ -147,7 +147,7 @@ export default function SinoNotificacoes({ session, onNavegar, onAbrirEntrada, c
           position: 'absolute', top: 'calc(100% + 8px)', right: 0,
           width: 340, maxHeight: 480,
           background: theme.surface, border: `1px solid ${theme.borderGold}`,
-          borderRadius: 14, boxShadow: theme.shadow,
+          borderRadius: 12, boxShadow: theme.shadow,
           display: 'flex', flexDirection: 'column',
           zIndex: 300, overflow: 'hidden',
           animation: 'fadeUp .15s ease',

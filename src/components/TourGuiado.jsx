@@ -91,7 +91,7 @@ export default function TourGuiado({ isMobile, isEditor, onFechar }) {
       <div style={{ position: 'fixed', inset: 0, zIndex: 600 }} onClick={avancar} />
 
       <div ref={tooltipRef} style={tooltipStyle} onClick={e => e.stopPropagation()}>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.borderGold}`, borderRadius: 10, padding: 18, boxShadow: '0 12px 32px #00000055' }}>
+        <div style={{ background: theme.surface, border: `1px solid ${theme.borderGold}`, borderRadius: 12, padding: 18, boxShadow: '0 12px 32px #00000055' }}>
           <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif, marginBottom: 6 }}>
             {indice + 1} de {passos.length}
           </div>
@@ -107,11 +107,11 @@ export default function TourGuiado({ isMobile, isEditor, onFechar }) {
             </button>
             <div style={{ display: 'flex', gap: 8 }}>
               {indice > 0 && (
-                <button onClick={voltar} style={{ background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: theme.text, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                <button onClick={voltar} style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', color: theme.text, fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                   Voltar
                 </button>
               )}
-              <button onClick={avancar} style={{ background: theme.gold, border: 'none', borderRadius: 6, padding: '6px 14px', color: theme.isDark ? '#2c241b' : '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              <button onClick={avancar} style={{ background: theme.gold, border: 'none', borderRadius: 6, padding: '10px 18px', color: theme.isDark ? '#2c241b' : '#fff', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 {indice === passos.length - 1 ? 'Concluir' : 'Próximo'}
               </button>
             </div>

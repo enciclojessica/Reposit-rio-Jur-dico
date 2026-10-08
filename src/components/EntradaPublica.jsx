@@ -137,10 +137,10 @@ export default function EntradaPublica({ entradaId, onFechar }) {
 
             {/* Botões */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 28, flexWrap: 'wrap' }}>
-              <button onClick={copiarFichamento} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: copiado ? theme.success : theme.textSub, borderRadius: 6, padding: '8px 14px', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif' }}>
+              <button onClick={copiarFichamento} style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: copiado ? theme.success : theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Inter, sans-serif' }}>
                 {copiado ? <Check size={13} /> : <Copy size={13} />} {copiado ? 'Copiado' : 'Copiar fichamento'}
               </button>
-              <button onClick={copiarABNT} style={{ background: 'transparent', border: `1px solid ${theme.border}`, color: copiadoABNT ? theme.success : theme.gold, borderRadius: 6, padding: '8px 14px', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif' }}>
+              <button onClick={copiarABNT} style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: copiadoABNT ? theme.success : theme.gold, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Inter, sans-serif' }}>
                 {copiadoABNT ? <Check size={13} /> : <Copy size={13} />} {copiadoABNT ? 'Copiado' : 'Copiar ABNT'}
               </button>
               {entry.url && (

@@ -94,10 +94,10 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
             </span>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={compartilharLink} style={{ background: 'transparent', color: linkCopiado ? theme.success : theme.gold, border: `1px solid ${linkCopiado ? theme.success : theme.border}`, borderRadius: 6, padding: '6px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button onClick={compartilharLink} style={{ background: theme.btnMutedBg, color: linkCopiado ? theme.success : theme.gold, border: `1px solid ${linkCopiado ? theme.success : theme.border}`, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
               {linkCopiado ? <><Check size={13} /> Copiado</> : <><Link2 size={13} /> Compartilhar</>}
             </button>
-            <button onClick={copiar} style={{ background: 'transparent', color: copiado ? theme.success : theme.textSub, border: `1px solid ${copiado ? theme.success : theme.border}`, borderRadius: 6, padding: '6px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button onClick={copiar} style={{ background: theme.btnMutedBg, color: copiado ? theme.success : theme.text, border: `1px solid ${copiado ? theme.success : theme.border}`, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
               {copiado ? <><Check size={13} /> Copiado</> : <><Copy size={13} /> Copiar</>}
             </button>
             <button onClick={onFechar} style={{ background: 'none', border: 'none', color: theme.muted, cursor: 'pointer', fontSize: 22, lineHeight: 1, padding: '0 4px' }}>×</button>
@@ -475,7 +475,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
           <button
             onClick={exportarPlanilha}
             disabled={exportando}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '8px 14px', color: exportando ? theme.muted : theme.gold, fontSize: 13, cursor: exportando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0 }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 8, background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', color: exportando ? theme.muted : theme.gold, fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: exportando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0 }}>
             <Download size={13} />
             {exportando ? 'Gerando…' : 'Exportar .csv'}
           </button>
@@ -545,9 +545,9 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
                 onClick={carregarMais}
                 disabled={carregandoMais}
                 style={{
-                  marginTop: 8, padding: '10px 16px', borderRadius: 6,
-                  border: `1px solid ${theme.gold}`, background: 'transparent',
-                  color: theme.gold, fontSize: 13, fontFamily: "'Inter', sans-serif",
+                  marginTop: 8, padding: '10px 18px', borderRadius: 6,
+                  border: `1px solid ${theme.gold}`, background: theme.btnMutedBg,
+                  color: theme.gold, fontSize: 13, lineHeight: 1.2, fontWeight: 600, fontFamily: "'Inter', sans-serif",
                   cursor: carregandoMais ? 'default' : 'pointer', opacity: carregandoMais ? 0.6 : 1,
                 }}>
                 {carregandoMais ? 'Carregando…' : `Carregar mais (${totalResultados - artigos.length} restantes)`}

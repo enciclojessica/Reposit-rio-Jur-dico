@@ -694,9 +694,9 @@ async function handleSave(entry) {
     <div>
       <button onClick={() => setShowLogin(false)} style={{
         position: 'fixed', top: 16, left: 16, zIndex: 200,
-        background: theme.raised, border: `1px solid ${theme.border}`,
-        borderRadius: 8, padding: '8px 14px', color: theme.muted,
-        fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif",
+        background: theme.btnMutedBg, border: `1px solid ${theme.border}`,
+        borderRadius: 6, padding: '10px 18px', color: theme.text,
+        fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif",
       }}>← Voltar</button>
       <Auth conviteToken={conviteToken} telaInicial={telaAuthInicial} />
     </div>
@@ -1098,13 +1098,13 @@ case VIEWS.JURISPRUDENCIA:
               <>
                 {isOwner && entradas.length > 0 && (
                   <button onClick={exportarTesesPlanilha} disabled={exportandoTeses} title="Exportar planilha"
-                    style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '9px 14px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', color: exportandoTeses ? theme.muted : theme.text, cursor: exportandoTeses ? 'not-allowed' : 'pointer', fontSize: 13, lineHeight: 1.2, fontWeight: 600, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Download size={15} strokeWidth={1.75} aria-hidden="true" /> {exportandoTeses ? 'Exportando...' : 'Exportar'}
                   </button>
                 )}
                 {isAdmin && (
                   <button onClick={() => setConfirmLimpar(true)} title="Limpar repositório"
-                    style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '9px 12px', color: theme.error, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}>
+                    style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', color: theme.error, cursor: 'pointer', fontSize: 13, lineHeight: 1.2, fontWeight: 600, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Trash2 size={15} strokeWidth={1.75} aria-hidden="true" />
                   </button>
                 )}
@@ -1137,16 +1137,16 @@ case VIEWS.JURISPRUDENCIA:
                   </div>
                 </div>
                 <button onClick={() => { logoutManualRef.current = true; supabase.auth.signOut() }} title="Sair"
-                  style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '9px 14px', color: theme.text, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', color: theme.text, cursor: 'pointer', fontSize: 13, lineHeight: 1.2, fontWeight: 600, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <LogOut size={15} strokeWidth={1.75} aria-hidden="true" /> Sair
                 </button>
               </>
             ) : (
               <button onClick={() => setShowLogin(true)} style={{
                 background: theme.gold, color: '#fff', border: 'none',
-                borderRadius: 8, padding: '7px 18px', fontSize: 12, fontWeight: 600,
+                borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-                display: 'flex', alignItems: 'center', gap: 6,
+                display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 <Lock size={13} /> Acesso Interno
               </button>
@@ -1197,11 +1197,11 @@ case VIEWS.JURISPRUDENCIA:
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               <button onClick={() => setConfirmLimpar(false)}
-                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 22px', cursor: 'pointer', fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
+                style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', cursor: 'pointer', fontSize: 13, lineHeight: 1.2, fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
                 Cancelar
               </button>
               <button onClick={limparTodoRepositorio} disabled={limpandoRepo}
-                style={{ background: (mode === 'dark' ? '#2a0f10' : '#fff0f0'), border: `1px solid ${theme.penal}`, color: theme.penal, borderRadius: 8, padding: '10px 22px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif" }}>
+                style={{ background: (mode === 'dark' ? '#2a0f10' : '#fff0f0'), border: `1px solid ${theme.penal}`, color: theme.penal, borderRadius: 6, padding: '10px 18px', cursor: limpandoRepo ? 'not-allowed' : 'pointer', fontSize: 13, lineHeight: 1.2, fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
                 {limpandoRepo ? 'Limpando...' : 'Confirmar exclusão'}
               </button>
             </div>

@@ -196,8 +196,8 @@ export default function ImportarLegislacao() {
           </div>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-            <button onClick={reiniciar} style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>Cancelar</button>
-            <button onClick={importar} disabled={!linhas.length} style={{ background: theme.gold, color: '#fdfbf7', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
+            <button onClick={reiniciar} style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>Cancelar</button>
+            <button onClick={importar} disabled={!linhas.length} style={{ background: theme.gold, color: '#fdfbf7', border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
               Importar {linhas.length} artigo{linhas.length !== 1 ? 's' : ''}
             </button>
           </div>
@@ -232,7 +232,7 @@ export default function ImportarLegislacao() {
           <div style={{ fontSize: 12, color: theme.muted, marginBottom: 20 }}>
             Use /cpc 300 no Editor de Peças para inserir artigos
           </div>
-          <button onClick={reiniciar} style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
+          <button onClick={reiniciar} style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
             Importar mais
           </button>
         </div>

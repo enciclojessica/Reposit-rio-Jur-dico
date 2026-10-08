@@ -223,7 +223,7 @@ export default function ImportacaoLote({ session }) {
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={gerarTemplate}
-                style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+                style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Download size={14} /> Template
               </button>
               <label style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 24px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
@@ -234,7 +234,7 @@ export default function ImportacaoLote({ session }) {
           </div>
 
           {erroArquivo && (
-            <div style={{ background: mode === 'dark' ? '#3b0f0f' : '#fef2f2', border: `1px solid ${theme.error}`, borderRadius: 10, padding: 14, fontSize: 13, color: theme.error }}>
+            <div style={{ background: mode === 'dark' ? '#3b0f0f' : '#fef2f2', border: `1px solid ${theme.error}`, borderRadius: 12, padding: 14, fontSize: 13, color: theme.error }}>
               ✕ {erroArquivo}
             </div>
           )}
@@ -339,11 +339,11 @@ export default function ImportacaoLote({ session }) {
 
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             <button onClick={reiniciar}
-              style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '10px 20px', fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
               ← Cancelar
             </button>
             <button onClick={importar} disabled={validas === 0}
-              style={{ background: validas === 0 ? theme.border : theme.gold, color: validas === 0 ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: validas === 0 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              style={{ background: validas === 0 ? theme.border : theme.gold, color: validas === 0 ? theme.muted : '#0b0f1a', border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: validas === 0 ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif' }}>
               Importar {validas} entrada{validas !== 1 ? 's' : ''}
             </button>
           </div>
@@ -392,7 +392,7 @@ export default function ImportacaoLote({ session }) {
           )}
 
           <button onClick={reiniciar}
-            style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginTop: 20 }}>
+            style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', marginTop: 20 }}>
             Importar mais
           </button>
         </div>

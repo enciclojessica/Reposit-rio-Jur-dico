@@ -136,10 +136,10 @@ export default function ComparadorTeses({ entradas, prefilA }) {
         </div>
         {a && b && (
           <button onClick={copiarComparacao} style={{
-            background: 'transparent', border: `1px solid ${copiado ? theme.success : theme.border}`,
-            color: copiado ? theme.success : theme.textSub, borderRadius: 6, padding: '7px 12px',
-            fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-            display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap',
+            background: theme.btnMutedBg, border: `1px solid ${copiado ? theme.success : theme.border}`,
+            color: copiado ? theme.success : theme.text, borderRadius: 6, padding: '10px 18px',
+            fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+            display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, whiteSpace: 'nowrap',
           }}>
             {copiado ? <Check size={13} /> : <Copy size={13} />} {copiado ? 'Copiado' : 'Copiar comparação'}
           </button>

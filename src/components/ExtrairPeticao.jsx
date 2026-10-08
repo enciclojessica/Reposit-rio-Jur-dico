@@ -307,11 +307,11 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                 <button onClick={reiniciar}
-                  style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '9px 18px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                   Trocar
                 </button>
                 <button onClick={processar}
-                  style={{ background: theme.gold, border: 'none', color: '#fff', borderRadius: 8, padding: '9px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  style={{ background: theme.gold, border: 'none', color: '#fff', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                   Extrair e salvar
                 </button>
               </div>
@@ -452,7 +452,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             </div>
           )}
           <button onClick={reiniciar}
-            style={{ background: theme.gold, border: 'none', color: '#fff', borderRadius: 8, padding: '10px 24px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+            style={{ background: theme.gold, border: 'none', color: '#fff', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
             Processar outra petição
           </button>
         </div>
@@ -469,7 +469,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             {erro}
           </div>
           <button onClick={reiniciar}
-            style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.muted, borderRadius: 8, padding: '8px 16px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+            style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
             Tentar novamente
           </button>
         </div>

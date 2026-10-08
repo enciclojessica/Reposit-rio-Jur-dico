@@ -31,7 +31,7 @@ export function ResultadoFts({ entradas, theme, onAbrir }) {
           onKeyDown={onAbrir ? (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); onAbrir(e) } } : undefined}
           style={{
             background: theme.cardBg, border: `1px solid ${theme.border}`,
-            borderRadius: 10, padding: 14,
+            borderRadius: 12, padding: 14,
             cursor: onAbrir ? 'pointer' : 'default',
           }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -199,10 +199,10 @@ export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
                 background: buscandoFts || !query.trim() ? theme.raised : theme.gold,
                 color: buscandoFts || !query.trim() ? theme.muted : '#fdfbf7',
                 border: 'none', borderRadius: 6, padding: '10px 18px',
-                fontSize: 13, fontWeight: 600,
+                fontSize: 13, lineHeight: 1.2, fontWeight: 600,
                 fontFamily: 'Inter, sans-serif',
                 cursor: buscandoFts || !query.trim() ? 'not-allowed' : 'pointer',
-                display: 'flex', alignItems: 'center', gap: 6,
+                display: 'flex', alignItems: 'center', gap: 8,
               }}>
               {buscandoFts ? <><RefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> Buscando…</> : <><Search size={13} /> Buscar</>}
             </button>
@@ -216,7 +216,7 @@ export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
                   : (loadingIA || !query.trim() ? theme.raised : theme.gold),
                 color: !podeUsarIA || loadingIA || !query.trim() ? theme.muted : '#fdfbf7',
                 border: 'none', borderRadius: 6, padding: '10px 18px',
-                fontSize: 13, fontWeight: 600,
+                fontSize: 13, lineHeight: 1.2, fontWeight: 600,
                 fontFamily: 'Inter, sans-serif',
                 cursor: (!podeUsarIA || loadingIA || !query.trim()) ? 'not-allowed' : 'pointer',
                 opacity: podeUsarIA ? 1 : 0.6,
@@ -282,10 +282,10 @@ export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
                 ? (mode === 'dark' ? '#0f2b1a' : '#f0fdf4')
                 : theme.raised,
               border: `1px solid ${copied ? theme.success : theme.border}`,
-              color: copied ? theme.success : theme.muted,
-              borderRadius: 6, padding: '6px 12px', fontSize: 12,
+              color: copied ? theme.success : theme.text,
+              borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'Inter, sans-serif',
-              display: 'flex', alignItems: 'center', gap: 5,
+              display: 'flex', alignItems: 'center', gap: 8,
             }}>
               {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? 'Copiado' : 'Copiar'}
             </button>

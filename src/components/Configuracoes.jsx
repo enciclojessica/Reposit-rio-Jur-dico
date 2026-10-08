@@ -138,7 +138,7 @@ function TabPerfil({ session, membro }) {
             )}
           </div>
           <div>
-            <button onClick={() => fileRef.current?.click()} disabled={uploading} style={{ background: theme.raised, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 8, padding: '8px 16px', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'Inter, sans-serif' }}>
+            <button onClick={() => fileRef.current?.click()} disabled={uploading} style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, color: theme.text, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Inter, sans-serif' }}>
               <Upload size={13} /> {uploading ? 'Enviando...' : 'Enviar foto'}
             </button>
             <div style={{ fontSize: 11, color: theme.muted, marginTop: 4, fontFamily: 'Inter, sans-serif' }}>JPG, PNG ou GIF · máx. 2MB</div>
@@ -174,7 +174,7 @@ function TabPerfil({ session, membro }) {
         </div>
       )}
 
-      <button onClick={salvar} disabled={salvando} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+      <button onClick={salvar} disabled={salvando} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
         {salvando ? 'Salvando...' : 'Salvar perfil'}
       </button>
     </div>
@@ -213,7 +213,7 @@ function TabPreferencias({ session, membro }) {
   return (
     <div style={{ maxWidth: 520 }}>
       <Campo label="Boletim semanal">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '14px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '14px 16px' }}>
           <div>
             <div style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: 'Inter, sans-serif', marginBottom: 2 }}>Receber boletim semanal</div>
             <div style={{ fontSize: 12, color: theme.muted, fontFamily: 'Inter, sans-serif' }}>Resumo das teses adicionadas nos últimos 7 dias, toda segunda-feira.</div>
@@ -242,7 +242,7 @@ function TabPreferencias({ session, membro }) {
         </div>
       )}
 
-      <button onClick={alterarSenha} disabled={salvando || !senha} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+      <button onClick={alterarSenha} disabled={salvando || !senha} style={{ background: theme.gold, color: theme.isDark ? '#0f0a0b' : '#fff', border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
         {salvando ? 'Alterando...' : 'Alterar senha'}
       </button>
     </div>
@@ -419,8 +419,8 @@ function TabBackup({ session, entradas }) {
             display: 'flex', alignItems: 'center', gap: 8,
             background: status === 'carregando' ? theme.border : theme.gold,
             color: status === 'carregando' ? theme.muted : '#0b0f1a',
-            border: 'none', borderRadius: 8, padding: '10px 20px',
-            fontSize: 13, fontWeight: 600, cursor: status === 'carregando' ? 'not-allowed' : 'pointer',
+            border: 'none', borderRadius: 6, padding: '10px 18px',
+            fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: status === 'carregando' ? 'not-allowed' : 'pointer',
             fontFamily: 'Inter, sans-serif',
           }}>
           <Download size={14} />
@@ -438,10 +438,10 @@ function TabBackup({ session, entradas }) {
             disabled={statusRestaurar === 'carregando'}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              background: 'transparent',
+              background: theme.btnMutedBg,
               color: statusRestaurar === 'carregando' ? theme.muted : theme.gold,
-              border: `1px solid ${statusRestaurar === 'carregando' ? theme.border : theme.gold}`, borderRadius: 8, padding: '9px 18px',
-              fontSize: 13, fontWeight: 600, cursor: statusRestaurar === 'carregando' ? 'not-allowed' : 'pointer',
+              border: `1px solid ${statusRestaurar === 'carregando' ? theme.border : theme.gold}`, borderRadius: 6, padding: '10px 18px',
+              fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: statusRestaurar === 'carregando' ? 'not-allowed' : 'pointer',
               fontFamily: 'Inter, sans-serif',
             }}>
             <Upload size={14} />
@@ -475,8 +475,8 @@ function TabBackup({ session, entradas }) {
             display: 'flex', alignItems: 'center', gap: 8,
             background: statusNotas === 'carregando' ? theme.border : theme.gold,
             color: statusNotas === 'carregando' ? theme.muted : '#0b0f1a',
-            border: 'none', borderRadius: 8, padding: '10px 20px',
-            fontSize: 13, fontWeight: 600, cursor: statusNotas === 'carregando' ? 'not-allowed' : 'pointer',
+            border: 'none', borderRadius: 6, padding: '10px 18px',
+            fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: statusNotas === 'carregando' ? 'not-allowed' : 'pointer',
             fontFamily: 'Inter, sans-serif',
           }}>
           <Download size={14} />
@@ -518,8 +518,8 @@ function TabBackup({ session, entradas }) {
             display: 'flex', alignItems: 'center', gap: 8,
             background: statusRascunhos === 'carregando' ? theme.border : theme.gold,
             color: statusRascunhos === 'carregando' ? theme.muted : '#0b0f1a',
-            border: 'none', borderRadius: 8, padding: '10px 20px',
-            fontSize: 13, fontWeight: 600, cursor: statusRascunhos === 'carregando' ? 'not-allowed' : 'pointer',
+            border: 'none', borderRadius: 6, padding: '10px 18px',
+            fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: statusRascunhos === 'carregando' ? 'not-allowed' : 'pointer',
             fontFamily: 'Inter, sans-serif',
           }}>
           <Download size={14} />
@@ -559,7 +559,7 @@ function TabBackup({ session, entradas }) {
       )}
 
       {/* Instruções */}
-      <div style={{ marginTop: 20, padding: '14px 16px', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 10 }}>
+      <div style={{ marginTop: 20, padding: '14px 16px', background: theme.raised, border: `1px solid ${theme.border}`, borderRadius: 12 }}>
         <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 10 }}>
           Como fazer backup semanal
         </div>

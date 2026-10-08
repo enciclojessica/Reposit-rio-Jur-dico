@@ -82,7 +82,7 @@ export default function InstalarApp() {
     <div style={{
       position: 'fixed', bottom: 70, left: 16, right: 16, zIndex: 150,
       background: theme.surface, border: `1px solid ${theme.borderGold}`,
-      borderRadius: 14, padding: '16px 18px', boxShadow: theme.shadow,
+      borderRadius: 12, padding: '16px 18px', boxShadow: theme.shadow,
       animation: 'fadeUp .3s ease',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
@@ -115,7 +115,7 @@ export default function InstalarApp() {
     <div style={{
       position: 'fixed', bottom: 70, left: 16, right: 16, zIndex: 150,
       background: theme.surface, border: `1px solid ${theme.borderGold}`,
-      borderRadius: 14, padding: '16px 18px', boxShadow: theme.shadow,
+      borderRadius: 12, padding: '16px 18px', boxShadow: theme.shadow,
       animation: 'fadeUp .3s ease',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
@@ -151,7 +151,7 @@ export default function InstalarApp() {
     <div style={{
       position: 'fixed', bottom: 70, left: 16, right: 16, zIndex: 150,
       background: theme.surface, border: `1px solid ${theme.borderGold}`,
-      borderRadius: 14, padding: '14px 16px',
+      borderRadius: 12, padding: '14px 16px',
       boxShadow: theme.shadow, animation: 'fadeUp .3s ease',
       display: 'flex', alignItems: 'center', gap: 14,
     }}>
@@ -166,7 +166,7 @@ export default function InstalarApp() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
         <button onClick={instalar}
-          style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Inter', sans-serif", whiteSpace: 'nowrap' }}>
+          style={{ background: theme.gold, border: 'none', color: '#fdfbf7', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif", whiteSpace: 'nowrap' }}>
           Instalar
         </button>
         <button onClick={() => setVisivel(false)}

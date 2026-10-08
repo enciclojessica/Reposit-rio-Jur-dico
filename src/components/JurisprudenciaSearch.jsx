@@ -230,8 +230,8 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
             style={{
               background: podeUsarIA ? theme.gold : theme.border, border: 'none', borderRadius: 6,
               padding: '10px 18px', cursor: (busca.trim() && podeUsarIA) ? 'pointer' : 'not-allowed',
-              display: 'flex', alignItems: 'center', gap: 6,
-              color: podeUsarIA ? '#fdfbf7' : theme.muted, fontWeight: 600, fontSize: 13,
+              display: 'flex', alignItems: 'center', gap: 8,
+              color: podeUsarIA ? '#fdfbf7' : theme.muted, fontWeight: 600, fontSize: 13, lineHeight: 1.2,
               fontFamily: 'Inter, sans-serif', opacity: (busca.trim() && podeUsarIA) ? 1 : 0.5,
               flexShrink: 0,
             }}>

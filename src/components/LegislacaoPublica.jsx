@@ -93,7 +93,7 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
                   {grupo.titulo || `Art. ${numero}`}
                 </span>
               </div>
-              <button onClick={() => copiar(grupo)} style={{ background: 'transparent', color: copiado ? theme.success : theme.textSub, border: `1px solid ${copiado ? theme.success : theme.border}`, borderRadius: 6, padding: '5px 10px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+              <button onClick={() => copiar(grupo)} style={{ background: theme.btnMutedBg, color: copiado ? theme.success : theme.text, border: `1px solid ${copiado ? theme.success : theme.border}`, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                 {copiado ? <Check size={12} /> : <Copy size={12} />} {copiado ? 'Copiado' : 'Copiar'}
               </button>
             </div>

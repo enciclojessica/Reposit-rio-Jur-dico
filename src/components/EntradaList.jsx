@@ -103,7 +103,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
             { label: 'Importar legislação', aba: 'legislacao' },
           ].map(item => (
             <button key={item.aba} onClick={() => onImportar && onImportar(item.aba)}
-              style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 16px', color: theme.textSub, fontSize: 13, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              style={{ background: theme.btnMutedBg, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', color: theme.text, fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
               {item.label}
             </button>
           ))}
@@ -126,12 +126,12 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
             <>
               {onTornarPublicasMultiple && (
                 <button onClick={confirmarTornarPublicas}
-                  style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.gold}66`, borderRadius: 6, padding: '5px 14px', color: theme.gold, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                  style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, background: theme.btnMutedBg, border: `1px solid ${theme.gold}66`, borderRadius: 6, padding: '10px 18px', color: theme.gold, fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                   <Globe size={13} /> Marcar públicas
                 </button>
               )}
               <button onClick={confirmarExclusao}
-                style={{ marginLeft: onTornarPublicasMultiple ? 0 : 'auto', display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.penal}66`, borderRadius: 6, padding: '5px 14px', color: theme.penal, fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+                style={{ marginLeft: onTornarPublicasMultiple ? 0 : 'auto', display: 'flex', alignItems: 'center', gap: 8, background: theme.btnMutedBg, border: `1px solid ${theme.penal}66`, borderRadius: 6, padding: '10px 18px', color: theme.penal, fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
                 <Trash2 size={13} /> Excluir selecionadas
               </button>
             </>

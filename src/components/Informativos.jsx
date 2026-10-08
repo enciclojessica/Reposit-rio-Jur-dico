@@ -70,10 +70,10 @@ function DecisaoCard({ decisao, onImportar, importada }) {
           background: importada ? (theme.success + '18') : theme.gold,
           color: importada ? theme.success : '#fdfbf7',
           border: `1px solid ${importada ? theme.success + '55' : theme.gold}`,
-          borderRadius: 6, padding: '8px 14px', fontSize: 12, fontWeight: 600,
+          borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600,
           cursor: importada ? 'default' : 'pointer',
           fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
-          display: 'flex', alignItems: 'center', gap: 5,
+          display: 'flex', alignItems: 'center', gap: 8,
         }}>
         {importada ? <><Check size={12} /> Importada</> : <><Plus size={12} /> Importar</>}
       </button>
@@ -215,12 +215,12 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
             onKeyDown={e => e.key === 'Enter' && buscar()}
           />
           <button onClick={buscar} disabled={loading}
-            style={{ background: theme.raised, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 16px', fontSize: 13, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
+            style={{ background: theme.btnMutedBg, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
             <RefreshCw size={13} style={loading ? { animation: 'spin 1s linear infinite' } : undefined} /> Atualizar
           </button>
           {isEditor && (
             <button onClick={autoImportar} disabled={autoImportando}
-              style={{ background: autoImportando ? theme.border : theme.gold, color: autoImportando ? theme.muted : '#fdfbf7', border: 'none', borderRadius: 6, padding: '10px 16px', fontSize: 13, fontWeight: 600, cursor: autoImportando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
+              style={{ background: autoImportando ? theme.border : theme.gold, color: autoImportando ? theme.muted : '#fdfbf7', border: 'none', borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: autoImportando ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Sparkles size={13} /> {autoImportando ? 'Analisando…' : 'Auto-importar relevantes'}
             </button>
           )}
@@ -234,7 +234,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
             ? (mode === 'dark' ? '#3b0f0f' : '#fef2f2')
             : (mode === 'dark' ? '#0f2b1a' : '#f0fdf4'),
           border: `1px solid ${autoResultado.erro ? theme.error : theme.success}`,
-          borderRadius: 10, padding: '12px 16px', marginBottom: 16,
+          borderRadius: 12, padding: '12px 16px', marginBottom: 16,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div>
@@ -262,7 +262,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
 
       {/* Erro */}
       {erro && (
-        <div style={{ background: mode === 'dark' ? '#3b0f0f' : '#fef2f2', border: `1px solid ${theme.error}`, borderRadius: 10, padding: 14, fontSize: 13, color: theme.error, marginBottom: 16 }}>
+        <div style={{ background: mode === 'dark' ? '#3b0f0f' : '#fef2f2', border: `1px solid ${theme.error}`, borderRadius: 12, padding: 14, fontSize: 13, color: theme.error, marginBottom: 16 }}>
           ✕ {erro}
         </div>
       )}
@@ -271,7 +271,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
       {loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[1, 2, 3, 4].map(i => (
-            <div key={i} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 10, padding: 18, opacity: 0.5 }}>
+            <div key={i} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 18, opacity: 0.5 }}>
               <div style={{ height: 10, background: theme.border, borderRadius: 4, width: '30%', marginBottom: 10 }} />
               <div style={{ height: 14, background: theme.border, borderRadius: 4, width: '80%', marginBottom: 8 }} />
               <div style={{ height: 10, background: theme.border, borderRadius: 4, width: '60%' }} />
@@ -284,7 +284,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
       {!loading && dados && (
         <>
           {/* Meta do informativo */}
-          <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 10, padding: '12px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
             <div>
               <span style={{ fontSize: 14, color: theme.text, fontWeight: 600, fontFamily: theme.fontTitle }}>
                 Informativo {dados.tribunal} nº {dados.edicao}

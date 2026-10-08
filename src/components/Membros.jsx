@@ -83,7 +83,7 @@ export default function Membros({ session }) {
 
   const card = {
     background: theme.cardBg, border: `1px solid ${theme.border}`,
-    borderRadius: 10, padding: 20, marginBottom: 16,
+    borderRadius: 12, padding: 20, marginBottom: 16,
   }
 
   const sectionLabel = {
@@ -140,8 +140,8 @@ export default function Membros({ session }) {
           style={{
             background: gerando ? theme.border : theme.gold,
             color: gerando ? theme.muted : '#fdfbf7',
-            border: 'none', borderRadius: 6, padding: '10px 20px',
-            fontSize: 13, fontWeight: 600, cursor: gerando ? 'not-allowed' : 'pointer',
+            border: 'none', borderRadius: 6, padding: '10px 18px',
+            fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: gerando ? 'not-allowed' : 'pointer',
             fontFamily: 'Inter, sans-serif',
           }}>
           {gerando ? 'Gerando…' : 'Gerar link de convite'}
@@ -166,12 +166,12 @@ export default function Membros({ session }) {
                 {linkGerado}
               </div>
               <button onClick={copiarLink} style={{
-                background: 'transparent',
-                color: copiado ? theme.success : theme.textSub,
+                background: theme.btnMutedBg,
+                color: copiado ? theme.success : theme.text,
                 border: `1px solid ${copiado ? theme.success : theme.border}`,
-                borderRadius: 6, padding: '8px 14px', fontSize: 12,
+                borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'Inter, sans-serif', whiteSpace: 'nowrap',
-                display: 'flex', alignItems: 'center', gap: 6,
+                display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 {copiado ? <><Check size={13} /> Copiado</> : <><Copy size={13} /> Copiar</>}
               </button>
@@ -264,9 +264,9 @@ export default function Membros({ session }) {
                   </div>
                 </div>
                 <button onClick={() => revogarConvite(c.id)} style={{
-                  background: 'none', border: `1px solid ${theme.border}`,
-                  color: theme.textSub, borderRadius: 6, padding: '5px 12px',
-                  fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                  background: theme.btnMutedBg, border: `1px solid ${theme.border}`,
+                  color: theme.text, borderRadius: 6, padding: '10px 18px',
+                  fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                 }}>Revogar</button>
               </div>
             ))}
