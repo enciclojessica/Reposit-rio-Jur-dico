@@ -62,8 +62,8 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
 ## Infraestrutura
 
 - GitHub: `enciclojessica/Reposit-rio-Jur-dico` (público). Vercel: `prj_hvj9epzrozqftDYENkITPRPHrZrv`, domínio `themisjur.com.br`.
-- Supabase: ref `wedfgqigtyrsrmmxsmuo`. Tabelas de backup de 02/10/2026 a apagar após validação da Jessica:
-  `legislacao_bkp_cf_adct_20261002`, `legislacao_bkp_oab_20261002`, `legislacao_bkp_ordinais_20261002`, `legislacao_bkp_pre_auditoria_20261002`.
+- Supabase: ref `wedfgqigtyrsrmmxsmuo`. As 4 tabelas de backup de 02/10/2026 (`legislacao_bkp_*`) foram apagadas em 08/10/2026,
+  após validação da Jessica; `legislacao` ficou com 13.781 linhas.
 - Os JSON de carga do repositório de importação (`themis-jur-importacao`) estão no formato antigo; regerar a partir do banco se forem reutilizados.
 - Sessões longas derrubam o conector do Supabase às vezes ("No approval received", "Mcp-Session-Id header is required"): tentar de novo
   ou abrir conversa nova. O terminal em nuvem não alcança `planalto.gov.br`: arquivos de lei precisam ser enviados pela Jessica.
