@@ -225,7 +225,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                       {isAdmin && ['jurisprudência', 'súmula'].includes(e.tipo) && !e.url && (
                         <SemLinkLabel theme={theme} />
                       )}
-                      {tagsVisiveis(e).map(t => <TagPill key={t} tag={t} pequena />)}
+                      {tagsVisiveis(e).map(t => <TagPill key={t} tag={t} />)}
                     </div>
                   )}
                 </div>

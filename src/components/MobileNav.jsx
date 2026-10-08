@@ -3,7 +3,7 @@ import { Home, Sparkles, PenLine, Plus, MoreHorizontal } from 'lucide-react'
 
 export default function MobileNav({
   theme, view, setView, maisAberto, setMaisAberto,
-  isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha, temNovidadeNaoVista,
+  isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha,
 }) {
   // Mesma lógica de compartilhar da Landing (Web Share API no celular,
   // com fallback pra copiar), só que aqui é pra quem já é membro
@@ -39,7 +39,6 @@ export default function MobileNav({
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
     ...(isAdmin  ? [{ v: VIEWS.METRICAS, label: 'Métricas' }] : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
-    ...(session  ? [{ v: VIEWS.NOVIDADES_APP, label: 'O que há de novo', dot: temNovidadeNaoVista }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
     ...(session  ? [{ v: 'compartilhar', label: 'Compartilhar o Themis Jur', action: compartilhar }] : []),
   ]

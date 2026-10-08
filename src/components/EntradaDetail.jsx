@@ -268,7 +268,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10, alignItems: 'center' }}>
           <Badge label={entry.area} color={am.color} />
           <Badge label={entry.tipo} color={theme.muted} />
-          {entry.tags.map(t => <TagPill key={t} tag={t} pequena />)}
+          {entry.tags.map(t => <TagPill key={t} tag={t} />)}
         </div>
         <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1.3, marginBottom: 6 }}>
           {entry.tema}

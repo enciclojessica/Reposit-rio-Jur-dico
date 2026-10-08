@@ -22,5 +22,4 @@ export const TITULOS_VIEWS = {
   [VIEWS.LEGISLACAO]: 'Legislação',
   [VIEWS.EXTRAIR]: 'Extrair',
   [VIEWS.CONFIG]: 'Configurações',
-  [VIEWS.NOVIDADES_APP]: 'O que há de novo',
 }

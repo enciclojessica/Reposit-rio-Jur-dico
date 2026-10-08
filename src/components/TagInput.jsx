@@ -1,37 +1,25 @@
 import { useState, useRef } from 'react'
 import { useTheme } from '../theme'
 
-// Paleta cíclica para tags, derivada da mesma família de cor do resto do
-// app (tinta, vinho, ouro e as cores mutadas de área) — não mais uma
-// paleta genérica de arco-íris sem relação com o tema.
-const TAG_CORES_ESCURO = ['#c9a878', '#a3324f', '#8fb89e', '#c5a05e', '#a89fc9', '#7fb0c9', '#d4a373', '#c98fa3']
-const TAG_CORES_CLARO  = ['#6e5a2c', '#7a1128', '#2c6e5a', '#8a5a2e', '#5a4a7a', '#2c5a6e', '#8a5a2e', '#a34a68']
-
-function corParaTag(tag, isDark) {
-  let hash = 0
-  for (const c of tag) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff
-  const paleta = isDark ? TAG_CORES_ESCURO : TAG_CORES_CLARO
-  return paleta[Math.abs(hash) % paleta.length]
-}
-
-export function TagPill({ tag, onRemove, pequena }) {
-  const { isDark } = useTheme()
-  const cor = corParaTag(tag, isDark)
+// Mesmo desenho do "Chip" do app de questões: neutro, 12px, peso médio, borda fina.
+// As tags não têm cor própria (a cor fica para o que tem significado, como área e status).
+export function TagPill({ tag, onRemove }) {
+  const { theme } = useTheme()
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      background: cor + '12', color: cor,
-      border: `1px solid ${cor}3a`,
-      borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
-      fontSize: pequena ? 10 : 11,
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      background: theme.bg, color: theme.textSub,
+      border: `1px solid ${theme.border}`,
+      borderRadius: 20, padding: '3px 10px',
+      fontSize: 12, fontWeight: 500, lineHeight: 1.5,
       fontFamily: "'Inter', sans-serif",
       whiteSpace: 'nowrap',
     }}>
       #{tag}
       {onRemove && (
-        <button onClick={() => onRemove(tag)} style={{
-          background: 'none', border: 'none', color: cor,
-          cursor: 'pointer', fontSize: 12, lineHeight: 1,
+        <button onClick={() => onRemove(tag)} aria-label={`Remover a tag ${tag}`} style={{
+          background: 'none', border: 'none', color: theme.muted,
+          cursor: 'pointer', fontSize: 14, lineHeight: 1,
           padding: 0, display: 'flex', alignItems: 'center',
         }}>×</button>
       )}

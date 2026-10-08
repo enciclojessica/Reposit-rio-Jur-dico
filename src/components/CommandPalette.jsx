@@ -19,7 +19,6 @@ export default function CommandPalette({ onFechar, setView, isAdmin, isEditor, s
       { label: 'Favoritos', acao: () => setView(VIEWS.FAVORITOS) },
       { label: 'Comparador de teses', acao: () => setView(VIEWS.COMPARAR) },
       { label: 'Alertas', acao: () => setView(VIEWS.ALERTAS) },
-      { label: 'O que há de novo', acao: () => setView(VIEWS.NOVIDADES_APP) },
       { label: 'Configurações', acao: () => setView(VIEWS.CONFIG) },
     ]
     if (isEditor) {

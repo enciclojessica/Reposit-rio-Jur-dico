@@ -198,18 +198,19 @@ export const STATUS_META = {
   superada:    { label: 'Superada',    cor: '#7a1128' },
 }
 
-export function StatusBadge({ status, onClick, pequena }) {
+export function StatusBadge({ status, onClick }) {
+  const { theme } = useTheme()
   const s = STATUS_META[status] || STATUS_META['vigente']
   return (
     <span
       onClick={onClick}
       title={onClick ? 'Clique para alterar o status' : s.label}
       style={{
-        display: 'inline-flex', alignItems: 'center',
-        color: s.cor,
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        background: theme.bg, color: s.cor,
         border: `1px solid ${s.cor}55`,
-        borderRadius: 20, padding: pequena ? '1px 9px' : '3px 11px',
-        fontSize: pequena ? 11 : 12,
+        borderRadius: 20, padding: '3px 10px',
+        fontSize: 12, fontWeight: 500, lineHeight: 1.5,
         fontFamily: "'Inter', sans-serif",
         cursor: onClick ? 'pointer' : 'default',
         userSelect: 'none', whiteSpace: 'nowrap',

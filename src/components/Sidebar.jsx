@@ -1,6 +1,6 @@
 import {
   Home, Library, Sparkles, Globe, BookA, PenLine, GitCompare, Star, Bell,
-  LayoutDashboard, Users, BarChart3, Upload, Settings, Newspaper, Share2, Plus,
+  LayoutDashboard, Users, BarChart3, Upload, Settings, Share2, Plus,
 } from 'lucide-react'
 import { VIEWS } from '../data/views'
 
@@ -40,7 +40,7 @@ function NavBtn({ theme, id, label, onClick, active, dot, Icone }) {
 // conforme especificação. Controles de sessão vivem no header (App.jsx).
 export default function Sidebar({
   theme, view, setView, setAreaFilter, setTipoFilter,
-  isAdmin, isEditor, setPrefillEntry, temNovidadeNaoVista,
+  isAdmin, isEditor, setPrefillEntry,
 }) {
   // Mesma lógica de compartilhar da Landing e do MobileNav — membro já
   // logado convidando outra pessoa.
@@ -107,7 +107,6 @@ export default function Sidebar({
         <SecaoLabel theme={theme}>Sistema</SecaoLabel>
         <NavBtn theme={theme} id="import" Icone={Upload} label="Importar" onClick={() => setView(VIEWS.IMPORTAR)} active={[VIEWS.IMPORTAR, VIEWS.LEGISLACAO, VIEWS.EXTRAIR].includes(view)} />
         <NavBtn theme={theme} id="config" Icone={Settings} label="Configurações" onClick={() => setView(VIEWS.CONFIG)} active={view === VIEWS.CONFIG} />
-        <NavBtn theme={theme} id="novidades_app" Icone={Newspaper} label="O que há de novo" onClick={() => setView(VIEWS.NOVIDADES_APP)} active={view === VIEWS.NOVIDADES_APP} dot={temNovidadeNaoVista} />
         <NavBtn theme={theme} id="compartilhar" Icone={Share2} label="Compartilhar" onClick={compartilhar} active={false} />
 
         {isEditor && (

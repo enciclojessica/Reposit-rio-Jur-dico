@@ -125,7 +125,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
                     {status.label}
                   </span>
                 )}
-                {(entry.tags || []).map(t => <TagPill key={t} tag={t} pequena />)}
+                {(entry.tags || []).map(t => <TagPill key={t} tag={t} />)}
               </div>
               <h1 style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.3, margin: '0 0 8px' }}>
                 {entry.tema}
