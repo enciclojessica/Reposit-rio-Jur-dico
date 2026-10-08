@@ -169,7 +169,7 @@ export default function ImportarLegislacao() {
                 <thead style={{ position: 'sticky', top: 0 }}>
                   <tr>
                     {['Código', 'Art.', 'Inciso', 'Parágrafo', 'Texto (prévia)'].map(h => (
-                      <th key={h} style={{ textAlign: 'left', padding: '8px 12px', background: theme.bg, color: theme.muted, fontSize: 10, fontStyle: 'italic', borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ textAlign: 'left', padding: '8px 12px', background: theme.bg, color: theme.muted, fontSize: 10, borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>

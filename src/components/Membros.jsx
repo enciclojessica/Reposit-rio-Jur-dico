@@ -98,7 +98,7 @@ export default function Membros({ session }) {
   }
 
   if (loading) return (
-    <div style={{ color: theme.muted, padding: 40, textAlign: 'center', fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+    <div style={{ color: theme.muted, padding: 40, textAlign: 'center', fontFamily: theme.fontSerif }}>
       Carregando…
     </div>
   )
@@ -132,7 +132,7 @@ export default function Membros({ session }) {
           </select>
         </div>
 
-        <div style={{ fontSize: 12, color: theme.muted, marginBottom: 14, lineHeight: 1.6, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+        <div style={{ fontSize: 12, color: theme.muted, marginBottom: 14, lineHeight: 1.6, fontFamily: theme.fontSerif }}>
           {ROLE_DESC[novoRole]}
         </div>
 
@@ -153,7 +153,7 @@ export default function Membros({ session }) {
             marginTop: 16, background: mode === 'dark' ? '#0f2b1a' : '#f0fdf4',
             border: `1px solid ${theme.success}`, borderRadius: 8, padding: 14,
           }}>
-            <div style={{ fontSize: 12, color: theme.success, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: theme.success, fontFamily: theme.fontSerif, marginBottom: 8 }}>
               Link gerado, válido por 7 dias
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -187,7 +187,7 @@ export default function Membros({ session }) {
       <div style={card}>
         <div style={sectionLabel}>Membros ativos ({membros.length})</div>
         {membros.length === 0 ? (
-          <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Nenhum membro ainda.</div>
+          <div style={{ color: theme.muted, fontSize: 13, fontFamily: theme.fontSerif }}>Nenhum membro ainda.</div>
         ) : (
           <div>
             {membros.map((m, i) => {
@@ -201,10 +201,10 @@ export default function Membros({ session }) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {m.nome || m.email || m.user_id.slice(0, 8) + '…'}
-                      {ehVoce && <span style={{ fontSize: 11, color: theme.gold, marginLeft: 8, fontStyle: 'italic' }}>(você)</span>}
+                      {ehVoce && <span style={{ fontSize: 11, color: theme.gold, marginLeft: 8 }}>(você)</span>}
                     </div>
                     {m.email && m.nome && (
-                      <div style={{ fontSize: 11, color: theme.muted, marginTop: 2, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                      <div style={{ fontSize: 11, color: theme.muted, marginTop: 2, fontFamily: theme.fontSerif }}>
                         {m.email}{m.telefone ? ` · ${m.telefone}` : ''}
                       </div>
                     )}
@@ -221,7 +221,7 @@ export default function Membros({ session }) {
                         <option value="admin">Admin</option>
                       </select>
                     ) : (
-                      <span style={{ color: ROLE_COR[m.role], fontSize: 12, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                      <span style={{ color: ROLE_COR[m.role], fontSize: 12, fontFamily: theme.fontSerif }}>
                         {ROLE_LABEL[m.role]}
                       </span>
                     )}
@@ -255,11 +255,11 @@ export default function Membros({ session }) {
                 <div>
                   <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif }}>
                     {c.email || 'Sem e-mail'}
-                    <span style={{ marginLeft: 8, color: ROLE_COR[c.role], fontSize: 12, fontStyle: 'italic' }}>
+                    <span style={{ marginLeft: 8, color: ROLE_COR[c.role], fontSize: 12 }}>
                       {ROLE_LABEL[c.role]}
                     </span>
                   </div>
-                  <div style={{ fontSize: 11, color: theme.muted, marginTop: 3, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                  <div style={{ fontSize: 11, color: theme.muted, marginTop: 3, fontFamily: theme.fontSerif }}>
                     Expira em {new Date(c.expires_at).toLocaleDateString('pt-BR')}
                   </div>
                 </div>

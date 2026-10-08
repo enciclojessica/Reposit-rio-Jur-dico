@@ -35,10 +35,10 @@ export function ResultadoFts({ entradas, theme, onAbrir }) {
             cursor: onAbrir ? 'pointer' : 'default',
           }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: 12, fontStyle: 'italic', color: corDaArea(e.area, theme), fontFamily: "'Inter', sans-serif" }}>{e.area}</span>
-            <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{e.tipo}</span>
+            <span style={{ fontSize: 12, color: corDaArea(e.area, theme), fontFamily: "'Inter', sans-serif" }}>{e.area}</span>
+            <span style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>{e.tipo}</span>
             {e.status === 'superada' && (
-              <span style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>superada</span>
+              <span style={{ fontSize: 12, color: theme.gold, fontFamily: "'Inter', sans-serif" }}>superada</span>
             )}
           </div>
           <div style={{ fontSize: 14, fontWeight: 600, color: theme.text, marginBottom: 4, fontFamily: theme.fontTitle }}>{e.tema}</div>
@@ -237,7 +237,7 @@ export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
           background: mode === 'dark' ? '#2a0f10' : '#fff0f0',
           border: `1px solid ${theme.penal}55`, borderRadius: 8,
           padding: 16, color: theme.penal, fontSize: 13, marginBottom: 16,
-          display: 'flex', alignItems: 'center', gap: 8, fontStyle: 'italic', fontFamily: "'Inter', sans-serif",
+          display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Inter', sans-serif",
         }}>
           <AlertTriangle size={15} /> {erroFts}
         </div>
@@ -245,7 +245,7 @@ export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
 
       {resultadosFts !== null && !resultIA && (
         <>
-          <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 10, fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 12, color: theme.gold, marginBottom: 10, fontFamily: "'Inter', sans-serif" }}>
             {resultadosFts.length} resultado(s)
           </div>
           <ResultadoFts entradas={resultadosFts} theme={theme} onAbrir={onAbrirEntrada ? abrirEntrada : undefined} />
@@ -257,7 +257,7 @@ export default function BuscaPeca({ entradas, podeUsarIA, onAbrirEntrada }) {
           background: mode === 'dark' ? '#2a0f10' : '#fff0f0',
           border: `1px solid ${theme.penal}55`, borderRadius: 8,
           padding: 16, color: theme.penal, fontSize: 13, marginBottom: 16,
-          display: 'flex', alignItems: 'center', gap: 8, fontStyle: 'italic', fontFamily: "'Inter', sans-serif",
+          display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Inter', sans-serif",
         }}>
           <AlertTriangle size={15} /> {erroIA}
         </div>

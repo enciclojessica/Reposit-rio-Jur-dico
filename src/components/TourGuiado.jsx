@@ -102,7 +102,7 @@ export default function TourGuiado({ isMobile, isEditor, onFechar }) {
             {passo.texto}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button onClick={onFechar} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: theme.fontSerif }}>
+            <button onClick={onFechar} style={{ background: 'none', border: 'none', color: theme.muted, fontSize: 12, cursor: 'pointer', fontFamily: theme.fontSerif }}>
               Pular tour
             </button>
             <div style={{ display: 'flex', gap: 8 }}>

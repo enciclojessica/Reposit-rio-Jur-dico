@@ -9,13 +9,13 @@ function IaStatusLabel({ status, theme }) {
   if (!status || status === 'manual') return null
   if (status === 'ia_revisado') {
     return (
-      <span style={{ fontSize: 11, fontStyle: 'italic', color: theme.success || '#065f46', fontFamily: theme.fontSerif }}>
+      <span style={{ fontSize: 11, color: theme.success || '#065f46', fontFamily: theme.fontSerif }}>
         Revisado por IA
       </span>
     )
   }
   return (
-    <span style={{ fontSize: 11, fontStyle: 'italic', color: theme.gold, fontFamily: theme.fontSerif }}>
+    <span style={{ fontSize: 11, color: theme.gold, fontFamily: theme.fontSerif }}>
       Sugerido por IA: revisar
     </span>
   )
@@ -25,7 +25,7 @@ function IaStatusLabel({ status, theme }) {
 // fonte, pra saber quais ainda precisam de URL sem abrir uma por uma.
 function SemLinkLabel({ theme }) {
   return (
-    <span style={{ fontSize: 11, fontStyle: 'italic', color: theme.penal, fontFamily: theme.fontSerif }}>
+    <span style={{ fontSize: 11, color: theme.penal, fontFamily: theme.fontSerif }}>
       Sem link de fonte
     </span>
   )
@@ -93,7 +93,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
         <div style={{ fontSize: 17, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 8 }}>
           Repositório vazio
         </div>
-        <div style={{ fontSize: 13, color: theme.muted, marginBottom: 28, fontFamily: theme.fontSerif, fontStyle: 'italic', lineHeight: 1.6 }}>
+        <div style={{ fontSize: 13, color: theme.muted, marginBottom: 28, fontFamily: theme.fontSerif, lineHeight: 1.6 }}>
           Nenhuma tese, jurisprudência ou doutrina cadastrada ainda.
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 280, margin: '0 auto' }}>
@@ -118,7 +118,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
 
       {isAdmin && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, padding: '8px 4px', borderBottom: `1px solid ${theme.border}` }}>
-          <button onClick={toggleTodos} style={{ background: 'none', border: 'none', color: selecionados.size === entradas.length && entradas.length > 0 ? theme.gold : theme.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontFamily: theme.fontSerif, fontStyle: 'italic', padding: 0 }}>
+          <button onClick={toggleTodos} style={{ background: 'none', border: 'none', color: selecionados.size === entradas.length && entradas.length > 0 ? theme.gold : theme.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontFamily: theme.fontSerif, padding: 0 }}>
             {selecionados.size === entradas.length && entradas.length > 0 ? <CheckSquare size={15} /> : <Square size={15} />}
             {selecionados.size > 0 ? selecionados.size + ' selecionada(s)' : 'Selecionar tudo'}
           </button>
@@ -146,7 +146,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
               <tr style={{ borderBottom: `1px solid ${theme.text}` }}>
                 {isAdmin && <th style={{ width: 32, padding: '8px 4px' }}></th>}
                 {['Área', 'Tipo', 'Tema', 'Tribunal', 'Data', 'Teses'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: theme.text, fontWeight: 600, fontStyle: 'italic', fontSize: 12 }}>{h}</th>
+                  <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: theme.text, fontWeight: 600, fontSize: 12 }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -167,7 +167,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                         {e.area}
                       </span>
                     </td>
-                    <td style={{ padding: '8px 12px', color: theme.muted, fontStyle: 'italic' }}>{e.tipo}</td>
+                    <td style={{ padding: '8px 12px', color: theme.muted }}>{e.tipo}</td>
                     <td style={{ padding: '8px 12px', color: theme.text, fontWeight: 600, maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.tema}</td>
                     <td style={{ padding: '8px 12px', color: theme.muted }}>{e.tribunal}</td>
                     <td style={{ padding: '8px 12px', color: theme.muted }}>{e.data_julgamento ? new Date(e.data_julgamento).toLocaleDateString('pt-BR') : '—'}</td>
@@ -213,7 +213,7 @@ export default function EntradaList({ entradas, onSelect, onImportar, onDeleteMu
                     <div style={{ fontSize: 13, color: theme.textSub, fontFamily: theme.fontSerif, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{e.ementa}</div>
                   )}
 
-                  <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, fontStyle: 'italic', marginTop: 6 }}>
+                  <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, marginTop: 6 }}>
                     {partesCitacao.join(', ')}
                     {partesCitacao.length > 0 && numTeses > 0 ? ' · ' : ''}
                     {numTeses > 0 && `${numTeses} ${numTeses === 1 ? 'tese' : 'teses'}`}

@@ -108,7 +108,7 @@ export default function Auth({ telaInicial }) {
           {/* Título da tela */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22 }}>
             <div style={{ flex: 1, height: 1, background: theme.border }} />
-            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+            <div style={{ fontSize: 12, color: theme.gold, fontFamily: "'Inter', sans-serif" }}>
               {{ login: 'Acesso', register: 'Cadastro', forgot: 'Redefinir senha' }[screen]}
             </div>
             <div style={{ flex: 1, height: 1, background: theme.border }} />
@@ -119,7 +119,7 @@ export default function Auth({ telaInicial }) {
             {screen === 'register' && (
               <>
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Nome completo</div>
+                  <div style={{ fontSize: 12, color: theme.gold, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Nome completo</div>
                   <div style={{ position: 'relative' }}>
                     <User size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                     <input type="text" value={nome} onChange={e => setNome(e.target.value)}
@@ -128,7 +128,7 @@ export default function Auth({ telaInicial }) {
                   </div>
                 </div>
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Telefone</div>
+                  <div style={{ fontSize: 12, color: theme.gold, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Telefone</div>
                   <div style={{ position: 'relative' }}>
                     <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                     <input type="tel" value={telefone} onChange={e => setTelefone(e.target.value)}
@@ -141,7 +141,7 @@ export default function Auth({ telaInicial }) {
 
             {/* E-mail */}
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>E-mail</div>
+              <div style={{ fontSize: 12, color: theme.gold, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>E-mail</div>
               <div style={{ position: 'relative' }}>
                 <Mail size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
@@ -153,7 +153,7 @@ export default function Auth({ telaInicial }) {
             {/* Senha */}
             {screen !== 'forgot' && (
               <div style={{ marginBottom: screen === 'login' ? 8 : 18 }}>
-                <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Senha</div>
+                <div style={{ fontSize: 12, color: theme.gold, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Senha</div>
                 <div style={{ position: 'relative' }}>
                   <Lock size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                   <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}

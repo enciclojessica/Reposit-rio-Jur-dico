@@ -805,7 +805,7 @@ case VIEWS.JURISPRUDENCIA:
         return <div className="fade-up"><ComparadorTeses entradas={entradas} prefilA={comparadorPrefilA} /></div>
 
       case VIEWS.METRICAS:
-        if (!isAdmin) return <div className="fade-up"><div style={{ color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Sem permissão pra ver esta tela.</div></div>
+        if (!isAdmin) return <div className="fade-up"><div style={{ color: theme.muted, fontFamily: theme.fontSerif }}>Sem permissão pra ver esta tela.</div></div>
         return <div className="fade-up"><PainelMetricas entradas={entradas} /></div>
 
       case VIEWS.NOVIDADES_APP:
@@ -1060,7 +1060,7 @@ case VIEWS.JURISPRUDENCIA:
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 600,
         background: '#3d0012', color: '#e8c98a', textAlign: 'center',
-        padding: '6px 12px', fontSize: 12, fontStyle: 'italic',
+        padding: '6px 12px', fontSize: 12,
         fontFamily: "'Inter', sans-serif",
       }}>
         Sem conexão. Mostrando os últimos dados salvos no aparelho. Favoritos e anotações não sincronizam até a internet voltar.

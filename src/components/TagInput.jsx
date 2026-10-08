@@ -20,7 +20,7 @@ export function TagPill({ tag, onRemove, pequena }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
-      background: cor + '12', color: cor, fontStyle: 'italic',
+      background: cor + '12', color: cor,
       border: `1px solid ${cor}3a`,
       borderRadius: 20, padding: pequena ? '1px 8px' : '3px 10px',
       fontSize: pequena ? 10 : 11,

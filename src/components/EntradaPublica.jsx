@@ -72,15 +72,15 @@ export default function EntradaPublica({ entradaId, onFechar }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}/>
-          <div style={{ fontSize: 12, color: '#c9a878', fontStyle: 'italic' }}>Entrada compartilhada do repositório</div>
+          <div style={{ fontSize: 12, color: '#c9a878' }}>Entrada compartilhada do repositório</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
-          <a href="/?vitrine=1" style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <a href="/?vitrine=1" style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontFamily: "'Inter', sans-serif", textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
             Ver mais do acervo
           </a>
           {onFechar && (
-            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>
+            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>
               Voltar ao repositório
             </button>
           )}
@@ -118,10 +118,10 @@ export default function EntradaPublica({ entradaId, onFechar }) {
             {/* Cabeçalho da entrada */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12, alignItems: 'center' }}>
-                <span style={{ color: am.color, fontSize: 12, fontStyle: 'italic' }}>{entry.area}</span>
-                <span style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic' }}>{entry.tipo}</span>
+                <span style={{ color: am.color, fontSize: 12 }}>{entry.area}</span>
+                <span style={{ color: theme.muted, fontSize: 12 }}>{entry.tipo}</span>
                 {status && (
-                  <span style={{ color: status.cor, fontSize: 12, fontStyle: 'italic', border: `1px solid ${status.cor}55`, borderRadius: 20, padding: '2px 10px' }}>
+                  <span style={{ color: status.cor, fontSize: 12, border: `1px solid ${status.cor}55`, borderRadius: 20, padding: '2px 10px' }}>
                     {status.label}
                   </span>
                 )}
@@ -130,7 +130,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
               <h1 style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.3, margin: '0 0 8px' }}>
                 {entry.tema}
               </h1>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+              <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
                 {fonteReferenciaResumo(entry, [`Compartilhado em ${new Date().toLocaleDateString('pt-BR')}`])}
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
                   ['aplicacao_pratica',   t.aplicacao_pratica],
                 ].filter(([, val]) => val).map(([campo, val]) => (
                   <div key={campo} style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 3 }}>{labelCampoTese(entry.tipo, campo)}</div>
+                    <div style={{ fontSize: 12, color: theme.gold, marginBottom: 3 }}>{labelCampoTese(entry.tipo, campo)}</div>
                     <div style={{ fontSize: 14, color: theme.text, lineHeight: 1.7 }}>{val}</div>
                   </div>
                 ))}
@@ -173,7 +173,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
 
             {/* Citação ABNT */}
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, marginTop: 8 }}>
-              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8 }}>Citação ABNT NBR 6023:2018</div>
+              <div style={{ fontSize: 12, color: theme.gold, marginBottom: 8 }}>Citação ABNT NBR 6023:2018</div>
               <div style={{ fontSize: 13, color: theme.textSub, lineHeight: 1.8 }}>{gerarCitacaoABNT(entry)}</div>
             </div>
           </>

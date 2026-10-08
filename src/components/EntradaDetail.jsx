@@ -229,7 +229,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
     background: 'transparent', color: theme.textSub,
   })
 
-  const label = { fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }
+  const label = { fontSize: 12, fontWeight: 500, color: theme.textSub, fontFamily: theme.fontSerif, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }
   const secao = { fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 14 }
 
   const sm = STATUS_META[status] || STATUS_META['vigente']
@@ -274,7 +274,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           {entry.tema}
         </div>
         {(entry.fonte || entry.referencia) && (
-          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+          <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif }}>
             {fonteReferenciaResumo(entry)}
           </div>
         )}
@@ -287,7 +287,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
         {!entry.url && ['jurisprudência', 'súmula'].includes(entry.tipo) && (entry.fonte || entry.referencia) && (
           <a href={`https://www.google.com/search?q=${encodeURIComponent([entry.fonte, entry.referencia].filter(Boolean).join(' '))}`}
             target="_blank" rel="noreferrer"
-            style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, fontFamily: theme.fontSerif, textDecoration: 'none' }}>
+            style={{ fontSize: 12, color: theme.muted, display: 'flex', alignItems: 'center', gap: 5, marginTop: 4, fontFamily: theme.fontSerif, textDecoration: 'none' }}>
             <Search size={12} /> Buscar fonte oficial (sem link salvo)
           </a>
         )}
@@ -298,7 +298,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
       <div className="no-print" style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap', alignItems: 'center' }}>
         {!readOnly && iasPendente && (
           <button onClick={confirmarRevisaoIA} title="Marca essa entrada como já revisada, tira o aviso de pendente"
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.gold}66`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontStyle: 'italic', color: theme.gold, cursor: 'pointer', fontFamily: theme.fontSerif }}>
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: `1px solid ${theme.gold}66`, borderRadius: 20, padding: '4px 12px', fontSize: 12, color: theme.gold, cursor: 'pointer', fontFamily: theme.fontSerif }}>
             <Check size={13} /> Marcar como revisado
           </button>
         )}
@@ -306,14 +306,14 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
         {!readOnly && (
           <div style={{ position: 'relative' }}>
             <span onClick={() => setShowStatus(m => !m)}
-              style={{ color: sm.cor, border: `1px solid ${sm.cor}55`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontStyle: 'italic', fontFamily: theme.fontSerif, cursor: 'pointer', userSelect: 'none', display: 'inline-block' }}>
+              style={{ color: sm.cor, border: `1px solid ${sm.cor}55`, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontFamily: theme.fontSerif, cursor: 'pointer', userSelect: 'none', display: 'inline-block' }}>
               {sm.label}
             </span>
             {showStatus && (
               <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 50, background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 10, overflow: 'hidden', boxShadow: theme.shadow, minWidth: 170 }}>
                 {Object.entries(STATUS_META).map(([k, meta]) => (
                   <button key={k} onClick={() => alterarStatus(k)}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: status === k ? meta.cor+'14' : 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: status === k ? meta.cor : theme.text, fontFamily: theme.fontSerif, fontStyle: 'italic', textAlign: 'left' }}>
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: status === k ? meta.cor+'14' : 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: status === k ? meta.cor : theme.text, fontFamily: theme.fontSerif, textAlign: 'left' }}>
                     {meta.label}
                     {status === k && <Check size={13} style={{ marginLeft: 'auto' }} />}
                   </button>
@@ -360,7 +360,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           </button>
           {showPreviewAbnt && abnt && (
             <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, background: theme.surface, border: `1px solid ${theme.borderGold}`, borderRadius: 8, padding: '12px 16px', width: 340, fontSize: 12, color: theme.text, lineHeight: 1.7, fontFamily: theme.fontSerif, boxShadow: theme.shadow, zIndex: 50 }}>
-              <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', marginBottom: 6 }}>Prévia ABNT</div>
+              <div style={{ fontSize: 11, color: theme.gold, marginBottom: 6 }}>Prévia ABNT</div>
               {abnt}
             </div>
           )}
@@ -376,7 +376,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           </button>
         )}
         {erroCompartilhar && (
-          <div style={{ fontSize: 12, color: theme.penal, width: '100%', fontStyle: 'italic', fontFamily: theme.fontSerif }}>{erroCompartilhar}</div>
+          <div style={{ fontSize: 12, color: theme.penal, width: '100%', fontFamily: theme.fontSerif }}>{erroCompartilhar}</div>
         )}
 
         {!readOnly && (
@@ -426,7 +426,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
                 <div style={label}>
                   {labelCampoTese(entry.tipo, campo)}
                   {isIa && iasPendente && (
-                    <span style={{ color: theme.gold, fontSize: 11, fontStyle: 'italic' }}>
+                    <span style={{ color: theme.gold, fontSize: 11 }}>
                       (sugestão de IA, pendente de revisão)
                     </span>
                   )}
@@ -443,7 +443,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
       })}
 
       {entry.teses.length === 0 && (
-        <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: theme.fontSerif, padding: '20px 0' }}>Nenhuma tese cadastrada.</div>
+        <div style={{ color: theme.muted, fontSize: 13, fontFamily: theme.fontSerif, padding: '20px 0' }}>Nenhuma tese cadastrada.</div>
       )}
 
       {/* Teses relacionadas */}
@@ -455,10 +455,10 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
               style={{ padding: '10px 0', borderBottom: `0.5px solid ${theme.border}`, cursor: onSelecionarRelacionada ? 'pointer' : 'default' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: corDaArea(entrada.area, theme), flexShrink: 0 }} />
-                <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{entrada.area}, {entrada.tipo}</span>
+                <span style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{entrada.area}, {entrada.tipo}</span>
               </div>
               <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{entrada.tema}</div>
-              <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: theme.gold, fontFamily: theme.fontSerif, marginTop: 2 }}>
                 {comuns} tag{comuns > 1 ? 's' : ''} em comum
               </div>
             </div>
@@ -480,7 +480,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
               <div style={{ cursor: onSelecionarRelacionada ? 'pointer' : 'default', flex: 1 }} onClick={() => onSelecionarRelacionada?.(c)}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                   <ArrowLeftRight size={11} style={{ color: theme.gold, flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{c.area}, {c.tipo}</span>
+                  <span style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{c.area}, {c.tipo}</span>
                 </div>
                 <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{c.tema}</div>
               </div>
@@ -527,7 +527,7 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
           <div style={{ ...secao, color: theme.muted, borderBottom: `1px solid ${theme.border}` }}>Histórico de alterações</div>
           {entry.historico.slice(0, 10).map((h, i) => (
             <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 6 }}>
-              <div style={{ fontSize: 11, color: theme.muted, whiteSpace: 'nowrap', fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+              <div style={{ fontSize: 11, color: theme.muted, whiteSpace: 'nowrap', fontFamily: theme.fontSerif }}>
                 {h?.data ? new Date(h.data).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : ''}
               </div>
               <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif }}>{s(h?.descricao)}</div>

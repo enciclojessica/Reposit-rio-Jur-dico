@@ -8,7 +8,7 @@ function StatBox({ label, valor, theme, cor }) {
   return (
     <div style={{ background: theme.raised, border: `1px solid ${theme.border}`, borderTop: `2px solid ${cor || theme.gold}`, borderRadius: 8, padding: '14px 16px' }}>
       <div style={{ fontSize: 24, fontWeight: 600, color: cor || theme.gold, fontFamily: theme.fontTitle }}>{valor}</div>
-      <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 2 }}>{label}</div>
+      <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif, marginTop: 2 }}>{label}</div>
     </div>
   )
 }
@@ -68,7 +68,7 @@ export default function PainelMetricas({ entradas }) {
     carregar()
   }, [])
 
-  if (loading) return <div style={{ color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Carregando…</div>
+  if (loading) return <div style={{ color: theme.muted, fontFamily: theme.fontSerif }}>Carregando…</div>
   if (!dados) return null
 
   const maxDia = Math.max(1, ...Object.values(dados.porDia))
@@ -129,7 +129,7 @@ export default function PainelMetricas({ entradas }) {
           {['admin', 'editor', 'leitor'].map(r => (
             <div key={r}>
               <div style={{ fontSize: 20, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{dados.porRole[r] || 0}</div>
-              <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{r}</div>
+              <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{r}</div>
             </div>
           ))}
         </div>
@@ -140,15 +140,15 @@ export default function PainelMetricas({ entradas }) {
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontSize: 20, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{dados.totalAnotacoes}</div>
-            <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>anotações pessoais</div>
+            <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>anotações pessoais</div>
           </div>
           <div>
             <div style={{ fontSize: 20, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{dados.totalFavoritos}</div>
-            <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>favoritos</div>
+            <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>favoritos</div>
           </div>
           <div>
             <div style={{ fontSize: 20, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>{dados.totalRascunhos}</div>
-            <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>rascunhos de peças</div>
+            <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>rascunhos de peças</div>
           </div>
         </div>
       </div>
@@ -187,11 +187,11 @@ export default function PainelMetricas({ entradas }) {
             {nuncaAbertas.slice(0, 8).map(e => (
               <div key={e.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}` }}>
                 <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{e.tema}</div>
-                <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.area}, {e.tipo}</div>
+                <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{e.area}, {e.tipo}</div>
               </div>
             ))}
             {nuncaAbertas.length > 8 && (
-              <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 8 }}>
+              <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif, marginTop: 8 }}>
                 + {nuncaAbertas.length - 8} outra(s)
               </div>
             )}
@@ -213,7 +213,7 @@ export default function PainelMetricas({ entradas }) {
             {temasIncompletos.slice(0, 8).map(({ entrada, semFundamentacao, semRatio }) => (
               <div key={entrada.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}` }}>
                 <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{entrada.tema}</div>
-                <div style={{ fontSize: 11, color: theme.error, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                <div style={{ fontSize: 11, color: theme.error, fontFamily: theme.fontSerif }}>
                   {semFundamentacao > 0 && `${semFundamentacao} sem fundamentação`}
                   {semFundamentacao > 0 && semRatio > 0 && ', '}
                   {semRatio > 0 && `${semRatio} sem ratio decidendi`}
@@ -221,7 +221,7 @@ export default function PainelMetricas({ entradas }) {
               </div>
             ))}
             {temasIncompletos.length > 8 && (
-              <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 8 }}>
+              <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif, marginTop: 8 }}>
                 + {temasIncompletos.length - 8} outra(s) entrada(s)
               </div>
             )}

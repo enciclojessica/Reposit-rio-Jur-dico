@@ -21,7 +21,7 @@ function Seletor({ entradas, valor, onEscolher, cor, theme }) {
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
           <AreaDot area={valor.area} theme={theme} />
-          <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{valor.area}, {valor.tipo}</span>
+          <span style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{valor.area}, {valor.tipo}</span>
         </div>
         <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, paddingRight: 20 }}>{valor.tema}</div>
       </div>
@@ -54,7 +54,7 @@ function Seletor({ entradas, valor, onEscolher, cor, theme }) {
         </div>
       )}
       {aberto && busca.trim() && resultados.length === 0 && (
-        <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, padding: '6px 4px' }}>Nada encontrado.</div>
+        <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, padding: '6px 4px' }}>Nada encontrado.</div>
       )}
     </div>
   )
@@ -65,7 +65,7 @@ function ColunaEntrada({ entrada, cor, theme }) {
     <div style={{ borderTop: `3px solid ${cor}`, background: theme.raised, borderRadius: 8, padding: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
         <AreaDot area={entrada.area} theme={theme} />
-        <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{entrada.area}, {entrada.tipo}, {entrada.fonte}</span>
+        <span style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{entrada.area}, {entrada.tipo}, {entrada.fonte}</span>
       </div>
       <div style={{ fontSize: 16, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 14 }}>{entrada.tema}</div>
       {(entrada.teses || []).map((t, i) => (
@@ -73,7 +73,7 @@ function ColunaEntrada({ entrada, cor, theme }) {
           {['tese_assunto', 'fundamentacao_legal', 'ratio_decidendi', 'aplicacao_pratica'].map(campo => (
             t[campo] ? (
               <div key={campo} style={{ marginBottom: 8 }}>
-                <div style={{ fontSize: 10, color: cor, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 2 }}>
+                <div style={{ fontSize: 10, color: cor, fontFamily: theme.fontSerif, marginBottom: 2 }}>
                   {labelCampoTese(entrada.tipo, campo)}
                 </div>
                 <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif, lineHeight: 1.55 }}>{t[campo]}</div>

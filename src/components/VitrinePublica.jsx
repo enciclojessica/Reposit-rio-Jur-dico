@@ -38,7 +38,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <SeletorTema compact />
-          <button onClick={onEntrar} style={{ background: 'none', border: 'none', color: '#736b62', fontSize: 12, fontStyle: 'italic', cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button onClick={onEntrar} style={{ background: 'none', border: 'none', color: '#736b62', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
             Já tenho acesso
           </button>
         </div>
@@ -48,7 +48,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
         <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 28, color: '#2c241b', marginBottom: 8 }}>
           Amostra do acervo
         </div>
-        <div style={{ fontSize: 14, color: '#736b62', fontStyle: 'italic', marginBottom: 28 }}>
+        <div style={{ fontSize: 14, color: '#736b62', marginBottom: 28 }}>
           Uma seleção do que o Themis Jur reúne, curada pra quem ainda não tem conta. O acervo completo é maior, e é gratuito pra quem se cadastra.
         </div>
 
@@ -68,11 +68,11 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
         )}
 
         {!entradas && (
-          <div style={{ fontSize: 13, color: '#736b62', fontStyle: 'italic' }}>Carregando…</div>
+          <div style={{ fontSize: 13, color: '#736b62' }}>Carregando…</div>
         )}
 
         {entradas && filtradas.length === 0 && (
-          <div style={{ fontSize: 13, color: '#736b62', fontStyle: 'italic' }}>Nenhuma entrada pública nessa área ainda.</div>
+          <div style={{ fontSize: 13, color: '#736b62' }}>Nenhuma entrada pública nessa área ainda.</div>
         )}
 
         {filtradas.map(e => (
@@ -86,7 +86,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
                 <span style={{ color: '#736b62' }}>· {e.tipo}</span>
               </div>
               <div style={{ fontSize: 15, color: '#2c241b' }}>{e.tema}</div>
-              {e.fonte && <div style={{ fontSize: 12, color: '#736b62', fontStyle: 'italic', marginTop: 3 }}>{e.fonte}</div>}
+              {e.fonte && <div style={{ fontSize: 12, color: '#736b62', marginTop: 3 }}>{e.fonte}</div>}
             </div>
             <ChevronRight size={16} color="#736b62" style={{ flexShrink: 0 }} />
           </div>

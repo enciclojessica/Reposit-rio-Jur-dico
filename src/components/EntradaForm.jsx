@@ -17,7 +17,7 @@ function IaBadge({ status, theme }) {
     return (
       <span style={{
         display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11,
-        color: theme.success, fontStyle: 'italic', fontFamily: theme.fontSerif, marginLeft: 8,
+        color: theme.success, fontFamily: theme.fontSerif, marginLeft: 8,
       }}>
         <CheckCircle size={11} /> Revisado
       </span>
@@ -26,7 +26,7 @@ function IaBadge({ status, theme }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11,
-      color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginLeft: 8,
+      color: theme.gold, fontFamily: theme.fontSerif, marginLeft: 8,
     }}>
       <AlertTriangle size={11} /> Gerado por IA: revise antes de salvar
     </span>
@@ -326,7 +326,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
         )}
 
         {temPendentes && (
-          <div style={{ marginTop: 8, padding: '8px 14px', background: mode === 'dark' ? '#1c1600' : '#fffbeb', border: `1px solid ${theme.gold}`, borderRadius: 6, fontSize: 12, color: theme.gold, display: 'flex', alignItems: 'center', gap: 6, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>
+          <div style={{ marginTop: 8, padding: '8px 14px', background: mode === 'dark' ? '#1c1600' : '#fffbeb', border: `1px solid ${theme.gold}`, borderRadius: 6, fontSize: 12, color: theme.gold, display: 'flex', alignItems: 'center', gap: 6, fontFamily: theme.fontSerif }}>
             <AlertTriangle size={13} />
             Há campos gerados por IA ainda não revisados. Edite-os para confirmar a revisão.
           </div>
@@ -356,7 +356,7 @@ export default function EntradaForm({ initial, onSave, onCancel, loading, entrad
             </div>
             {possiveisDuplicatas.map(({ entrada, score }) => (
               <div key={entrada.id} style={{ fontSize: 12, color: theme.text, fontFamily: "'Inter', sans-serif", padding: '3px 0' }}>
-                {entrada.tema} <span style={{ color: theme.muted, fontStyle: 'italic', fontSize: 10 }}>({entrada.area}, {Math.round(score * 100)}% parecido)</span>
+                {entrada.tema} <span style={{ color: theme.muted, fontSize: 10 }}>({entrada.area}, {Math.round(score * 100)}% parecido)</span>
               </div>
             ))}
           </div>

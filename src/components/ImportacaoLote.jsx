@@ -241,7 +241,7 @@ export default function ImportacaoLote({ session }) {
 
           {/* Instruções */}
           <div style={card}>
-            <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ fontSize: 11, color: theme.gold, marginBottom: 14, fontFamily: 'Inter, sans-serif' }}>
               Formato esperado
             </div>
             <div style={{ overflowX: 'auto' }}>
@@ -271,7 +271,7 @@ export default function ImportacaoLote({ session }) {
                       <td style={{ padding: '6px 10px', fontFamily: 'Inter, sans-serif', color: theme.gold, borderBottom: `1px solid ${theme.border}22` }}>{col}</td>
                       <td style={{ padding: '6px 10px', color: req ? theme.error : theme.muted, textAlign: 'center', borderBottom: `1px solid ${theme.border}22` }}>{req || '—'}</td>
                       <td style={{ padding: '6px 10px', color: theme.muted, borderBottom: `1px solid ${theme.border}22` }}>{vals}</td>
-                      <td style={{ padding: '6px 10px', color: theme.text, borderBottom: `1px solid ${theme.border}22`, fontStyle: 'italic' }}>{ex}</td>
+                      <td style={{ padding: '6px 10px', color: theme.text, borderBottom: `1px solid ${theme.border}22` }}>{ex}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -305,7 +305,7 @@ export default function ImportacaoLote({ session }) {
                 <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
                   <tr>
                     {['#', 'Área', 'Tipo', 'Tema', 'Fonte', 'Tese', 'Status'].map(h => (
-                      <th key={h} style={{ textAlign: 'left', padding: '10px 12px', background: theme.bg, color: theme.muted, fontSize: 10, fontStyle: 'italic', borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ textAlign: 'left', padding: '10px 12px', background: theme.bg, color: theme.muted, fontSize: 10, borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -380,7 +380,7 @@ export default function ImportacaoLote({ session }) {
 
           {resultados.errosMsgs && resultados.errosMsgs.length > 0 && (
             <div style={{ marginTop: 16, textAlign: 'left', background: theme.inputBg, border: `1px solid ${theme.error}44`, borderRadius: 8, padding: '12px 16px', maxHeight: 200, overflowY: 'auto' }}>
-              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+              <div style={{ fontSize: 11, color: theme.error, fontWeight: 600, marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>
                 Detalhes dos erros
               </div>
               {resultados.errosMsgs.map((msg, i) => (

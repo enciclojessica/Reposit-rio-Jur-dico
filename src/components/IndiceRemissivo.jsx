@@ -33,7 +33,7 @@ function Secao({ titulo, grupos, onSelecionarTag, theme }) {
                   borderTop: i > 0 ? `0.5px solid ${theme.border}` : 'none',
                 }}>
                 <span style={{ fontSize: 14, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{formatarTagIndice(tag)}</span>
-                <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>{count}</span>
+                <span style={{ fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>{count}</span>
               </div>
             ))}
           </div>
@@ -91,7 +91,7 @@ export default function IndiceRemissivo({ entradas, onSelecionarTag }) {
         }} />
 
       {total === 0 ? (
-        <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ color: theme.muted, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
           {busca.trim() ? 'Nenhuma tag encontrada.' : 'Nenhuma tag cadastrada ainda.'}
         </div>
       ) : (

@@ -62,7 +62,7 @@ export default function CommandPalette({ onFechar, setView, isAdmin, isEditor, s
         </div>
         <div style={{ maxHeight: 320, overflowY: 'auto', padding: '6px 0' }}>
           {itens.length === 0 && (
-            <div style={{ padding: '16px', fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nada encontrado.</div>
+            <div style={{ padding: '16px', fontSize: 13, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>Nada encontrado.</div>
           )}
           {itens.map((item, i) => (
             <div key={item.label} onClick={() => ativar(item)} onMouseEnter={() => setSelecionado(i)}

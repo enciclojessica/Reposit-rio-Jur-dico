@@ -65,12 +65,12 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
       <div style={{ background: '#5e0018', borderBottom: '2px solid #a9812e', padding: '12px 24px', paddingTop: 'calc(12px + env(safe-area-inset-top))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img src="/logo-temis-transparente.png" alt="Themis Jur" style={{ width: 32, height: 32, objectFit: 'contain', display: 'block' }}/>
-          <div style={{ fontSize: 12, color: '#c9a878', fontStyle: 'italic' }}>Legislação, Themis Jur</div>
+          <div style={{ fontSize: 12, color: '#c9a878' }}>Legislação, Themis Jur</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <SeletorTema compact />
           {onFechar && (
-            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>
+            <button onClick={onFechar} style={{ background: 'transparent', border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', color: '#e8dfc8', fontSize: 12, fontFamily: "'Inter', sans-serif", cursor: 'pointer' }}>
               Voltar ao repositório
             </button>
           )}
@@ -78,17 +78,17 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
       </div>
 
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px 60px' }}>
-        {loading && <div style={{ color: theme.muted, fontStyle: 'italic' }}>Carregando…</div>}
+        {loading && <div style={{ color: theme.muted }}>Carregando…</div>}
 
         {erro && (
-          <div style={{ color: theme.penal, fontStyle: 'italic' }}>{erro}</div>
+          <div style={{ color: theme.penal }}>{erro}</div>
         )}
 
         {!loading && !erro && grupos.map((grupo, gi) => (
           <div key={gi} style={{ marginBottom: 32, paddingBottom: 24, borderBottom: gi < grupos.length - 1 ? `1px solid ${theme.border}` : 'none' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                <span style={{ color: meta.cor, fontSize: 13, fontStyle: 'italic' }}>{meta.label}</span>
+                <span style={{ color: meta.cor, fontSize: 13 }}>{meta.label}</span>
                 <span style={{ fontSize: 20, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
                   {grupo.titulo || `Art. ${numero}`}
                 </span>
@@ -97,7 +97,7 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
                 {copiado ? <Check size={12} /> : <Copy size={12} />} {copiado ? 'Copiado' : 'Copiar'}
               </button>
             </div>
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', marginBottom: 14 }}>
+            <div style={{ fontSize: 12, color: theme.muted, marginBottom: 14 }}>
               {NOME_CODIGO[codigo] || meta.label}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

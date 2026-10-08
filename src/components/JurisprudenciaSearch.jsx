@@ -17,7 +17,7 @@ function badgeConfig(tendencia, area, theme) {
 function RelevanciaBar({ pct, cor, theme }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
-      <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
+      <span style={{ fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif", flexShrink: 0 }}>
         Relevância
       </span>
       <div style={{ flex: 1, height: 4, background: theme.border, borderRadius: 2 }}>
@@ -74,13 +74,13 @@ function ResultadoCard({ r, onSalvar, salvando, salvo, theme }) {
             )}
           </div>
           {(relator || data) && (
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif", marginTop: 2 }}>
               {[relator, data ? data.toLocaleDateString('pt-BR') : null].filter(Boolean).join(', ')}
             </div>
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <span style={{ fontSize: 12, color: badge.color, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: 12, color: badge.color, fontFamily: "'Inter', sans-serif" }}>
             {badge.label}
           </span>
           <button
@@ -194,7 +194,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       <div style={{ marginBottom: 28, paddingTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <Scale size={22} color={theme.gold} />
-          <span style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
             Jurisprudência
           </span>
         </div>
@@ -255,7 +255,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
               cursor: 'pointer',
               borderBottom: tribunal === t ? `1.5px solid ${theme.gold}` : '1.5px solid transparent',
               color: tribunal === t ? theme.text : theme.muted,
-              fontStyle: tribunal === t ? 'normal' : 'italic',
+              
             }}>
             {t}
           </span>
@@ -276,7 +276,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
 
       {/* Erro */}
       {erro && (
-        <div style={{ background: 'transparent', border: `1px solid ${theme.penal}55`, borderRadius: 8, padding: '12px 16px', color: theme.penal, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ background: 'transparent', border: `1px solid ${theme.penal}55`, borderRadius: 8, padding: '12px 16px', color: theme.penal, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
           {erro}
         </div>
       )}
@@ -285,10 +285,10 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       {resultados.length > 0 && (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
               {resultados.length} resultado{resultados.length !== 1 ? 's' : ''} para "{pesquisado}"
             </div>
-            <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 4 }}>
               {salvos.size > 0
                 ? `${salvos.size} salvo${salvos.size > 1 ? 's' : ''} no repositório`
                 : <>Clique em <BookmarkPlus size={12} /> para salvar</>}
@@ -314,7 +314,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
       {!carregando && resultados.length === 0 && !erro && (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <Scale size={32} color={theme.muted} style={{ marginBottom: 12 }} />
-          <div style={{ fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
+          <div style={{ fontSize: 13, color: theme.muted, fontFamily: "'Inter', sans-serif", lineHeight: 1.6 }}>
             Digite o tema, tese ou número do processo<br />
             para buscar jurisprudência em tempo real
           </div>

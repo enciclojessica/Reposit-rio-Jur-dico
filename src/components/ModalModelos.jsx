@@ -60,7 +60,7 @@ export default function ModalModelos({ onUsar, onFechar }) {
                 <div style={{ fontSize: 11, color: theme.muted, marginTop: 4, lineHeight: 1.5, fontFamily: 'Inter, sans-serif' }}>
                   {m.descricao}
                 </div>
-                <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, fontFamily: "'Inter', sans-serif", fontStyle: 'italic' }}>
+                <div style={{ fontSize: 11, color: theme.gold, marginTop: 6, fontFamily: "'Inter', sans-serif" }}>
                   {m.categoria} · {m.rito}
                 </div>
               </div>

@@ -24,11 +24,11 @@ function DecisaoCard({ decisao, onImportar, importada }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Metadados */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ color: cor, fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ color: cor, fontSize: 12, fontFamily: "'Inter', sans-serif" }}>
             {decisao.area || 'Informativo'}
           </span>
           {decisao.orgao && (
-            <span style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+            <span style={{ color: theme.muted, fontSize: 12, fontFamily: "'Inter', sans-serif" }}>
               {decisao.orgao}
             </span>
           )}
@@ -290,7 +290,7 @@ export default function Informativos({ onImportar, isEditor, todasEntradas, user
                 Informativo {dados.tribunal} nº {dados.edicao}
               </span>
               {dados.data && (
-                <span style={{ fontSize: 12, color: theme.muted, marginLeft: 10, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+                <span style={{ fontSize: 12, color: theme.muted, marginLeft: 10, fontFamily: "'Inter', sans-serif" }}>
                   {new Date(dados.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </span>
               )}

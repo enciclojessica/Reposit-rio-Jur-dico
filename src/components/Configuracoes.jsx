@@ -24,7 +24,7 @@ function Campo({ label, children }) {
   const { theme } = useTheme()
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 500, color: theme.textSub, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>{label}</div>
       {children}
     </div>
   )
@@ -407,7 +407,7 @@ function TabBackup({ session, entradas }) {
         </div>
 
         {ultimo && (
-          <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
+          <div style={{ fontSize: 12, color: theme.gold, fontFamily: "'Inter', sans-serif", marginBottom: 16, padding: '6px 10px', background: theme.gold + '11', borderRadius: 6 }}>
             Último backup: {ultimo}
           </div>
         )}

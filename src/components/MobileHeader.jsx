@@ -17,11 +17,11 @@ export default function MobileHeader({
         />
         <div>
           <div style={{ fontSize: 14, fontWeight: 600, color: '#f2e9d8', fontFamily: 'Inter, sans-serif', lineHeight: 1.1 }}>Themis Jur</div>
-          <div style={{ fontSize: 10, color: '#c9a878', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Inteligência jurídica</div>
+          <div style={{ fontSize: 10, color: '#c9a878', fontFamily: "'Inter', sans-serif" }}>Inteligência jurídica</div>
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {role && <span style={{ fontSize: 10, color: '#e8c98a', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{ROLE_LABEL[role]}</span>}
+        {role && <span style={{ fontSize: 10, color: '#e8c98a', fontFamily: "'Inter', sans-serif" }}>{ROLE_LABEL[role]}</span>}
         <SeletorTema onDark />
         {session && (
           <SinoNotificacoes session={session} corIcone="#e8dfc8"

@@ -27,7 +27,7 @@ function ReguaBarras({ dados, alturaMax = 64 }) {
       </div>
       <div style={{ display: 'flex', gap: 12 }}>
         {dados.map((d, i) => (
-          <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>{d.rotulo}</div>
+          <div key={i} style={{ flex: 1, textAlign: 'center', fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{d.rotulo}</div>
         ))}
       </div>
     </div>
@@ -43,7 +43,7 @@ function BarrasPorArea({ dados }) {
       {dados.filter(d => d.valor > 0).sort((a, b) => b.valor - a.valor).map(d => (
         <div key={d.label}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-            <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>{d.label}</div>
+            <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif }}>{d.label}</div>
             <div style={{ fontSize: 12, color: d.cor, fontFamily: theme.fontSerif }}>{d.valor}</div>
           </div>
           <div style={{ height: 4, background: theme.border, borderRadius: 2, overflow: 'hidden' }}>
@@ -59,7 +59,7 @@ function BarrasPorArea({ dados }) {
 function AnelFino({ fatias, raio = 46 }) {
   const { theme } = useTheme()
   const total = fatias.reduce((s, f) => s + f.valor, 0)
-  if (!total) return <div style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic', fontFamily: theme.fontSerif, textAlign: 'center', padding: 20 }}>Sem dados.</div>
+  if (!total) return <div style={{ color: theme.muted, fontSize: 12, fontFamily: theme.fontSerif, textAlign: 'center', padding: 20 }}>Sem dados.</div>
 
   let angulo = -Math.PI / 2
   const cx = 60, cy = 60
@@ -85,14 +85,14 @@ function AnelFino({ fatias, raio = 46 }) {
         <circle cx={cx} cy={cy} r={raio - espessura / 2} fill="none" stroke={theme.border} strokeWidth={1} />
         {fatiasSVG.map((f, i) => <path key={i} d={f.d} fill={f.cor} />)}
         <text x={cx} y={cy - 2} textAnchor="middle" fill={theme.text} fontSize={18} fontWeight="600" fontFamily={theme.fontTitle}>{total}</text>
-        <text x={cx} y={cy + 14} textAnchor="middle" fill={theme.muted} fontSize={9} fontStyle="italic" fontFamily={theme.fontSerif}>entradas</text>
+        <text x={cx} y={cy + 14} textAnchor="middle" fill={theme.muted} fontSize={9} fontFamily={theme.fontSerif}>entradas</text>
       </svg>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
         {fatiasSVG.map((f, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: f.cor, flexShrink: 0 }} />
             <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif }}>
-              {f.rotulo} <span style={{ color: theme.muted, fontStyle: 'italic' }}>({f.valor})</span>
+              {f.rotulo} <span style={{ color: theme.muted }}>({f.valor})</span>
             </div>
           </div>
         ))}
@@ -119,8 +119,8 @@ function StatCard({ label, valor, cor, sub, onClick }) {
         transition: 'background .15s, border-color .15s',
       }}>
       <div style={{ fontSize: 26, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, lineHeight: 1 }}>{valor}</div>
-      <div style={{ fontSize: 12, color: cor, marginTop: 5, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>{label}</div>
-      {sub && <div style={{ fontSize: 10, color: theme.muted, marginTop: 2, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>{sub}</div>}
+      <div style={{ fontSize: 12, color: cor, marginTop: 5, fontFamily: theme.fontSerif }}>{label}</div>
+      {sub && <div style={{ fontSize: 10, color: theme.muted, marginTop: 2, fontFamily: theme.fontSerif }}>{sub}</div>}
     </div>
   )
 }
@@ -228,13 +228,13 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
         <div style={card}>
           <div style={secLabel}>Fontes mais citadas</div>
           {stats.topFontes.length === 0 ? (
-            <div style={{ color: theme.muted, fontSize: 12, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Sem dados.</div>
+            <div style={{ color: theme.muted, fontSize: 12, fontFamily: theme.fontSerif }}>Sem dados.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
               {stats.topFontes.map((f, i) => (
                 <div key={i}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                    <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '75%' }} title={f.nomeCompleto}>
+                    <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '75%' }} title={f.nomeCompleto}>
                       {f.nomeCompleto}
                     </div>
                     <div style={{ fontSize: 12, color: theme.gold, fontFamily: theme.fontSerif }}>{f.valor}</div>
@@ -259,7 +259,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
         <div style={card}>
           <div style={secLabel}>Lacunas de cobertura</div>
           {stats.lacunas.length === 0 ? (
-            <div style={{ fontSize: 12, color: theme.success, fontStyle: 'italic', fontFamily: theme.fontSerif, padding: '8px 0' }}>
+            <div style={{ fontSize: 12, color: theme.success, fontFamily: theme.fontSerif, padding: '8px 0' }}>
               Todas as áreas têm cobertura adequada.
             </div>
           ) : (
@@ -271,7 +271,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <AreaDot area={l.label} theme={theme} />
-                    <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, fontStyle: 'italic' }}>{l.label}</div>
+                    <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif }}>{l.label}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ fontSize: 11, color: l.valor === 0 ? theme.penal : theme.gold, fontFamily: theme.fontSerif }}>
@@ -307,7 +307,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
                   <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12, color: theme.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: theme.fontSerif }}>{e.tema}</div>
-                      <div style={{ fontSize: 10, color: theme.muted, marginTop: 2, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.fonte}</div>
+                      <div style={{ fontSize: 10, color: theme.muted, marginTop: 2, fontFamily: theme.fontSerif }}>{e.fonte}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       <div style={{ height: 4, background: cor, borderRadius: 2, width: pct, opacity: 0.8 }} />
@@ -335,7 +335,7 @@ export default function Dashboard({ entradas, countLegislacao = 0, session, onCr
                     <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {e.tema}
                     </div>
-                    <div style={{ fontSize: 10, color: theme.muted, marginTop: 3, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                    <div style={{ fontSize: 10, color: theme.muted, marginTop: 3, fontFamily: theme.fontSerif }}>
                       {[e.fonte, new Date(e.criado_em).toLocaleDateString('pt-BR')].filter(Boolean).join(', ')}
                       {e.area === 'Informativo' ? ' (novo)' : ''}
                     </div>

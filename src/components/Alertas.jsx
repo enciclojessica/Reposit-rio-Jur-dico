@@ -264,11 +264,11 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                           <AreaDot area={e.area} theme={theme} />
-                          <span style={{ fontSize: 11, color: theme.text, fontStyle: 'italic', fontFamily: theme.fontSerif }}>
+                          <span style={{ fontSize: 11, color: theme.text, fontFamily: theme.fontSerif }}>
                             {e.area}
                           </span>
-                          <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.tipo}</span>
-                          {e.fonte && <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{e.fonte}</span>}
+                          <span style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{e.tipo}</span>
+                          {e.fonte && <span style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{e.fonte}</span>}
                         </div>
                         <div style={{ fontSize: 14, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.4, marginBottom: 4 }}>
                           {e.tema}
@@ -299,12 +299,12 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
             <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, borderBottom: `1px solid ${theme.text}`, paddingBottom: 6, marginBottom: 16 }}>
               Monitorar novo tema
             </div>
-            <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Tema</div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: theme.textSub, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Tema</div>
             <input value={tema} onChange={e => setTema(e.target.value)} onKeyDown={e => e.key === 'Enter' && adicionar()}
               placeholder="Ex: dano moral plano de saúde, responsabilidade civil bancária"
               style={{ marginBottom: 12, fontFamily: "'Inter', sans-serif" }} />
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>Tribunais</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: theme.textSub, marginBottom: 8, fontFamily: "'Inter', sans-serif" }}>Tribunais</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {TRIBUNAIS.map(t => {
                   const ativo = tribunais.includes(t.id)
@@ -323,7 +323,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Receber em</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: theme.textSub, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Receber em</div>
               <input type="email" value={email} readOnly title="Os alertas são enviados ao e-mail da sua conta" placeholder="seu@email.com" style={{ fontFamily: "'Inter', sans-serif", maxWidth: 320 }} />
             </div>
             <button onClick={adicionar} disabled={salvando || !tema.trim() || !email.trim()} style={{
@@ -358,7 +358,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                     <div style={{ fontSize: 13, color: theme.text, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Inter', sans-serif" }}>
                       {a.tema}
                     </div>
-                    <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+                    <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
                       {[
                         (Array.isArray(a.tribunal) ? a.tribunal : [a.tribunal]).includes('todos') ? 'Todos os tribunais' : (Array.isArray(a.tribunal) ? a.tribunal.join(', ') : a.tribunal),
                         a.email,

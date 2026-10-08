@@ -66,7 +66,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
     setTimeout(() => setLinkCopiado(false), 2500)
   }
 
-  const rotuloSecao = { fontSize: 12, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 5 }
+  const rotuloSecao = { fontSize: 12, fontWeight: 500, color: theme.textSub, fontFamily: "'Inter', sans-serif", marginBottom: 5 }
 
   return (
     <>
@@ -86,7 +86,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
         {/* Header */}
         <div style={{ padding: '16px 20px', borderBottom: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ color: meta.cor, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+            <span style={{ color: meta.cor, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
               {meta.label}
             </span>
             <span style={{ fontSize: 17, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
@@ -106,7 +106,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
 
         {/* Corpo */}
         <div style={{ overflowY: 'auto', flex: 1, padding: 20 }}>
-          <div style={{ fontSize: 12, color: meta.cor, fontStyle: 'italic', marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 12, color: meta.cor, marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
             {meta.nome}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
@@ -128,7 +128,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
               {caput.contexto && (
                 <div>
                   <div style={rotuloSecao}>Comentário didático</div>
-                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>{caput.contexto}</div>
+                  <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.6, fontFamily: "'Inter', sans-serif" }}>{caput.contexto}</div>
                 </div>
               )}
               {caput.aplicacao_pratica && (
@@ -165,7 +165,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
                     }}>
                     <FileText size={13} color={corDaArea(entrada.area, theme)} style={{ flexShrink: 0, marginTop: 2 }} />
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 11, color: corDaArea(entrada.area, theme), fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+                      <div style={{ fontSize: 11, color: corDaArea(entrada.area, theme), fontFamily: "'Inter', sans-serif" }}>
                         {entrada.area} · {entrada.fonte}
                       </div>
                       <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -218,7 +218,7 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
-            <span style={{ color: meta.cor, fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+            <span style={{ color: meta.cor, fontSize: 12, fontFamily: "'Inter', sans-serif" }}>
               {meta.label}
             </span>
             <span style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: theme.fontTitle }}>
@@ -230,12 +230,12 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
               </span>
             )}
             {numSubItens > 0 && (
-              <span style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
                 +{numSubItens} inciso{numSubItens !== 1 ? 's' : ''}/parágrafo{numSubItens !== 1 ? 's' : ''}
               </span>
             )}
             {citacoes > 0 && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: theme.gold, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: theme.gold, fontFamily: "'Inter', sans-serif" }}>
                 <FileText size={11} /> {citacoes} tese{citacoes !== 1 ? 's' : ''}
               </span>
             )}
@@ -247,13 +247,13 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
             <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {caput.contexto && (
                 <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
-                  <span style={{ fontStyle: 'italic', color: theme.gold }}>Comentário: </span>
+                  <span style={{ color: theme.gold }}>Comentário: </span>
                   {caput.contexto}
                 </div>
               )}
               {caput.aplicacao_pratica && (
                 <div style={{ fontSize: 12, color: theme.text, fontFamily: "'Inter', sans-serif" }}>
-                  <span style={{ color: meta.cor, fontStyle: 'italic' }}>Aplicação: </span>
+                  <span style={{ color: meta.cor }}>Aplicação: </span>
                   {caput.aplicacao_pratica}
                 </div>
               )}
@@ -467,7 +467,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
           <div style={{ fontSize: 19, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>
             Legislação
           </div>
-          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
             {total > 0 ? `${total} artigos importados, clique em qualquer um para ver detalhes` : 'Nenhum artigo importado. Use Importar, na navegação'}
           </div>
         </div>
@@ -484,8 +484,8 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
 
       {total === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: theme.muted }}>
-          <div style={{ fontSize: 14, marginBottom: 6, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nenhuma legislação importada.</div>
-          <div style={{ fontSize: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Use "Importar", na navegação, para adicionar o CPC, CDC e outros códigos.</div>
+          <div style={{ fontSize: 14, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Nenhuma legislação importada.</div>
+          <div style={{ fontSize: 12, fontFamily: "'Inter', sans-serif" }}>Use "Importar", na navegação, para adicionar o CPC, CDC e outros códigos.</div>
         </div>
       ) : (
         <>
@@ -529,7 +529,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
               style={{ paddingLeft: 38 }} />
           </div>
 
-          <div style={{ fontSize: 12, color: theme.muted, marginBottom: 12, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 12, color: theme.muted, marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
             {loading ? 'Buscando…' : `${gruposArtigos.length} artigo${gruposArtigos.length !== 1 ? 's' : ''} encontrado${gruposArtigos.length !== 1 ? 's' : ''}${artigos.length < totalResultados ? ` (mostrando as primeiras ${artigos.length} linhas de ${totalResultados})` : ''}`}
           </div>
 
@@ -538,7 +538,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
               <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} citacoes={mapaCitacoes.get(`${g.codigo}|${g.numero}`) || 0} />
             ))}
             {!loading && gruposArtigos.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
+              <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
             )}
             {!loading && artigos.length < totalResultados && (
               <button

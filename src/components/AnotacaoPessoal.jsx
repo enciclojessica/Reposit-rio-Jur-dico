@@ -168,7 +168,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
   return (
     <div style={{ marginTop: 10 }}>
       <button onClick={() => setAberto(a => !a)}
-        style={{ fontSize: 12, background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, color: nota ? theme.gold : theme.muted, padding: '5px 12px', cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 5 }}>
+        style={{ fontSize: 12, background: 'none', border: `1px solid ${theme.border}`, borderRadius: 6, color: nota ? theme.gold : theme.muted, padding: '5px 12px', cursor: 'pointer', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 5 }}>
         <PenLine size={11} /> {carregando ? 'Carregando…' : (nota ? 'Ver anotação' : 'Adicionar anotação')}
       </button>
       {aberto && !carregando && (
@@ -180,7 +180,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
             </button>
           )}
           {erroDitado && (
-            <div style={{ fontSize: 10, color: theme.penal, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
+            <div style={{ fontSize: 10, color: theme.penal, fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
               {erroDitado}
             </div>
           )}
@@ -188,7 +188,7 @@ export default function AnotacaoPessoal({ itemId, session, theme, namespace = 'g
             placeholder={placeholder}
             style={{ width: '100%', minHeight: 70, background: theme.raised, border: `1px solid ${nota ? theme.gold + '66' : theme.border}`, borderRadius: 8, color: theme.text, fontSize: 12, padding: '8px 10px', fontFamily: 'Inter, sans-serif', lineHeight: 1.5, resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
           />
-          <div style={{ fontSize: 10, color: theme.muted, marginTop: 3, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 4, minHeight: 14 }}>
+          <div style={{ fontSize: 10, color: theme.muted, marginTop: 3, fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: 4, minHeight: 14 }}>
             {salvando && <><Loader2 size={10} style={{ animation: 'spin 1s linear infinite' }} /> Salvando…</>}
             {salvo && !salvando && <><Check size={10} color={theme.success} /> Salvo, sincronizado com sua conta</>}
           </div>

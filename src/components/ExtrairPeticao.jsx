@@ -356,20 +356,20 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
               <div style={{ fontSize: 24, fontWeight: 600, color: theme.success, fontFamily: theme.fontTitle }}>
                 {resultado.teses_salvas ?? 0}
               </div>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>tese(s) adicionadas</div>
+              <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>tese(s) adicionadas</div>
             </div>
             <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: `1px solid ${theme.border}`, borderTop: `2px solid ${theme.civel}`, borderRadius: 6, padding: '12px 16px' }}>
               <div style={{ fontSize: 24, fontWeight: 600, color: theme.civel, fontFamily: theme.fontTitle }}>
                 {resultado.artigos_salvos ?? 0}
               </div>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>artigo(s) na legislação</div>
+              <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>artigo(s) na legislação</div>
             </div>
             {((resultado.juris_salvas ?? 0) + (resultado.juris_atualizadas ?? 0)) > 0 && (
               <div style={{ flex: 1, minWidth: 100, background: theme.raised, border: `1px solid ${theme.border}`, borderTop: `2px solid ${theme.doutrina}`, borderRadius: 6, padding: '12px 16px' }}>
                 <div style={{ fontSize: 24, fontWeight: 600, color: theme.doutrina, fontFamily: theme.fontTitle }}>
                   {(resultado.juris_salvas ?? 0) + (resultado.juris_atualizadas ?? 0)}
                 </div>
-                <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
+                <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
                   jurisprudência(s)
                   {resultado.juris_atualizadas > 0 && ` (${resultado.juris_atualizadas} com novo contexto)`}
                 </div>
@@ -387,7 +387,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
             <div style={{ marginBottom: 20 }}>
               {resultado.detalhes.teses?.length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
                     Teses / Doutrina / Jurisprudência do Repositório
                   </div>
                   {resultado.detalhes.teses.map((t, i) => (
@@ -408,7 +408,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
               {resultado.detalhes.artigos?.length > 0 && (
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
                     Artigos de Legislação
                   </div>
                   {resultado.detalhes.artigos.map((a, i) => (
@@ -430,7 +430,7 @@ Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem texto ant
 
               {resultado.detalhes.juris?.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 10, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, color: theme.muted, fontFamily: "'Inter', sans-serif", marginBottom: 6 }}>
                     Jurisprudência citada na peça
                   </div>
                   {resultado.detalhes.juris.map((j, i) => (

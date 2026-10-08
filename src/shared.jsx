@@ -113,7 +113,6 @@ export function Badge({ label, color, small }) {
       color,
       fontSize: small ? 11 : 12,
       fontFamily: "'Inter', sans-serif",
-      fontStyle: 'italic',
       whiteSpace: 'nowrap',
     }}>{label}</span>
   )
@@ -124,9 +123,9 @@ export function FieldLabel({ children }) {
   return (
     <div style={{
       fontSize: 12,
-      color: theme.gold,
+      fontWeight: 500,
+      color: theme.textSub,
       fontFamily: "'Inter', sans-serif",
-      fontStyle: 'italic',
       marginBottom: 6,
       marginTop: 14,
     }}>{children}</div>
@@ -212,7 +211,6 @@ export function StatusBadge({ status, onClick, pequena }) {
         borderRadius: 20, padding: pequena ? '1px 9px' : '3px 11px',
         fontSize: pequena ? 11 : 12,
         fontFamily: "'Inter', sans-serif",
-        fontStyle: 'italic',
         cursor: onClick ? 'pointer' : 'default',
         userSelect: 'none', whiteSpace: 'nowrap',
       }}>

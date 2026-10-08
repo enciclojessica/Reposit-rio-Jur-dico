@@ -41,7 +41,7 @@ export default function Hoje({ entradas, session, onSelectEntrada }) {
         <div style={{ fontSize: 20, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle, marginBottom: 4 }}>
           Hoje
         </div>
-        <div style={{ fontSize: 13, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>{dataCapitalizada}</div>
+        <div style={{ fontSize: 13, color: theme.muted, fontFamily: theme.fontSerif }}>{dataCapitalizada}</div>
       </div>
 
       {continuarLendo.length > 0 && (
@@ -59,7 +59,7 @@ export default function Hoje({ entradas, session, onSelectEntrada }) {
                 <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {e.tema}
                 </div>
-                <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif, marginTop: 2 }}>
                   {[e.area, e.tipo].filter(Boolean).join(', ')}
                 </div>
               </div>
@@ -73,7 +73,7 @@ export default function Hoje({ entradas, session, onSelectEntrada }) {
       </div>
 
       {novidades.length === 0 ? (
-        <div style={{ color: theme.muted, fontSize: 13, fontStyle: 'italic', fontFamily: theme.fontSerif, padding: '14px 0' }}>Nenhuma entrada ainda.</div>
+        <div style={{ color: theme.muted, fontSize: 13, fontFamily: theme.fontSerif, padding: '14px 0' }}>Nenhuma entrada ainda.</div>
       ) : (
         novidades.map((e, i) => (
           <div key={e.id} onClick={() => onSelectEntrada?.(e)}
@@ -90,12 +90,12 @@ export default function Hoje({ entradas, session, onSelectEntrada }) {
               <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {e.tema}
               </div>
-              <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginTop: 3 }}>
+              <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, marginTop: 3 }}>
                 {[e.area, e.fonte, new Date(e.criado_em).toLocaleDateString('pt-BR')].filter(Boolean).join(', ')}
               </div>
             </div>
             {e.area === 'Informativo' && (
-              <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, flexShrink: 0, paddingTop: 2 }}>novo</div>
+              <div style={{ fontSize: 11, color: theme.gold, fontFamily: theme.fontSerif, flexShrink: 0, paddingTop: 2 }}>novo</div>
             )}
           </div>
         ))

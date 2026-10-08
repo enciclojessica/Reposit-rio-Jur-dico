@@ -24,7 +24,7 @@ export default function NovidadesApp({ session }) {
 
       {NOVIDADES_APP.map((n, i) => (
         <div key={i} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: i < NOVIDADES_APP.length - 1 ? `1px solid ${theme.border}` : 'none' }}>
-          <div style={{ fontSize: 11, color: theme.gold, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 4 }}>
+          <div style={{ fontSize: 11, color: theme.gold, fontFamily: theme.fontSerif, marginBottom: 4 }}>
             {new Date(n.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
           </div>
           <div style={{ fontSize: 15, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 6 }}>{n.titulo}</div>
