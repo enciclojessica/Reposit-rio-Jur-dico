@@ -1,0 +1,3 @@
+-- CF art. 171 (revogado pela EC 6/1995): caput, incisos I e II, § 1º (I, II, a, b) e § 2º. vigente = false.
+-- Texto do compilado do Planalto enviado pela Jessica em 09/10/2026. Aplicado direto; 9 linhas (total 17.623).
+-- Rótulos como na fonte ("§ 1º -"); anotação de revogação mantida no texto, como no CF 233.
