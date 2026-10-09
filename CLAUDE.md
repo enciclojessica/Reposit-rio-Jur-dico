@@ -64,7 +64,7 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
 
 - GitHub: `enciclojessica/Reposit-rio-Jur-dico` (público). Vercel: `prj_hvj9epzrozqftDYENkITPRPHrZrv`, domínio `themisjur.com.br`.
 - Supabase: ref `wedfgqigtyrsrmmxsmuo`. As 4 tabelas de backup de 02/10/2026 (`legislacao_bkp_*`) foram apagadas em 08/10/2026,
-  após validação da Jessica; `legislacao` ficou com 13.781 linhas e, após a importação do CPP, tinha 15.911 e, com o CTB, tinha 17.519; com a inclusão do art. 155 §§ 10 a 12 e do art. 157 § 2º, XI e § 2º-A, III (a a e), tem 17.539. Os backups de 09/10/2026 (`legislacao_bkp_20261009` e `legislacao_bkp_20261009_ctb_cpp`) foram aprovados para exclusão pela Jessica em 09/10/2026 (SQL em `MIGRATION_ajustes_finais_20261009.sql`).
+  após validação da Jessica; `legislacao` ficou com 13.781 linhas e, após a importação do CPP, tinha 15.911 e, com o CTB, tinha 17.519; com a inclusão do art. 155 §§ 10 a 12 e do art. 157 § 2º, XI e § 2º-A, III (a a e), tem 17.539 e, com CF art. 233 (caput e §§ 1º a 3º, revogados pela EC 28/2000) e Lei 9.099 art. 47 (vetado), tem 17.544 (`MIGRATION_lacunas_cf233_lei9099_47.sql`). Os backups de 09/10/2026 (`legislacao_bkp_20261009` e `legislacao_bkp_20261009_ctb_cpp`) foram aprovados para exclusão pela Jessica em 09/10/2026 (SQL em `MIGRATION_ajustes_finais_20261009.sql`).
 - Os JSON de carga do repositório de importação (`themis-jur-importacao`) estão no formato antigo; regerar a partir do banco se forem reutilizados.
 - Sessões longas derrubam o conector do Supabase às vezes ("No approval received", "Mcp-Session-Id header is required"): tentar de novo
   ou abrir conversa nova. O terminal em nuvem não alcança `planalto.gov.br`: arquivos de lei precisam ser enviados pela Jessica.
@@ -78,7 +78,7 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 
 - Auditoria de 09/10/2026 (correções em `MIGRATION_auditoria_20261009.sql`). Sem duplicatas, entidades, mojibake, órfãos, referências cruzadas quebradas (CTB e CPP) nem divergência de vigência. Em aberto, para decidir com a Jessica:
   - CF `titulo` como rótulo temático: resolvido em 09/10/2026 (`MIGRATION_cf_rotulo_20261009.sql`). `titulo` é só para artigos com letra; os rótulos foram para a coluna `rotulo` (exibida como subtítulo do cartão em `Legislacao.jsx` e `LegislacaoPublica.jsx`, e incluída na busca `busca_tsv`). O art. 5º agora é um grupo só.
-  - Lacunas de numeração: ADCT 91, 106, 108 a 112 e 114; CC 1.621 a 1.629; CF 117, 171 e 233; Lei 9.099 art. 47; CPP (7 já registrados). Conferir no texto compilado se são artigos revogados ou vetados antes de inserir.
+  - Lacunas de numeração: restam ADCT 91, 106, 108 a 112 e 114; CF 171; CPP (7 já registrados). Conferir no texto compilado se são artigos revogados ou vetados antes de inserir. Resolvidas em 09/10/2026 com o texto enviado pela Jessica: CC 1.620 a 1.629 (já é uma linha revogada só, como o CPP 556), CF 117 (é o ADCT 117, já presente e idêntico à EC 136/2025), CF 233 e Lei 9.099 art. 47.
   - CPC art. 1.030, parágrafo único: `vigente = false` sem marca de revogação no texto; conferir.
   - Sem comentário (nunca preenchidos): CF (251 caputs), ADCT (138), Lei 8.906 (96) e CED-OAB (84); CED-OAB com `origem` diferente de 'planalto.gov.br' (226 linhas).
   - Travessão nos comentários de CC, CDC, CP, CPC, CF e Lei 9.099 (padrão da Jessica, não alterado).
