@@ -64,7 +64,7 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
 
 - GitHub: `enciclojessica/Reposit-rio-Jur-dico` (público). Vercel: `prj_hvj9epzrozqftDYENkITPRPHrZrv`, domínio `themisjur.com.br`.
 - Supabase: ref `wedfgqigtyrsrmmxsmuo`. As 4 tabelas de backup de 02/10/2026 (`legislacao_bkp_*`) foram apagadas em 08/10/2026,
-  após validação da Jessica; `legislacao` ficou com 13.781 linhas e, após a importação do CPP, tinha 15.911 e, com o CTB, tem 17.519. Os backups de 09/10/2026 (`legislacao_bkp_20261009` e `legislacao_bkp_20261009_ctb_cpp`) foram aprovados para exclusão pela Jessica em 09/10/2026 (SQL em `MIGRATION_ajustes_finais_20261009.sql`).
+  após validação da Jessica; `legislacao` ficou com 13.781 linhas e, após a importação do CPP, tinha 15.911 e, com o CTB, tinha 17.519; com a inclusão do art. 155 §§ 10 a 12 e do art. 157 § 2º, XI, tem 17.533. Os backups de 09/10/2026 (`legislacao_bkp_20261009` e `legislacao_bkp_20261009_ctb_cpp`) foram aprovados para exclusão pela Jessica em 09/10/2026 (SQL em `MIGRATION_ajustes_finais_20261009.sql`).
 - Os JSON de carga do repositório de importação (`themis-jur-importacao`) estão no formato antigo; regerar a partir do banco se forem reutilizados.
 - Sessões longas derrubam o conector do Supabase às vezes ("No approval received", "Mcp-Session-Id header is required"): tentar de novo
   ou abrir conversa nova. O terminal em nuvem não alcança `planalto.gov.br`: arquivos de lei precisam ser enviados pela Jessica.
@@ -78,7 +78,7 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 
 - Reescrita dos comentários curtos (menos de 200 caracteres na `aplicacao_pratica`), regra aprovada em 09/10/2026: reescrever só onde há ganho verificável no texto do banco (função ou distinção frente a dispositivos vizinhos), sem jurisprudência, doutrina, penas ou prazos que não estejam no artigo. CPP: 55 reescritos e aplicados (`MIGRATION_reescrita_cpp_curtos_lote1.sql` a `lote4.sql`), o restante dos curtos foi mantido por já dizer tudo. CTB: 12 em `MIGRATION_reescrita_ctb_curtos_lote1.sql` (aguardando execução e conferência), o restante mantido. Observação: comentários do CTB com afirmações sobre prática forense ("muito invocado em colisões") foram removidos onde apareciam nos curtos (arts. 28 e 42).
 - CC art. 1.783-A: corrigir os caracteres soltos com `MIGRATION_ajustes_finais_20261009.sql` (7 linhas; aplicar e conferir 0 restantes).
-- CP arts. 155, 157 e 171: conferir valores de pena (Lei 15.397/2026) antes de qualquer comentário que os cite.
+- CP arts. 155, 157 e 171: penas conferidas em 09/10/2026 contra prints do texto compilado (155: 1 a 6; §4º 2 a 8; 157: 6 a 10; 171: 1 a 5; 171-A: 4 a 8), sem divergência. Foram inseridos o art. 155 §§ 10 a 12 e o art. 157 § 2º, XI (Lei 15.517/2026) em `MIGRATION_cp_155_157_lei_15517.sql`. Ainda não conferidos contra o texto: art. 157 § 2º-A, III (incluído pela Lei 15.517/2026, com alíneas) e os §§ 2º-B a 5º, que não apareceram nos prints.
 - CP art. 337-A § 2º, I: existe no banco como "(VETADO)", `vigente = false`, o que confere com a fonte; sem pendência. CDC art. 49: comentário corrigido em 09/10/2026 (sem "internet", que não está no caput).
 - CPC art. 1.063: corrigido em 09/10/2026 para `vigente = true` (redação dada pela Lei 14.976/2024, conferida em print do texto compilado do Planalto enviado pela Jessica) e comentado; sem pendência.
 - Conferir na tela: CF art. 5º e 37, Estatuto art. 7º, CED art. 2º, um artigo do CC com muitos incisos.
