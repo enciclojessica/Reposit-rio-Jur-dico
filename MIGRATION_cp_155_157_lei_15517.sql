@@ -24,3 +24,20 @@ where not exists (
   where l.codigo='cp' and l.numero=v.numero and coalesce(l.titulo,'')=''
     and coalesce(l.inciso,'')=coalesce(v.inciso,'') and coalesce(l.paragrafo,'')=coalesce(v.paragrafo,'')
 );
+
+-- CP art. 157 § 2º-A, III e alineas a a e (Lei 15.517/2026); alinea e) vetada (vigente = false).
+-- Alinea sob inciso: inciso 'III-a'. Idempotente.
+insert into legislacao (codigo, numero, inciso, paragrafo, texto, titulo, vigente, origem)
+select 'cp', 157, v.inciso, '2-A', v.texto, null, v.vigente, 'planalto.gov.br'
+from (values
+ ('III',   $t$III – se do crime previsto no inciso XI do § 2º deste artigo resulta: (Incluído pela Lei nº 15.517, de 2026)$t$, true),
+ ('III-a', $t$a) suspensão ou paralisação das atividades do estabelecimento; (Incluído pela Lei nº 15.517, de 2026)$t$, true),
+ ('III-b', $t$b) desabastecimento; (Incluído pela Lei nº 15.517, de 2026)$t$, true),
+ ('III-c', $t$c) incêndio; (Incluído pela Lei nº 15.517, de 2026)$t$, true),
+ ('III-d', $t$d) poluição efetiva ou potencial ao meio ambiente; ou (Incluído pela Lei nº 15.517, de 2026)$t$, true),
+ ('III-e', $t$e) (VETADO) (Incluído pela Lei nº 15.517, de 2026)$t$, false)
+) as v(inciso, texto, vigente)
+where not exists (
+  select 1 from legislacao l
+  where l.codigo='cp' and l.numero=157 and coalesce(l.titulo,'')='' and l.paragrafo='2-A' and l.inciso=v.inciso
+);
