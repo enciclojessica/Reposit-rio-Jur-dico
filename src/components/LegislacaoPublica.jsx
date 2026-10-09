@@ -16,6 +16,11 @@ const CODIGOS_META = {
   lei9099: { label: 'Lei 9.099/95', cor: '#8a5a2e' },
 }
 
+// Rótulo temático do artigo (ex.: CF art. 37, "Princípios da Administração Pública"), guardado na linha do caput.
+function rotuloDoGrupo(grupo) {
+  return grupo.itens.find(i => !i.inciso && !i.paragrafo)?.rotulo || ''
+}
+
 export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) {
   const { theme } = useTheme()
   const [grupos, setGrupos]   = useState([])
@@ -92,6 +97,11 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
                 <span style={{ fontSize: 20, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
                   {grupo.titulo || `Art. ${numero}`}
                 </span>
+                {rotuloDoGrupo(grupo) && (
+                  <span style={{ fontSize: 13, color: theme.textSub, fontFamily: "'Inter', sans-serif" }}>
+                    {rotuloDoGrupo(grupo)}
+                  </span>
+                )}
               </div>
               <button onClick={() => copiar(grupo)} style={{ background: theme.btnMutedBg, color: copiado ? theme.success : theme.text, border: `1px solid ${copiado ? theme.success : theme.border}`, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                 {copiado ? <Check size={12} /> : <Copy size={12} />} {copiado ? 'Copiado' : 'Copiar'}

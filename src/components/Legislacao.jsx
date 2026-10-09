@@ -92,6 +92,11 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
             <span style={{ fontSize: 17, fontWeight: 600, color: theme.text, fontFamily: theme.fontTitle }}>
               {grupo.titulo || `Art. ${grupo.numero}`}
             </span>
+            {caput?.rotulo && (
+              <span style={{ fontSize: 12, color: theme.textSub, fontFamily: "'Inter', sans-serif" }}>
+                {caput.rotulo}
+              </span>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={compartilharLink} style={{ background: theme.btnMutedBg, color: linkCopiado ? theme.success : theme.gold, border: `1px solid ${linkCopiado ? theme.success : theme.border}`, borderRadius: 6, padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -224,6 +229,11 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
             <span style={{ fontSize: 13, color: theme.text, fontWeight: 600, fontFamily: theme.fontTitle }}>
               {grupo.titulo || `Art. ${grupo.numero}`}
             </span>
+            {caput?.rotulo && (
+              <span style={{ fontSize: 12, color: theme.textSub, fontFamily: "'Inter', sans-serif" }}>
+                {caput.rotulo}
+              </span>
+            )}
             {revogado && (
               <span style={{ fontSize: 10, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Revogado
