@@ -37,6 +37,7 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
   `LegislacaoPublica.jsx` e `api/legislacao.js`).
 - Códigos carregados: cf, adct, cc, cdc, cp, cpc, cpp, ctb, cedoab, lei8906, lei9099. O CPP (Decreto-Lei 3.689/1941, texto compilado do Planalto) entrou em 08/10/2026 com 2.134 linhas (74 não vigentes) e 804 artigos; ficaram de fora 7 números que a versão compilada não traz (194, 557 a 560, 562 e 611), e os intervalos 556 e 561 estão como uma linha revogada cada. Erros de grafia da fonte foram mantidos ("Ihe", "Xl"), mas hífen com espaço ("boa- fé") foi corrigido. Alínea sob inciso: `inciso` 'III-a'; alínea direto sob o caput ou parágrafo: `inciso` = a letra. O CTB (Lei 9.503/1997, texto compilado do Planalto) entrou em 08/10/2026 com 1.612 linhas (154 não vigentes), 341 artigos e 50 títulos com letra (ex.: 253-A, 268-A, 326-C); ficaram de fora o Anexo I (definições) e os demais anexos, o art. 147 § 1º-A e o art. 268-A § 8º com seus incisos (a fonte traz só o rótulo e a anotação da Medida Provisória, sem texto). Linhas sem rótulo ("Infração", "Penalidade", "Medida administrativa", "Penas") ficam dentro do `texto` da linha anterior. Em 08/10/2026 o CTB e o CPP foram padronizados como as demais leis: hífen com espaço ("contar- se"), "13. 281", "Incluído Lei" (sem "pela"), "13.495, 2017" (sem "de") e "XXIV-" foram corrigidos. Truncamentos da própria fonte foram mantidos (art. 162, VII "(Incluído dad"; art. 280, § 6º sem o ")" final). Art. 139-A, I e IV (revogados pela MP 1.360/2026, vigência encerrada) seguem com `vigente = true`, como na fonte. Em 08/10/2026 os 364 artigos vigentes do CTB (inclusive os com letra) ganharam `contexto` (Comentário didático) e `aplicacao_pratica` (Aplicação prática) na linha do caput, no padrão de CP, CDC, CPC e Lei 9.099, redigidos só a partir do texto do artigo (sem jurisprudência ou doutrina). Em 09/10/2026 os 809 artigos vigentes do CPP (inclusive os com letra) ganharam `contexto` e `aplicacao_pratica` na linha do caput, no mesmo padrão do CTB, redigidos só a partir do texto do artigo (sem jurisprudência ou doutrina); onde o texto traz a anotação "Vide", o comentário apenas a registra, sem afirmar o resultado.
 - **CC, CDC, CP, CPC e Lei 9.099 são o padrão de referência da Jessica**: só ler e relatar; alterar apenas com autorização expressa.
+  Em 09/10/2026, com autorização expressa dela, `origem` de CC e Lei 9.099 foi normalizada para 'planalto.gov.br' e os caputs que estavam sem `contexto`/`aplicacao_pratica` foram preenchidos só a partir do texto do artigo (sem jurisprudência ou doutrina): CC 9, CDC 14, CPC 8, Lei 9.099 art. 95 (só `aplicacao_pratica`) e CP 118 (arts. 35 a 361). Conferência por SELECT: 0 caputs vigentes sem comentário em cc, cdc, cp, cpc e lei9099. SQL em `MIGRATION_comentarios_faltantes_cc_cdc_cpc.sql` e `MIGRATION_comentarios_faltantes_cp_lote1.sql` a `_lote4.sql`.
 - Importação em lote: preparar candidatos em Python, conferir por `SELECT` que cada (código, número) existe, aplicar em lotes pequenos e
   rodar build e testes ao fim de cada leva. Auditoria completa (duplicatas, conteúdo raso, referência cruzada, formato de data e citação)
   é rotina que ela pede periodicamente.
@@ -63,7 +64,7 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
 
 - GitHub: `enciclojessica/Reposit-rio-Jur-dico` (público). Vercel: `prj_hvj9epzrozqftDYENkITPRPHrZrv`, domínio `themisjur.com.br`.
 - Supabase: ref `wedfgqigtyrsrmmxsmuo`. As 4 tabelas de backup de 02/10/2026 (`legislacao_bkp_*`) foram apagadas em 08/10/2026,
-  após validação da Jessica; `legislacao` ficou com 13.781 linhas e, após a importação do CPP, tinha 15.911 e, com o CTB, tem 17.519.
+  após validação da Jessica; `legislacao` ficou com 13.781 linhas e, após a importação do CPP, tinha 15.911 e, com o CTB, tem 17.519. Backups de 09/10/2026 (apagar só após validação da Jessica): `legislacao_bkp_20261009` (cc, lei9099, cdc, cp, cpc, antes da normalização e dos comentários) e `legislacao_bkp_20261009_ctb_cpp` (ctb 1.612 e cpp 2.134 linhas, antes de qualquer reescrita dos comentários).
 - Os JSON de carga do repositório de importação (`themis-jur-importacao`) estão no formato antigo; regerar a partir do banco se forem reutilizados.
 - Sessões longas derrubam o conector do Supabase às vezes ("No approval received", "Mcp-Session-Id header is required"): tentar de novo
   ou abrir conversa nova. O terminal em nuvem não alcança `planalto.gov.br`: arquivos de lei precisam ser enviados pela Jessica.
@@ -74,6 +75,12 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 (confirmar que o `main` não mudou desde a base).
 
 ## Pendências
+
+- Reescrita dos comentários de CTB (364) e CPP (809): auditoria de 09/10/2026 mostrou que o defeito de índice de parágrafo é raro (CPP 14, CTB 0); o problema é densidade (CTB 160 e CPP 364 com menos de 200 caracteres). Escopo a definir com a Jessica.
+- CC art. 1.783-A: caracteres soltos no texto do banco ("ido&#770;neas"); corrigir só com autorização.
+- CP arts. 155, 157 e 171: conferir valores de pena (Lei 15.397/2026) antes de qualquer comentário que os cite.
+- CDC art. 49: comentário cita "internet", que não está no caput (vem do Decreto 7.962/2013); confirmar.
+- CP art. 337-A § 2º, I: ausente no banco (só o inciso II está carregado); conferir com o Planalto.
 
 - CPC art. 1.063 (está como não vigente; confirmar).
 - Conferir na tela: CF art. 5º e 37, Estatuto art. 7º, CED art. 2º, um artigo do CC com muitos incisos.
