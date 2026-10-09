@@ -82,4 +82,5 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
   - CPC art. 1.030, parágrafo único: `vigente = false` sem marca de revogação no texto; conferir.
   - Sem comentário (nunca preenchidos): CF (251 caputs), ADCT (138), Lei 8.906 (96) e CED-OAB (84); CED-OAB com `origem` diferente de 'planalto.gov.br' (226 linhas).
   - Travessão nos comentários de CC, CDC, CP, CPC, CF e Lei 9.099 (padrão da Jessica, não alterado).
-- Páginas em aberto de outras frentes: Página inicial para visitantes (opcional).
+- Conferir na tela: CF art. 5º e 37 (ligado ao item de `titulo` acima), Estatuto art. 7º, CED art. 2º, um artigo do CC com muitos incisos.
+- Página inicial para visitantes, no molde da do app de questões (opcional).
