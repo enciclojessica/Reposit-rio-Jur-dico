@@ -76,10 +76,10 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 
 ## Pendências
 
-- Reescrita dos comentários curtos (menos de 200 caracteres na `aplicacao_pratica`), regra aprovada em 09/10/2026: reescrever só onde há ganho verificável no texto do banco (função ou distinção frente a dispositivos vizinhos), sem jurisprudência, doutrina, penas ou prazos que não estejam no artigo. CPP: 55 reescritos e aplicados (`MIGRATION_reescrita_cpp_curtos_lote1.sql` a `lote4.sql`), o restante dos curtos foi mantido por já dizer tudo. CTB: 12 em `MIGRATION_reescrita_ctb_curtos_lote1.sql` (aguardando execução e conferência), o restante mantido. Observação: comentários do CTB com afirmações sobre prática forense ("muito invocado em colisões") foram removidos onde apareciam nos curtos (arts. 28 e 42).
-- CC art. 1.783-A: corrigir os caracteres soltos com `MIGRATION_ajustes_finais_20261009.sql` (7 linhas; aplicar e conferir 0 restantes).
-- CP arts. 155, 157 e 171: penas conferidas em 09/10/2026 contra prints do texto compilado (155: 1 a 6; § 4º 2 a 8; 157: 6 a 10; § 3º, I 7 a 18 e II 24 a 30; § 5º 20 a 40; 171: 1 a 5; 171-A: 4 a 8), sem divergência. Inseridos, da Lei 15.517/2026: art. 155 §§ 10 a 12, art. 157 § 2º, XI e § 2º-A, III com alíneas a a e (a alínea e é vetada, `vigente = false`), em `MIGRATION_cp_155_157_lei_15517.sql`. Arts. 155, 157 e 171 (inclusive 171-A) conferidos por inteiro contra o texto compilado em 09/10/2026; o art. 171 não tinha divergência, sem pendência.
-- CP art. 337-A § 2º, I: existe no banco como "(VETADO)", `vigente = false`, o que confere com a fonte; sem pendência. CDC art. 49: comentário corrigido em 09/10/2026 (sem "internet", que não está no caput).
-- CPC art. 1.063: corrigido em 09/10/2026 para `vigente = true` (redação dada pela Lei 14.976/2024, conferida em print do texto compilado do Planalto enviado pela Jessica) e comentado; sem pendência.
-- Conferir na tela: CF art. 5º e 37, Estatuto art. 7º, CED art. 2º, um artigo do CC com muitos incisos.
-- Página inicial para visitantes, no molde da do app de questões (opcional).
+- Auditoria de 09/10/2026 (correções em `MIGRATION_auditoria_20261009.sql`). Sem duplicatas, entidades, mojibake, órfãos, referências cruzadas quebradas (CTB e CPP) nem divergência de vigência. Em aberto, para decidir com a Jessica:
+  - CF `titulo` usado como rótulo temático em 183 linhas (arts. 1, 2, 5, 9, 12, 15, 16, 37 a 47, 50, 53), contra o padrão (`titulo` só para 'Art. N-X'): o agrupamento por `numero|titulo` e o cabeçalho do cartão usam esse campo, então o art. 5º aparece dividido (102 linhas sem caput mais 6 cartões de uma linha) e outros cartões aparecem com o rótulo no lugar de 'Art. N'. Mexer exige decidir o destino dos rótulos.
+  - Lacunas de numeração: ADCT 91, 106, 108 a 112 e 114; CC 1.621 a 1.629; CF 117, 171 e 233; Lei 9.099 art. 47; CPP (7 já registrados). Conferir no texto compilado se são artigos revogados ou vetados antes de inserir.
+  - CPC art. 1.030, parágrafo único: `vigente = false` sem marca de revogação no texto; conferir.
+  - Sem comentário (nunca preenchidos): CF (251 caputs), ADCT (138), Lei 8.906 (96) e CED-OAB (84); CED-OAB com `origem` diferente de 'planalto.gov.br' (226 linhas).
+  - Travessão nos comentários de CC, CDC, CP, CPC, CF e Lei 9.099 (padrão da Jessica, não alterado).
+- Páginas em aberto de outras frentes: Página inicial para visitantes (opcional).
