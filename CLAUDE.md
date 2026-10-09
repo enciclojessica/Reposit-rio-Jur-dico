@@ -80,6 +80,6 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 - CC art. 1.783-A: corrigir os caracteres soltos com `MIGRATION_ajustes_finais_20261009.sql` (7 linhas; aplicar e conferir 0 restantes).
 - CP arts. 155, 157 e 171: conferir valores de pena (Lei 15.397/2026) antes de qualquer comentário que os cite.
 - CP art. 337-A § 2º, I: existe no banco como "(VETADO)", `vigente = false`, o que confere com a fonte; sem pendência. CDC art. 49: comentário corrigido em 09/10/2026 (sem "internet", que não está no caput).
-- CPC art. 1.063 (está como não vigente, mas o texto traz "Redação dada pela Lei nº 14.976, de 2024"; confirmar no texto compilado do Planalto, que a busca automática não alcançou).
+- CPC art. 1.063: corrigido em 09/10/2026 para `vigente = true` (redação dada pela Lei 14.976/2024, conferida em print do texto compilado do Planalto enviado pela Jessica) e comentado; sem pendência.
 - Conferir na tela: CF art. 5º e 37, Estatuto art. 7º, CED art. 2º, um artigo do CC com muitos incisos.
 - Página inicial para visitantes, no molde da do app de questões (opcional).
