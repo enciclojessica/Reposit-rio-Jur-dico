@@ -76,7 +76,7 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 
 ## Pendências
 
-- Reescrita dos comentários de CTB (364) e CPP (809): auditoria de 09/10/2026 mostrou que o defeito de índice de parágrafo é raro (CPP 14, CTB 0); o problema é densidade (CTB 160 e CPP 364 com menos de 200 caracteres). Escopo a definir com a Jessica.
+- Reescrita dos comentários curtos (menos de 200 caracteres na `aplicacao_pratica`), regra aprovada em 09/10/2026: reescrever só onde há ganho verificável no texto do banco (função ou distinção frente a dispositivos vizinhos), sem jurisprudência, doutrina, penas ou prazos que não estejam no artigo. CPP: 55 reescritos e aplicados (`MIGRATION_reescrita_cpp_curtos_lote1.sql` a `lote4.sql`), o restante dos curtos foi mantido por já dizer tudo. CTB: 12 em `MIGRATION_reescrita_ctb_curtos_lote1.sql` (aguardando execução e conferência), o restante mantido. Observação: comentários do CTB com afirmações sobre prática forense ("muito invocado em colisões") foram removidos onde apareciam nos curtos (arts. 28 e 42).
 - CC art. 1.783-A: caracteres soltos no texto do banco ("ido&#770;neas"); corrigir só com autorização.
 - CP arts. 155, 157 e 171: conferir valores de pena (Lei 15.397/2026) antes de qualquer comentário que os cite.
 - CDC art. 49: comentário cita "internet", que não está no caput (vem do Decreto 7.962/2013); confirmar.
