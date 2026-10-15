@@ -36,7 +36,7 @@ describe('tagsVisiveis', () => {
     expect(tagsVisiveis({ tipo: 'lei', tema: 'x' })).toEqual([])
   })
 
-  it('esconde siglas de código/diploma (cpc, cpp, cf, cp, cc, cdc, ctb, lei9099)', () => {
+  it('esconde siglas de código/diploma (cpc, cpp, cf, cp, cc, cdc, ctb, lei9099, lep)', () => {
     const entry = { tipo: 'doutrina', tema: 'Crime impossível: ineficácia absoluta do meio', tags: ['cp'] }
     expect(tagsVisiveis(entry)).toEqual([])
   })

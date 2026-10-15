@@ -13,6 +13,7 @@ const CODIGOS_META = {
   cpp:     { label: 'CPP',          nome: 'Código de Processo Penal',       cor: '#7a1128' },
   cf:      { label: 'CF/88',        nome: 'Constituição Federal',           cor: '#3f4a7a' },
   lei9099: { label: 'Lei 9.099/95', nome: 'Juizados Especiais',             cor: '#8a5a2e' },
+  lep:     { label: 'LEP',          nome: 'Lei de Execução Penal',          cor: '#5a3a2e' },
 }
 
 // ── Modal de detalhe ────────────────────────────────────────────────────────

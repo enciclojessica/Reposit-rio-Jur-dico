@@ -18,6 +18,7 @@ const NOME_CODIGO_LANDING = {
   cc: 'Código Civil', cpc: 'Código de Processo Civil', cpp: 'Código de Processo Penal',
   cdc: 'Código de Defesa do Consumidor', cf: 'Constituição Federal',
   ctb: 'Código de Trânsito Brasileiro', lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
+  lep: 'Lei de Execução Penal (Lei 7.210/1984)',
 }
 
 // Revela um bloco uma vez, quando entra na tela ao rolar — usado pra
