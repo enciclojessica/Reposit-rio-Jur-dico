@@ -24,6 +24,7 @@ export default function Membros({ session }) {
   const [toast, setToast]         = useState(null)
   const [dominios, setDominios]   = useState([])
   const [novoDominio, setNovoDominio] = useState('')
+  const [incluiSub, setIncluiSub] = useState(true)
   const pendentes = membros.filter(m => !m.aprovado)
   const ativos    = membros.filter(m => m.aprovado)
 
@@ -63,10 +64,17 @@ export default function Membros({ session }) {
   async function adicionarDominio() {
     const dominio = normalizarDominio(novoDominio)
     if (!dominio) { notify('Domínio inválido. Exemplo: unisantos.br', 'err'); return }
-    const { error } = await supabase.from('dominios_aprovados').insert({ dominio })
+    const { error } = await supabase.from('dominios_aprovados').insert({ dominio, inclui_subdominios: incluiSub })
     if (error) { notify(error.code === '23505' ? 'Domínio já cadastrado.' : 'Erro ao salvar: ' + error.message, 'err'); return }
     setNovoDominio('')
     notify('Domínio adicionado.')
+    carregar()
+  }
+
+  async function alternarSubdominios(dominio, valor) {
+    const { error } = await supabase.from('dominios_aprovados').update({ inclui_subdominios: valor }).eq('dominio', dominio)
+    if (error) { notify('Erro ao atualizar: ' + error.message, 'err'); return }
+    notify(valor ? 'Subdomínios incluídos.' : 'Somente o domínio exato.')
     carregar()
   }
 
@@ -317,7 +325,7 @@ export default function Membros({ session }) {
         <div style={sectionLabel}>Aprovação automática por domínio</div>
         <div style={{ fontSize: 12, color: theme.muted, marginBottom: 14, lineHeight: 1.6, fontFamily: theme.fontSerif }}>
           Quem se cadastrar com e-mail confirmado em um destes domínios entra como leitor sem esperar aprovação.
-          A correspondência é exata: alunos.unisantos.br é um domínio diferente de unisantos.br.
+          Com "incluir subdomínios", unisantos.br também vale para alunos.unisantos.br (e-mail de aluno). Sem a opção, só o domínio exato.
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, marginBottom: dominios.length ? 14 : 0 }}>
           <input
@@ -332,12 +340,24 @@ export default function Membros({ session }) {
             fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
           }}>Adicionar</button>
         </div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, marginBottom: dominios.length ? 14 : 0, cursor: 'pointer' }}>
+          <input type="checkbox" checked={incluiSub} onChange={e => setIncluiSub(e.target.checked)} style={{ accentColor: theme.gold }} />
+          Incluir subdomínios (e-mail de aluno, por exemplo)
+        </label>
         {dominios.map(d => (
-          <div key={d.dominio} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0' }}>
-            <span style={{ fontSize: 13, color: theme.text, fontFamily: "'IBM Plex Mono', monospace" }}>@{d.dominio}</span>
-            <button onClick={() => removerDominio(d.dominio)} title="Remover domínio" style={{
-              background: 'none', border: 'none', color: theme.penal, cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 2,
-            }}><X size={15} /></button>
+          <div key={d.dominio} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', gap: 12 }}>
+            <span style={{ fontSize: 13, color: theme.text, fontFamily: "'IBM Plex Mono', monospace" }}>
+              @{d.dominio}{d.inclui_subdominios ? ' e subdomínios' : ''}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button onClick={() => alternarSubdominios(d.dominio, !d.inclui_subdominios)} style={{
+                background: theme.btnMutedBg, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 6,
+                padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+              }}>{d.inclui_subdominios ? 'Só o exato' : 'Incluir subdomínios'}</button>
+              <button onClick={() => removerDominio(d.dominio)} title="Remover domínio" style={{
+                background: 'none', border: 'none', color: theme.penal, cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 2,
+              }}><X size={15} /></button>
+            </div>
           </div>
         ))}
       </div>
