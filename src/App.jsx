@@ -7,6 +7,7 @@ import EntradaDetail from './components/EntradaDetail'
 import EntradaForm from './components/EntradaForm'
 import BuscaPeca from './components/BuscaPeca'
 import Membros from './components/Membros'
+import AcessoPendente from './components/AcessoPendente'
 import Atualizacoes from './components/Atualizacoes'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
@@ -137,6 +138,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true)
   const [membro, setMembro]         = useState(null)   // { role, nome, email }
   const [membroLoading, setMembroLoading] = useState(false)
+  const [membroVerificado, setMembroVerificado] = useState(false) // true quando a checagem de membro terminou
   const [entradas, setEntradas]     = useState([])
   const [favoritos, setFavoritos]   = useState(new Set())
   const [view, setView]             = useState(VIEWS.HOJE)
@@ -188,9 +190,8 @@ export default function App() {
   const isMobile = useIsMobile()
   const [maisAberto, setMaisAberto] = useState(false)
 
-  // Se logado mas sem registro em membros (migração ainda não aplicada),
-  // concede acesso de editor como fallback para não bloquear o uso.
-  const role     = membro?.role || (session && !membroLoading ? 'editor' : null)
+  // Sem registro em membros não há papel: o acesso é por convite ou por aprovação (ver AcessoPendente).
+  const role     = membro?.role || null
   const isOwner  = session?.user?.email === 'foxjessica01@gmail.com'
   const isAdmin  = role === 'admin' || isOwner
   const isEditor = role === 'editor' || isAdmin
@@ -280,20 +281,25 @@ export default function App() {
 
   // ── Carregar perfil de membro após login ───────────────────────────────
   useEffect(() => {
-    if (!session) { setMembro(null); return }
+    if (!session) { setMembro(null); setMembroVerificado(false); return }
     setMembroLoading(true)
+    setMembroVerificado(false)
 
     async function verificarMembro() {
       const { data } = await supabase
         .from('membros').select('*').eq('user_id', session.user.id).single()
 
-      if (data) {
+      // Já aprovado, ou pendente sem convite em mãos: só tenta a aprovação automática por domínio.
+      if (data && (data.aprovado || !conviteToken)) {
         setMembro(data)
+        if (!data.aprovado) await tentarAprovacaoAutomatica()
+        setMembroVerificado(true)
         setMembroLoading(false)
         return
       }
+      if (data) setMembro(data) // pendente com convite: aplica o convite abaixo
 
-      // Não é membro — verificar se tem convite pendente
+      // Não é membro aprovado — verificar se tem convite pendente
       if (conviteToken) {
         setAceitandoConvite(true)
         try {
@@ -326,10 +332,9 @@ export default function App() {
         }
         setAceitandoConvite(false)
       } else {
-        // Cadastro público, sem convite: cria automaticamente como leitor
-        // gratuito (a política membros_self_insert_leitor_gratuito só
-        // permite exatamente isso — role='leitor', pago=false — qualquer
-        // tentativa de se dar mais que isso é bloqueada pelo próprio banco).
+        // Cadastro sem convite (QR code do site): registra como leitor PENDENTE. A política membros_insert só
+        // aceita role='leitor', pago=false e aprovado=false; a liberação vem da curadoria (tela Membros) ou,
+        // com e-mail confirmado em domínio aprovado, da função aprovar_por_dominio.
         const { data: novoMembro, error: erroAuto } = await supabase
           .from('membros')
           .insert({
@@ -339,16 +344,32 @@ export default function App() {
             telefone: session.user.user_metadata?.telefone || null,
             role: 'leitor',
             pago: false,
+            aprovado: false,
           })
           .select().single()
-        if (!erroAuto) setMembro(novoMembro)
+        if (!erroAuto) {
+          setMembro(novoMembro)
+          await tentarAprovacaoAutomatica()
+        }
       }
 
+      setMembroVerificado(true)
       setMembroLoading(false)
     }
 
     verificarMembro()
   }, [session, conviteToken])
+
+  // Aprovação automática: o banco só libera com e-mail confirmado e domínio exato em dominios_aprovados.
+  async function tentarAprovacaoAutomatica() {
+    if (!session) return false
+    const { data: liberado, error } = await supabase.rpc('aprovar_por_dominio')
+    if (error || !liberado) return false
+    const { data: atualizado } = await supabase
+      .from('membros').select('*').eq('user_id', session.user.id).single()
+    if (atualizado) setMembro(atualizado)
+    return !!atualizado?.aprovado
+  }
 
   // ── Carregar favoritos do usuário logado ────────────────────────────────
   useEffect(() => {
@@ -708,6 +729,22 @@ async function handleSave(entry) {
   // ?pagina=) já foram tratados mais acima e nunca chegam aqui.
   if (!session && !showLogin) return (
     <Landing onEntrar={(tela) => { setTelaAuthInicial(tela || 'login'); setShowLogin(true) }} />
+  )
+
+  // Logado, mas ainda sem aprovação (ou sem registro de membro): nada do acervo é mostrado.
+  // A titular (isOwner) nunca fica de fora, mesmo que o registro dela falhe ao carregar.
+  if (session && !membroVerificado && !isOwner) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: theme.bg, color: theme.gold, fontFamily: 'Inter, sans-serif', fontSize: 16 }}>
+      Verificando seu acesso…
+    </div>
+  )
+  if (session && membroVerificado && !isOwner && !membro?.aprovado) return (
+    <AcessoPendente
+      email={session.user.email}
+      temRegistro={!!membro}
+      onVerificar={tentarAprovacaoAutomatica}
+      onSair={() => { logoutManualRef.current = true; supabase.auth.signOut() }}
+    />
   )
 
   const sidebarItems = [

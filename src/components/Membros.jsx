@@ -3,6 +3,7 @@ import { Check, Copy, X } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { ROLE_LABEL, ROLE_COR } from '../shared'
+import { normalizarDominio } from '../utils/dominios'
 
 const ROLE_DESC = {
   admin:  'Controle total: adiciona, edita, remove entradas e gerencia membros.',
@@ -21,6 +22,10 @@ export default function Membros({ session }) {
   const [linkGerado, setLinkGerado] = useState('')
   const [copiado, setCopiado]     = useState(false)
   const [toast, setToast]         = useState(null)
+  const [dominios, setDominios]   = useState([])
+  const [novoDominio, setNovoDominio] = useState('')
+  const pendentes = membros.filter(m => !m.aprovado)
+  const ativos    = membros.filter(m => m.aprovado)
 
   function notify(msg, type = 'ok') {
     setToast({ msg, type })
@@ -29,13 +34,47 @@ export default function Membros({ session }) {
 
   async function carregar() {
     setLoading(true)
-    const [{ data: m }, { data: c }] = await Promise.all([
+    const [{ data: m }, { data: c }, { data: d }] = await Promise.all([
       supabase.from('membros').select('*').order('criado_em'),
       supabase.from('convites').select('*').eq('status', 'pendente').order('criado_em', { ascending: false }),
+      supabase.from('dominios_aprovados').select('*').order('dominio'),
     ])
     setMembros(m || [])
     setConvites(c || [])
+    setDominios(d || [])
     setLoading(false)
+  }
+
+  async function aprovarMembro(membro_id) {
+    const { error } = await supabase.from('membros').update({ aprovado: true }).eq('id', membro_id)
+    if (error) { notify('Não foi possível aprovar: ' + error.message, 'err'); return }
+    notify('Cadastro aprovado.')
+    carregar()
+  }
+
+  async function recusarMembro(user_id) {
+    if (!confirm('Recusar este cadastro? A pessoa perde o registro e poderá pedir de novo.')) return
+    const { error } = await supabase.from('membros').delete().eq('user_id', user_id)
+    if (error) { notify('Não foi possível recusar: ' + error.message, 'err'); return }
+    notify('Cadastro recusado.')
+    carregar()
+  }
+
+  async function adicionarDominio() {
+    const dominio = normalizarDominio(novoDominio)
+    if (!dominio) { notify('Domínio inválido. Exemplo: unisantos.br', 'err'); return }
+    const { error } = await supabase.from('dominios_aprovados').insert({ dominio })
+    if (error) { notify(error.code === '23505' ? 'Domínio já cadastrado.' : 'Erro ao salvar: ' + error.message, 'err'); return }
+    setNovoDominio('')
+    notify('Domínio adicionado.')
+    carregar()
+  }
+
+  async function removerDominio(dominio) {
+    const { error } = await supabase.from('dominios_aprovados').delete().eq('dominio', dominio)
+    if (error) { notify('Erro ao remover: ' + error.message, 'err'); return }
+    notify('Domínio removido.')
+    carregar()
   }
 
   useEffect(() => { carregar() }, [])
@@ -183,20 +222,52 @@ export default function Membros({ session }) {
         )}
       </div>
 
+      {/* ── Cadastros aguardando aprovação ───────────────── */}
+      {pendentes.length > 0 && (
+        <div style={{ ...card, borderColor: theme.gold }}>
+          <div style={sectionLabel}>Aguardando aprovação ({pendentes.length})</div>
+          {pendentes.map((m, i) => (
+            <div key={m.id} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 0',
+              borderBottom: i < pendentes.length - 1 ? `0.5px solid ${theme.border}` : 'none',
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {m.nome || m.email || m.user_id.slice(0, 8) + '…'}
+                </div>
+                <div style={{ fontSize: 11, color: theme.muted, marginTop: 2, fontFamily: theme.fontSerif }}>
+                  {m.email}{m.telefone ? ` · ${m.telefone}` : ''} · cadastro em {new Date(m.criado_em).toLocaleDateString('pt-BR')}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <button onClick={() => aprovarMembro(m.id)} style={{
+                  background: theme.gold, color: '#fdfbf7', border: 'none', borderRadius: 6, padding: '10px 18px',
+                  fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                }}>Aprovar</button>
+                <button onClick={() => recusarMembro(m.user_id)} style={{
+                  background: theme.btnMutedBg, color: theme.text, border: `1px solid ${theme.border}`, borderRadius: 6,
+                  padding: '10px 18px', fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                }}>Recusar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ── Membros ativos ───────────────────────────────── */}
       <div style={card}>
-        <div style={sectionLabel}>Membros ativos ({membros.length})</div>
-        {membros.length === 0 ? (
+        <div style={sectionLabel}>Membros ativos ({ativos.length})</div>
+        {ativos.length === 0 ? (
           <div style={{ color: theme.muted, fontSize: 13, fontFamily: theme.fontSerif }}>Nenhum membro ainda.</div>
         ) : (
           <div>
-            {membros.map((m, i) => {
+            {ativos.map((m, i) => {
               const ehVoce = m.user_id === session.user.id
               return (
                 <div key={m.id} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '12px 0', gap: 12,
-                  borderBottom: i < membros.length - 1 ? `0.5px solid ${theme.border}` : 'none',
+                  borderBottom: i < ativos.length - 1 ? `0.5px solid ${theme.border}` : 'none',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontSerif, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -239,6 +310,36 @@ export default function Membros({ session }) {
             })}
           </div>
         )}
+      </div>
+
+      {/* ── Domínios com aprovação automática ────────────── */}
+      <div style={card}>
+        <div style={sectionLabel}>Aprovação automática por domínio</div>
+        <div style={{ fontSize: 12, color: theme.muted, marginBottom: 14, lineHeight: 1.6, fontFamily: theme.fontSerif }}>
+          Quem se cadastrar com e-mail confirmado em um destes domínios entra como leitor sem esperar aprovação.
+          A correspondência é exata: alunos.unisantos.br é um domínio diferente de unisantos.br.
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, marginBottom: dominios.length ? 14 : 0 }}>
+          <input
+            value={novoDominio}
+            onChange={e => setNovoDominio(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') adicionarDominio() }}
+            placeholder="Domínio, por exemplo unisantos.br"
+            style={selStyle}
+          />
+          <button onClick={adicionarDominio} style={{
+            background: theme.gold, color: '#fdfbf7', border: 'none', borderRadius: 6, padding: '10px 18px',
+            fontSize: 13, lineHeight: 1.2, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+          }}>Adicionar</button>
+        </div>
+        {dominios.map(d => (
+          <div key={d.dominio} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0' }}>
+            <span style={{ fontSize: 13, color: theme.text, fontFamily: "'IBM Plex Mono', monospace" }}>@{d.dominio}</span>
+            <button onClick={() => removerDominio(d.dominio)} title="Remover domínio" style={{
+              background: 'none', border: 'none', color: theme.penal, cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 2,
+            }}><X size={15} /></button>
+          </div>
+        ))}
       </div>
 
       {/* ── Convites pendentes ───────────────────────────── */}

@@ -48,21 +48,23 @@ export default async function handler(req, res) {
   const desfazerReserva = () =>
     supabase.from('convites').update({ status: 'pendente' }).eq('id', convite.id)
 
-  // 4. Já é membro (ex.: auto-cadastro como leitor): aplica o papel do convite
-  // se for superior ao atual, em vez de descartá-lo.
+  // 4. Já tem registro (ex.: cadastro pendente pelo QR code): o convite aprova o cadastro e aplica o papel
+  // do convite se for superior ao atual, em vez de descartá-lo.
   const { data: existente } = await supabase
-    .from('membros').select('id, role').eq('user_id', user_id).maybeSingle()
+    .from('membros').select('id, role, aprovado').eq('user_id', user_id).maybeSingle()
 
   if (existente) {
-    if ((NIVEL[convite.role] ?? 0) > (NIVEL[existente.role] ?? 0)) {
+    const eleva = (NIVEL[convite.role] ?? 0) > (NIVEL[existente.role] ?? 0)
+    if (eleva || !existente.aprovado) {
+      const alteracao = { aprovado: true }
+      if (eleva) { alteracao.role = convite.role; alteracao.invited_by = convite.invited_by }
       const { error: upErr } = await supabase
-        .from('membros').update({ role: convite.role, invited_by: convite.invited_by })
-        .eq('user_id', user_id)
+        .from('membros').update(alteracao).eq('user_id', user_id)
       if (upErr) {
         await desfazerReserva()
         return res.status(500).json({ error: 'Não foi possível aplicar o convite.' })
       }
-      return res.status(200).json({ ok: true, role: convite.role, ja_membro: true })
+      return res.status(200).json({ ok: true, role: eleva ? convite.role : existente.role, ja_membro: true })
     }
     return res.status(200).json({ ok: true, role: existente.role, ja_membro: true })
   }
@@ -75,6 +77,7 @@ export default async function handler(req, res) {
     telefone: typeof telefone === 'string' ? telefone.slice(0, 30) : null,
     email: email || convite.email || null,
     invited_by: convite.invited_by,
+    aprovado: true, // convite emitido pela curadoria já é aprovação
   })
   if (insertErr) {
     await desfazerReserva()
