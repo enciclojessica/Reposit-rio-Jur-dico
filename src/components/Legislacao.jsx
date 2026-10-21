@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Download, Search, Check, Copy, Link2, FileText } from 'lucide-react'
+import { Download, Search, Check, Copy, Link2, FileText, History } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
@@ -16,13 +16,51 @@ const CODIGOS_META = {
   lep:     { label: 'LEP',          nome: 'Lei de Execução Penal',          cor: '#5a3a2e' },
 }
 
+// ── Selo de alteração ───────────────────────────────────────────────────────
+// `alteracoes` vem de legislacao_historico (linhas anteriores guardadas a cada mudança).
+function formatarData(d) {
+  if (!d) return ''
+  const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/)
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : ''
+}
+
+function textoSelo(alteracoes) {
+  if (!alteracoes?.length) return ''
+  const leis = [...new Set(alteracoes.map(a => a.lei_alteradora).filter(Boolean))]
+  const datas = alteracoes.map(a => a.data_norma).filter(Boolean).sort()
+  const data = formatarData(datas[datas.length - 1] || alteracoes.map(a => a.registrado_em).sort().pop())
+  if (leis.length) return `Alterado pela ${leis.join(' e ')}${datas.length ? ` em ${data}` : ''}`
+  return `Atualizado em ${data}`
+}
+
+function rotuloLinha(a) {
+  const partes = []
+  if (a.paragrafo) partes.push(a.paragrafo === 'único' ? 'Parágrafo único' : `§ ${a.paragrafo}`)
+  if (a.inciso) partes.push(a.inciso)
+  return partes.length ? partes.join(', ') : 'Caput'
+}
+
+function SeloAlteracao({ alteracoes, vigenciaDiferida, theme }) {
+  const texto = textoSelo(alteracoes)
+  if (!texto && !vigenciaDiferida) return null
+  const estilo = { fontSize: 10, color: theme.gold, border: `1px solid ${theme.gold}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }
+  return (
+    <>
+      {texto && <span style={estilo}>{texto}</span>}
+      {vigenciaDiferida && <span style={estilo}>Vigência diferida</span>}
+    </>
+  )
+}
+
 // ── Modal de detalhe ────────────────────────────────────────────────────────
-function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
+function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) {
   const { theme } = useTheme()
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase(), nome: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
   const [linkCopiado, setLinkCopiado] = useState(false)
+  const [verAnterior, setVerAnterior] = useState(false)
   const caput = grupo.caput
+  const temVigenciaDiferida = grupo.itens.some(i => i.vigencia_obs)
 
   // Teses do acervo cuja fundamentação legal ou ratio decidendi cita este
   // artigo — mesmo parser usado no sentido inverso (tese → artigo) em
@@ -112,8 +150,9 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
 
         {/* Corpo */}
         <div style={{ overflowY: 'auto', flex: 1, padding: 20 }}>
-          <div style={{ fontSize: 12, color: meta.cor, marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 12, color: meta.cor, marginBottom: 12, fontFamily: "'Inter', sans-serif", display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             {meta.nome}
+            <SeloAlteracao alteracoes={alteracoes} vigenciaDiferida={temVigenciaDiferida} theme={theme} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
             {grupo.itens.map((item, i) => (
@@ -124,9 +163,33 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
                     Revogado
                   </span>
                 )}
+                {item.vigencia_obs && (
+                  <div style={{ fontSize: 12, color: theme.gold, fontStyle: 'italic', textDecoration: 'none' }}>{item.vigencia_obs}</div>
+                )}
               </div>
             ))}
           </div>
+
+          {alteracoes?.length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <button onClick={() => setVerAnterior(v => !v)}
+                style={{ background: 'transparent', color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 6, padding: '6px 12px', fontSize: 12, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <History size={12} /> {verAnterior ? 'Ocultar redação anterior' : 'Ver redação anterior'}
+              </button>
+              {verAnterior && (
+                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {alteracoes.map(a => (
+                    <div key={a.id} style={{ borderLeft: `2px solid ${theme.border}`, paddingLeft: 12 }}>
+                      <div style={{ fontSize: 11, color: theme.muted, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 2 }}>
+                        {rotuloLinha(a)}{a.operacao === 'DELETE' ? ' (removido)' : ''}{a.lei_alteradora ? `, substituído pela ${a.lei_alteradora}` : ''}
+                      </div>
+                      <div style={{ fontSize: 14, color: theme.muted, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>{a.texto}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {(caput?.contexto || caput?.aplicacao_pratica || caput?.resultado) && (
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -190,7 +253,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada }) {
 }
 
 // ── Card do artigo ───────────────────────────────────────────────────────────
-function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
+function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes }) {
   const { theme } = useTheme()
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
@@ -235,6 +298,7 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0 }) {
                 {caput.rotulo}
               </span>
             )}
+            <SeloAlteracao alteracoes={alteracoes} vigenciaDiferida={grupo.itens.some(i => i.vigencia_obs)} theme={theme} />
             {revogado && (
               <span style={{ fontSize: 10, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Revogado
@@ -299,6 +363,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
   const [exportando, setExportando] = useState(false)
   const [mostrarRevogados, setMostrarRevogados] = useState(false)
+  const [alteracoesPorArtigo, setAlteracoesPorArtigo] = useState(new Map())
 
   // Mapa "codigo|numero" → nº de teses do acervo que citam aquele artigo,
   // computado uma vez por mudança em entradas (não a cada busca/filtro), pra
@@ -325,6 +390,22 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
     setBusca(preFiltro.numero ? String(preFiltro.numero) : '')
     onPreFiltroConsumido?.()
   }, [preFiltro])
+
+  useEffect(() => {
+    // Redação anterior de dispositivos alterados (legislacao_historico, leitura liberada aos membros).
+    supabase.from('legislacao_historico')
+      .select('id,codigo,numero,titulo,inciso,paragrafo,texto,operacao,lei_alteradora,data_norma,registrado_em')
+      .order('registrado_em', { ascending: false }).limit(2000)
+      .then(({ data }) => {
+        const mapa = new Map()
+        for (const h of data || []) {
+          const k = `${h.codigo}|${h.numero}|${h.titulo || ''}`
+          if (!mapa.has(k)) mapa.set(k, [])
+          mapa.get(k).push(h)
+        }
+        setAlteracoesPorArtigo(mapa)
+      })
+  }, [])
 
   useEffect(() => {
     // Total: conta com agregação no banco (count: 'exact', head: true), sem
@@ -546,7 +627,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {gruposArtigos.map((g) => (
-              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} citacoes={mapaCitacoes.get(`${g.codigo}|${g.numero}`) || 0} />
+              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} citacoes={mapaCitacoes.get(`${g.codigo}|${g.numero}`) || 0} alteracoes={alteracoesPorArtigo.get(g.chave)} />
             ))}
             {!loading && gruposArtigos.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
@@ -570,7 +651,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
 
       {/* Modal */}
       {artigoSelecionado && (
-        <ArtigoModal grupo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} entradas={entradas} onAbrirEntrada={onAbrirEntrada} />
+        <ArtigoModal grupo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} entradas={entradas} onAbrirEntrada={onAbrirEntrada} alteracoes={alteracoesPorArtigo.get(artigoSelecionado.chave)} />
       )}
     </div>
   )

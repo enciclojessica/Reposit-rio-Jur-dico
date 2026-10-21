@@ -42,6 +42,8 @@ export default function Atualizacoes() {
   const [marcados, setMarcados] = useState(new Set())
   const [autorizaPadrao, setAutorizaPadrao] = useState(false)
   const [aplicando, setAplicando] = useState(false)
+  const [leiAlteradora, setLeiAlteradora] = useState('')
+  const [dataNorma, setDataNorma] = useState('')
   const [msg, setMsg] = useState(null)
 
   const ops = useMemo(() => montarOperacoes(itens, { selecionados: marcados }), [itens, marcados])
@@ -60,6 +62,8 @@ export default function Atualizacoes() {
   function escolherAlerta(a) {
     setAlertaSel(a)
     if (a?.codigos?.[0]) setCodigo(a.codigos[0])
+    const ano = String(a?.data_norma || '').match(/\d{4}/)?.[0]
+    setLeiAlteradora(a ? `${a.tipo.toUpperCase()} ${a.numero}${ano ? `/${ano}` : ''}` : '')
     setItens([]); setMarcados(new Set()); setMsg(null)
   }
 
@@ -124,6 +128,8 @@ export default function Atualizacoes() {
       p_alerta_tipo: alertaSel?.tipo ?? null,
       p_alerta_numero: alertaSel?.numero ?? null,
       p_autorizar_padrao: autorizaPadrao,
+      p_lei_alteradora: leiAlteradora.trim() || null,
+      p_data_norma: dataNorma || null,
     })
     setAplicando(false)
     if (error) { setMsg({ tipo: 'err', texto: `Nada foi gravado. ${error.message}` }); return }
@@ -203,6 +209,14 @@ export default function Atualizacoes() {
           <label style={{ ...campo, cursor: 'pointer', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
             <FileUp size={14} /> {lendo ? 'Lendo…' : 'Enviar PDF'}
             <input type="file" accept="application/pdf" onChange={lerPdf} style={{ display: 'none' }} />
+          </label>
+        </div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+          <label style={{ fontSize: 12, color: theme.muted }}>Norma alteradora (selo no cartão)
+            <input value={leiAlteradora} onChange={e => setLeiAlteradora(e.target.value)} placeholder="EC 141/2026" style={{ ...campo, marginLeft: 8, width: 150 }} />
+          </label>
+          <label style={{ fontSize: 12, color: theme.muted }}>Data da norma
+            <input type="date" value={dataNorma} onChange={e => setDataNorma(e.target.value)} style={{ ...campo, marginLeft: 8 }} />
           </label>
         </div>
         <textarea value={texto} onChange={e => setTexto(e.target.value)} rows={8}
