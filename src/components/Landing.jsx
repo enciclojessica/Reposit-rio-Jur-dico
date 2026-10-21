@@ -266,6 +266,7 @@ export default function Landing({ onEntrar }) {
           <div>
             <span style={{ display: 'block', marginBottom: 3, fontSize: 11.5, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAIXA_BORDA }}>Plataforma e curadoria</span>
             <b style={{ display: 'block', fontFamily: FONTE_TITULO, fontSize: 18, fontWeight: 600, color: FAIXA_TITULO }}>Farias Fusquiani</b>
+            <span style={{ display: 'block', marginTop: 4, fontSize: 12.5 }}>Desenvolvido por Jessica Farias Fusquiani</span>
             <p style={{ margin: '14px 0 0', maxWidth: 560, lineHeight: 1.6 }}>
               O acervo e as sugestões de teses têm finalidade de apoio ao estudo e à pesquisa jurídica, e exigem conferência dos fatos, fundamentos e fontes pelo profissional antes do uso em peça. A responsabilidade pelo exercício profissional permanece do advogado, nos termos do art. 32 da Lei nº 8.906/94.
             </p>
