@@ -6,6 +6,23 @@ import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { corDaArea } from '../shared'
 import { compararDispositivos } from '../../lib/ordemDispositivos'
 
+// Nome oficial completo exibido acima da busca quando um código está selecionado.
+const NOME_COMPLETO_CODIGO = {
+  adct:    'Ato das Disposições Constitucionais Transitórias',
+  cc:      'Código Civil (Lei 10.406/2002)',
+  cdc:     'Código de Defesa do Consumidor (Lei 8.078/1990)',
+  cedoab:  'Código de Ética e Disciplina da OAB',
+  cf:      'Constituição da República Federativa do Brasil de 1988',
+  clt:     'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
+  cp:      'Código Penal (Decreto-Lei 2.848/1940)',
+  cpc:     'Código de Processo Civil (Lei 13.105/2015)',
+  cpp:     'Código de Processo Penal (Decreto-Lei 3.689/1941)',
+  ctb:     'Código de Trânsito Brasileiro (Lei 9.503/1997)',
+  lei8906: 'Estatuto da Advocacia e da Ordem dos Advogados do Brasil (Lei 8.906/1994)',
+  lei9099: 'Lei dos Juizados Especiais (Lei 9.099/1995)',
+  lep:     'Lei de Execução Penal (Lei 7.210/1984)',
+}
+
 const CODIGOS_META = {
   cpc:     { label: 'CPC',          nome: 'Código de Processo Civil',       cor: '#2c5a6e' },
   cdc:     { label: 'CDC',          nome: 'Código de Defesa do Consumidor', cor: '#5a4a7a' },
@@ -616,6 +633,12 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
               Mostrar revogados
             </label>
           </div>
+
+          {codigoAtivo !== 'todos' && NOME_COMPLETO_CODIGO[codigoAtivo] && (
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: theme.text, marginBottom: 10 }}>
+              {NOME_COMPLETO_CODIGO[codigoAtivo]}
+            </div>
+          )}
 
           {/* Busca */}
           <div style={{ position: 'relative', marginBottom: 16 }}>
