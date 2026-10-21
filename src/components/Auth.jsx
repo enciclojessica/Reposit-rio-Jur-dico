@@ -36,12 +36,16 @@ export default function Auth({ telaInicial }) {
           setLoading(false)
           return
         }
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: { data: { full_name: nome.trim(), telefone: telefone.trim() } },
         })
         if (error) setError(error.message)
-        else setSuccess('Verifique seu e-mail para confirmar o cadastro.')
+        else if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+          // E-mail que já tem conta: o Supabase não cria usuário nem envia e-mail de confirmação (anti-enumeração).
+          setError('Este e-mail já tem cadastro, e por isso nenhum e-mail de confirmação foi enviado. Entre com a sua senha ou use "Esqueci minha senha".')
+        }
+        else setSuccess('Verifique seu e-mail (e a caixa de spam) para confirmar o cadastro.')
       } else if (screen === 'forgot') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + '/reset-password',
