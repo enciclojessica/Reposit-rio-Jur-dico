@@ -1,12 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { AUTORIA, SUBTITULO_LOGIN } from './autoria'
+import { AUTORIA } from './autoria'
 
 describe('autoria', () => {
-  it('traz a frase e o subtitulo definidos', () => {
+  it('traz a frase de autoria definida', () => {
     expect(AUTORIA).toBe('Idealizado e desenvolvido por Jessica Farias Fusquiani')
-    expect(SUBTITULO_LOGIN).toBe('Repositório jurídico curado')
   })
 
   it('nenhum componente escreve a frase de autoria direto', () => {

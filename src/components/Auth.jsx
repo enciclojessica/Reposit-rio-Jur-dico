@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { AUTORIA, SUBTITULO_LOGIN } from '../data/autoria'
+import { AUTORIA } from '../data/autoria'
 import { Lock, Mail, Eye, EyeOff, Moon, Sun, AlertCircle, CheckCircle, User, Phone } from 'lucide-react'
 
 export default function Auth({ telaInicial }) {
@@ -97,9 +97,6 @@ export default function Auth({ telaInicial }) {
           />
           <div style={{ fontSize: 22, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif', lineHeight: 1.2, marginBottom: 4 }}>
             Themis Jur
-          </div>
-          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
-            {SUBTITULO_LOGIN}
           </div>
         </div>
 
