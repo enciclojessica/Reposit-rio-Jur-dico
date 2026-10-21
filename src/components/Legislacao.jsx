@@ -14,6 +14,7 @@ const CODIGOS_META = {
   cf:      { label: 'CF/88',        nome: 'Constituição Federal',           cor: '#3f4a7a' },
   lei9099: { label: 'Lei 9.099/95', nome: 'Juizados Especiais',             cor: '#8a5a2e' },
   lep:     { label: 'LEP',          nome: 'Lei de Execução Penal',          cor: '#5a3a2e' },
+  clt:     { label: 'CLT',          nome: 'Consolidação das Leis do Trabalho', cor: '#4a5a3a' },
 }
 
 // ── Selo de alteração ───────────────────────────────────────────────────────

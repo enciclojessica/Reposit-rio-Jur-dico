@@ -73,7 +73,7 @@ function buildServer() {
         "Sempre sinaliza o campo 'vigente'; dispositivos não vigentes só aparecem se incluir_revogados=true.",
       inputSchema: {
         query: z.string().describe("Termo, artigo ou tema legislativo buscado"),
-        codigo: z.string().optional().describe("Filtro por diploma (ex: cc, lei9099, lep)"),
+        codigo: z.string().optional().describe("Filtro por diploma (ex: cc, lei9099, lep, clt)"),
         incluir_revogados: z.boolean().optional().describe("Incluir dispositivos não vigentes (default false)"),
         limit: z.number().int().min(1).max(30).optional().describe("Máx. de resultados (default 10)"),
       },

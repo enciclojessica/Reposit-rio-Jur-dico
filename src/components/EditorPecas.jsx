@@ -343,7 +343,7 @@ export default function EditorPecas({ entradas, session }) {
     const match = texto.slice(0, posicaoCursor).match(/\/([a-z0-9]+)(?:\s+(\S+))?$/)
     if (!match) { setSlashCmd(''); setSlashOpts([]); return }
     const [, cmd, arg] = match
-    const CODIGOS = ['cpc', 'cdc', 'cc', 'cpp', 'cf', 'ctb', 'lei9099', 'lep', 'leg']
+    const CODIGOS = ['cpc', 'cdc', 'cc', 'cpp', 'cf', 'ctb', 'lei9099', 'lep', 'clt', 'leg']
     if (!CODIGOS.includes(cmd)) { setSlashCmd(''); setSlashOpts([]); return }
     setSlashCmd(cmd)
     if (!arg || arg.length < 1) return

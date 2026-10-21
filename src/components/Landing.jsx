@@ -19,6 +19,7 @@ const NOME_CODIGO_LANDING = {
   cdc: 'Código de Defesa do Consumidor', cf: 'Constituição Federal',
   ctb: 'Código de Trânsito Brasileiro', lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
   lep: 'Lei de Execução Penal (Lei 7.210/1984)',
+  clt: 'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
 }
 
 // Revela um bloco uma vez, quando entra na tela ao rolar — usado pra

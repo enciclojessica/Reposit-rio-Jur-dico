@@ -3,7 +3,7 @@ import { NOME_CODIGO, detectarCodigoNoTexto, extrairReferenciasLegais } from '..
 
 describe('NOME_CODIGO', () => {
   it('tem um nome completo para cada código usado no editor', () => {
-    for (const codigo of ['cc', 'cdc', 'cf', 'cpc', 'cpp', 'ctb', 'lei9099', 'lep']) {
+    for (const codigo of ['cc', 'cdc', 'cf', 'cpc', 'cpp', 'ctb', 'lei9099', 'lep', 'clt']) {
       expect(NOME_CODIGO[codigo]?.trim().length, `sem nome para "${codigo}"`).toBeGreaterThan(0)
     }
   })
@@ -28,6 +28,12 @@ describe('detectarCodigoNoTexto', () => {
     expect(detectarCodigoNoTexto('art. 112 da Lei de Execução Penal')).toBe('lep')
     expect(detectarCodigoNoTexto('nos termos da Lei 7.210/84')).toBe('lep')
     expect(detectarCodigoNoTexto('art. 126 da LEP')).toBe('lep')
+  })
+
+  it('reconhece CLT, Consolidação das Leis do Trabalho e Decreto-Lei 5.452', () => {
+    expect(detectarCodigoNoTexto('art. 477 da CLT')).toBe('clt')
+    expect(detectarCodigoNoTexto('art. 7º da Consolidação das Leis do Trabalho')).toBe('clt')
+    expect(detectarCodigoNoTexto('Decreto-Lei 5.452/43')).toBe('clt')
   })
 
   it('reconhece Lei 9.099 e "juizados especiais"', () => {

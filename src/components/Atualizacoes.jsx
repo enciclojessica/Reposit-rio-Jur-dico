@@ -4,7 +4,7 @@ import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { parseEmenda, compararComBanco, montarOperacoes, rotuloDispositivo } from '../utils/parserAtualizacao'
 
-const CODIGOS = ['cf', 'adct', 'cc', 'cdc', 'cp', 'cpc', 'cpp', 'ctb', 'lep', 'lei9099', 'lei8906', 'cedoab']
+const CODIGOS = ['cf', 'adct', 'cc', 'cdc', 'cp', 'cpc', 'cpp', 'ctb', 'lep', 'clt', 'lei9099', 'lei8906', 'cedoab']
 const PADRAO_REFERENCIA = ['cc', 'cdc', 'cp', 'cpc', 'lei9099']
 const ROTULO_STATUS = { alterar: 'Alterar', inserir: 'Inserir', igual: 'Já idêntico', ambiguo: 'Ambíguo' }
 

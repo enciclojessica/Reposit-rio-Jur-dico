@@ -12,6 +12,7 @@ export const NOME_CODIGO = {
   ctb:     'Código de Trânsito Brasileiro (Lei 9.503/1997)',
   lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
   lep:     'Lei de Execução Penal (Lei 7.210/1984)',
+  clt:     'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
 }
 
 // Palavras-chave (case-insensitive) que indicam menção a cada diploma.
@@ -24,6 +25,7 @@ const PISTAS_CODIGO = [
   ['ctb',     /\bc[oó]digo\s+de\s+tr[aâ]nsito\b|\bctb\b/i],
   ['lei9099', /\blei\s*9\.?099\b|\bjuizados?\s+especiais?\b/i],
   ['lep',     /\blei\s+de\s+execu[cç][aã]o\s+penal\b|\blei\s*7\.?210\b|\blep\b/i],
+  ['clt',     /\bconsolida[cç][aã]o\s+das\s+leis\s+do\s+trabalho\b|\bdecreto[-\s]lei\s*(n[ºo°]\s*)?5\.?452\b|\bclt\b/i],
 ]
 
 // Detecta um diploma mencionado numa janela de texto (ex: os ~80 caracteres
