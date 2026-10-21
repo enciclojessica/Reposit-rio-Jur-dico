@@ -24,7 +24,7 @@ export default function Membros({ session }) {
   const [toast, setToast]         = useState(null)
   const [dominios, setDominios]   = useState([])
   const [novoDominio, setNovoDominio] = useState('')
-  const [incluiSub, setIncluiSub] = useState(true)
+  const [incluiSub, setIncluiSub] = useState(false)
   const pendentes = membros.filter(m => !m.aprovado)
   const ativos    = membros.filter(m => m.aprovado)
 

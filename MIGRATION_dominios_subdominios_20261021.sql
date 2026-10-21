@@ -27,7 +27,8 @@ begin
 end;
 $$;
 
-update public.dominios_aprovados set inclui_subdominios = true where dominio = 'unisantos.br';
+-- A opcao chegou a ser ligada em unisantos.br e foi desligada no mesmo dia: a Jessica confirmou que vale so @unisantos.br.
+update public.dominios_aprovados set inclui_subdominios = false where dominio = 'unisantos.br';
 
--- Reverter: update public.dominios_aprovados set inclui_subdominios = false where dominio = 'unisantos.br';
--- (e restaurar a aprovar_por_dominio de MIGRATION_cadastro_aprovacao_20261021.sql; a coluna pode ficar.)
+-- Para incluir subdominios no futuro: update public.dominios_aprovados set inclui_subdominios = true where dominio = '<dominio>';
+-- (a funcao aprovar_por_dominio ja trata a opcao; para voltar a exigir dominio exato basta deixar a coluna em false.)
