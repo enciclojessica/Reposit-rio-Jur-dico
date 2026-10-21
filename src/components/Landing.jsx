@@ -229,7 +229,7 @@ export default function Landing({ onEntrar }) {
               &ldquo;O Themis Jur nasceu de uma necessidade concreta: organizar, num só lugar, o material que a rotina de estudo e prática forense exige consultar todos os dias. A curadoria de cada entrada segue o mesmo rigor que se espera de uma pesquisa jurídica bem feita.&rdquo;
             </blockquote>
             <div style={{ fontFamily: FONTE, fontSize: 14, fontWeight: 600, color: theme.text }}>Jessica Farias Fusquiani</div>
-            <div style={{ fontFamily: FONTE, fontSize: 13, color: theme.muted }}>Criadora do Themis Jur</div>
+            <div style={{ fontFamily: FONTE, fontSize: 13, color: theme.muted }}>Idealizadora do Themis Jur</div>
           </div>
         </div>
 
