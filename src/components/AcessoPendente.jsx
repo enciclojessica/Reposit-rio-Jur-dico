@@ -62,8 +62,7 @@ export default function AcessoPendente({ email, temRegistro, onVerificar, onSair
         </div>
       </div>
       <div style={{ marginTop: 22, textAlign: 'center', fontFamily: "'Inter', sans-serif" }}>
-        <div style={{ fontSize: 11, color: theme.muted }}>Plataforma e Curadoria, Farias Fusquiani</div>
-        <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>{AUTORIA}</div>
+        <div style={{ fontSize: 11, color: theme.muted }}>{AUTORIA}</div>
       </div>
     </div>
   )
