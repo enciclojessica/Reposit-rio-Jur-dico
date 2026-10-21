@@ -40,7 +40,7 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
       // (?art=1358-D), filtra direto pelo artigo certo em vez de trazer os
       // ~20 artigos reais daquele número juntos.
       let query = supabase
-        .from('legislacao').select('*')
+        .from('legislacao_publica').select('*')
         .eq('codigo', codigo).eq('numero', numero).eq('vigente', true)
       query = sufixo ? query.eq('titulo', `Art. ${numero}-${sufixo}`) : query
       const { data, error } = await query
@@ -120,6 +120,33 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
                 </div>
               ))}
             </div>
+            {(() => {
+              const caput = grupo.itens.find(i => !i.inciso && !i.paragrafo)
+              const rotuloSecao = { fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: theme.gold, marginBottom: 4 }
+              if (caput?.contexto || caput?.aplicacao_pratica) {
+                return (
+                  <div style={{ marginTop: 18, padding: '14px 16px', border: `1px solid ${theme.border}`, borderRadius: 8, background: theme.cardBg, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {caput.contexto && (
+                      <div>
+                        <div style={rotuloSecao}>Comentário didático</div>
+                        <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7 }}>{caput.contexto}</div>
+                      </div>
+                    )}
+                    {caput.aplicacao_pratica && (
+                      <div>
+                        <div style={rotuloSecao}>Aplicação prática</div>
+                        <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7 }}>{caput.aplicacao_pratica}</div>
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+              return (
+                <div style={{ marginTop: 18, fontSize: 12, color: theme.muted, lineHeight: 1.6 }}>
+                  O comentário didático e a aplicação prática deste artigo são exclusivos para membros aprovados.
+                </div>
+              )
+            })()}
           </div>
         ))}
 

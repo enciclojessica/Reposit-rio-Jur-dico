@@ -3,8 +3,10 @@ import { checarRateLimit } from '../lib/rateLimit.js'
 import { ordenarDispositivos } from '../lib/ordemDispositivos.js'
 import { gerarSitemapXml } from '../lib/sitemap.js'
 
-// Rota pública: legislação é de leitura livre para qualquer visitante (política
-// `legislacao_public_read`), então a chave de serviço não é necessária aqui.
+// Rota pública: o texto da legislação é de leitura livre para qualquer visitante, pela visão
+// `legislacao_publica` (a tabela `legislacao` é só para membros aprovados). A visão devolve contexto e
+// aplicacao_pratica apenas nos artigos marcados como amostra (`comentario_publico`); o resto é nulo.
+// A chave de serviço não é necessária aqui.
 // Usa a mesma publishable key exposta ao navegador em src/supabase.js — ela já
 // é pública por natureza, e assim esta rota fica limitada pelo RLS como
 // qualquer cliente comum, em vez de driblar as políticas com a service key.
@@ -20,7 +22,7 @@ async function buscarTudo(construirQuery) {
   let tudo = []
   let de = 0
   while (true) {
-    const { data, error } = await construirQuery(supabase.from('legislacao'), de, de + PAGINA - 1)
+    const { data, error } = await construirQuery(supabase.from('legislacao_publica'), de, de + PAGINA - 1)
     if (error) return { data: null, error }
     tudo = tudo.concat(data || [])
     if (!data || data.length < PAGINA) break
@@ -67,7 +69,7 @@ export default async function handler(req, res) {
     const sufixo = m[2] ? m[2].toUpperCase() : null
 
     let query = supabase
-      .from('legislacao')
+      .from('legislacao_publica')
       .select('*')
       .eq('codigo', codigo.toLowerCase())
       .eq('numero', base)
@@ -86,7 +88,7 @@ export default async function handler(req, res) {
   // Busca textual: /leg responsabilidade civil
   if (q) {
     const { data, error } = await supabase
-      .from('legislacao')
+      .from('legislacao_publica')
       .select('*')
       .textSearch('texto', q, { type: 'websearch', config: 'portuguese' })
       .eq('vigente', true)

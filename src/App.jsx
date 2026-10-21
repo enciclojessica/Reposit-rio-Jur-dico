@@ -183,7 +183,7 @@ export default function App() {
   const [countLegislacao, setCountLegislacao] = useState(0)
 
   useEffect(() => {
-    supabase.from('legislacao').select('id', { count: 'exact', head: true })
+    supabase.from('legislacao_publica').select('id', { count: 'exact', head: true })
       .eq('vigente', true)
       .then(({ count }) => setCountLegislacao(count || 0))
   }, [])
