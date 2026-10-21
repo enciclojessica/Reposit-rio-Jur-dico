@@ -371,6 +371,22 @@ export default function App() {
     return !!atualizado?.aprovado
   }
 
+  // Cadastro que ficou aguardando aprovação: avisa a curadoria (sino e e-mail). O servidor manda uma vez só por cadastro.
+  const avisoCadastroRef = useRef(false)
+  useEffect(() => {
+    if (!session || !membroVerificado || !membro || membro.aprovado || isOwner || avisoCadastroRef.current) return
+    avisoCadastroRef.current = true
+    supabase.auth.getSession().then(({ data }) => {
+      const token = data.session?.access_token
+      if (!token) return
+      return fetch('/api/notificacoes', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acao: 'novo_cadastro' }),
+      })
+    }).catch(err => console.warn('Aviso de cadastro pendente não enviado:', err))
+  }, [session, membroVerificado, membro, isOwner])
+
   // ── Carregar favoritos do usuário logado ────────────────────────────────
   useEffect(() => {
     if (!session) { setFavoritos(new Set()); return }

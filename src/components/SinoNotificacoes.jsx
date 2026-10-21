@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
-import { Bell, Megaphone, ClipboardList, Info, Sparkles, AlertTriangle } from 'lucide-react'
+import { Bell, Megaphone, ClipboardList, Info, Sparkles, AlertTriangle, UserPlus } from 'lucide-react'
 
-const TIPO_ICONE = { alerta: Megaphone, informativo: ClipboardList, sistema: Info, auto: Sparkles, superada: AlertTriangle }
-const TIPO_COR   = { alerta: '#f59e0b', informativo: '#10b981', sistema: '#6b7fa3', auto: '#c9a452', superada: '#ef4444' }
+const TIPO_ICONE = { alerta: Megaphone, informativo: ClipboardList, sistema: Info, auto: Sparkles, superada: AlertTriangle, cadastro: UserPlus }
+const TIPO_COR   = { alerta: '#f59e0b', informativo: '#10b981', sistema: '#6b7fa3', auto: '#c9a452', superada: '#ef4444', cadastro: '#c9a452' }
 
 export default function SinoNotificacoes({ session, onNavegar, onAbrirEntrada, corIcone }) {
   const { theme, mode } = useTheme()
@@ -97,6 +97,7 @@ export default function SinoNotificacoes({ session, onNavegar, onAbrirEntrada, c
     marcarLida(notif.id)
     if (notif.tipo === 'alerta' && onNavegar)    onNavegar('alertas')
     if (notif.tipo === 'informativo' && onNavegar) onNavegar('informativos')
+    if (notif.tipo === 'cadastro' && onNavegar)    onNavegar('membros')
     if (notif.tipo === 'superada' && notif.dados?.entrada_id && onAbrirEntrada) onAbrirEntrada(notif.dados.entrada_id)
     setAberto(false)
   }
