@@ -17,4 +17,5 @@ export const VIEWS = {
   FAVORITOS: 'favoritos',
   COMPARAR: 'comparar',
   METRICAS: 'metricas',
+  ATUALIZACOES: 'atualizacoes',
 }

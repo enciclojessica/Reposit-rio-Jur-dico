@@ -38,6 +38,7 @@ export default function MobileNav({
     ...(isEditor ? [{ v: VIEWS.IMPORTAR, label: 'Importar' }] : []),
     ...(isAdmin  ? [{ v: VIEWS.MEMBROS,  label: 'Membros' }]  : []),
     ...(isAdmin  ? [{ v: VIEWS.METRICAS, label: 'Métricas' }] : []),
+    ...(isAdmin  ? [{ v: VIEWS.ATUALIZACOES, label: 'Atualizações' }] : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
     ...(session  ? [{ v: 'compartilhar', label: 'Compartilhar o Themis Jur', action: compartilhar }] : []),

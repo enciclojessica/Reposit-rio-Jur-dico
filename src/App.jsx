@@ -7,6 +7,7 @@ import EntradaDetail from './components/EntradaDetail'
 import EntradaForm from './components/EntradaForm'
 import BuscaPeca from './components/BuscaPeca'
 import Membros from './components/Membros'
+import Atualizacoes from './components/Atualizacoes'
 import Alertas from './components/Alertas'
 import EditorPecas from './components/EditorPecas'
 import Dashboard from './components/Dashboard'
@@ -724,6 +725,11 @@ async function handleSave(entry) {
   // ── Conteúdo ───────────────────────────────────────────────────────────
   function renderContent() {
     switch (view) {
+      case VIEWS.ATUALIZACOES:
+        return isAdmin
+          ? <div className="fade-up"><Atualizacoes /></div>
+          : null
+
       case VIEWS.MEMBROS:
         return isAdmin
           ? <div className="fade-up"><Membros session={session} /></div>

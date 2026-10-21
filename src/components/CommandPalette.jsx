@@ -28,6 +28,7 @@ export default function CommandPalette({ onFechar, setView, isAdmin, isEditor, s
     if (isAdmin) {
       base.push({ label: 'Membros', acao: () => setView(VIEWS.MEMBROS) })
       base.push({ label: 'Métricas', acao: () => setView(VIEWS.METRICAS) })
+      base.push({ label: 'Atualizações legislativas', acao: () => setView(VIEWS.ATUALIZACOES) })
     }
     if (!busca.trim()) return base
     const q = busca.trim().toLowerCase()

@@ -43,11 +43,13 @@ describe('Sidebar', () => {
   it('não mostra "Membros" para quem não é admin', () => {
     renderSidebar({ isAdmin: false })
     expect(screen.queryByText('Membros')).not.toBeInTheDocument()
+    expect(screen.queryByText('Atualizações')).not.toBeInTheDocument()
   })
 
   it('mostra "Membros" para admin', () => {
     renderSidebar({ isAdmin: true })
     expect(screen.getByText('Membros')).toBeInTheDocument()
+    expect(screen.getByText('Atualizações')).toBeInTheDocument()
   })
 
   it('mostra "+ Nova Entrada" apenas para editor', () => {

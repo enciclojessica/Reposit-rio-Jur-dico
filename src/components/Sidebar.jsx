@@ -1,6 +1,6 @@
 import {
   Home, Library, Sparkles, Globe, BookA, PenLine, GitCompare, Star, Bell,
-  LayoutDashboard, Users, BarChart3, Upload, Settings, Share2, Plus,
+  LayoutDashboard, Users, BarChart3, RefreshCw, Upload, Settings, Share2, Plus,
 } from 'lucide-react'
 import { VIEWS } from '../data/views'
 
@@ -101,6 +101,7 @@ export default function Sidebar({
             <SecaoLabel theme={theme}>Administração</SecaoLabel>
             <NavBtn theme={theme} id="membros" Icone={Users} label="Membros" onClick={() => setView(VIEWS.MEMBROS)} active={view === VIEWS.MEMBROS} />
             <NavBtn theme={theme} id="metricas" Icone={BarChart3} label="Métricas" onClick={() => setView(VIEWS.METRICAS)} active={view === VIEWS.METRICAS} />
+            <NavBtn theme={theme} id="atualizacoes" Icone={RefreshCw} label="Atualizações" onClick={() => setView(VIEWS.ATUALIZACOES)} active={view === VIEWS.ATUALIZACOES} />
           </>
         )}
 

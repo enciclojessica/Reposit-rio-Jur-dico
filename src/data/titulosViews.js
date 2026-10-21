@@ -18,6 +18,7 @@ export const TITULOS_VIEWS = {
   [VIEWS.DASHBOARD]: 'Dashboard',
   [VIEWS.MEMBROS]: 'Membros',
   [VIEWS.METRICAS]: 'Métricas',
+  [VIEWS.ATUALIZACOES]: 'Atualizações',
   [VIEWS.IMPORTAR]: 'Importar',
   [VIEWS.LEGISLACAO]: 'Legislação',
   [VIEWS.EXTRAIR]: 'Extrair',
