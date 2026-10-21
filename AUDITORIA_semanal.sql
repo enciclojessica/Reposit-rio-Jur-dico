@@ -5,11 +5,11 @@ select 'duplicatas' item, count(*)::text n from (
   select 1 from legislacao group by codigo, numero, coalesce(titulo,''), coalesce(inciso,''), coalesce(paragrafo,'')
   having count(*) > 1 and bool_or(vigente is true)) t
 union all select 'caputs_vigentes_sem_comentario', count(*)::text from legislacao
-  where codigo in ('cf','adct','cc','cdc','cp','cpc','cpp','ctb','lei9099','lep') and inciso is null and paragrafo is null
+  where codigo in ('cf','adct','cc','cdc','cp','cpc','cpp','ctb','lei9099','lep','clt') and inciso is null and paragrafo is null
     and vigente is true and (coalesce(trim(contexto),'') = '' or coalesce(trim(aplicacao_pratica),'') = '')
 union all select 'comentarios_em_revisao', count(*)::text from legislacao where comentario_revisar
-union all select 'travessao_em_comentarios_ctb_cpp_lep_adct', count(*)::text from legislacao
-  where codigo in ('ctb','cpp','lep','adct') and (contexto ~ '[—–]' or aplicacao_pratica ~ '[—–]')
+union all select 'travessao_em_comentarios_ctb_cpp_lep_adct_clt', count(*)::text from legislacao
+  where codigo in ('ctb','cpp','lep','adct','clt') and (contexto ~ '[—–]' or aplicacao_pratica ~ '[—–]')
 union all select 'origem_fora_do_padrao_exceto_cedoab', count(*)::text from legislacao
   where codigo <> 'cedoab' and origem is distinct from 'planalto.gov.br'
 union all select 'texto_vazio_ou_nulo', count(*)::text from legislacao where coalesce(trim(texto),'') = ''
