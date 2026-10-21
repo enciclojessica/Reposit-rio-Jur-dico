@@ -75,6 +75,12 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
 Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, prévia da Vercel conferida, só então `main`
 (confirmar que o `main` não mudou desde a base).
 
+## Atualização legislativa
+
+- Em 21/10/2026 entraram `legislacao.atualizado_em` (muda só quando o dispositivo muda, não nos comentários), `legislacao_historico` (gatilho `trg_legislacao_historico` guarda a linha anterior em UPDATE de texto, vigência, posição, título ou rótulo, e em DELETE; leitura só para editor ou admin), `legislacao_versao` (um registro por código, com `termos` que identificam a norma nas ementas), `legislacao_monitor` (últimos números verificados: lei 15517, lc 225, ec 136) e `legislacao_alertas` (normas novas que alteram códigos do banco: pendente, aplicado ou descartado). SQL em `MIGRATION_legislacao_versionamento_20261021.sql` e `MIGRATION_legislacao_versao_seed_20261021.sql`. O conector cancela blocos com `drop`: criar sem `drop`.
+- Tarefa agendada semanal (segunda, 07h43 de Brasília): sonda as normas novas depois do último número verificado (leis em `.../_ato2023-2026/2026/lei/L<número>.htm`, EC em `.../constituicao/emendas/emc/emc<número>.htm`), lê a ementa, cruza com `legislacao_versao.termos`, grava em `legislacao_alertas` e avisa por notificação e e-mail. **Só detecta e avisa: nunca altera `legislacao`.** O resumo do WebFetch trunca páginas longas (CF, CTB) e não serve para gravar texto; o texto que vai ao banco vem do compilado enviado pela Jessica. A aplicação segue o fluxo: relatório de diferenças, aprovação dela, migração com reversão, e CC, CDC, CP, CPC e Lei 9.099 só com autorização expressa.
+- EC 141/2026 (16/10/2026, art. 7º da CF: jornada e repouso semanal, vigência escalonada) está como alerta pendente; o art. 7º do banco ainda está na redação anterior. Falta o texto compilado do Planalto para aplicar. O `historico` preservará a redação atual.
+
 ## Pendências
 
 - Auditoria de 09/10/2026 (correções em `MIGRATION_auditoria_20261009.sql`). Sem duplicatas, entidades, mojibake, órfãos, referências cruzadas quebradas (CTB e CPP) nem divergência de vigência. Em aberto, para decidir com a Jessica:
