@@ -5,6 +5,7 @@
 // CRON_SECRET, não é chamável publicamente sem o segredo.
 import { createClient } from '@supabase/supabase-js'
 import { segredoConfere } from '../lib/segredo.js'
+import { agruparMudancasLei } from '../lib/mudancasLei.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -52,6 +53,21 @@ export default async function handler(req, res) {
   const lacunas = AREAS_LISTA
     .map(area => ({ area, valor: (todasEntradas || []).filter(e => e.area === area).length }))
     .filter(l => l.valor < 5)
+
+  // O que mudou na legislação nos últimos 7 dias (dado compartilhado, calculado uma vez).
+  let mudancasLei = { artigos: [], lotes: [] }
+  try {
+    const corte = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
+    const [{ data: linhasLei }, { data: histLei }] = await Promise.all([
+      supabase.from('legislacao').select('id,codigo,numero,titulo,texto,vigente,criado_em,atualizado_em')
+        .gte('atualizado_em', corte).order('atualizado_em', { ascending: false }).limit(1500),
+      supabase.from('legislacao_historico').select('legislacao_id,lei_alteradora,data_norma').gte('registrado_em', corte).limit(1500),
+    ])
+    mudancasLei = agruparMudancasLei(linhasLei || [], histLei || [], corte)
+  } catch (e) {
+    console.warn('[verificar-alertas] Não foi possível ler as mudanças na legislação:', e.message)
+  }
+  const temMudancaLei = mudancasLei.artigos.length > 0 || mudancasLei.lotes.length > 0
 
   // Agrupar por email para enviar um único e-mail por usuário
   const porEmail = {}
@@ -109,12 +125,12 @@ export default async function handler(req, res) {
 
       // Só envia se houver novidade de fato — sem isso, vira spam semanal
       // sem conteúdo.
-      if (!resultadosPorTema.length) {
+      if (!resultadosPorTema.length && !temMudancaLei) {
         console.log(`[verificar-alertas] ${email}: nada novo esta semana.`)
         continue
       }
 
-      const html = montarEmail(resultadosPorTema, { lacunas })
+      const html = montarEmail(resultadosPorTema, { lacunas, mudancasLei })
 
       const envio = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -125,7 +141,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'Themis Jur <alertas@themisjur.com.br>',
           to: [email],
-          subject: `Atualização jurisprudencial — ${new Date().toLocaleDateString('pt-BR')}`,
+          subject: `Atualização semanal: ${new Date().toLocaleDateString('pt-BR')}`,
           html,
         }),
       })
@@ -167,7 +183,35 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, enviados, erros, temasProcessados, teto: MAX_TEMAS_POR_EXECUCAO })
 }
 
-function montarEmail(resultadosPorTema, { lacunas = [] } = {}) {
+function escapar(t) {
+  return String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+function montarSecaoLei(mudancasLei) {
+  const { artigos = [], lotes = [] } = mudancasLei || {}
+  if (!artigos.length && !lotes.length) return ''
+  const MAX = 15
+  const linhasLotes = lotes.map(l => `<div style="font-size:13px;color:#2c241b;line-height:1.6;margin-bottom:8px;"><b>${escapar(l.codigo.toUpperCase())}</b>: ${l.total} dispositivos incluídos ou atualizados em carga.</div>`).join('')
+  const linhasArtigos = artigos.slice(0, MAX).map(a => `
+    <div style="padding:10px 14px;margin-bottom:10px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #c9a452;border-radius:0 6px 6px 0;">
+      <div style="font-size:13px;font-weight:700;color:#2c241b;margin-bottom:4px;">
+        ${escapar(a.codigo.toUpperCase())} ${escapar(a.titulo || `Art. ${a.numero}`)}${a.norma ? ` <span style="font-weight:400;color:#800020;">· ${escapar(a.norma)}</span>` : ''}
+      </div>
+      <div style="font-size:12px;color:#736b62;">${a.itens.length} dispositivo${a.itens.length !== 1 ? 's' : ''}: ${[...new Set(a.itens.map(i => i.status))].join(', ')}</div>
+    </div>`).join('')
+  const resto = artigos.length > MAX ? `<div style="font-size:12px;color:#736b62;">e mais ${artigos.length - MAX} artigo(s); veja a aba "O que mudou na lei" no Radar.</div>` : ''
+  return `
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#800020;font-family:'IBM Plex Mono',monospace;
+                  text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;
+                  border-bottom:1px solid #e8e3dc;padding-bottom:8px;">
+        O que mudou na lei
+      </div>
+      ${linhasLotes}${linhasArtigos}${resto}
+    </div>`
+}
+
+function montarEmail(resultadosPorTema, { lacunas = [], mudancasLei = null } = {}) {
   const linhasTemas = resultadosPorTema.map(({ tema, tribunal, resultados }) => {
     const linhasResultados = resultados.map(r => `
       <div style="border-left:3px solid #c9a452;padding:10px 14px;margin-bottom:10px;background:#ffffff;border:1px solid #e8e3dc;border-left:3px solid #c9a452;border-radius:0 6px 6px 0;">
@@ -232,9 +276,10 @@ function montarEmail(resultadosPorTema, { lacunas = [] } = {}) {
         <div style="font-size:13px;color:#4a3f35;margin-bottom:24px;line-height:1.6;
                     padding:14px;background:#ffffff;border:1px solid #e8e3dc;border-radius:8px;
                     border-left:3px solid #800020;">
-          Encontramos novas decisões relevantes para os temas que você monitora. Revise, importe para o repositório ou descarte conforme necessário.
+          Novidades da semana: alterações na legislação do repositório e novas decisões relevantes para os temas que você monitora. Revise, importe para o repositório ou descarte conforme necessário.
         </div>
 
+        ${montarSecaoLei(mudancasLei)}
         ${secaoLacunas}
         ${linhasTemas}
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { agruparMudancasLei } from '../components/Alertas'
+import { agruparMudancasLei } from '../../lib/mudancasLei'
 
 const corte = '2026-10-14T00:00:00Z'
 const l = (id, extra = {}) => ({ id, codigo: 'cf', numero: 7, titulo: null, inciso: null, paragrafo: null, texto: `t${id}`, vigente: true, criado_em: '2026-10-01T00:00:00Z', atualizado_em: '2026-10-21T15:00:00Z', ...extra })
