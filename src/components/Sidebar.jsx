@@ -130,7 +130,7 @@ export default function Sidebar({
         <div>
           <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: 'Inter, sans-serif' }}>Plataforma e curadoria</div>
           <div style={{ fontSize: 13, color: theme.goldDark, fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>Farias Fusquiani</div>
-          <div style={{ fontSize: 10.5, color: theme.muted, fontFamily: 'Inter, sans-serif', marginTop: 6 }}>Desenvolvido por Jessica Farias Fusquiani</div>
+          <div style={{ fontSize: 10.5, color: theme.muted, fontFamily: 'Inter, sans-serif', marginTop: 6 }}>Idealizado e desenvolvido por Jessica Farias Fusquiani</div>
         </div>
       </div>
     </div>

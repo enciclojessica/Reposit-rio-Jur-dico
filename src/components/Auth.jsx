@@ -230,7 +230,7 @@ export default function Auth({ telaInicial }) {
         {/* Rodapé */}
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif", fontStyle: 'italic', opacity: 0.75 }}>
           Plataforma e curadoria, Farias Fusquiani
-          <div style={{ marginTop: 3 }}>Desenvolvido por Jessica Farias Fusquiani</div>
+          <div style={{ marginTop: 3 }}>Idealizado e desenvolvido por Jessica Farias Fusquiani</div>
         </div>
         <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, fontFamily: "'Inter', sans-serif" }}>
           <a href="/?pagina=termos" style={{ color: theme.muted, textDecoration: 'underline' }}>Termos de uso</a>
