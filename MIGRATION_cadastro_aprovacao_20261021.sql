@@ -78,8 +78,8 @@ revoke execute on function public.legislacao_registrar_mudanca() from public, an
 -- Jurisprudência sem número identificado (rastreabilidade): sai da vitrine pública até a Jessica identificar o julgado.
 update public.entradas set publica = false where id = '25b4acf9-2f70-4626-ba28-d7ea981551cc';
 
--- ── Domínio (só depois de a Jessica confirmar a grafia; não inserido por esta migração) ──────────
--- insert into public.dominios_aprovados (dominio) values ('<dominio confirmado>');
+-- ── Domínio institucional (aplicado depois, após a confirmação da grafia) ───────────────────────
+insert into public.dominios_aprovados (dominio) values ('unisantos.br') on conflict do nothing; -- confirmado pela Jessica em 21/10/2026
 
 -- ── Reverter ─────────────────────────────────────────────────────────────────────────────────────
 -- alter policy membros_insert on public.membros with check (((user_id = (select auth.uid())) and role = 'leitor' and pago = false and invited_by is null) or (select public.is_admin()));
