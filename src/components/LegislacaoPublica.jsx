@@ -1,3 +1,4 @@
+import { AUTORIA } from '../data/autoria'
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
@@ -127,6 +128,7 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
             Texto de lei em domínio público, curado pela Themis Jur para consulta rápida. Sempre confira a redação vigente na fonte oficial antes de usar em peça processual.
           </div>
         )}
+        <div style={{ textAlign: 'center', marginTop: 28, fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>{AUTORIA}</div>
       </div>
     </div>
   )

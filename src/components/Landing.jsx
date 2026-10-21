@@ -4,6 +4,7 @@ import { supabase } from '../supabase'
 import { Share2, Check, ArrowRight } from 'lucide-react'
 import SeletorTema from './SeletorTema'
 import AmostraAcervo from './AmostraAcervo'
+import { AUTORIA } from '../data/autoria'
 
 const FAIXA = '#5e0018'
 const FAIXA_BORDA = '#a9812e'
@@ -228,7 +229,7 @@ export default function Landing({ onEntrar }) {
               &ldquo;O Themis Jur nasceu de uma necessidade concreta: organizar, num só lugar, o material que a rotina de estudo e prática forense exige consultar todos os dias. A curadoria de cada entrada segue o mesmo rigor que se espera de uma pesquisa jurídica bem feita.&rdquo;
             </blockquote>
             <div style={{ fontFamily: FONTE, fontSize: 14, fontWeight: 600, color: theme.text }}>Jessica Farias Fusquiani</div>
-            <div style={{ fontFamily: FONTE, fontSize: 13, color: theme.muted }}>Idealizadora do Themis Jur</div>
+            <div style={{ fontFamily: FONTE, fontSize: 13, color: theme.muted }}>Criadora do Themis Jur</div>
           </div>
         </div>
 
@@ -267,7 +268,7 @@ export default function Landing({ onEntrar }) {
           <div>
             <span style={{ display: 'block', marginBottom: 3, fontSize: 11.5, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: FAIXA_BORDA }}>Plataforma e curadoria</span>
             <b style={{ display: 'block', fontFamily: FONTE_TITULO, fontSize: 18, fontWeight: 600, color: FAIXA_TITULO }}>Farias Fusquiani</b>
-            <span style={{ display: 'block', marginTop: 4, fontSize: 12.5 }}>Idealizado e desenvolvido por Jessica Farias Fusquiani</span>
+            <span style={{ display: 'block', marginTop: 4, fontSize: 12.5 }}>{AUTORIA}</span>
             <p style={{ margin: '14px 0 0', maxWidth: 560, lineHeight: 1.6 }}>
               O acervo e as sugestões de teses têm finalidade de apoio ao estudo e à pesquisa jurídica, e exigem conferência dos fatos, fundamentos e fontes pelo profissional antes do uso em peça. A responsabilidade pelo exercício profissional permanece do advogado, nos termos do art. 32 da Lei nº 8.906/94.
             </p>

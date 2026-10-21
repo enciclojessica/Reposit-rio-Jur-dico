@@ -1,3 +1,4 @@
+import { AUTORIA } from '../data/autoria'
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
@@ -178,6 +179,7 @@ export default function EntradaPublica({ entradaId, onFechar }) {
             </div>
           </>
         )}
+        <div style={{ textAlign: 'center', marginTop: 28, fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>{AUTORIA}</div>
       </div>
     </div>
   )

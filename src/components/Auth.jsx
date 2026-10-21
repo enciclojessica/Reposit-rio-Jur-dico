@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { AUTORIA, SUBTITULO_LOGIN } from '../data/autoria'
 import { Lock, Mail, Eye, EyeOff, Moon, Sun, AlertCircle, CheckCircle, User, Phone } from 'lucide-react'
 
 export default function Auth({ telaInicial }) {
@@ -98,7 +99,7 @@ export default function Auth({ telaInicial }) {
             Themis Jur
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>
-            Inteligência jurídica, por Farias Fusquiani
+            {SUBTITULO_LOGIN}
           </div>
         </div>
 
@@ -230,7 +231,7 @@ export default function Auth({ telaInicial }) {
         {/* Rodapé */}
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif", fontStyle: 'italic', opacity: 0.75 }}>
           Plataforma e curadoria, Farias Fusquiani
-          <div style={{ marginTop: 3 }}>Idealizado e desenvolvido por Jessica Farias Fusquiani</div>
+          <div style={{ marginTop: 3 }}>{AUTORIA}</div>
         </div>
         <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, fontFamily: "'Inter', sans-serif" }}>
           <a href="/?pagina=termos" style={{ color: theme.muted, textDecoration: 'underline' }}>Termos de uso</a>

@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Users, BarChart3, RefreshCw, Upload, Settings, Share2, Plus,
 } from 'lucide-react'
 import { VIEWS } from '../data/views'
+import { AUTORIA } from '../data/autoria'
 
 // Rótulo discreto de seção — só pra agrupar visualmente os itens do menu,
 // sem virar um item clicável nem ocupar destaque.
@@ -130,7 +131,7 @@ export default function Sidebar({
         <div>
           <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: 'Inter, sans-serif' }}>Plataforma e curadoria</div>
           <div style={{ fontSize: 13, color: theme.goldDark, fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>Farias Fusquiani</div>
-          <div style={{ fontSize: 10.5, color: theme.muted, fontFamily: 'Inter, sans-serif', marginTop: 6 }}>Idealizado e desenvolvido por Jessica Farias Fusquiani</div>
+          <div style={{ fontSize: 10.5, color: theme.muted, fontFamily: 'Inter, sans-serif', marginTop: 6 }}>{AUTORIA}</div>
         </div>
       </div>
     </div>

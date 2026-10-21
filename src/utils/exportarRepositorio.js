@@ -4,6 +4,7 @@ import {
   Footer, TabStopType, TabStopPosition,
   PageBreak,
 } from 'docx'
+import { AUTORIA } from '../data/autoria'
 
 const A4_W   = 11906
 const A4_H   = 16838
@@ -162,9 +163,14 @@ export async function exportarRepositorioDocx(entradas) {
 
   // ── Rodapé ───────────────────────────────────────────────────────────
   const rodape = new Footer({
-    children: [paragrafo([
-      txt(`Themis Jur · Farias Fusquiani · ${data}`, { size: 16, color: 'aaaaaa' }),
-    ], { alignment: AlignmentType.CENTER })],
+    children: [
+      paragrafo([
+        txt(`Themis Jur · Farias Fusquiani · ${data}`, { size: 16, color: 'aaaaaa' }),
+      ], { alignment: AlignmentType.CENTER }),
+      paragrafo([
+        txt(AUTORIA, { size: 16, color: 'aaaaaa' }),
+      ], { alignment: AlignmentType.CENTER }),
+    ],
   })
 
   const doc = new Document({

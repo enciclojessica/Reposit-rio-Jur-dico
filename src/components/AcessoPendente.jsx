@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Clock, Lock } from 'lucide-react'
 import { useTheme } from '../theme'
+import { AUTORIA } from '../data/autoria'
 
 // Tela para quem está logado mas ainda não foi aprovado (ou não tem registro de membro).
 // A aprovação é da administradora, ou automática se o e-mail confirmado estiver em um domínio aprovado.
@@ -62,7 +63,7 @@ export default function AcessoPendente({ email, temRegistro, onVerificar, onSair
       </div>
       <div style={{ marginTop: 22, textAlign: 'center', fontFamily: "'Inter', sans-serif" }}>
         <div style={{ fontSize: 11, color: theme.muted }}>Plataforma e Curadoria, Farias Fusquiani</div>
-        <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>Idealizado e desenvolvido por Jessica Farias Fusquiani</div>
+        <div style={{ fontSize: 11, color: theme.muted, marginTop: 2 }}>{AUTORIA}</div>
       </div>
     </div>
   )

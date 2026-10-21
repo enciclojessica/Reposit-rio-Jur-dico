@@ -20,7 +20,7 @@ React 18, Vite 5, Supabase (PostgreSQL, Auth, Storage), Vercel (funções server
 - Títulos em Playfair Display; texto longo (Editor e Teses) em Georgia; interface e metadados em Inter ou IBM Plex Mono.
 - Marfim `#fdfbf7`, Vinho `#800020`, Ouro `#c9a452`, Chumbo/cinza neutro. **Nada de azul padrão do navegador** em seleções, buscas ou
   contornos: foco em ouro ou borda cinza sutil.
-- Sidebar: só navegação funcional no topo e, fixo no rodapé, "Plataforma e Curadoria / Farias Fusquiani" e, abaixo, "Idealizado e desenvolvido por Jessica Farias Fusquiani" (também nos rodapés do login e da página inicial). Controles de sessão
+- Sidebar: só navegação funcional no topo e, fixo no rodapé, "Plataforma e Curadoria / Farias Fusquiani" e, abaixo, "Criado e desenvolvido por Jessica Farias Fusquiani" (também nos rodapés do login, da página inicial, da tela de espera e das páginas públicas, e no rodapé do documento exportado). A frase vem de uma constante única, `src/data/autoria.js` (`AUTORIA`; subtítulo do login em `SUBTITULO_LOGIN`, "Repositório jurídico curado"): não escrever o texto direto nos componentes. Controles de sessão
   (login, avatar, sair, exportar) alinhados à direita no header.
 - Na tela de legislação, um cartão agrupado por artigo (decisão confirmada), não um cartão por linha.
 

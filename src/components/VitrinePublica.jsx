@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
+import { AUTORIA } from '../data/autoria'
 import { AREAS, corDaArea, buscarTodasLinhas } from '../shared'
 import SeletorTema from './SeletorTema'
 import { ChevronRight, ArrowLeft } from 'lucide-react'
@@ -102,6 +103,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
             </button>
           </div>
         )}
+        <div style={{ textAlign: 'center', marginTop: 28, fontSize: 11, color: '#736b62' }}>{AUTORIA}</div>
       </div>
     </div>
   )
