@@ -50,7 +50,7 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
           Amostra do acervo
         </div>
         <div style={{ fontSize: 14, color: '#736b62', marginBottom: 28 }}>
-          Uma seleção do que o Themis Jur reúne, curada pra quem ainda não tem conta. O acervo completo é maior, e é gratuito pra quem se cadastra.
+          Uma seleção do que o Themis Jur reúne, curada pra quem ainda não tem conta. O acervo completo é maior e gratuito, com cadastro aprovado pela curadoria.
         </div>
 
         {entradas && entradas.length > 0 && (
@@ -96,10 +96,10 @@ export default function VitrinePublica({ onAbrirEntrada, onEntrar }) {
         {entradas && entradas.length > 0 && (
           <div style={{ textAlign: 'center', marginTop: 48, padding: '28px 24px', background: '#f6ede0', borderRadius: 10 }}>
             <div style={{ fontSize: 14, color: '#3a3128', marginBottom: 16 }}>
-              Isso é só uma amostra. O acervo completo tem muito mais, e o cadastro é gratuito.
+              Isso é só uma amostra. O acervo completo tem muito mais, e o acesso é gratuito com cadastro aprovado pela curadoria.
             </div>
             <button onClick={onEntrar} style={{ background: '#8f6d27', border: 'none', color: '#fff', fontSize: 14, fontWeight: 'bold', padding: '12px 32px', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit' }}>
-              Criar conta gratuita
+              Solicitar acesso gratuito
             </button>
           </div>
         )}

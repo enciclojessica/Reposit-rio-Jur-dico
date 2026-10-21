@@ -3,7 +3,7 @@
 
 export const TERMOS_DE_USO = {
   titulo: 'Termos de Uso',
-  atualizadoEm: '09/09/2026',
+  atualizadoEm: '21/10/2026',
   secoes: [
     {
       titulo: '1. O que é o Themis Jur',
@@ -13,11 +13,11 @@ O conteúdo disponibilizado tem finalidade de apoio à pesquisa e ao estudo jur�
     },
     {
       titulo: '2. Cadastro e acesso',
-      corpo: `O cadastro na plataforma é aberto: qualquer pessoa pode criar uma conta vinculada a e-mail e senha, informando nome completo e telefone. O acesso ao acervo completo (jurisprudência, doutrina e legislação) é gratuito para todo usuário cadastrado.
+      corpo: `O cadastro na plataforma é feito com e-mail e senha, informando nome completo e telefone, e está sujeito à aprovação da curadoria. Contas com e-mail confirmado de domínio institucional previamente aprovado pela curadoria (por exemplo, o de uma instituição de ensino) são liberadas automaticamente; nos demais casos o cadastro fica aguardando aprovação e, enquanto isso, o acesso se limita ao conteúdo público. A curadoria pode recusar cadastros a seu critério. O acesso ao acervo completo (jurisprudência, doutrina e legislação) é gratuito para o usuário aprovado.
 
 Recursos que utilizam inteligência artificial (busca assistida, extração de dados de petições) são reservados a contas com plano pago ou a administradores, conforme indicado na própria plataforma.
 
-Além do cadastro aberto, um administrador pode convidar diretamente uma pessoa para integrar a plataforma com papel de editor, responsável pela curadoria de novo conteúdo.
+Além do cadastro, um administrador pode convidar diretamente uma pessoa para integrar a plataforma, inclusive com papel de editor, responsável pela curadoria de novo conteúdo; o convite aceito já aprova o cadastro.
 
 O usuário é responsável por manter a confidencialidade de suas credenciais de acesso e por toda atividade realizada em sua conta. O Themis Jur pode revogar o acesso de qualquer usuário a seu exclusivo critério, especialmente em caso de violação destes Termos.`,
     },
@@ -41,7 +41,7 @@ Conteúdo inserido pelo próprio usuário (anotações pessoais, rascunhos de pe
     },
     {
       titulo: '6. Planos e cobrança',
-      corpo: `O cadastro e o acesso ao acervo completo são gratuitos. Recursos de inteligência artificial exigem plano pago; eventuais condições de cobrança serão informadas previamente ao usuário antes da contratação.`,
+      corpo: `O cadastro e o acesso ao acervo completo, para o usuário aprovado, são gratuitos. Recursos de inteligência artificial exigem plano pago; eventuais condições de cobrança serão informadas previamente ao usuário antes da contratação.`,
     },
     {
       titulo: '7. Limitação de responsabilidade',
@@ -66,7 +66,7 @@ O Themis Jur não se responsabiliza por decisões tomadas com base no conteúdo 
 
 export const POLITICA_PRIVACIDADE = {
   titulo: 'Política de Privacidade',
-  atualizadoEm: '09/09/2026',
+  atualizadoEm: '21/10/2026',
   secoes: [
     {
       titulo: '1. Controladora',
@@ -84,7 +84,7 @@ O Themis Jur não coleta dados sensíveis (saúde, origem racial, convicção re
     },
     {
       titulo: '3. Para que usamos esses dados',
-      corpo: `Autenticar o usuário e controlar seu nível de acesso (leitor, editor, administrador) e seu plano (gratuito ou pago); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
+      corpo: `Autenticar o usuário e avaliar e aprovar o cadastro e avisar a curadoria de novos cadastros pendentes; controlar seu nível de acesso (leitor, editor, administrador) e seu plano (gratuito ou pago); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
 
 Não utilizamos os dados pessoais do usuário para publicidade ou para venda a terceiros.`,
     },

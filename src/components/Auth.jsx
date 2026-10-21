@@ -192,6 +192,12 @@ export default function Auth({ telaInicial }) {
               </div>
             )}
 
+            {screen === 'register' && (
+              <div style={{ fontSize: 12, color: theme.muted, lineHeight: 1.6, marginBottom: 14, fontFamily: "'Inter', sans-serif" }}>
+                O cadastro é aprovado pela curadoria. Com e-mail institucional de domínio parceiro (por exemplo, @unisantos.br), o acesso é liberado assim que você confirmar o e-mail.
+              </div>
+            )}
+
             {/* Botão principal */}
             <button type="submit" disabled={loading} style={{
               width: '100%',
