@@ -45,6 +45,7 @@ export default function Atualizacoes() {
   const [leiAlteradora, setLeiAlteradora] = useState('')
   const [dataNorma, setDataNorma] = useState('')
   const [msg, setMsg] = useState(null)
+  const [revisar, setRevisar] = useState([])
 
   const ops = useMemo(() => montarOperacoes(itens, { selecionados: marcados }), [itens, marcados])
   const tocaPadrao = PADRAO_REFERENCIA.includes(codigo) && ops.length > 0
@@ -57,7 +58,22 @@ export default function Atualizacoes() {
     setCarregando(false)
   }
 
-  useEffect(() => { carregarAlertas() }, [])
+  async function carregarRevisar() {
+    const { data, error } = await supabase.from('legislacao')
+      .select('id,codigo,numero,titulo,texto,contexto,aplicacao_pratica')
+      .eq('comentario_revisar', true).order('codigo').order('numero').limit(300)
+    if (error) { setMsg({ tipo: 'err', texto: `Não foi possível carregar os comentários a revisar: ${error.message}` }); return }
+    setRevisar(data || [])
+  }
+
+  async function marcarRevisado(l) {
+    const { error } = await supabase.from('legislacao').update({ comentario_revisar: false }).eq('id', l.id)
+    if (error) { setMsg({ tipo: 'err', texto: `Erro ao marcar como revisado: ${error.message}` }); return }
+    setMsg({ tipo: 'ok', texto: `Comentário de ${l.codigo.toUpperCase()} ${l.titulo || `Art. ${l.numero}`} marcado como revisado.` })
+    carregarRevisar()
+  }
+
+  useEffect(() => { carregarAlertas(); carregarRevisar() }, [])
 
   function escolherAlerta(a) {
     setAlertaSel(a)
@@ -136,6 +152,7 @@ export default function Atualizacoes() {
     setMsg({ tipo: 'ok', texto: `Aplicado: ${data.atualizados} atualizado(s), ${data.inseridos} inserido(s).` })
     setItens([]); setMarcados(new Set()); setTexto('')
     carregarAlertas()
+    carregarRevisar()
   }
 
   const card = { background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 20, marginBottom: 16 }
@@ -195,6 +212,26 @@ export default function Atualizacoes() {
             </div>
           ))}
       </div>
+
+      {revisar.length > 0 && (
+        <div style={card}>
+          <div style={secao}>Comentários a revisar ({revisar.length})</div>
+          <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, marginBottom: 10 }}>
+            O texto do artigo mudou depois que o comentário foi escrito. Revise o Comentário didático e a Aplicação prática e marque como revisado.
+          </div>
+          {revisar.map((l, i) => (
+            <div key={l.id} style={{ padding: '10px 0', borderTop: i > 0 ? `0.5px solid ${theme.border}` : 'none' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', marginBottom: 4 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: theme.text, fontFamily: 'Inter, sans-serif' }}>{l.codigo.toUpperCase()} {l.titulo || `Art. ${l.numero}`}</span>
+                <button onClick={() => marcarRevisado(l)} style={{ ...campo, cursor: 'pointer', display: 'inline-flex', gap: 6, alignItems: 'center' }}><Check size={13} /> Marcar como revisado</button>
+              </div>
+              <div style={{ fontSize: 12, color: theme.text, fontFamily: theme.fontSerif, lineHeight: 1.5 }}><strong>Artigo:</strong> {l.texto}</div>
+              {l.contexto && <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, lineHeight: 1.5, marginTop: 3 }}><strong>Comentário:</strong> {l.contexto}</div>}
+              {l.aplicacao_pratica && <div style={{ fontSize: 12, color: theme.muted, fontFamily: theme.fontSerif, lineHeight: 1.5, marginTop: 3 }}><strong>Aplicação:</strong> {l.aplicacao_pratica}</div>}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={card}>
         <div style={secao}>

@@ -193,7 +193,9 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) 
 
           {(caput?.contexto || caput?.aplicacao_pratica || caput?.resultado) && (
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>Experiência prática</div>
+              <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>Experiência prática
+                {caput.comentario_revisar && <span style={{ marginLeft: 10, fontSize: 10, color: theme.gold, border: `1px solid ${theme.gold}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', fontWeight: 400 }}>em revisão após alteração do texto</span>}
+              </div>
               {caput.contexto && (
                 <div>
                   <div style={rotuloSecao}>Comentário didático</div>
@@ -323,6 +325,7 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes }) {
               {caput.contexto && (
                 <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
                   <span style={{ color: theme.gold }}>Comentário: </span>
+                  {caput.comentario_revisar && <span style={{ color: theme.gold, border: `1px solid ${theme.gold}`, borderRadius: 4, padding: '0 5px', marginRight: 6, fontSize: 10, textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace" }}>em revisão</span>}
                   {caput.contexto}
                 </div>
               )}

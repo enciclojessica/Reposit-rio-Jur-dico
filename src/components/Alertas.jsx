@@ -4,6 +4,36 @@ import { useTheme } from '../theme'
 import { Bell, BellOff, Trash2, RefreshCw, Clock, CheckCircle } from 'lucide-react'
 import { AreaDot, corDaArea } from '../shared'
 
+// Agrupa as linhas de legislacao alteradas na semana por artigo. Códigos com carga em lote (mais de 80 linhas
+// na janela, como uma importação) viram uma linha-resumo, para não afogar as mudanças reais.
+export function agruparMudancasLei(linhas, historico, corte) {
+  const histPorLinha = new Map()
+  for (const h of historico) if (!histPorLinha.has(h.legislacao_id)) histPorLinha.set(h.legislacao_id, h)
+  const porCodigo = new Map()
+  for (const l of linhas) {
+    if (!porCodigo.has(l.codigo)) porCodigo.set(l.codigo, [])
+    porCodigo.get(l.codigo).push(l)
+  }
+  const lotes = []
+  const artigos = new Map()
+  for (const [codigo, lista] of porCodigo) {
+    if (lista.length > 80) {
+      lotes.push({ codigo, total: lista.length, quando: lista[0].atualizado_em })
+      continue
+    }
+    for (const l of lista) {
+      const chave = `${codigo}|${l.numero}|${l.titulo || ''}`
+      if (!artigos.has(chave)) artigos.set(chave, { chave, codigo, numero: l.numero, titulo: l.titulo, quando: l.atualizado_em, norma: '', itens: [] })
+      const a = artigos.get(chave)
+      const h = histPorLinha.get(l.id)
+      if (h?.lei_alteradora && !a.norma.includes(h.lei_alteradora)) a.norma = a.norma ? `${a.norma} e ${h.lei_alteradora}` : h.lei_alteradora
+      const status = h ? 'Alterado' : (l.criado_em >= corte ? 'Novo' : 'Atualizado')
+      a.itens.push({ id: l.id, texto: l.texto, vigente: l.vigente, status })
+    }
+  }
+  return { artigos: [...artigos.values()].sort((x, y) => String(y.quando).localeCompare(String(x.quando))), lotes }
+}
+
 // ── Radar de Atualizações ─────────────────────────────────────────────────────
 // Lê entradas criadas nos últimos 7 dias no próprio banco de dados.
 // O cron semanal lê receber_boletim: true para disparar e-mails.
@@ -23,6 +53,12 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
   const [recentes, setRecentes]     = useState([])
   const [loadingRecentes, setLoadingRecentes] = useState(true)
   const [abaAtiva, setAbaAtiva]     = useState(temaPrefill ? 'alertas' : 'radar')
+
+  // O que mudou na lei (últimos 7 dias): dispositivos com atualizado_em recente, agrupados por artigo.
+  const [mudancasLei, setMudancasLei] = useState([])
+  const [lotes, setLotes]             = useState([])
+  const [loadingLei, setLoadingLei]   = useState(true)
+  const [erroLei, setErroLei]         = useState('')
 
   // Boletim
   const [boletim, setBoletim]       = useState(membro?.receber_boletim !== false)
@@ -83,6 +119,27 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
       setLoadingRecentes(false)
     }
     carregarRecentes()
+  }, [])
+
+  // ── Carregar o que mudou na legislação ──────────────────────────────────
+  useEffect(() => {
+    async function carregarMudancasLei() {
+      setLoadingLei(true)
+      const corte = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
+      const [{ data: linhas, error: e1 }, { data: hist, error: e2 }] = await Promise.all([
+        supabase.from('legislacao')
+          .select('id,codigo,numero,titulo,inciso,paragrafo,texto,vigente,criado_em,atualizado_em')
+          .gte('atualizado_em', corte).order('atualizado_em', { ascending: false }).limit(1500),
+        supabase.from('legislacao_historico')
+          .select('legislacao_id,lei_alteradora,data_norma').gte('registrado_em', corte).limit(1500),
+      ])
+      if (e1 || e2) { setErroLei((e1 || e2).message); setLoadingLei(false); return }
+      const r = agruparMudancasLei(linhas || [], hist || [], corte)
+      setMudancasLei(r.artigos)
+      setLotes(r.lotes)
+      setLoadingLei(false)
+    }
+    carregarMudancasLei()
   }, [])
 
   // ── Carregar alertas externos ───────────────────────────────────────────
@@ -226,6 +283,7 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
       <div style={{ display: 'flex', borderBottom: `1px solid ${theme.border}`, marginBottom: 20 }}>
         {[
           { id: 'radar',   label: `Radar (${recentes.length})` },
+          { id: 'lei',     label: `O que mudou na lei (${mudancasLei.length})` },
           { id: 'alertas', label: `Alertas (${alertas.length})` },
         ].map(a => (
           <button key={a.id} onClick={() => setAbaAtiva(a.id)} style={{
@@ -286,6 +344,51 @@ export default function Alertas({ session, membro, temaPrefill, onTemaPrefillCon
                   </div>
                 )
               })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── ABA O QUE MUDOU NA LEI ───────────────────────────────────────── */}
+      {abaAtiva === 'lei' && (
+        <>
+          {loadingLei ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: theme.muted, padding: '20px 0', fontFamily: 'Inter, sans-serif', fontSize: 13 }}>
+              <RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} /> Carregando...
+            </div>
+          ) : erroLei ? (
+            <div style={{ color: theme.error, fontSize: 13, fontFamily: 'Inter, sans-serif', padding: '20px 0' }}>Não foi possível carregar as mudanças: {erroLei}</div>
+          ) : mudancasLei.length === 0 && lotes.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: theme.muted }}>
+              <Clock size={36} style={{ opacity: 0.3, display: 'block', margin: '0 auto 12px' }} />
+              <div style={{ fontSize: 14, fontFamily: 'Inter, sans-serif' }}>Nenhuma alteração na legislação nos últimos 7 dias.</div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {lotes.map(l => (
+                <div key={l.codigo} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '14px 16px', fontSize: 13, color: theme.text, fontFamily: 'Inter, sans-serif' }}>
+                  <strong>{l.codigo.toUpperCase()}</strong>: {l.total} dispositivos incluídos ou atualizados em carga ({tempoRelativo(l.quando)}).
+                </div>
+              ))}
+              {mudancasLei.map(a => (
+                <div key={a.chave} style={{ background: theme.cardBg, border: `1px solid ${theme.border}`, borderRadius: 8, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <div style={{ fontSize: 14, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>
+                      {a.codigo.toUpperCase()} {a.titulo || `Art. ${a.numero}`}
+                      {a.norma && <span style={{ marginLeft: 10, fontSize: 11, color: theme.gold, fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{a.norma}</span>}
+                    </div>
+                    <div style={{ fontSize: 10, color: theme.muted, fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Clock size={10} /> {tempoRelativo(a.quando)}
+                    </div>
+                  </div>
+                  {a.itens.map(i => (
+                    <div key={i.id} style={{ fontSize: 12.5, color: i.vigente === false ? theme.muted : theme.text, lineHeight: 1.6, fontFamily: theme.fontSerif, marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, color: i.status === 'Novo' ? theme.success : theme.gold, fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', marginRight: 8 }}>{i.status}</span>
+                      {i.texto.length > 260 ? `${i.texto.slice(0, 260)}...` : i.texto}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
           )}
         </>
