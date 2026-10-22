@@ -66,7 +66,7 @@ O Themis Jur não se responsabiliza por decisões tomadas com base no conteúdo 
 
 export const POLITICA_PRIVACIDADE = {
   titulo: 'Política de Privacidade',
-  atualizadoEm: '21/10/2026',
+  atualizadoEm: '22/10/2026',
   secoes: [
     {
       titulo: '1. Controladora',
@@ -89,7 +89,19 @@ O Themis Jur não coleta dados sensíveis (saúde, origem racial, convicção re
 Não utilizamos os dados pessoais do usuário para publicidade ou para venda a terceiros.`,
     },
     {
-      titulo: '4. Com quem compartilhamos dados',
+      titulo: '4. Bases legais do tratamento',
+      corpo: `Cada tratamento se apoia em uma das bases legais do art. 7º da LGPD:
+
+Cadastro, autenticação, aprovação do acesso e funcionalidades pessoais (anotações, favoritos, rascunhos, alertas): execução do serviço solicitado pelo usuário e de procedimentos preliminares a ele (art. 7º, V).
+
+Segurança da plataforma, prevenção de abuso e diagnóstico técnico: legítimo interesse da controladora (art. 7º, IX), limitado ao estritamente necessário.
+
+Dados opcionais, como a inscrição na OAB e a foto de perfil: consentimento do titular (art. 7º, I), que pode ser revogado a qualquer momento.
+
+Guarda de registros de acesso e demais dados exigidos por lei: cumprimento de obrigação legal ou regulatória (art. 7º, II).`,
+    },
+    {
+      titulo: '5. Com quem compartilhamos dados',
       corpo: `Para operar a plataforma, utilizamos os seguintes prestadores de serviço (operadores, nos termos da LGPD), que têm acesso aos dados estritamente na medida necessária à prestação do serviço contratado:
 
 Supabase: hospedagem do banco de dados e autenticação. Vercel: hospedagem da aplicação web. Resend: envio de e-mails transacionais e de alerta. Anthropic: processamento de texto nos recursos que usam inteligência artificial (busca assistida, extração de petições).
@@ -97,26 +109,32 @@ Supabase: hospedagem do banco de dados e autenticação. Vercel: hospedagem da a
 Não compartilhamos dados pessoais com terceiros para finalidades próprias desses terceiros.`,
     },
     {
-      titulo: '5. Por quanto tempo guardamos os dados',
+      titulo: '6. Transferência internacional de dados',
+      corpo: `O banco de dados (Supabase) e a hospedagem da aplicação (Vercel) operam em região dos Estados Unidos, e os serviços de envio de e-mail (Resend) e de inteligência artificial (Anthropic) são prestados por empresas estrangeiras. Por isso, os dados do usuário podem ser tratados fora do Brasil. Essa transferência é necessária para a execução do serviço contratado pelo usuário (art. 33, IX, da LGPD, combinado com o art. 7º, V), e a controladora contrata apenas operadores que declaram observar padrões de proteção de dados compatíveis com a LGPD.`,
+    },
+    {
+      titulo: '7. Por quanto tempo guardamos os dados',
       corpo: `Os dados são mantidos enquanto a conta do usuário estiver ativa. Após a exclusão de uma conta ou a revogação de acesso, os dados pessoais associados podem ser mantidos por período adicional quando exigido por obrigação legal, ou removidos mediante solicitação do titular, nos termos do art. 18 da LGPD.`,
     },
     {
-      titulo: '6. Direitos do titular',
+      titulo: '8. Direitos do titular',
       corpo: `Nos termos da LGPD, o usuário pode, a qualquer momento: confirmar a existência de tratamento e acessar seus dados; corrigir dados incompletos, inexatos ou desatualizados; solicitar a exclusão de seus dados pessoais, ressalvadas hipóteses de guarda obrigatória por lei; solicitar a portabilidade de seus dados a outro fornecedor de serviço; revogar consentimento, quando aplicável.
 
 A plataforma já oferece, na tela de Configurações, exportação dos próprios dados (entradas, anotações, rascunhos e demais dados vinculados à conta) em formato aberto (JSON). Solicitações adicionais podem ser feitas para themisjur.ia@gmail.com.`,
     },
     {
-      titulo: '7. Segurança',
-      corpo: `Os dados são protegidos por controle de acesso por linha (Row Level Security) no banco de dados. Cada usuário acessa livremente apenas os dados pessoais que lhe pertencem (anotações, favoritos, rascunhos, histórico de leitura); o administrador da plataforma tem acesso a esses mesmos dados de qualquer usuário, para fins de administração, métricas de uso e suporte. O tráfego entre o navegador e os servidores é criptografado (HTTPS).`,
+      titulo: '9. Segurança e incidentes',
+      corpo: `Os dados são protegidos por controle de acesso por linha (Row Level Security) no banco de dados. Cada usuário acessa livremente apenas os dados pessoais que lhe pertencem (anotações, favoritos, rascunhos, histórico de leitura); o administrador da plataforma tem acesso a esses mesmos dados de qualquer usuário, para fins de administração, métricas de uso e suporte. O tráfego entre o navegador e os servidores é criptografado (HTTPS).
+
+Em caso de incidente de segurança que possa acarretar risco ou dano relevante aos titulares, a controladora comunicará a Autoridade Nacional de Proteção de Dados (ANPD) e os titulares afetados, em prazo razoável, informando a natureza dos dados atingidos, as medidas adotadas e os riscos envolvidos (art. 48 da LGPD).`,
     },
     {
-      titulo: '8. Alterações desta Política',
+      titulo: '10. Alterações desta Política',
       corpo: `Esta Política pode ser atualizada para refletir mudanças na plataforma ou na legislação aplicável. Alterações relevantes serão comunicadas aos usuários.`,
     },
     {
-      titulo: '9. Contato',
-      corpo: `Para exercer os direitos descritos nesta Política ou esclarecer dúvidas sobre o tratamento de dados, entre em contato pelo e-mail themisjur.ia@gmail.com.`,
+      titulo: '11. Contato',
+      corpo: `Para exercer os direitos descritos nesta Política ou esclarecer dúvidas sobre o tratamento de dados, entre em contato pelo e-mail themisjur.ia@gmail.com. Esse é também o canal de comunicação com os titulares e com a ANPD (art. 41 da LGPD), mantido pela controladora.`,
     },
   ],
 }
