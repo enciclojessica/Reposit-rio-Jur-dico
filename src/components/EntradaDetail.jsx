@@ -4,6 +4,7 @@ import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo, gerarCitacaoABNT } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
+import { artigosRevogados } from '../utils/artigosRevogados'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
 import AnotacaoPessoal from './AnotacaoPessoal'
@@ -110,9 +111,9 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
       referenciasNaEntrada.forEach(r => { (porCodigo[r.codigo] ||= []).push(r.numero) })
       const resultados = await Promise.all(
         Object.entries(porCodigo).map(([codigo, numeros]) =>
-          supabase.from('legislacao').select('numero, vigente')
-            .eq('codigo', codigo).in('numero', [...new Set(numeros)]).eq('vigente', false)
-            .then(({ data }) => (data || []).map(d => `${codigo}|${d.numero}`))
+          supabase.from('legislacao').select('numero, titulo, paragrafo, inciso, vigente')
+            .eq('codigo', codigo).in('numero', [...new Set(numeros)]).limit(5000)
+            .then(({ data }) => artigosRevogados(data || []).map(n => `${codigo}|${n}`))
         )
       )
       if (!cancelado) setRevogados(new Set(resultados.flat()))
