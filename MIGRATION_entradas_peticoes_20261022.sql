@@ -60,3 +60,6 @@ array['revisão criminal','justificação criminal','jurisprudência em teses'],
 ('Penal','Revisão criminal: novas testemunhas não fundamentam o pedido (Jurisprudência em Teses, ed. 63, tese 16)','jurisprudência','STJ, Jurisprudência em Teses, edição 63 (Revisão Criminal), tese 16','STJ, Jurisprudência em Teses, ed. 63 (Revisão Criminal), tese 16','',
 $$[{"tese_assunto":"Revisão criminal e rol de novas testemunhas","ratio_decidendi":"A revisão criminal não pode ser fundamentada no arrolamento de novas testemunhas.","aplicacao_pratica":"Impede a revisão criminal que apenas arrola testemunhas novas; a prova nova deve ser demonstrada de outra forma, como documento ou justificação.","precedente_sumula":"Jurisprudência em Teses, ed. 63, tese 16","fundamentacao_legal":"CPP, art. 621, III"}]$$::jsonb,
 array['revisão criminal','prova testemunhal','jurisprudência em teses'],'vigente','[]'::jsonb,'manual',false);
+
+-- Ajuste posterior (22/10/2026), com a Revista de Súmulas do STJ enviada pela Jessica: Súmula 375, Corte Especial, 18/03/2009, DJe 30/03/2009.
+update entradas set fonte='STJ, Corte Especial, sessão de 18/03/2009, DJe 30/03/2009 (ed. 334)', teses = jsonb_set(teses,'{0,fundamentacao_legal}','"CPC, art. 792 (CPC/1973, art. 593, II, c/c art. 659, § 4º)"') where referencia='Súmula 375/STJ' and publica=false;
