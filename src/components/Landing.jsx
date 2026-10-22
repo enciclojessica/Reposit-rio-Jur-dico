@@ -21,6 +21,8 @@ const NOME_CODIGO_LANDING = {
   ctb: 'Código de Trânsito Brasileiro', lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
   lep: 'Lei de Execução Penal (Lei 7.210/1984)',
   clt: 'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
+  ctn: 'Código Tributário Nacional (Lei 5.172/1966)',
+  lei15040: 'Marco Legal dos Seguros (Lei 15.040/2024)',
 }
 
 // Revela um bloco uma vez, quando entra na tela ao rolar — usado pra

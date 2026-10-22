@@ -11,7 +11,7 @@ export const TAGS_ORIGEM_OCULTAS = ['pesquisa-juri', 'extraído-de-peça', 'auto
 
 // Siglas de código/diploma legal — classificação estrutural, não conteúdo
 // que ajuda a reconhecer a entrada de relance na lista.
-export const CODIGOS_OCULTOS = ['cc', 'cpc', 'cdc', 'cf', 'cpp', 'cp', 'ctb', 'clt', 'ctn', 'lei9099', 'lep']
+export const CODIGOS_OCULTOS = ['cc', 'cpc', 'cdc', 'cf', 'cpp', 'cp', 'ctb', 'clt', 'ctn', 'lei15040', 'lei9099', 'lep']
 
 // Tribunais — sigla de quem decidiu, não do que trata. Cobre as siglas
 // conhecidas do acervo hoje, mais um padrão geral pra tribunais de

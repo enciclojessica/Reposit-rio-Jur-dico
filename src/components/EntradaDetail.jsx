@@ -3,8 +3,8 @@ import { Check, Link2, Unlock, Star, ArrowLeftRight, Printer, Maximize2, Minimiz
 import { useTheme } from '../theme'
 import { AREAS, Badge, STATUS_META, corDaArea, labelCampoTese, fonteReferenciaResumo, gerarCitacaoABNT } from '../shared'
 import TextoComReferenciasLegais from './TextoComReferenciasLegais'
-import { extrairReferenciasLegais } from '../data/legislacaoNomes'
-import { artigosRevogados } from '../utils/artigosRevogados'
+import { extrairReferenciasComDispositivo, chaveArtigo, chaveDispositivo } from '../utils/dispositivoCitado'
+import { artigosRevogados, dispositivoRevogado } from '../utils/artigosRevogados'
 import { supabase } from '../supabase'
 import { TagPill } from './TagInput'
 import AnotacaoPessoal from './AnotacaoPessoal'
@@ -92,14 +92,22 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
   }, [buscaContraponto, todasEntradas, contrapontos, entry.id])
 
   // Referências legais citadas nas teses (fundamentacao_legal, ratio_decidendi),
-  // pra checar quais artigos já não estão mais vigentes. Uma consulta só,
-  // pra todas as referências da entrada inteira, não uma por campo.
+  // pra checar quais artigos, e quais dispositivos citados (parágrafo, inciso,
+  // alínea), já não estão mais vigentes. Uma consulta só por código, pra todas
+  // as referências da entrada inteira, não uma por campo. Cada item agrupa um
+  // artigo com os dispositivos distintos citados dele nas teses.
   const referenciasNaEntrada = useMemo(() => {
     const textos = (entry.teses || []).flatMap(t => [t.fundamentacao_legal, t.ratio_decidendi])
-    const todasRefs = textos.flatMap(t => extrairReferenciasLegais(t || ''))
+    const todasRefs = textos.flatMap(t => extrairReferenciasComDispositivo(t || ''))
     const unicas = new Map()
-    todasRefs.forEach(r => unicas.set(`${r.codigo}|${r.numero}`, r))
-    return [...unicas.values()]
+    todasRefs.forEach(r => {
+      const chave = chaveArtigo(r.codigo, r.numero)
+      if (!unicas.has(chave)) unicas.set(chave, { codigo: r.codigo, numero: r.numero, dispositivos: new Map() })
+      if (r.dispositivo) {
+        unicas.get(chave).dispositivos.set(chaveDispositivo(r.codigo, r.numero, r.dispositivo), r.dispositivo)
+      }
+    })
+    return [...unicas.values()].map(u => ({ ...u, dispositivos: [...u.dispositivos.values()] }))
   }, [entry.teses])
 
   const [revogados, setRevogados] = useState(new Set())
@@ -108,12 +116,19 @@ export default function EntradaDetail({ entry: raw, session, membro, onClose, on
     let cancelado = false
     async function checar() {
       const porCodigo = {}
-      referenciasNaEntrada.forEach(r => { (porCodigo[r.codigo] ||= []).push(r.numero) })
+      referenciasNaEntrada.forEach(r => { (porCodigo[r.codigo] ||= []).push(r) })
       const resultados = await Promise.all(
-        Object.entries(porCodigo).map(([codigo, numeros]) =>
+        Object.entries(porCodigo).map(([codigo, refs]) =>
           supabase.from('legislacao').select('numero, titulo, paragrafo, inciso, vigente')
-            .eq('codigo', codigo).in('numero', [...new Set(numeros)]).limit(5000)
-            .then(({ data }) => artigosRevogados(data || []).map(n => `${codigo}|${n}`))
+            .eq('codigo', codigo).in('numero', [...new Set(refs.map(r => r.numero))]).limit(5000)
+            .then(({ data }) => {
+              const linhas = data || []
+              const chaves = artigosRevogados(linhas).map(n => chaveArtigo(codigo, n))
+              refs.forEach(r => r.dispositivos.forEach(d => {
+                if (dispositivoRevogado(linhas, r.numero, d)) chaves.push(chaveDispositivo(codigo, r.numero, d))
+              }))
+              return chaves
+            })
         )
       )
       if (!cancelado) setRevogados(new Set(resultados.flat()))

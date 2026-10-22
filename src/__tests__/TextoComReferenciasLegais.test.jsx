@@ -27,4 +27,33 @@ describe('TextoComReferenciasLegais', () => {
     expect(link).toHaveStyle({ color: temaFake.error })
     expect(link.closest('span')).toHaveAttribute('title', expect.stringContaining('não está mais vigente'))
   })
+
+  it('mostra aviso do dispositivo quando o inciso citado está revogado (CP 121, § 2º, VI)', () => {
+    render(<TextoComReferenciasLegais texto="Art. 121, § 2º, VI, CP" theme={temaFake} onAbrirArtigo={vi.fn()}
+      revogados={new Set(['cp|121|2|VI'])} />)
+    const link = screen.getByText('Art. 121')
+    expect(link).toHaveStyle({ color: temaFake.error })
+    expect(link.closest('span')).toHaveAttribute('title', expect.stringContaining('Este dispositivo (§ 2º, inciso VI)'))
+  })
+
+  it('não mostra aviso quando outro dispositivo do mesmo artigo é que está revogado', () => {
+    render(<TextoComReferenciasLegais texto="Art. 121, § 1º, CP" theme={temaFake} onAbrirArtigo={vi.fn()}
+      revogados={new Set(['cp|121|2|VI'])} />)
+    const link = screen.getByText('Art. 121')
+    expect(link).toHaveStyle({ color: temaFake.gold })
+    expect(link.closest('span')).toHaveAttribute('title', 'Abrir na Legislação')
+  })
+
+  it('citação ao artigo sem dispositivo não é marcada por dispositivo revogado dele', () => {
+    render(<TextoComReferenciasLegais texto="nos termos do art. 121 do Código Penal" theme={temaFake} onAbrirArtigo={vi.fn()}
+      revogados={new Set(['cp|121|2|VI'])} />)
+    expect(screen.getByText('art. 121')).toHaveStyle({ color: temaFake.gold })
+  })
+
+  it('artigo revogado prevalece e mantém a mensagem de artigo', () => {
+    render(<TextoComReferenciasLegais texto="Art. 121, § 2º, VI, CP" theme={temaFake} onAbrirArtigo={vi.fn()}
+      revogados={new Set(['cp|121', 'cp|121|2|VI'])} />)
+    const link = screen.getByText('Art. 121')
+    expect(link.closest('span')).toHaveAttribute('title', expect.stringContaining('Este artigo não está mais vigente'))
+  })
 })
