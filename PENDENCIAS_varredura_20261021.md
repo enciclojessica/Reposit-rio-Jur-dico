@@ -58,3 +58,8 @@ Em aberto:
 - 25b4acf9 (privada) sem número de processo ("não identificado"): completar ou retirar.
 - Doutrinas de Cavalieri Filho (2 entradas) sem edição, ano e página; Lopes Jr. (3 entradas) sem página; Gonçalves 22. ed. 2025 não confirmada.
 - Travessões em 41 entradas, todos dentro de `teses`. Não substituí: parte são citações literais de súmulas (ex.: Súmula 472), que não podem ser alteradas. Decidir caso a caso no computador.
+
+## "Arrume tudo" (21/10, 23h15)
+Feito: travessões ` — ` das `teses` trocados por vírgula nas 41 entradas (backup completo em `entradas_bkp_20261021`, apagar depois de validar; ficam só 2 travessões "–" em citações literais das Súmulas 472 e 530/STJ); tags nas 5 entradas que não tinham.
+Rate limit: função `rate_limit_legislacao` aplicada no banco e `api/legislacao.js` ajustado (branch `claude/seguranca-varredura-20261021`, commit 07ad1ba, build e 169 testes ok). Falta: conferir a prévia, ela dizer "pode subir" (merge no `main`) e só então fechar as políticas `rate_limit_select` e `rate_limit_insert` (SQL no fim de `MIGRATION_seguranca_varredura_20261021.sql`). Fechar antes do deploy desliga o limite da rota pública até o código novo subir.
+Não consegui arrumar sem inventar dado: 1aa4d335 sem fundamentação legal, 25b4acf9 sem número de processo, doutrinas sem edição/ano/página, links oficiais das 16 entradas sem URL, Temas 970/996, HC 585.941/MG, APn 686/AP, TJPR, Súmula 545 (redação de 2025), CDC 42.
