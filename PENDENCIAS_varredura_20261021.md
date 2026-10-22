@@ -70,3 +70,10 @@ Não confirmei, por falta de acesso ao inteiro teor (SCON/portal do STJ fora do 
 
 ## Concluído às 23h25 (21/10)
 Código do rate limit no `main` (eb0872f), produção READY. Políticas `rate_limit_select` e `rate_limit_insert` de `api_rate_limit` fechadas (`using (false)` / `with check (false)`). Conferido em produção: `/api/legislacao` responde 200 e a função `rate_limit_legislacao` continua registrando as chamadas. Correções da Súmula 545 e do REsp 2.209.868 aplicadas por ela no SQL Editor e conferidas.
+
+## Peças enviadas pela Jessica (22/10/2026)
+
+- 19 entradas inseridas em `entradas` como privadas (`publica = false`), todas conferidas em fonte oficial ou espelho confiável: Súmulas 84 e 375/STJ, 188 e 310/STF, Enunciado 26/FONAJE, EAREsp 676.608/RS, 600.663/RS e 1.501.756/SC, REsp 2.106.053/RJ, 1.025.769/MG e 1.689.175/MS, Tema 821/STF, Tema 243/STJ, Tema 1.161/STJ, RHC 58.442, HC 140.618, HC 169.605 e Jurisprudência em Teses ed. 63 (teses 15 e 16). SQL em `MIGRATION_entradas_peticoes_20261022.sql`. `entradas` passou a 196 linhas. Doutrina das peças não entrou como entrada (autor e obra apenas).
+- Tema 929/STJ julgado pela Corte Especial em 15/09/2026 (tese por maioria, sem modulação, segundo Conjur e Migalhas): acórdão ainda não publicado e relator divergente entre as fontes. Fica como alerta de monitoramento, sem tese literal no banco. Tema 1.435/STJ afetado, sem tese.
+- Peças corrigidas em cópias (originais intactos): remoção de TJPR 0001113-61.2018.8.16.0058, TJMG 5055156-61.2024.8.13.0145, TJBA 0014716-35.2012.8.05.0248, AgRg na RvCr 5.560/DF e REsp 957.760/MS (não localizados); Súmula 310/STF sem a remissão à Lei 1.408/1951; "20266"; resíduo de plano de saúde na peça da Uber; Tema 929 atualizado e modulação retirada; ressalva de ação civil pública nos REsp 1.634.851/RJ e 1.737.412/SE; nota 7 da peça de RESE; Araken 2020; Theodoro sem edição e ano.
+- Para reavaliar depois: os cinco itens não localizados (portais oficiais ou Jusratio após 11/11/2026), Súmula 375/STJ (órgão e data da sessão), relator e acórdão do Tema 929, páginas das citações de doutrina.
