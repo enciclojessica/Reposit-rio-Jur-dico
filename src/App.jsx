@@ -489,7 +489,20 @@ export default function App() {
     const channel = supabase.channel('entradas-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'entradas' }, loadEntradas)
       .subscribe()
-    return () => supabase.removeChannel(channel)
+    // O Realtime não está ligado para `entradas` no banco: sem isto, a lista (e o Início) só atualiza ao recarregar a página.
+    // Recarrega ao voltar para a aba, no máximo uma vez a cada 30 segundos.
+    let ultimaCarga = Date.now()
+    const aoVoltar = () => {
+      if (document.visibilityState !== 'visible') return
+      if (Date.now() - ultimaCarga < 30000) return
+      ultimaCarga = Date.now()
+      loadEntradas()
+    }
+    document.addEventListener('visibilitychange', aoVoltar)
+    return () => {
+      document.removeEventListener('visibilitychange', aoVoltar)
+      supabase.removeChannel(channel)
+    }
   }, [authLoading, loadEntradas])
 
 
