@@ -226,7 +226,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
           <button
             onClick={pesquisar}
             disabled={carregando || !busca.trim() || !podeUsarIA}
-            title={podeUsarIA ? '' : 'Recurso da versão paga'}
+            title={podeUsarIA ? '' : 'Recurso indisponível'}
             style={{
               background: podeUsarIA ? theme.gold : theme.border, border: 'none', borderRadius: 6,
               padding: '10px 18px', cursor: (busca.trim() && podeUsarIA) ? 'pointer' : 'not-allowed',
@@ -241,7 +241,7 @@ export default function JurisprudenciaSearch({ session, theme, podeUsarIA }) {
         </div>
         {!podeUsarIA && (
           <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: "'Inter', sans-serif", marginTop: 8 }}>
-            Pesquisa de jurisprudência por IA é um recurso da versão paga. Peça liberação ao administrador.
+            A pesquisa de jurisprudência por IA não está disponível.
           </div>
         )}
       </div>

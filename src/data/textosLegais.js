@@ -15,7 +15,7 @@ O conteúdo disponibilizado tem finalidade de apoio à pesquisa e ao estudo jur�
       titulo: '2. Cadastro e acesso',
       corpo: `O cadastro na plataforma é feito com e-mail e senha, informando nome completo e, se desejar, telefone, e está sujeito à aprovação da curadoria. Contas com e-mail confirmado de domínio institucional previamente aprovado pela curadoria (por exemplo, o de uma instituição de ensino) são liberadas automaticamente; nos demais casos o cadastro fica aguardando aprovação e, enquanto isso, o acesso se limita ao conteúdo público. A curadoria pode recusar cadastros a seu critério. O acesso ao acervo completo (jurisprudência, doutrina e legislação) é gratuito para o usuário aprovado.
 
-Recursos que utilizam inteligência artificial (busca assistida, extração de dados de petições) são reservados a contas com plano pago ou a administradores, conforme indicado na própria plataforma.
+Os recursos de inteligência artificial não estão disponíveis aos usuários nesta plataforma.
 
 Além do cadastro, um administrador pode convidar diretamente uma pessoa para integrar a plataforma, inclusive com papel de editor, responsável pela curadoria de novo conteúdo; o convite aceito já aprova o cadastro.
 
@@ -37,11 +37,11 @@ Conteúdo inserido pelo próprio usuário (anotações pessoais, rascunhos de pe
     },
     {
       titulo: '5. Recursos com inteligência artificial',
-      corpo: `Alguns recursos (busca assistida, sugestão de conteúdo, extração de dados de petições) utilizam modelos de inteligência artificial de terceiros para processar o texto submetido pelo usuário. Esses recursos são auxiliares e sujeitos a erro: o usuário deve sempre revisar e confirmar qualquer sugestão gerada por IA antes de utilizá-la. Como descrito na seção 2, o acesso a esses recursos é condicionado a plano pago ou a papel de administrador.`,
+      corpo: `Alguns recursos (busca assistida, sugestão de conteúdo, extração de dados de petições) utilizam modelos de inteligência artificial de terceiros para processar o texto submetido pelo usuário. Esses recursos são auxiliares e sujeitos a erro: o usuário deve sempre revisar e confirmar qualquer sugestão gerada por IA antes de utilizá-la. Como descrito na seção 2, esses recursos não estão disponíveis aos usuários.`,
     },
     {
       titulo: '6. Planos e cobrança',
-      corpo: `O cadastro e o acesso ao acervo completo, para o usuário aprovado, são gratuitos. Recursos de inteligência artificial exigem plano pago; eventuais condições de cobrança serão informadas previamente ao usuário antes da contratação.`,
+      corpo: `O cadastro e o acesso ao acervo completo, para o usuário aprovado, são gratuitos. Os recursos de inteligência artificial não estão disponíveis aos usuários.`,
     },
     {
       titulo: '7. Limitação de responsabilidade',
@@ -84,7 +84,7 @@ O Themis Jur não coleta dados sensíveis (saúde, origem racial, convicção re
     },
     {
       titulo: '3. Para que usamos esses dados',
-      corpo: `Autenticar o usuário e avaliar e aprovar o cadastro, avisar a curadoria de novos cadastros pendentes e, quando o telefone for informado, permitir que a curadoria entre em contato sobre o cadastro; controlar seu nível de acesso (leitor, editor, administrador) e seu plano (gratuito ou pago); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
+      corpo: `Autenticar o usuário e avaliar e aprovar o cadastro, avisar a curadoria de novos cadastros pendentes e, quando o telefone for informado, permitir que a curadoria entre em contato sobre o cadastro; controlar seu nível de acesso (leitor, editor, administrador); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
 
 Não utilizamos os dados pessoais do usuário para publicidade ou para venda a terceiros.`,
     },

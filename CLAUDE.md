@@ -109,6 +109,7 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 ## LGPD (22/10/2026)
 
 - A Política de Privacidade (`src/data/textosLegais.js`, 11 seções) traz bases legais (art. 7º, V, IX, I e II), transferência internacional (art. 33, IX; Supabase `us-east-1` e Vercel `iad1`, Resend e Anthropic estrangeiros), comunicação de incidente à ANPD e aos titulares (art. 48), canal de comunicação (art. 41) e direito de petição à ANPD (art. 18, § 1º). Confirmado pela Jessica. Não há registro das operações (art. 37) nem relatório de impacto (art. 38) elaborados: não afirmar "adequação total".
+- IA indisponível (22/10/2026): a Jessica decidiu não liberar recursos de IA a nenhum usuário (custo dela). Termos, Política, página inicial e a mensagem da pesquisa de jurisprudência dizem que os recursos de IA não estão disponíveis aos usuários; não voltar a falar em "versão paga" ou "plano pago". A regra técnica não mudou (`podeUsarIA` = admin ou `membros.pago`, e ninguém recebe `pago`).
 - O telefone é opcional no cadastro (`Auth.jsx`; `membros.telefone` já aceitava nulo; o e-mail de cadastro pendente mostra "Não informado"). A tela de cadastro avisa a finalidade (contato da curadoria sobre o cadastro) e linka Termos e Política. O app de questões ainda pede o telefone (outro repositório).
 - Teste: `src/__tests__/textosLegais.test.js` (seções em sequência, sem travessão, artigos da LGPD presentes).
 
