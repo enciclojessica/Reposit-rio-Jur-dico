@@ -21,7 +21,6 @@ import Hoje from './components/Hoje'
 import RedefinirSenha from './components/RedefinirSenha'
 import EntradaPublica from './components/EntradaPublica'
 import VitrinePublica from './components/VitrinePublica'
-import DemoPublica from './components/DemoPublica'
 import LegislacaoPublica from './components/LegislacaoPublica'
 import PaginaLegal from './components/PaginaLegal'
 import Landing from './components/Landing'
@@ -173,7 +172,6 @@ export default function App() {
   const [recuperandoSenha, setRecuperandoSenha] = useState(false)
   const [entradaPublicaId, setEntradaPublicaId] = useState(null)
   const [mostrarVitrine, setMostrarVitrine] = useState(false)
-  const [mostrarDemo, setMostrarDemo] = useState(false)
   const [legislacaoPublica, setLegislacaoPublica] = useState(null)
   const [paginaLegal, setPaginaLegal] = useState(null) // 'termos' | 'privacidade' | null
   const [conviteToken, setConviteToken] = useState(null)
@@ -218,10 +216,6 @@ export default function App() {
     const vitrineParam = params.get('vitrine')
     if (vitrineParam) {
       setMostrarVitrine(true)
-      window.history.replaceState({}, '', window.location.pathname)
-    }
-    if (params.get('demo')) {
-      setMostrarDemo(true)
       window.history.replaceState({}, '', window.location.pathname)
     }
     const leiParam = params.get('lei')
@@ -705,13 +699,6 @@ async function handleSave(entry) {
     <EntradaPublica
       entradaId={entradaPublicaId}
       onFechar={() => setEntradaPublicaId(null)}
-    />
-  )
-
-  if (mostrarDemo) return (
-    <DemoPublica
-      onAbrirEntrada={(id) => setEntradaPublicaId(id)}
-      onEntrar={() => { setMostrarDemo(false); setTelaAuthInicial('register'); setShowLogin(true) }}
     />
   )
 
