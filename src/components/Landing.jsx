@@ -254,7 +254,7 @@ export default function Landing({ onEntrar }) {
             <h2 style={{ maxWidth: 560, margin: '16px auto', fontFamily: FONTE_TITULO, fontSize: 'clamp(29px, 4vw, 43px)', fontWeight: 600, lineHeight: 1.2, color: theme.text }}>
               Acesso ao acervo completo, sem custo
             </h2>
-            <p style={{ maxWidth: 520, margin: '0 auto', color: theme.textSub }}>O cadastro é aprovado pela curadoria, e é liberado na hora para e-mail institucional de domínio parceiro. Busca com IA é recurso da versão paga.</p>
+            <p style={{ maxWidth: 520, margin: '0 auto', color: theme.textSub }}>O cadastro é aprovado pela curadoria, e é liberado na hora para e-mail institucional de domínio parceiro.</p>
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
               <button type="button" onClick={() => onEntrar('register')} style={botaoPrimario}>
                 Solicitar acesso gratuito <ArrowRight size={16} strokeWidth={1.75} />
