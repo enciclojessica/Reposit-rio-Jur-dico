@@ -13,7 +13,7 @@ O conteúdo disponibilizado tem finalidade de apoio à pesquisa e ao estudo jur�
     },
     {
       titulo: '2. Cadastro e acesso',
-      corpo: `O cadastro na plataforma é feito com e-mail e senha, informando nome completo e telefone, e está sujeito à aprovação da curadoria. Contas com e-mail confirmado de domínio institucional previamente aprovado pela curadoria (por exemplo, o de uma instituição de ensino) são liberadas automaticamente; nos demais casos o cadastro fica aguardando aprovação e, enquanto isso, o acesso se limita ao conteúdo público. A curadoria pode recusar cadastros a seu critério. O acesso ao acervo completo (jurisprudência, doutrina e legislação) é gratuito para o usuário aprovado.
+      corpo: `O cadastro na plataforma é feito com e-mail e senha, informando nome completo e, se desejar, telefone, e está sujeito à aprovação da curadoria. Contas com e-mail confirmado de domínio institucional previamente aprovado pela curadoria (por exemplo, o de uma instituição de ensino) são liberadas automaticamente; nos demais casos o cadastro fica aguardando aprovação e, enquanto isso, o acesso se limita ao conteúdo público. A curadoria pode recusar cadastros a seu critério. O acesso ao acervo completo (jurisprudência, doutrina e legislação) é gratuito para o usuário aprovado.
 
 Recursos que utilizam inteligência artificial (busca assistida, extração de dados de petições) são reservados a contas com plano pago ou a administradores, conforme indicado na própria plataforma.
 
@@ -74,7 +74,7 @@ export const POLITICA_PRIVACIDADE = {
     },
     {
       titulo: '2. Quais dados coletamos',
-      corpo: `Dados de cadastro: nome, telefone e e-mail (fornecidos no cadastro ou obtidos via login social, quando utilizado); foto de perfil (se fornecida via login social); número e UF de inscrição na OAB (opcional, fornecido pelo próprio usuário para inserção automática em documentos exportados).
+      corpo: `Dados de cadastro: nome e e-mail e, de forma opcional, telefone (fornecidos no cadastro ou obtidos via login social, quando utilizado); foto de perfil (se fornecida via login social); número e UF de inscrição na OAB (opcional, fornecido pelo próprio usuário para inserção automática em documentos exportados).
 
 Dados de uso da plataforma: anotações pessoais feitas em entradas do repositório; entradas marcadas como favoritas; rascunhos de peças processuais elaborados no Editor; alertas de monitoramento configurados; histórico de entradas cadastradas ou editadas por membros com permissão de edição.
 
@@ -84,7 +84,7 @@ O Themis Jur não coleta dados sensíveis (saúde, origem racial, convicção re
     },
     {
       titulo: '3. Para que usamos esses dados',
-      corpo: `Autenticar o usuário e avaliar e aprovar o cadastro e avisar a curadoria de novos cadastros pendentes; controlar seu nível de acesso (leitor, editor, administrador) e seu plano (gratuito ou pago); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
+      corpo: `Autenticar o usuário e avaliar e aprovar o cadastro, avisar a curadoria de novos cadastros pendentes e, quando o telefone for informado, permitir que a curadoria entre em contato sobre o cadastro; controlar seu nível de acesso (leitor, editor, administrador) e seu plano (gratuito ou pago); viabilizar funcionalidades pessoais (anotações, favoritos, rascunhos, alertas); inserir automaticamente dados de OAB em documentos exportados, quando o usuário preencher essa informação; enviar e-mails de alerta sobre novidades nos temas monitorados pelo usuário, quando habilitado; melhorar a plataforma e diagnosticar problemas técnicos.
 
 Não utilizamos os dados pessoais do usuário para publicidade ou para venda a terceiros.`,
     },
@@ -96,7 +96,7 @@ Cadastro, autenticação, aprovação do acesso e funcionalidades pessoais (anot
 
 Segurança da plataforma, prevenção de abuso e diagnóstico técnico: legítimo interesse da controladora (art. 7º, IX), limitado ao estritamente necessário.
 
-Dados opcionais, como a inscrição na OAB e a foto de perfil: consentimento do titular (art. 7º, I), que pode ser revogado a qualquer momento.
+Dados opcionais, como o telefone, a inscrição na OAB e a foto de perfil: consentimento do titular (art. 7º, I), que pode ser revogado a qualquer momento.
 
 Guarda de registros de acesso e demais dados exigidos por lei: cumprimento de obrigação legal ou regulatória (art. 7º, II).`,
     },
@@ -118,7 +118,7 @@ Não compartilhamos dados pessoais com terceiros para finalidades próprias dess
     },
     {
       titulo: '8. Direitos do titular',
-      corpo: `Nos termos da LGPD, o usuário pode, a qualquer momento: confirmar a existência de tratamento e acessar seus dados; corrigir dados incompletos, inexatos ou desatualizados; solicitar a exclusão de seus dados pessoais, ressalvadas hipóteses de guarda obrigatória por lei; solicitar a portabilidade de seus dados a outro fornecedor de serviço; revogar consentimento, quando aplicável.
+      corpo: `Nos termos da LGPD, o usuário pode, a qualquer momento: confirmar a existência de tratamento e acessar seus dados; corrigir dados incompletos, inexatos ou desatualizados; solicitar a exclusão de seus dados pessoais, ressalvadas hipóteses de guarda obrigatória por lei; solicitar a portabilidade de seus dados a outro fornecedor de serviço; revogar consentimento, quando aplicável; e peticionar contra a controladora perante a Autoridade Nacional de Proteção de Dados (art. 18, § 1º, da LGPD).
 
 A plataforma já oferece, na tela de Configurações, exportação dos próprios dados (entradas, anotações, rascunhos e demais dados vinculados à conta) em formato aberto (JSON). Solicitações adicionais podem ser feitas para themisjur.ia@gmail.com.`,
     },

@@ -32,14 +32,14 @@ export default function Auth({ telaInicial }) {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) setError(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message)
       } else if (screen === 'register') {
-        if (!telefoneValido(telefone)) {
-          setError('Telefone inválido. Use DDD + número, ex: (13) 99999-9999.')
+        if (telefone.trim() && !telefoneValido(telefone)) {
+          setError('Telefone inválido. Use DDD + número, ex: (13) 99999-9999, ou deixe em branco.')
           setLoading(false)
           return
         }
         const { data, error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { full_name: nome.trim(), telefone: telefone.trim() } },
+          options: { data: { full_name: nome.trim(), ...(telefone.trim() ? { telefone: telefone.trim() } : {}) } },
         })
         if (error) setError(error.message)
         else if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -130,11 +130,11 @@ export default function Auth({ telaInicial }) {
                   </div>
                 </div>
                 <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 12, color: theme.gold, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Telefone</div>
+                  <div style={{ fontSize: 12, color: theme.gold, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Telefone <span style={{ color: theme.muted }}>(opcional)</span></div>
                   <div style={{ position: 'relative' }}>
                     <Phone size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: theme.muted }} />
                     <input type="tel" value={telefone} onChange={e => setTelefone(e.target.value)}
-                      placeholder="(00) 00000-0000" required autoComplete="tel"
+                      placeholder="(00) 00000-0000" autoComplete="tel"
                       style={{ ...inp, paddingLeft: 36 }} />
                   </div>
                 </div>
@@ -195,6 +195,11 @@ export default function Auth({ telaInicial }) {
             {screen === 'register' && (
               <div style={{ fontSize: 12, color: theme.muted, lineHeight: 1.6, marginBottom: 14, fontFamily: "'Inter', sans-serif" }}>
                 O cadastro é aprovado pela curadoria. Com e-mail institucional de domínio parceiro (por exemplo, @unisantos.br), o acesso é liberado assim que você confirmar o e-mail.
+                <div style={{ marginTop: 8 }}>
+                  O telefone é opcional e serve apenas para a curadoria falar com você sobre o cadastro. Ao criar a conta, você confirma que leu os{' '}
+                  <a href="/?pagina=termos" target="_blank" rel="noopener noreferrer" style={{ color: theme.muted, textDecoration: 'underline' }}>Termos de uso</a> e a{' '}
+                  <a href="/?pagina=privacidade" target="_blank" rel="noopener noreferrer" style={{ color: theme.muted, textDecoration: 'underline' }}>Política de Privacidade</a>.
+                </div>
               </div>
             )}
 

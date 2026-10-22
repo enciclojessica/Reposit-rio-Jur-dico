@@ -103,6 +103,12 @@ Branch `claude/<assunto>`, `npx vite build` e `npx vitest run` passando, push, p
 - **Início (Hoje)**: o Realtime não está ligado para `entradas` (publicação `supabase_realtime` sem tabelas), então o app recarrega as entradas ao voltar para a aba (máximo a cada 30 s, em `App.jsx`). Ligar o Realtime: `alter publication supabase_realtime add table entradas;`.
 - **Aviso de artigo revogado** nas teses (`EntradaDetail.jsx`, `src/utils/artigosRevogados.js`): o artigo só conta como revogado quando o caput está revogado (ou, sem linha de caput, nenhum dispositivo vigente); inciso ou parágrafo revogado dentro de artigo vigente não dispara o aviso (falso alerta do CP 121 corrigido em 22/10/2026).
 
+## LGPD (22/10/2026)
+
+- A Política de Privacidade (`src/data/textosLegais.js`, 11 seções) traz bases legais (art. 7º, V, IX, I e II), transferência internacional (art. 33, IX; Supabase `us-east-1` e Vercel `iad1`, Resend e Anthropic estrangeiros), comunicação de incidente à ANPD e aos titulares (art. 48), canal de comunicação (art. 41) e direito de petição à ANPD (art. 18, § 1º). Confirmado pela Jessica. Não há registro das operações (art. 37) nem relatório de impacto (art. 38) elaborados: não afirmar "adequação total".
+- O telefone é opcional no cadastro (`Auth.jsx`; `membros.telefone` já aceitava nulo; o e-mail de cadastro pendente mostra "Não informado"). A tela de cadastro avisa a finalidade (contato da curadoria sobre o cadastro) e linka Termos e Política. O app de questões ainda pede o telefone (outro repositório).
+- Teste: `src/__tests__/textosLegais.test.js` (seções em sequência, sem travessão, artigos da LGPD presentes).
+
 ## Pendências
 
 - Auditoria de 09/10/2026 (correções em `MIGRATION_auditoria_20261009.sql`). Sem duplicatas, entidades, mojibake, órfãos, referências cruzadas quebradas (CTB e CPP) nem divergência de vigência. Em aberto, para decidir com a Jessica:
