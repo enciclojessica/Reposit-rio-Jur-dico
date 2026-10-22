@@ -14,6 +14,8 @@ const NOME_COMPLETO_CODIGO = {
   cedoab:  'Código de Ética e Disciplina da OAB',
   cf:      'Constituição da República Federativa do Brasil de 1988',
   clt:     'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
+  ctn:     'Código Tributário Nacional (Lei 5.172/1966)',
+  lei15040:'Marco Legal dos Seguros (Lei 15.040/2024)',
   cp:      'Código Penal (Decreto-Lei 2.848/1940)',
   cpc:     'Código de Processo Civil (Lei 13.105/2015)',
   cpp:     'Código de Processo Penal (Decreto-Lei 3.689/1941)',
@@ -32,6 +34,8 @@ const CODIGOS_META = {
   lei9099: { label: 'Lei 9.099/95', nome: 'Juizados Especiais',             cor: '#8a5a2e' },
   lep:     { label: 'LEP',          nome: 'Lei de Execução Penal',          cor: '#5a3a2e' },
   clt:     { label: 'CLT',          nome: 'Consolidação das Leis do Trabalho', cor: '#4a5a3a' },
+  ctn:     { label: 'CTN',          nome: 'Código Tributário Nacional',        cor: '#6e5a2c' },
+  lei15040:{ label: 'Lei 15.040/24', nome: 'Marco Legal dos Seguros',          cor: '#2c5a4a' },
 }
 
 // ── Selo de alteração ───────────────────────────────────────────────────────

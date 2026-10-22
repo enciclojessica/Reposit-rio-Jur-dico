@@ -17,6 +17,8 @@ const CODIGOS_META = {
   lei9099: { label: 'Lei 9.099/95', cor: '#8a5a2e' },
   lep:     { label: 'LEP',          cor: '#5a3a2e' },
   clt:     { label: 'CLT',          cor: '#4a5a3a' },
+  ctn:     { label: 'CTN',          cor: '#6e5a2c' },
+  lei15040:{ label: 'Lei 15.040/24', cor: '#2c5a4a' },
 }
 
 // Rótulo temático do artigo (ex.: CF art. 37, "Princípios da Administração Pública"), guardado na linha do caput.

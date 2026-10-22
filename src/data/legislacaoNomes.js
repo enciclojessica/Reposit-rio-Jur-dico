@@ -13,6 +13,8 @@ export const NOME_CODIGO = {
   lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
   lep:     'Lei de Execução Penal (Lei 7.210/1984)',
   clt:     'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
+  ctn:     'Código Tributário Nacional (Lei 5.172/1966)',
+  lei15040:'Marco Legal dos Seguros (Lei 15.040/2024)',
   cp:      'Código Penal (Decreto-Lei 2.848/1940)',
   adct:    'Ato das Disposições Constitucionais Transitórias',
   lei8906: 'Estatuto da Advocacia e a OAB (Lei 8.906/1994)',
@@ -35,6 +37,8 @@ const PISTAS_CODIGO = [
   ['lei8906', /\bestatuto\s+da\s+advocacia\b|\blei\s*8\.?906\b|\beoab\b/i],
   ['cedoab',  /\bc[oó]digo\s+de\s+[eé]tica\b|\bced[-\s]?oab\b/i],
   ['clt',     /\bconsolida[cç][aã]o\s+das\s+leis\s+do\s+trabalho\b|\bdecreto[-\s]lei\s*(n[ºo°]\s*)?5\.?452\b|\bclt\b/i],
+  ['ctn',     /\bc[oó]digo\s+tribut[aá]rio\s+nacional\b|\blei\s*5\.?172\b|\bctn\b/i],
+  ['lei15040',/\bmarco\s+legal\s+dos\s+seguros\b|\blei\s*15\.?040\b/i],
 ]
 
 // Detecta um diploma mencionado numa janela de texto (ex: os ~80 caracteres

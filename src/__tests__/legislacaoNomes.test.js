@@ -3,7 +3,7 @@ import { NOME_CODIGO, detectarCodigoNoTexto, extrairReferenciasLegais } from '..
 
 describe('NOME_CODIGO', () => {
   it('tem um nome completo para cada código usado no editor', () => {
-    for (const codigo of ['cc', 'cdc', 'cf', 'cpc', 'cpp', 'ctb', 'lei9099', 'lep', 'clt', 'cp', 'adct', 'lei8906', 'cedoab']) {
+    for (const codigo of ['cc', 'cdc', 'cf', 'cpc', 'cpp', 'ctb', 'lei9099', 'lep', 'clt', 'ctn', 'lei15040', 'cp', 'adct', 'lei8906', 'cedoab']) {
       expect(NOME_CODIGO[codigo]?.trim().length, `sem nome para "${codigo}"`).toBeGreaterThan(0)
     }
   })
@@ -28,6 +28,14 @@ describe('detectarCodigoNoTexto', () => {
     expect(detectarCodigoNoTexto('art. 112 da Lei de Execução Penal')).toBe('lep')
     expect(detectarCodigoNoTexto('nos termos da Lei 7.210/84')).toBe('lep')
     expect(detectarCodigoNoTexto('art. 126 da LEP')).toBe('lep')
+  })
+
+  it('reconhece CTN e Marco Legal dos Seguros', () => {
+    expect(detectarCodigoNoTexto('art. 150 do CTN')).toBe('ctn')
+    expect(detectarCodigoNoTexto('Código Tributário Nacional')).toBe('ctn')
+    expect(detectarCodigoNoTexto('Lei 5.172/66')).toBe('ctn')
+    expect(detectarCodigoNoTexto('art. 757 da Lei 15.040/2024')).toBe('lei15040')
+    expect(detectarCodigoNoTexto('Marco Legal dos Seguros')).toBe('lei15040')
   })
 
   it('reconhece CLT, Consolidação das Leis do Trabalho e Decreto-Lei 5.452', () => {
