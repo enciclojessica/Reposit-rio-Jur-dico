@@ -49,3 +49,12 @@ Acervo: 177 entradas (doutrina 30, jurisprudência 42, lei 66, súmula 39). Sem 
 ## Links removidos (autorizado por ela em 21/10, 23h)
 - 18 entradas ficaram com `url` vazia: 11 súmulas e a REsp 1.399.199/RS com link genérico `www.stj.jus.br` (297, 323, 359, 385, 404, 541, 548, 565, 597, 608 e 55c5cf1e; 2efd6914 inclui a 297), 2 doutrinas de Maria Berenice Dias com a home da Minha Biblioteca, e as fontes frágeis b0911d76 (busca Jusbrasil), 36b92809 (blog), e17fb792 (modeloinicial), 7fd90be8 (trilhante) e 28379d4b (PDF do MPMG). Jurisprudência e súmulas ganharam a tag `conferir inteiro teor`. Os precedentes em si não foram alterados.
 - Próximo passo (no computador): colocar o link do portal oficial (STJ/STF) em cada uma e tirar a tag.
+
+## Segunda passada nas entradas (21/10, 23h10; autorizada por ela)
+Alterado: e17fb792 (FONAJE 8): `ratio_decidendi` agora separa o texto do Enunciado 8 da interpretação das turmas recursais e manda conferir o acórdão; `fonte` sem travessão. Súmulas 718 e 719 do STF tinham o mesmo `tema`; agora distintos (gravidade em abstrato não é motivação idônea; regime mais severo exige motivação idônea). Tag `conferir página` em fcce9c30 e d9620118 (Gonçalves, mesma p. 452 para dois assuntos).
+Conferido sem problema: nenhuma entrada sem teses, sem `ratio_decidendi` ou sem `aplicacao_pratica`; sem caracteres corrompidos; sem datas futuras; sem tema duplicado depois do ajuste.
+Em aberto:
+- 1aa4d335 (Tema 312/STJ, consórcio) sem `fundamentacao_legal`: não preenchi para não inferir norma.
+- 25b4acf9 (privada) sem número de processo ("não identificado"): completar ou retirar.
+- Doutrinas de Cavalieri Filho (2 entradas) sem edição, ano e página; Lopes Jr. (3 entradas) sem página; Gonçalves 22. ed. 2025 não confirmada.
+- Travessões em 41 entradas, todos dentro de `teses`. Não substituí: parte são citações literais de súmulas (ex.: Súmula 472), que não podem ser alteradas. Decidir caso a caso no computador.
