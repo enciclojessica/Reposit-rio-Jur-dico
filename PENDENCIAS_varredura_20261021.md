@@ -32,3 +32,6 @@ Aplicado nesta data (sem ação sua): revogada a escrita em `legislacao_publica`
 ## Decisão dela (21/10, 22h56): o Themis Jur não deve ter manuais
 - Os buckets `manuais-pdf`, `audio-aulas`, `slides-ppt` e `videos` do Themis Jur são legado e devem sair de lá. Hoje estão privados e sem uso no código. NÃO apagados: a exclusão é irreversível e parte dos PDFs não existe no app de questões.
 - Ordem: (1) no computador, baixar os arquivos do Dashboard do Supabase do Themis Jur (Storage); (2) enviar os manuais que faltam ao app de questões pelo "Enviar manual"; (3) só então apagar os 4 buckets pelo Dashboard (esvaziar e excluir). Áudios, slides e vídeo não têm tela em nenhum dos dois apps; decidir se guarda fora.
+
+## Exclusão dos buckets (autorizada por ela em 21/10, 22h57; cópia no Drive dela)
+- O conector cancelou o `delete` em `storage.objects` (ação destrutiva sem confirmação possível). Não contornei. Fazer no Dashboard do Supabase do Themis Jur: Storage, abrir cada bucket (`manuais-pdf`, `audio-aulas`, `slides-ppt`, `videos`), "Empty bucket" e depois "Delete bucket". Excluir pelo Dashboard é o caminho certo: apagar linhas de `storage.objects` por SQL deixaria os arquivos órfãos.
