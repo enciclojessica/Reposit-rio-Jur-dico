@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import { checarRateLimit } from '../lib/rateLimit.js'
 import { ordenarDispositivos } from '../lib/ordemDispositivos.js'
 import { gerarSitemapXml } from '../lib/sitemap.js'
 
@@ -39,7 +38,11 @@ export default async function handler(req, res) {
   // trivial. Limite generoso para não atrapalhar uso normal do app (várias
   // consultas por navegação), mas alto o bastante pra travar scraping.
   const ip = (req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'desconhecido').trim()
-  const { permitido } = await checarRateLimit(supabase, { ip }, 'legislacao', { limite: 120, janelaMs: 60_000 })
+  // Limite de 120 requisições por minuto por IP, aplicado pela função `rate_limit_legislacao` (a tabela
+  // `api_rate_limit` não é mais legível nem gravável por anon). Falha aberta: se a função errar, não bloqueia.
+  const { data: ok, error: rlErr } = await supabase.rpc('rate_limit_legislacao', { p_ip: ip.slice(0, 64) })
+  if (rlErr) console.error('[rateLimit] erro:', rlErr.message)
+  const permitido = rlErr ? true : ok !== false
   if (!permitido) return res.status(429).json({ error: 'Muitas requisições. Aguarde um momento e tente novamente.' })
 
   // ── Sitemap (rota /sitemap.xml via rewrite no vercel.json) ──────────────

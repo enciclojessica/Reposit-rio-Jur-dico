@@ -17,3 +17,24 @@ AS $function$
   order by rank desc
   limit greatest(least(coalesce(p_limit, 10), 30), 1);
 $function$;
+
+-- 3) Rate limit da rota pública /api/legislacao por função própria (aplicada em 21/10/2026, migração rate_limit_legislacao_rpc).
+-- DEPOIS que o código novo de api/legislacao.js estiver em produção, fechar a tabela (rodar no SQL Editor):
+--   alter policy rate_limit_select on public.api_rate_limit using (false);
+--   alter policy rate_limit_insert on public.api_rate_limit with check (false);
+-- As rotas autenticadas usam a chave de serviço e não são afetadas.
+create or replace function public.rate_limit_legislacao(p_ip text)
+returns boolean language plpgsql security definer set search_path = public
+as $$
+declare n integer;
+begin
+  if p_ip is null or length(p_ip) = 0 or length(p_ip) > 64 then return true; end if;
+  select count(*) into n from public.api_rate_limit
+   where endpoint = 'legislacao' and ip = p_ip and criado_em >= now() - interval '60 seconds';
+  if n >= 120 then return false; end if;
+  insert into public.api_rate_limit (ip, endpoint) values (p_ip, 'legislacao');
+  return true;
+end;
+$$;
+revoke all on function public.rate_limit_legislacao(text) from public;
+grant execute on function public.rate_limit_legislacao(text) to anon, authenticated;
