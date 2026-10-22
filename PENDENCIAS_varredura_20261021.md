@@ -45,3 +45,7 @@ Acervo: 177 entradas (doutrina 30, jurisprudência 42, lei 66, súmula 39). Sem 
 - e17fb792 (privada): o Enunciado 8 do FONAJE trata de procedimentos especiais nos Juizados; aplicar isso ao superendividamento é interpretação, a tese deve deixar isso claro.
 - Verificados na busca: Tema 466/STJ (origem da Súmula 479), Tema 312/STJ (consórcio), Tema 777/STF (RE 842.846), Tema 1.221/STJ (existência).
 - Entradas sem tags: 5 (1 jurisprudência cível, 2 consumidor, 2 súmulas cíveis). Entradas do tipo lei sem URL: 66 (esperado; conferir texto contra `legislacao`).
+
+## Links removidos (autorizado por ela em 21/10, 23h)
+- 18 entradas ficaram com `url` vazia: 11 súmulas e a REsp 1.399.199/RS com link genérico `www.stj.jus.br` (297, 323, 359, 385, 404, 541, 548, 565, 597, 608 e 55c5cf1e; 2efd6914 inclui a 297), 2 doutrinas de Maria Berenice Dias com a home da Minha Biblioteca, e as fontes frágeis b0911d76 (busca Jusbrasil), 36b92809 (blog), e17fb792 (modeloinicial), 7fd90be8 (trilhante) e 28379d4b (PDF do MPMG). Jurisprudência e súmulas ganharam a tag `conferir inteiro teor`. Os precedentes em si não foram alterados.
+- Próximo passo (no computador): colocar o link do portal oficial (STJ/STF) em cada uma e tirar a tag.
