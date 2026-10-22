@@ -35,3 +35,13 @@ Aplicado nesta data (sem ação sua): revogada a escrita em `legislacao_publica`
 
 ## Exclusão dos buckets (autorizada por ela em 21/10, 22h57; cópia no Drive dela)
 - O conector cancelou o `delete` em `storage.objects` (ação destrutiva sem confirmação possível). Não contornei. Fazer no Dashboard do Supabase do Themis Jur: Storage, abrir cada bucket (`manuais-pdf`, `audio-aulas`, `slides-ppt`, `videos`), "Empty bucket" e depois "Delete bucket". Excluir pelo Dashboard é o caminho certo: apagar linhas de `storage.objects` por SQL deixaria os arquivos órfãos.
+
+## Auditoria das entradas (21/10, 23h; somente leitura, exceto o item corrigido)
+Acervo: 177 entradas (doutrina 30, jurisprudência 42, lei 66, súmula 39). Sem entrada sem referência.
+- Súmulas (39): texto e número conferidos contra o que consta nos enunciados oficiais, sem divergência (STJ 5, 7, 35, 37, 43, 54, 98, 174 cancelada, 211, 285, 297, 302, 323, 356, 359, 362, 379, 382, 385, 404, 440, 444, 472, 477, 479, 530, 532, 538, 539, 541, 545, 548, 565, 597, 608; STF 282, 356, 718, 719). Pendente de conferência na fonte: a redação "revista em 2025" da Súmula 545 do STJ (a entrada afirma mudança de texto; não confirmei em fonte oficial).
+- Corrigido: status de 58c52704 e 3f8c34a2 era texto livre ("vigente (dano moral coletivo...)"); passou a "vigente" (a ressalva sobre aplicação individual por analogia já consta na própria tese).
+- Fontes frágeis, a trocar pelo inteiro teor ou pelo portal do tribunal: b0911d76 (link é página de busca do Jusbrasil), 36b92809 (blog aurum), e17fb792 (site modeloinicial), 7fd90be8 (trilhante), 55c5cf1e (link genérico stj.jus.br), 28379d4b (PDF do MPMG).
+- Conferir identificação (não verifiquei em fonte oficial): Tema 970 e Tema 996 do STJ (números de tema e processos), HC 585.941/MG, APn 686/AP, TJPR 0001113-61.2018.8.16.0058.
+- e17fb792 (privada): o Enunciado 8 do FONAJE trata de procedimentos especiais nos Juizados; aplicar isso ao superendividamento é interpretação, a tese deve deixar isso claro.
+- Verificados na busca: Tema 466/STJ (origem da Súmula 479), Tema 312/STJ (consórcio), Tema 777/STF (RE 842.846), Tema 1.221/STJ (existência).
+- Entradas sem tags: 5 (1 jurisprudência cível, 2 consumidor, 2 súmulas cíveis). Entradas do tipo lei sem URL: 66 (esperado; conferir texto contra `legislacao`).
