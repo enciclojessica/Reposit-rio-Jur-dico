@@ -18,6 +18,6 @@ union all select 'alertas_pendentes', count(*)::text from legislacao_alertas whe
 union all select 'entradas_tag_slug_ou_maiuscula', count(*)::text from entradas e
   where exists (select 1 from unnest(e.tags) t where (t ~ '-' or t ~ '[A-Z]')
     and t not in ('extraído-de-peça','pesquisa-juri','auto-importado') and t !~ '^(art\.|súmula|multa art)'
-    and t !~ 'necessidade-possibilidade|proporcionalidade-possibilidade')
+    and t !~ 'necessidade-possibilidade|proporcionalidade-possibilidade|boa-fé|má-fé|sub-rogação|ar-condicionado|pré-|pós-|ex-|vice-|co-')
 union all select 'entradas_tema_com_travessao', count(*)::text from entradas where tema ~ '[—–]| - '
 union all select 'total_linhas', count(*)::text from legislacao;
