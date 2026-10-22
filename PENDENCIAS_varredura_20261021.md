@@ -18,6 +18,6 @@ Aplicado nesta data (sem ação sua): revogada a escrita em `legislacao_publica`
 3. Visão `legislacao_publica` aparece como ERROR no linter (SECURITY DEFINER). É intencional (esconde comentários de não membros); manter e documentar.
 4. Funções `is_admin`, `is_member`, `is_editor_or_admin` executáveis por anon: só devolvem booleano do próprio usuário, baixo risco; revogar de anon se não forem usadas sem login.
 5. `npm audit` (prod): 20 vulnerabilidades (1 crítica, 10 altas); `xlsx` sem correção (avaliar troca por exceljs), `mammoth/argparse`, `pdfjs-dist`, `@modelcontextprotocol/sdk`. Revisar uma a uma antes de `audit fix`.
-6. App de questões (Simulado OAB): `acesso_liberado` e `questoes_tags_log` com RLS sem política (ok, acesso só por função); `aceitar_convite`, `admin_atualizar_tags_questao`, `app_admin`, `app_liberado` executáveis por authenticated (conferir que `admin_atualizar_tags_questao` checa `app_admin()` por dentro).
+6. App de questões (Simulado OAB): `acesso_liberado` e `questoes_tags_log` com RLS sem política (ok, acesso só por função); `aceitar_convite`, `admin_atualizar_tags_questao`, `app_admin`, `app_liberado` executáveis por authenticated. Conferido: `admin_atualizar_tags_questao` checa `app_admin()` por dentro, sem risco.
 7. `emailRedirectTo: window.location.origin` no app de questões; Radar com aviso de cadastros pendentes.
 8. CTN é a próxima norma a importar (precisa do PDF do Planalto enviado por você).
