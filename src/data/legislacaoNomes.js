@@ -13,11 +13,18 @@ export const NOME_CODIGO = {
   lei9099: 'Lei 9.099/1995 (Juizados Especiais)',
   lep:     'Lei de Execução Penal (Lei 7.210/1984)',
   clt:     'Consolidação das Leis do Trabalho (Decreto-Lei 5.452/1943)',
+  cp:      'Código Penal (Decreto-Lei 2.848/1940)',
+  adct:    'Ato das Disposições Constitucionais Transitórias',
+  lei8906: 'Estatuto da Advocacia e a OAB (Lei 8.906/1994)',
+  cedoab:  'Código de Ética e Disciplina da OAB',
 }
 
 // Palavras-chave (case-insensitive) que indicam menção a cada diploma.
+// O ADCT vem antes da CF: "art. 76 do ADCT da CF" é do ADCT.
 const PISTAS_CODIGO = [
+  ['adct',    /\badct\b|\batos?\s+das?\s+disposi[cç][oõ]es\s+constitucionais\s+transit[oó]rias\b/i],
   ['cc',      /\bc[oó]digo\s+civil\b|\bcc\b/i],
+  ['cp',      /\bc[oó]digo\s+penal\b|\bcp\b/i],
   ['cdc',     /\bc[oó]digo\s+de\s+defesa\s+do\s+consumidor\b|\bcdc\b/i],
   ['cf',      /\bconstitui[cç][aã]o\s+federal\b|\bcf\b/i],
   ['cpc',     /\bc[oó]digo\s+de\s+processo\s+civil\b|\bcpc\b/i],
@@ -25,6 +32,8 @@ const PISTAS_CODIGO = [
   ['ctb',     /\bc[oó]digo\s+de\s+tr[aâ]nsito\b|\bctb\b/i],
   ['lei9099', /\blei\s*9\.?099\b|\bjuizados?\s+especiais?\b/i],
   ['lep',     /\blei\s+de\s+execu[cç][aã]o\s+penal\b|\blei\s*7\.?210\b|\blep\b/i],
+  ['lei8906', /\bestatuto\s+da\s+advocacia\b|\blei\s*8\.?906\b|\beoab\b/i],
+  ['cedoab',  /\bc[oó]digo\s+de\s+[eé]tica\b|\bced[-\s]?oab\b/i],
   ['clt',     /\bconsolida[cç][aã]o\s+das\s+leis\s+do\s+trabalho\b|\bdecreto[-\s]lei\s*(n[ºo°]\s*)?5\.?452\b|\bclt\b/i],
 ]
 

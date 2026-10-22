@@ -3,7 +3,7 @@ import { NOME_CODIGO, detectarCodigoNoTexto, extrairReferenciasLegais } from '..
 
 describe('NOME_CODIGO', () => {
   it('tem um nome completo para cada código usado no editor', () => {
-    for (const codigo of ['cc', 'cdc', 'cf', 'cpc', 'cpp', 'ctb', 'lei9099', 'lep', 'clt']) {
+    for (const codigo of ['cc', 'cdc', 'cf', 'cpc', 'cpp', 'ctb', 'lei9099', 'lep', 'clt', 'cp', 'adct', 'lei8906', 'cedoab']) {
       expect(NOME_CODIGO[codigo]?.trim().length, `sem nome para "${codigo}"`).toBeGreaterThan(0)
     }
   })
@@ -41,6 +41,21 @@ describe('detectarCodigoNoTexto', () => {
     expect(detectarCodigoNoTexto('rito dos juizados especiais')).toBe('lei9099')
   })
 
+  it('reconhece Código Penal e a sigla CP sem confundir com CPP ou CPC', () => {
+    expect(detectarCodigoNoTexto('art. 121, § 2º, III, CP')).toBe('cp')
+    expect(detectarCodigoNoTexto('art. 155 do Código Penal')).toBe('cp')
+    expect(detectarCodigoNoTexto('art. 312 do CPP')).toBe('cpp')
+    expect(detectarCodigoNoTexto('art. 300 do CPC')).toBe('cpc')
+    expect(detectarCodigoNoTexto('art. 3º do Código de Processo Penal')).toBe('cpp')
+  })
+
+  it('reconhece ADCT antes da CF, Estatuto da Advocacia e Código de Ética', () => {
+    expect(detectarCodigoNoTexto('art. 76 do ADCT da CF')).toBe('adct')
+    expect(detectarCodigoNoTexto('art. 7º da Lei 8.906/94')).toBe('lei8906')
+    expect(detectarCodigoNoTexto('art. 2º do Estatuto da Advocacia')).toBe('lei8906')
+    expect(detectarCodigoNoTexto('art. 2º do Código de Ética e Disciplina')).toBe('cedoab')
+  })
+
   it('retorna null quando nenhum diploma é mencionado', () => {
     expect(detectarCodigoNoTexto('o autor sustenta que houve dano moral')).toBe(null)
   })
@@ -68,6 +83,11 @@ describe('extrairReferenciasLegais', () => {
     const texto = 'combinação do art. 927 do Código Civil com o art. 6º do Código de Defesa do Consumidor'
     const refs = extrairReferenciasLegais(texto)
     expect(refs.map(r => [r.codigo, r.numero])).toEqual([['cc', 927], ['cdc', 6]])
+  })
+
+  it('linka "Art. 121, § 2º, III, CP" ao Código Penal', () => {
+    const refs = extrairReferenciasLegais('Art. 121, § 2º, III, CP')
+    expect(refs.map(r => [r.codigo, r.numero])).toEqual([['cp', 121]])
   })
 
   it('retorna lista vazia para texto vazio ou nulo', () => {
