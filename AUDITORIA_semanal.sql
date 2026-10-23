@@ -20,4 +20,8 @@ union all select 'entradas_tag_slug_ou_maiuscula', count(*)::text from entradas 
     and t not in ('extraído-de-peça','pesquisa-juri','auto-importado') and t !~ '^(art\.|súmula|multa art)'
     and t !~ 'necessidade-possibilidade|proporcionalidade-possibilidade|boa-fé|má-fé|sub-rogação|ar-condicionado|pré-|pós-|ex-|vice-|co-')
 union all select 'entradas_tema_com_travessao', count(*)::text from entradas where tema ~ '[—–]| - '
+union all select 'comentarios_com_selo_sem_comentario', count(*)::text from legislacao
+  where comentario_conferencia is not null and coalesce(trim(contexto),'') = '' and coalesce(trim(aplicacao_pratica),'') = ''
+union all select 'conferencia_' || codigo || '_' || comentario_resultado, count(*)::text from legislacao
+  where comentario_conferencia is not null group by codigo, comentario_resultado
 union all select 'total_linhas', count(*)::text from legislacao;

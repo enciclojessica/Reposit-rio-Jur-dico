@@ -5,6 +5,7 @@ import { useTheme } from '../theme'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { corDaArea } from '../shared'
 import { compararDispositivos } from '../../lib/ordemDispositivos'
+import { conferenciaComentario } from '../utils/conferenciaComentario'
 
 // Nome oficial completo exibido acima da busca quando um código está selecionado.
 const NOME_COMPLETO_CODIGO = {
@@ -82,6 +83,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) 
   const [linkCopiado, setLinkCopiado] = useState(false)
   const [verAnterior, setVerAnterior] = useState(false)
   const caput = grupo.caput
+  const conf = conferenciaComentario(grupo.caput)
   const temVigenciaDiferida = grupo.itens.some(i => i.vigencia_obs)
 
   // Teses do acervo cuja fundamentação legal ou ratio decidendi cita este
@@ -218,6 +220,11 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) 
               <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600 }}>Experiência prática
                 {caput.comentario_revisar && <span style={{ marginLeft: 10, fontSize: 10, color: theme.gold, border: `1px solid ${theme.gold}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', fontWeight: 400 }}>em revisão após alteração do texto</span>}
               </div>
+              {conf && (
+                <div title={conf.detalhe} style={{ fontSize: 11, color: conf.conferido ? theme.muted : theme.gold, fontFamily: "'IBM Plex Mono', monospace", marginTop: -8 }}>
+                  {conf.rotulo}. {conf.detalhe}
+                </div>
+              )}
               {caput.contexto && (
                 <div>
                   <div style={rotuloSecao}>Comentário didático</div>
@@ -283,6 +290,7 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes }) {
   const [copiado, setCopiado] = useState(false)
   const [hover, setHover] = useState(false)
   const caput = grupo.caput
+  const conf = conferenciaComentario(grupo.caput)
   const numSubItens = grupo.itens.length - 1
   const revogado = caput?.vigente === false
 
@@ -350,6 +358,9 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes }) {
                   {caput.comentario_revisar && <span style={{ color: theme.gold, border: `1px solid ${theme.gold}`, borderRadius: 4, padding: '0 5px', marginRight: 6, fontSize: 10, textTransform: 'uppercase', fontFamily: "'IBM Plex Mono', monospace" }}>em revisão</span>}
                   {caput.contexto}
                 </div>
+              )}
+              {conf && conf.conferido && (
+                <div title={conf.detalhe} style={{ fontSize: 10, color: theme.muted, fontFamily: "'IBM Plex Mono', monospace" }}>{conf.rotulo}</div>
               )}
               {caput.aplicacao_pratica && (
                 <div style={{ fontSize: 12, color: theme.text, fontFamily: "'Inter', sans-serif" }}>
