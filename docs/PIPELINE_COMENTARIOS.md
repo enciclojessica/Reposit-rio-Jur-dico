@@ -38,4 +38,13 @@ manual) e só grava o que passa em todos os portões. Escopo: caputs vigentes de
 11. Inverter quem invoca o artigo (utilidade para o contribuinte x para a Fazenda) sem apoio no texto.
 12. Frases de consequência não trazidas pelo texto ("a quitação não afasta, por si, a penalidade").
 
+13. Dever de motivar, de juntar ou de provar criado a partir de "poderá/pode" ("a decisão deve ser motivada", "deve juntar", "exige demonstrar"). Usar "convém juntar" apenas como orientação, nunca como regra do artigo.
+14. Declarar o rol exclusivo ("só", "apenas") ou exemplificativo quando o texto não diz.
+15. Remissão a "artigo seguinte/anterior" que o texto não faz, ou remissão ao artigo errado; "este Capítulo" não é "o próprio texto".
+16. Rótulo ou instituto que o texto não nomeia (regime disciplinar diferenciado num inciso que não o nomeia, "data-base", "carta de livramento", "terceirização" por "execução indireta", "comarca" por "Juiz").
+17. Anotação da fonte ("Regulamento", "Vigência", "Vide") lida como norma ou como efeito: só registrar a anotação e o dispositivo a que ela está ligada.
+18. Dever trocado por faculdade ("julgará extinta" por "permite julgar"), sujeito trocado (programa do condenado atribuído ao juízo), ou omissão de inciso, alínea ou ressalva ("para os fins deste artigo", "respeitados os prazos").
+
+Medida: a primeira passagem conta como aprovada só quando A e B dão CORRETO sem ARRISCADO e sem genérico. A primeira LEP (216 caputs) deu 75,0% nesse critério (A sozinho 87,5%, B sozinho 77,8%), antes de acrescentar os itens 13 a 18 ao redator; o portão manteve 100% do publicado aprovado pelos dois.
+
 Formato: sem travessões (usar vírgula, parênteses ou dois-pontos), sem emojis, sem a expressão "no banco" nem "Capítulo"/"Seção" do banco, sem "nos termos do parágrafo" como substituto de conteúdo; filho truncado na consulta é consultado de novo, não resumido de memória. Norma de organização, transitória ou de efeito exaurido: o comentário apenas registra o conteúdo.

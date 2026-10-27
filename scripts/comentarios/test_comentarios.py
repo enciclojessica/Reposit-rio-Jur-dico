@@ -33,6 +33,12 @@ class T(unittest.TestCase):
         m = checar_campo(5, FONTE, 'A prova será feita em 10 dias. I - o requerente; II - o credor. O prazo conta da citação. A prova será feita em 10 dias. ' * 2, 'aplicacao_pratica')
         self.assertTrue(any('repete' in x for x in m))
 
+    def test_todo_palavra_inteira(self):
+        m = checar_campo(5, FONTE, BOM + ' Todos os métodos e todo o procedimento valem.', 'aplicacao_pratica')
+        self.assertFalse(any('TODO' in x for x in m))
+        m2 = checar_campo(5, FONTE, BOM + ' TODO: revisar.', 'aplicacao_pratica')
+        self.assertTrue(any('TODO' in x for x in m2))
+
     def test_curto(self):
         self.assertIn('curto demais', checar_campo(5, FONTE, 'Confira o prazo.', 'aplicacao_pratica'))
 

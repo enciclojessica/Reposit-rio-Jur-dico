@@ -43,7 +43,7 @@ def checar_campo(numero, fonte, texto, campo):
     if EMOJI.search(texto):
         motivos.append('emoji')
     for f in FRASES_PROIBIDAS:
-        if f.lower() in texto.lower():
+        if re.search(r'(?<![\wÀ-ÿ])' + re.escape(f) + r'(?![\wÀ-ÿ])', texto, 0 if f == 'TODO' else re.I):
             motivos.append(f'expressão proibida: {f}')
     fonte_n = norm(fonte)
     for p in PROIBIDOS:
