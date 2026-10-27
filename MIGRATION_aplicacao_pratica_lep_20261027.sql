@@ -1,9 +1,10 @@
--- Reescrita da Aplicação prática (aplicacao_pratica) de 214 dos 216 caputs vigentes da LEP (Lei 7.210/1984), pelo pipeline automático
+-- Reescrita da Aplicação prática (aplicacao_pratica) de 213 dos 216 caputs vigentes da LEP (Lei 7.210/1984), pelo pipeline automático
 -- (docs/PIPELINE_COMENTARIOS.md): redação, checagem automática, revisão independente A e B, correção e nova revisão, gravação com selo
 -- (comentario_conferencia = 'revisao_independente', comentario_conferido_em = 2026-10-23). Aplicada em 27/10/2026 em 12 blocos.
--- Resultado: 162 aprovados na primeira passagem (A e B CORRETO), 52 corrigidos e reaprovados (46 na 1ª correção, 6 na 2ª).
+-- Resultado (antes da auditoria; o art. 68 aprovado perdeu o selo depois): 162 aprovados na primeira passagem (A e B CORRETO), 52 corrigidos e reaprovados (46 na 1ª correção, 6 na 2ª).
 -- Primeira passagem: 75,0% (162 de 216) com os dois revisores; A sozinho 87,5%, B sozinho 77,8%.
 -- Não publicados: arts. 52 e 112 (reprovados por um dos revisores após duas rodadas de correção): mantêm o comentário antigo, sem selo.
+-- Auditoria cega (22 caputs sorteados): 21 corretos (95,5%); art. 68 impreciso, selo retirado (update comentario_* = null). Sem selo: 52, 68 e 112.
 -- Conferência por hash: 214 de 214 textos idênticos aos aprovados; 0 travessões. O art. 5 foi regravado após a conferência (uma palavra omitida na gravação).
 -- Reversão: reaplicar MIGRATION_comentarios_lep_lote1.sql a _lote9.sql (aplicacao_pratica anterior) e zerar o selo:
 --   update legislacao set comentario_conferencia=null, comentario_resultado=null, comentario_conferido_em=null where codigo='lep';
