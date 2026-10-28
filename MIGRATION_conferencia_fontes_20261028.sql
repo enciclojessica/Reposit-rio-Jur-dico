@@ -22,3 +22,13 @@ update entradas set
   referencia = 'REsp 2.209.868, Rel. Min. Humberto Martins, Terceira Turma (conferir data de julgamento e inteiro teor no portal do STJ)',
   url = 'https://www.stj.jus.br/sites/portalp/Paginas/Comunicacao/Noticias/2026/15072026-Sem-transacoes-incompativeis-com-perfil-de-cliente--banco-nao-responde-por-golpe-da-falsa-central.aspx'
 where id = 'c9cf09e0-05a7-4c5c-9836-2b9967ff4fc8';
+
+-- Súmulas 385, 404, 548 e 565/STJ: datas de julgamento e publicação conferem com a fonte gravada em fontes secundárias
+-- (385: PDF do TJBA reproduzindo o STJ, 27/05/2009, DJe 08/06/2009; 404: Damásio, aprovada em 28/10/2009, publicada em 24/11/2009;
+-- 548: Damásio, 14/10/2015, 19/10/2015; 565: Damásio, 24/02/2016, 29/02/2016). Autorizado pela Jessica em 28/10/2026.
+update entradas set tags = array_remove(tags, 'conferir inteiro teor')
+where id in ('1f74f597-372d-402a-b95e-29bfc531804c','5cf67907-babb-4877-a244-93ba4def4350',
+             '03129996-c557-49dc-9737-574bf29f932b','b98d4a5b-a830-4237-85be-d34b62f35b32');
+
+-- Conferência (esperado: 8 súmulas sem a tag; restam 10 entradas públicas com a tag):
+-- select count(*) from entradas where publica and 'conferir inteiro teor' = any(tags);
