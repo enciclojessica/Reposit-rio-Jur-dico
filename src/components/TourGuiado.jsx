@@ -1,27 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../theme'
+import { PASSOS_DESKTOP, PASSOS_MOBILE } from '../data/passosTour'
 
 // Tour guiado: aponta pra elementos reais da tela (marcados com
 // data-tour="id" no Sidebar/MobileNav), um passo de cada vez, com um
 // recorte de destaque (spotlight) e uma explicação ao lado. Diferente do
 // TourBoasVindas antigo (um popup só, estático) — esse navega pela
 // interface de verdade.
-
-const PASSOS_DESKTOP = [
-  { alvo: 'home',   titulo: 'Acervo', texto: 'Teses, súmulas, jurisprudência, doutrina e o texto integral da legislação, tudo num lugar só — use as abas no topo da tela pra alternar entre o repositório curado e os códigos completos.' },
-  { alvo: 'busca',  titulo: 'Busca com IA', texto: 'Descreva a peça que está escrevendo e o sistema sugere teses do acervo que podem ajudar. Recurso pago.' },
-  { alvo: 'indice', titulo: 'Índice remissivo', texto: 'Lista alfabética de todas as tags do repositório. Útil quando você ainda não sabe o termo exato pra buscar.' },
-  { alvo: 'favoritos', titulo: 'Favoritos', texto: 'Marque qualquer entrada com a estrela pra achar rápido depois, sem precisar buscar de novo.' },
-  { alvo: 'juri',   titulo: 'Pesquisa Externa', texto: 'Pesquise jurisprudência e doutrina direto das fontes, fora do acervo, e adicione ao repositório com um clique. Recurso pago.' },
-  { alvo: 'add',    titulo: 'Nova entrada', texto: 'Cadastre uma nova entrada no acervo, com teses e fundamentação legal.', apenasEditor: true },
-]
-
-const PASSOS_MOBILE = [
-  { alvo: 'm_hoje',   titulo: 'Início', texto: 'Sua tela de todo dia: o que você estava lendo, e as entradas mais recentes do acervo.' },
-  { alvo: 'm_busca',  titulo: 'Busca com IA', texto: 'Descreva a peça que está escrevendo e o sistema sugere teses do acervo que podem ajudar. Recurso pago.' },
-  { alvo: 'm_editor', titulo: 'Editor de Peças', texto: 'Escreva sua peça e insira citações do acervo direto no texto.' },
-  { alvo: 'm_add',    titulo: 'Nova entrada', texto: 'Cadastre uma nova entrada no acervo, com teses e fundamentação legal.', apenasEditor: true },
-]
 
 export default function TourGuiado({ isMobile, isEditor, onFechar }) {
   const { theme } = useTheme()

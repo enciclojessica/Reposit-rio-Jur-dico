@@ -3,7 +3,7 @@ import { Home, Sparkles, PenLine, Plus, MoreHorizontal } from 'lucide-react'
 
 export default function MobileNav({
   theme, view, setView, maisAberto, setMaisAberto,
-  isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha,
+  isEditor, isAdmin, session, entradas, isOwner, exportarTesesPlanilha, onAbrirTour,
 }) {
   // Mesma lógica de compartilhar da Landing (Web Share API no celular,
   // com fallback pra copiar), só que aqui é pra quem já é membro
@@ -41,6 +41,7 @@ export default function MobileNav({
     ...(isAdmin  ? [{ v: VIEWS.ATUALIZACOES, label: 'Atualizações' }] : []),
     ...(session  ? [{ v: VIEWS.CONFIG,   label: 'Configurações' }] : []),
     ...(isOwner && entradas.length > 0 ? [{ v: 'exportar_teses', label: 'Exportar planilha', action: exportarTesesPlanilha }] : []),
+    ...(session && onAbrirTour ? [{ v: 'tour', label: 'Conhecer o app', action: onAbrirTour }] : []),
     ...(session  ? [{ v: 'compartilhar', label: 'Compartilhar o Themis Jur', action: compartilhar }] : []),
   ]
   // O item "Acervo" (VIEWS.HOME) também deve destacar quando a pessoa
@@ -103,7 +104,7 @@ export default function MobileNav({
           </button>
         ))}
         {/* Botão "mais" */}
-        <button
+        <button data-tour="m_mais"
           onClick={() => setMaisAberto(m => !m)}
           style={{
             flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',

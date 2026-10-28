@@ -63,4 +63,16 @@ describe('Sidebar', () => {
     renderSidebar()
     expect(screen.getByText('Farias Fusquiani')).toBeInTheDocument()
   })
+
+  it('mostra "Conhecer o app" só com a função de abrir o tour e chama ao clicar', () => {
+    renderSidebar()
+    expect(screen.queryByText('Conhecer o app')).not.toBeInTheDocument()
+  })
+
+  it('"Conhecer o app" reabre o tour', () => {
+    const onAbrirTour = vi.fn()
+    renderSidebar({ onAbrirTour })
+    fireEvent.click(screen.getByText('Conhecer o app'))
+    expect(onAbrirTour).toHaveBeenCalled()
+  })
 })

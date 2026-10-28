@@ -56,4 +56,17 @@ describe('MobileNav', () => {
     fireEvent.click(screen.getByText('Início'))
     expect(setView).toHaveBeenCalledWith(VIEWS.HOJE)
   })
+
+  it('"Conhecer o app" fica no menu Mais para quem está logado e reabre o tour', () => {
+    const onAbrirTour = vi.fn()
+    const { setMaisAberto } = renderNav({ session: { user: { id: 'u1' } }, maisAberto: true, onAbrirTour })
+    fireEvent.click(screen.getByText('Conhecer o app'))
+    expect(onAbrirTour).toHaveBeenCalled()
+    expect(setMaisAberto).toHaveBeenCalledWith(false)
+  })
+
+  it('sem sessão não mostra "Conhecer o app"', () => {
+    renderNav({ session: null, maisAberto: true, onAbrirTour: vi.fn() })
+    expect(screen.queryByText('Conhecer o app')).not.toBeInTheDocument()
+  })
 })

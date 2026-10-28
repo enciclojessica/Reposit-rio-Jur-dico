@@ -138,6 +138,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true)
   const [membro, setMembro]         = useState(null)   // { role, nome, email }
   const [membroLoading, setMembroLoading] = useState(false)
+  const [tourManual, setTourManual] = useState(false) // "Conhecer o app": reabre o tour de boas-vindas
   const [membroVerificado, setMembroVerificado] = useState(false) // true quando a checagem de membro terminou
   const [entradas, setEntradas]     = useState([])
   const [favoritos, setFavoritos]   = useState(new Set())
@@ -1140,8 +1141,10 @@ case VIEWS.JURISPRUDENCIA:
         setPrefillEntry={setPrefillEntry}
       />
     )}
-    {membro && !membro.tour_visto && (
+    {membro && (!membro.tour_visto || tourManual) && (
       <TourGuiado isMobile={isMobile} isEditor={isEditor} onFechar={async () => {
+        setTourManual(false)
+        if (membro.tour_visto) return
         setMembro(prev => ({ ...prev, tour_visto: true }))
         await supabase.from('membros').update({ tour_visto: true }).eq('user_id', session.user.id)
       }} />
@@ -1152,6 +1155,7 @@ case VIEWS.JURISPRUDENCIA:
           theme={theme} view={view} setView={setView}
           setAreaFilter={setAreaFilter} setTipoFilter={setTipoFilter}
           isAdmin={isAdmin} isEditor={isEditor} setPrefillEntry={setPrefillEntry}
+          onAbrirTour={() => setTourManual(true)}
         />
       )}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -1243,6 +1247,7 @@ case VIEWS.JURISPRUDENCIA:
             maisAberto={maisAberto} setMaisAberto={setMaisAberto}
             isEditor={isEditor} isAdmin={isAdmin} session={session}
             entradas={entradas} isOwner={isOwner} exportarTesesPlanilha={exportarTesesPlanilha}
+            onAbrirTour={() => setTourManual(true)}
           />
         )}
       </div>
