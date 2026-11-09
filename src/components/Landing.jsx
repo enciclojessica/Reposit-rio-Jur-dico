@@ -131,6 +131,7 @@ export default function Landing({ onEntrar }) {
                 <a href="#numeros" style={linkFaixa}>O acervo</a>
                 <a href="#amostra" style={linkFaixa}>Amostra</a>
                 <a href="#diferenciais" style={linkFaixa}>Diferenciais</a>
+                <a href="#plataformas" style={linkFaixa}>Plataformas</a>
                 <a href="/?vitrine=1" style={linkFaixa}>Ver amostra</a>
                 <button type="button" onClick={compartilhar} style={linkFaixa}>
                   {copiado ? <Check size={14} strokeWidth={1.75} /> : <Share2 size={14} strokeWidth={1.75} />}
@@ -247,8 +248,42 @@ export default function Landing({ onEntrar }) {
           </div>
         </div>
 
-        {/* Chamada final */}
-        <div style={secao(false)}>
+        {/* Plataformas: o mesmo bloco do app de questões, visto do lado do Themis Jur */}
+        <div id="plataformas" style={{ ...secao(false), scrollMarginTop: 72 }}>
+          <div style={contorno}>
+            <Cabecalho theme={theme} rotulo="Plataformas" titulo="Duas plataformas, um mesmo propósito" />
+            <p style={{ margin: '-20px 0 28px', maxWidth: 640, color: theme.textSub }}>
+              O Themis Jur reúne o acervo jurídico para consulta e redação. O Themis Jur Questões concentra a prática de questões e simulados para o Exame de Ordem, e lê o texto das leis direto deste acervo. Cada uma cumpre o seu papel, e ambas seguem a mesma curadoria.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: medio ? '1fr' : 'repeat(2, 1fr)', gap: 18 }}>
+              <Plataforma theme={theme} atual rotulo="Você está aqui" titulo="Themis Jur"
+                texto="Repositório jurídico curado, com legislação, jurisprudência, doutrina e súmulas."
+                itens={[
+                  'Legislação consolidada, da Constituição Federal aos principais códigos',
+                  'Editor de peças com sugestão de teses e de artigos',
+                  'Caderno de estudos, com anotações próprias em cada entrada',
+                ]}>
+                <button type="button" onClick={() => onEntrar('register')} style={botaoPrimario}>
+                  Solicitar acesso gratuito <ArrowRight size={16} strokeWidth={1.75} />
+                </button>
+              </Plataforma>
+              <Plataforma theme={theme} rotulo="Plataforma irmã" titulo="Themis Jur Questões"
+                texto="Prática de questões e simulados para o Exame de Ordem."
+                itens={[
+                  'Questões com gabarito comentado e simulados cronometrados',
+                  'Caderno de erros com revisão espaçada e treino da 2ª fase',
+                  'Desempenho, plano de estudos e cronograma',
+                ]}>
+                <a href={LINK_QUESTOES} target="_blank" rel="noopener noreferrer" style={{ ...botaoNeutro, textDecoration: 'none' }}>
+                  Conhecer o Themis Jur Questões <ArrowRight size={16} strokeWidth={1.75} />
+                </a>
+              </Plataforma>
+            </div>
+          </div>
+        </div>
+
+        {/* Chamada final (fundo alternado, depois de Plataformas) */}
+        <div style={secao(true)}>
           <div style={{ ...contorno, textAlign: 'center' }}>
             <Rotulo theme={theme}>Comece hoje</Rotulo>
             <h2 style={{ maxWidth: 560, margin: '16px auto', fontFamily: FONTE_TITULO, fontSize: 'clamp(29px, 4vw, 43px)', fontWeight: 600, lineHeight: 1.2, color: theme.text }}>
@@ -279,6 +314,7 @@ export default function Landing({ onEntrar }) {
             <a href="#numeros" style={linkRodape}>O acervo</a>
             <a href="/?vitrine=1" style={linkRodape}>Ver amostra</a>
             <button type="button" onClick={() => onEntrar('login')} style={{ ...linkRodape, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: FONTE, fontSize: 13 }}>Entrar</button>
+            <a href={LINK_QUESTOES} target="_blank" rel="noopener noreferrer" style={linkRodape}>Themis Jur Questões</a>
             <a href="mailto:themisjur.ia@gmail.com" style={linkRodape}>Contato</a>
             <a href="/?pagina=termos" style={linkRodape}>Termos de uso</a>
             <a href="/?pagina=privacidade" style={linkRodape}>Privacidade</a>
@@ -291,6 +327,31 @@ export default function Landing({ onEntrar }) {
 }
 
 const linkRodape = { color: FAIXA_SUB, textDecoration: 'none' }
+
+// App irmão (repositório themis-jur-questoes), que linka de volta para cá.
+const LINK_QUESTOES = 'https://aprovaoab.vercel.app'
+
+function Plataforma({ theme, atual = false, rotulo, titulo, texto, itens, children }) {
+  return (
+    <article style={{
+      display: 'flex', flexDirection: 'column', gap: 14, padding: '28px 26px', background: theme.cardBg, borderRadius: 12,
+      border: `1px solid ${atual ? theme.vinho : theme.border}`, boxShadow: atual ? `inset 0 3px 0 ${theme.vinho}` : 'none',
+    }}>
+      <span style={{ fontFamily: FONTE, fontSize: 11.5, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: theme.gold }}>{rotulo}</span>
+      <h3 style={{ margin: 0, fontFamily: FONTE_TITULO, fontSize: 24, fontWeight: 600, color: theme.text }}>{titulo}</h3>
+      <p style={{ margin: 0, color: theme.textSub }}>{texto}</p>
+      <ul style={{ margin: '2px 0 6px', padding: 0, listStyle: 'none', display: 'grid', gap: 9 }}>
+        {itens.map(item => (
+          <li key={item} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 15.5 }}>
+            <Check size={16} strokeWidth={2} style={{ flex: 'none', marginTop: 6, color: theme.gold }} aria-hidden="true" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+      <div style={{ marginTop: 'auto' }}>{children}</div>
+    </article>
+  )
+}
 
 function Rotulo({ theme, children }) {
   return (
