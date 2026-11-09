@@ -52,9 +52,14 @@ async function buscarArtigo(codigo, numeroBruto) {
   if (!m) return null
   const numero = m[1]
   const sufixo = m[2] ? m[2].toUpperCase() : null
-  const filtroTitulo = sufixo ? `&titulo=eq.${encodeURIComponent(`Art. ${numero}-${sufixo}`)}` : ''
+  // Sem sufixo, só o artigo principal (`titulo` nulo): com limit=1, ?art=7 podia
+  // devolver o texto do 7-A na prévia do link.
+  const filtroTitulo = sufixo ? `&titulo=eq.${encodeURIComponent(`Art. ${numero}-${sufixo}`)}` : '&titulo=is.null'
+  // Leitor anônimo: a tabela `legislacao` só abre para membro aprovado desde
+  // 21/10/2026, então a prévia lê a visão `legislacao_publica`. A ordem garante
+  // que a linha devolvida seja o caput, não um inciso ou parágrafo.
   const r = await fetch(
-    `${SUPABASE_URL}/rest/v1/legislacao?codigo=eq.${encodeURIComponent(codigo)}&numero=eq.${encodeURIComponent(numero)}${filtroTitulo}&vigente=eq.true&select=titulo,texto&limit=1`,
+    `${SUPABASE_URL}/rest/v1/legislacao_publica?codigo=eq.${encodeURIComponent(codigo)}&numero=eq.${encodeURIComponent(numero)}${filtroTitulo}&vigente=eq.true&select=titulo,texto&order=paragrafo.asc.nullsfirst,inciso.asc.nullsfirst&limit=1`,
     { headers: { apikey: SUPABASE_PUBLISHABLE_KEY } }
   )
   if (!r.ok) return null

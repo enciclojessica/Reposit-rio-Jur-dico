@@ -40,11 +40,13 @@ export default function LegislacaoPublica({ codigo, numero, sufixo, onFechar }) 
       // 54-A a 54-G, CP 359-A a 359-U) compartilham o mesmo `numero` no
       // banco — só o `titulo` os distingue. Com o sufixo vindo na URL
       // (?art=1358-D), filtra direto pelo artigo certo em vez de trazer os
-      // ~20 artigos reais daquele número juntos.
+      // ~20 artigos reais daquele número juntos. Sem sufixo, só o artigo
+      // principal (`titulo` nulo), como em api/legislacao.js: ?art=7 do
+      // Estatuto trazia o 7-A e o 7-B antes do próprio art. 7.
       let query = supabase
         .from('legislacao_publica').select('*')
         .eq('codigo', codigo).eq('numero', numero).eq('vigente', true)
-      query = sufixo ? query.eq('titulo', `Art. ${numero}-${sufixo}`) : query
+      query = sufixo ? query.eq('titulo', `Art. ${numero}-${sufixo}`) : query.is('titulo', null)
       const { data, error } = await query
         .order('paragrafo', { ascending: true, nullsFirst: true })
 
