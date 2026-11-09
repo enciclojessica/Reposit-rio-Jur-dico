@@ -1,7 +1,34 @@
 import { describe, it, expect } from 'vitest'
-import { compararDispositivos, ordenarDispositivos, romanoParaNumero, chaveParagrafo } from '../../lib/ordemDispositivos'
+import { compararDispositivos, ordenarDispositivos, romanoParaNumero, chaveParagrafo, ordenarGruposArtigos } from '../../lib/ordemDispositivos'
 
 const ordem = (lista) => ordenarDispositivos(lista).map(d => `${d.paragrafo ?? ''}|${d.inciso ?? ''}`)
+
+describe('ordem dos cartões de artigo com letra', () => {
+  const rotulos = (grupos) => ordenarGruposArtigos(grupos).map(g => `${g.codigo} ${g.titulo || `Art. ${g.numero}`}`)
+
+  it('artigo-base primeiro e letras em ordem (Estatuto art. 7, 7-B, 7-A)', () => {
+    expect(rotulos([
+      { codigo: 'lei8906', numero: 7, titulo: null },
+      { codigo: 'lei8906', numero: 7, titulo: 'Art. 7-B' },
+      { codigo: 'lei8906', numero: 7, titulo: 'Art. 7-A' },
+    ])).toEqual(['lei8906 Art. 7', 'lei8906 Art. 7-A', 'lei8906 Art. 7-B'])
+  })
+
+  it('sufixo duplo vem depois do simples (CP 359-M, 359-M-A)', () => {
+    expect(rotulos([
+      { codigo: 'cp', numero: 359, titulo: 'Art. 359-M-A' },
+      { codigo: 'cp', numero: 359, titulo: 'Art. 359-M' },
+    ])).toEqual(['cp Art. 359-M', 'cp Art. 359-M-A'])
+  })
+
+  it('mantém a ordem de chegada entre códigos e números diferentes', () => {
+    expect(rotulos([
+      { codigo: 'cf', numero: 37, titulo: null },
+      { codigo: 'clt', numero: 37, titulo: null },
+      { codigo: 'cf', numero: 37, titulo: 'Art. 37-A' },
+    ])).toEqual(['cf Art. 37', 'cf Art. 37-A', 'clt Art. 37'])
+  })
+})
 
 describe('numeral romano', () => {
   it('converte corretamente', () => {

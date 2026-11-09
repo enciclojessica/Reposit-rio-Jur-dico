@@ -4,7 +4,7 @@ import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { corDaArea } from '../shared'
-import { compararDispositivos } from '../../lib/ordemDispositivos'
+import { compararDispositivos, ordenarGruposArtigos } from '../../lib/ordemDispositivos'
 import { conferenciaComentario } from '../utils/conferenciaComentario'
 
 // Nome oficial completo exibido acima da busca quando um código está selecionado.
@@ -395,7 +395,10 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
   const [carregandoMais, setCarregandoMais]       = useState(false)
   const [loading, setLoading]                    = useState(true)
   const [codigos, setCodigos]                    = useState([])
-  const [total, setTotal]                        = useState(0)
+  // null = contagem ainda carregando; sem isso a tela mostrava "Nenhuma
+  // legislação importada" por alguns segundos, como se o banco estivesse vazio.
+  const [total, setTotal]                        = useState(null)
+  const [erroTotal, setErroTotal]                = useState('')
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
   const [exportando, setExportando] = useState(false)
   const [mostrarRevogados, setMostrarRevogados] = useState(false)
@@ -448,7 +451,10 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
     // trazer linhas — evita o teto padrão de 1000 linhas por requisição do
     // PostgREST, que travava esse número assim que o acervo passava disso.
     supabase.from('legislacao').select('*', { count: 'exact', head: true }).eq('vigente', true)
-      .then(({ count }) => setTotal(count || 0))
+      .then(({ count, error }) => {
+        if (error) { setErroTotal('Não foi possível carregar a legislação. Recarregue a página ou tente de novo em instantes.'); return }
+        setTotal(count || 0)
+      })
     // Códigos distintos: precisa de função no banco (SELECT DISTINCT), já
     // que buscar todas as linhas só pra extrair os códigos únicos sofreria
     // do mesmo teto de 1000 linhas e, pior, traria códigos incompletos
@@ -474,7 +480,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
       g.itens.sort(compararDispositivos)
       g.caput = g.itens.find(i => !i.inciso && !i.paragrafo) || g.itens[0]
     }
-    return grupos
+    return ordenarGruposArtigos(grupos)
   }, [artigos])
 
   useEffect(() => {
@@ -596,7 +602,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
             Legislação
           </div>
           <div style={{ fontSize: 12, color: theme.muted, fontFamily: "'Inter', sans-serif" }}>
-            {total > 0 ? `${total} artigos importados, clique em qualquer um para ver detalhes` : 'Nenhum artigo importado. Use Importar, na navegação'}
+            {erroTotal ? 'Falha ao carregar' : total === null ? 'Carregando…' : total > 0 ? `${total} artigos importados, clique em qualquer um para ver detalhes` : 'Nenhum artigo importado. Use Importar, na navegação'}
           </div>
         </div>
         {total > 0 && (
@@ -610,7 +616,15 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
         )}
       </div>
 
-      {total === 0 ? (
+      {erroTotal ? (
+        <div role="alert" style={{ textAlign: 'center', padding: '60px 0', color: theme.penal, fontSize: 14, fontFamily: "'Inter', sans-serif" }}>
+          {erroTotal}
+        </div>
+      ) : total === null ? (
+        <div style={{ textAlign: 'center', padding: '60px 0', color: theme.muted, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
+          Carregando a legislação…
+        </div>
+      ) : total === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: theme.muted }}>
           <div style={{ fontSize: 14, marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Nenhuma legislação importada.</div>
           <div style={{ fontSize: 12, fontFamily: "'Inter', sans-serif" }}>Use "Importar", na navegação, para adicionar o CPC, CDC e outros códigos.</div>
