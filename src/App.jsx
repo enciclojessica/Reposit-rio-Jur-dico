@@ -197,6 +197,10 @@ export default function App() {
   const isAdmin  = role === 'admin' || isOwner
   const isEditor = role === 'editor' || isAdmin
   const isMembro = !!membro
+  // Quem está logado e se já foi aprovado: o RLS de `entradas` depende dos dois
+  // (`is_member()` exige `aprovado`), então a lista recarrega quando mudam.
+  const usuarioId      = session?.user?.id || null
+  const membroAprovado = !!membro?.aprovado
   // Recursos de IA opcionais (ex: Busca para Peça com IA): admin sempre tem
   // acesso; demais membros só se marcados manualmente como pago=true.
   const podeUsarIA = isAdmin || !!membro?.pago
@@ -484,6 +488,10 @@ export default function App() {
     setEntradas(data)
   }, [])
 
+  // Recarrega também no login, no logout e na aprovação (usuarioId e
+  // membroAprovado): antes a lista só carregava uma vez, então quem entrava
+  // sem recarregar a página via só o acervo público (157 em vez de 199), e
+  // quem saía continuava com as entradas restritas na tela.
   useEffect(() => {
     if (authLoading) return
     loadEntradas()
@@ -504,7 +512,7 @@ export default function App() {
       document.removeEventListener('visibilitychange', aoVoltar)
       supabase.removeChannel(channel)
     }
-  }, [authLoading, loadEntradas])
+  }, [authLoading, loadEntradas, usuarioId, membroAprovado])
 
 
   async function buscarSemantico() {
