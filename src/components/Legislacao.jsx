@@ -1,11 +1,16 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Download, Search, Check, Copy, Link2, FileText, History } from 'lucide-react'
+import { Download, Search, Check, Copy, Link2, FileText, History, GraduationCap } from 'lucide-react'
 import { supabase } from '../supabase'
 import { useTheme } from '../theme'
 import { extrairReferenciasLegais } from '../data/legislacaoNomes'
 import { corDaArea } from '../shared'
 import { compararDispositivos, ordenarGruposArtigos } from '../../lib/ordemDispositivos'
 import { conferenciaComentario } from '../utils/conferenciaComentario'
+import { letraDoTitulo, trechosComRemissoes } from '../utils/remissoes'
+import { carregarCobradosOab, textoCobradoOab } from '../supabaseQuestoes'
+
+// Chave do artigo no índice do app de questões: "5" ou "7-A".
+const chaveOab = (g) => `${g.codigo}|${g.numero}${letraDoTitulo(g.titulo) ? `-${letraDoTitulo(g.titulo)}` : ''}`
 
 // Nome oficial completo exibido acima da busca quando um código está selecionado.
 const NOME_COMPLETO_CODIGO = {
@@ -75,9 +80,24 @@ function SeloAlteracao({ alteracoes, vigenciaDiferida, theme }) {
   )
 }
 
+// ── Remissões clicáveis ("art. 37", "art. 121 do Código Penal") ─────────────
+function TextoComRemissoes({ texto, atual, onAbrir }) {
+  const trechos = useMemo(() => trechosComRemissoes(texto, atual), [texto, atual.codigo, atual.numero, atual.letra])
+  if (!onAbrir) return texto
+  return trechos.map((t, i) => t.codigo
+    ? (
+      <button key={i} type="button" className="remissao-lei" onClick={() => onAbrir(t)}
+        title={`Abrir ${CODIGOS_META[t.codigo]?.label || t.codigo.toUpperCase()}, art. ${t.numero}${t.letra ? `-${t.letra}` : ''}`}>
+        {t.texto}
+      </button>
+    )
+    : <span key={i}>{t.texto}</span>)
+}
+
 // ── Modal de detalhe ────────────────────────────────────────────────────────
-function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) {
+function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes, onAbrirRemissao, avisoRemissao, cobradoOab }) {
   const { theme } = useTheme()
+  const atual = useMemo(() => ({ codigo: grupo.codigo, numero: grupo.numero, letra: letraDoTitulo(grupo.titulo) }), [grupo.codigo, grupo.numero, grupo.titulo])
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase(), nome: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
   const [linkCopiado, setLinkCopiado] = useState(false)
@@ -178,10 +198,22 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) 
             {meta.nome}
             <SeloAlteracao alteracoes={alteracoes} vigenciaDiferida={temVigenciaDiferida} theme={theme} />
           </div>
+          {cobradoOab?.questoes > 0 && (
+            <div style={{ fontSize: 12, color: theme.textSub, fontFamily: "'Inter', sans-serif", marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <GraduationCap size={13} color={theme.gold} />
+              <span>
+                {textoCobradoOab(cobradoOab)}.{' '}
+                <span style={{ color: theme.muted }}>Contagem do Themis Jur Questões, pela base legal da questão ou, sem ela, pelo comentário.</span>
+              </span>
+            </div>
+          )}
+          {avisoRemissao && (
+            <div role="status" style={{ fontSize: 12, color: theme.gold, fontFamily: "'Inter', sans-serif", marginBottom: 12 }}>{avisoRemissao}</div>
+          )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
             {grupo.itens.map((item, i) => (
               <div key={i} style={{ fontSize: 15, color: item.vigente === false ? theme.muted : theme.text, lineHeight: 1.8, fontFamily: "'Inter', sans-serif", paddingLeft: (item.inciso || item.paragrafo) ? 16 : 0, textDecoration: item.vigente === false ? 'line-through' : 'none' }}>
-                {item.texto}
+                <TextoComRemissoes texto={item.texto} atual={atual} onAbrir={onAbrirRemissao} />
                 {item.vigente === false && (
                   <span style={{ display: 'inline-block', marginLeft: 8, fontSize: 10, color: theme.muted, border: `1px solid ${theme.border}`, borderRadius: 4, padding: '1px 6px', fontFamily: "'IBM Plex Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', textDecoration: 'none' }}>
                     Revogado
@@ -284,7 +316,7 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes }) 
 }
 
 // ── Card do artigo ───────────────────────────────────────────────────────────
-function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes }) {
+function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes, cobradoOab }) {
   const { theme } = useTheme()
   const meta = CODIGOS_META[grupo.codigo] || { cor: theme.muted, label: grupo.codigo?.toUpperCase() }
   const [copiado, setCopiado] = useState(false)
@@ -346,6 +378,11 @@ function ArtigoCard({ grupo, onAbrir, citacoes = 0, alteracoes }) {
                 <FileText size={11} /> {citacoes} tese{citacoes !== 1 ? 's' : ''}
               </span>
             )}
+            {cobradoOab?.questoes > 0 && (
+              <span title={textoCobradoOab(cobradoOab)} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: theme.gold, fontFamily: "'Inter', sans-serif" }}>
+                <GraduationCap size={11} /> OAB {cobradoOab.questoes}
+              </span>
+            )}
           </div>
           <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, fontFamily: "'Inter', sans-serif", textDecoration: revogado ? 'line-through' : 'none' }}>
             {caput?.texto}
@@ -400,6 +437,8 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
   const [total, setTotal]                        = useState(null)
   const [erroTotal, setErroTotal]                = useState('')
   const [artigoSelecionado, setArtigoSelecionado] = useState(null)
+  const [avisoRemissao, setAvisoRemissao] = useState('')
+  const [cobradoOab, setCobradoOab] = useState(new Map())
   const [exportando, setExportando] = useState(false)
   const [mostrarRevogados, setMostrarRevogados] = useState(false)
   const [alteracoesPorArtigo, setAlteracoesPorArtigo] = useState(new Map())
@@ -429,6 +468,13 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
     setBusca(preFiltro.numero ? String(preFiltro.numero) : '')
     onPreFiltroConsumido?.()
   }, [preFiltro])
+
+  useEffect(() => {
+    // Artigos citados nas questões da OAB (app irmão). Sem resposta, o selo só não aparece.
+    let ativo = true
+    carregarCobradosOab().then(m => { if (ativo) setCobradoOab(m) }).catch(() => {})
+    return () => { ativo = false }
+  }, [])
 
   useEffect(() => {
     // Redação anterior de dispositivos alterados (legislacao_historico, leitura liberada aos membros).
@@ -503,6 +549,21 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
       else              q = q.textSearch('texto', busca, { type: 'websearch', config: 'portuguese' })
     }
     return q
+  }
+
+  // Abre, no mesmo modal, o artigo citado numa remissão. Artigo com letra vem pelo `titulo` ("Art. 7-A"); sem letra,
+  // `titulo` nulo (os artigos com letra dividem o `numero` com o artigo-base).
+  async function abrirRemissao({ codigo, numero, letra }) {
+    setAvisoRemissao('')
+    const rotulo = `${CODIGOS_META[codigo]?.label || codigo.toUpperCase()}, art. ${numero}${letra ? `-${letra}` : ''}`
+    let q = supabase.from('legislacao').select('*').eq('codigo', codigo).eq('numero', numero)
+    q = letra ? q.eq('titulo', `Art. ${numero}-${letra}`) : q.is('titulo', null)
+    const { data, error } = await q
+    if (error) { setAvisoRemissao(`Não foi possível abrir o ${rotulo} agora. Tente de novo.`); return }
+    if (!data?.length) { setAvisoRemissao(`O ${rotulo} não está na base do Themis Jur.`); return }
+    const itens = [...data].sort(compararDispositivos)
+    const titulo = letra ? `Art. ${numero}-${letra}` : null
+    setArtigoSelecionado({ chave: `${codigo}|${numero}|${titulo || ''}`, codigo, numero, titulo, itens, caput: itens.find(i => !i.inciso && !i.paragrafo) || itens[0] })
   }
 
   async function buscarArtigos() {
@@ -683,7 +744,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {gruposArtigos.map((g) => (
-              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} citacoes={mapaCitacoes.get(`${g.codigo}|${g.numero}`) || 0} alteracoes={alteracoesPorArtigo.get(g.chave)} />
+              <ArtigoCard key={g.chave} grupo={g} onAbrir={setArtigoSelecionado} citacoes={mapaCitacoes.get(`${g.codigo}|${g.numero}`) || 0} alteracoes={alteracoesPorArtigo.get(g.chave)} cobradoOab={cobradoOab.get(chaveOab(g))} />
             ))}
             {!loading && gruposArtigos.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 0', color: theme.muted, fontSize: 13, fontFamily: "'Inter', sans-serif" }}>Nenhum artigo encontrado.</div>
@@ -707,7 +768,7 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
 
       {/* Modal */}
       {artigoSelecionado && (
-        <ArtigoModal grupo={artigoSelecionado} onFechar={() => setArtigoSelecionado(null)} entradas={entradas} onAbrirEntrada={onAbrirEntrada} alteracoes={alteracoesPorArtigo.get(artigoSelecionado.chave)} />
+        <ArtigoModal key={artigoSelecionado.chave} grupo={artigoSelecionado} onFechar={() => { setArtigoSelecionado(null); setAvisoRemissao('') }} entradas={entradas} onAbrirEntrada={onAbrirEntrada} alteracoes={alteracoesPorArtigo.get(artigoSelecionado.chave)} onAbrirRemissao={abrirRemissao} avisoRemissao={avisoRemissao} cobradoOab={cobradoOab.get(chaveOab(artigoSelecionado))} />
       )}
     </div>
   )

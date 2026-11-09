@@ -40,6 +40,14 @@ input:focus, select:focus, textarea:focus {
 
 textarea { resize: vertical; }
 
+/* ── Remissão clicável no texto da lei (Legislacao.jsx): foco em ouro, nunca azul ── */
+.remissao-lei { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer;
+  text-decoration: underline; text-decoration-color: #c9a452; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.remissao-lei:hover { color: #800020; }
+.remissao-lei:focus { outline: none; }
+.remissao-lei:focus-visible { outline: 2px solid #c9a452; outline-offset: 2px; border-radius: 2px; }
+[data-dark="true"] .remissao-lei:hover { color: #C5A059; }
+
 /* ── Dark mode overrides via data-theme ──────────────────────────────────── */
 [data-dark="true"] body,
 .dark-mode {
