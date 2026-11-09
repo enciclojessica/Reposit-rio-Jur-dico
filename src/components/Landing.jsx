@@ -89,8 +89,10 @@ export default function Landing({ onEntrar }) {
 
   const [estreito, setEstreito] = useState(typeof window !== 'undefined' ? window.innerWidth <= 560 : false)
   const [medio, setMedio] = useState(typeof window !== 'undefined' ? window.innerWidth <= 920 : false)
+  // A faixa só comporta os quatro atalhos de seção acima de ~1180 px.
+  const [amplo, setAmplo] = useState(typeof window !== 'undefined' ? window.innerWidth > 1180 : true)
   useEffect(() => {
-    function onResize() { setEstreito(window.innerWidth <= 560); setMedio(window.innerWidth <= 920) }
+    function onResize() { setEstreito(window.innerWidth <= 560); setMedio(window.innerWidth <= 920); setAmplo(window.innerWidth > 1180) }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
@@ -128,8 +130,8 @@ export default function Landing({ onEntrar }) {
           <nav aria-label="Seções da página" style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 22 }}>
             {!estreito && (
               <>
-                {/* Atalhos de seção só em tela larga: abaixo de 920 px a faixa quebrava em duas linhas. */}
-                {!medio && (
+                {/* Atalhos de seção só em tela larga: abaixo de ~1180 px a faixa quebrava em duas linhas. */}
+                {amplo && (
                   <>
                     <a href="#numeros" style={linkFaixa}>O acervo</a>
                     <a href="#amostra" style={linkFaixa}>Amostra</a>
