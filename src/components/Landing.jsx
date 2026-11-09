@@ -110,7 +110,7 @@ export default function Landing({ onEntrar }) {
   const botaoNeutro = {
     ...botaoPrimario, background: theme.bgDeep, color: theme.text, border: `1px solid ${theme.border}`,
   }
-  const linkFaixa = { color: FAIXA_SUB, fontSize: 13, fontWeight: 500, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTE, display: 'inline-flex', alignItems: 'center', gap: 5, padding: 0 }
+  const linkFaixa = { color: FAIXA_SUB, fontSize: 13, fontWeight: 500, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTE, display: 'inline-flex', alignItems: 'center', gap: 5, padding: 0, whiteSpace: 'nowrap' }
 
   return (
     <div style={{ background: theme.bg, color: theme.text, fontFamily: FONTE_TEXTO, fontSize: 17, lineHeight: 1.7, minHeight: '100vh' }}>
@@ -120,7 +120,7 @@ export default function Landing({ onEntrar }) {
         <div style={{ ...contorno, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 64 }}>
           <a href="#topo" aria-label="Themis Jur, início" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
             <img src="/logo-temis-transparente.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
-            <span>
+            <span style={{ whiteSpace: 'nowrap' }}>
               <span style={{ display: 'block', fontFamily: FONTE_TITULO, fontSize: 18, fontWeight: 600, lineHeight: 1.2, color: FAIXA_TITULO }}>Themis Jur</span>
               <span style={{ display: 'block', fontFamily: FONTE, fontSize: 11, fontStyle: 'italic', color: FAIXA_SUB }}>Inteligência jurídica</span>
             </span>
@@ -128,10 +128,15 @@ export default function Landing({ onEntrar }) {
           <nav aria-label="Seções da página" style={{ display: 'flex', alignItems: 'center', gap: estreito ? 10 : 22 }}>
             {!estreito && (
               <>
-                <a href="#numeros" style={linkFaixa}>O acervo</a>
-                <a href="#amostra" style={linkFaixa}>Amostra</a>
-                <a href="#diferenciais" style={linkFaixa}>Diferenciais</a>
-                <a href="#plataformas" style={linkFaixa}>Plataformas</a>
+                {/* Atalhos de seção só em tela larga: abaixo de 920 px a faixa quebrava em duas linhas. */}
+                {!medio && (
+                  <>
+                    <a href="#numeros" style={linkFaixa}>O acervo</a>
+                    <a href="#amostra" style={linkFaixa}>Amostra</a>
+                    <a href="#diferenciais" style={linkFaixa}>Diferenciais</a>
+                    <a href="#plataformas" style={linkFaixa}>Plataformas</a>
+                  </>
+                )}
                 <a href="/?vitrine=1" style={linkFaixa}>Ver amostra</a>
                 <button type="button" onClick={compartilhar} style={linkFaixa}>
                   {copiado ? <Check size={14} strokeWidth={1.75} /> : <Share2 size={14} strokeWidth={1.75} />}
@@ -141,7 +146,7 @@ export default function Landing({ onEntrar }) {
               </>
             )}
             <SeletorTema onDark />
-            <button type="button" onClick={() => onEntrar('register')} style={{ ...botaoPrimario, padding: '9px 16px', fontSize: 13 }}>
+            <button type="button" onClick={() => onEntrar('register')} style={{ ...botaoPrimario, padding: '9px 16px', fontSize: 13, whiteSpace: 'nowrap' }}>
               {estreito ? 'Solicitar acesso' : 'Solicitar acesso gratuito'}
             </button>
           </nav>
