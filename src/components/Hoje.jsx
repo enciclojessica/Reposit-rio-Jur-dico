@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useTheme } from '../theme'
 import { AreaDot } from '../shared'
 import { supabase } from '../supabase'
+import RevisaoAnotacoes from './RevisaoAnotacoes'
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -43,6 +44,8 @@ export default function Hoje({ entradas, session, onSelectEntrada }) {
         </div>
         <div style={{ fontSize: 13, color: theme.muted, fontFamily: theme.fontSerif }}>{dataCapitalizada}</div>
       </div>
+
+      <RevisaoAnotacoes entradas={entradas} session={session} theme={theme} onSelectEntrada={onSelectEntrada} />
 
       {continuarLendo.length > 0 && (
         <div style={{ marginBottom: 28 }}>
