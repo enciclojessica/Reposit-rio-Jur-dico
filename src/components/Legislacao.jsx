@@ -7,6 +7,7 @@ import { corDaArea } from '../shared'
 import { compararDispositivos, ordenarGruposArtigos } from '../../lib/ordemDispositivos'
 import { conferenciaComentario } from '../utils/conferenciaComentario'
 import { letraDoTitulo, trechosComRemissoes } from '../utils/remissoes'
+import { compararRedacoes, redacaoAtual } from '../utils/diffRedacao'
 import { carregarCobradosOab, textoCobradoOab } from '../supabaseQuestoes'
 
 // Chave do artigo no índice do app de questões: "5" ou "7-A".
@@ -77,6 +78,26 @@ function SeloAlteracao({ alteracoes, vigenciaDiferida, theme }) {
       {texto && <span style={estilo}>{texto}</span>}
       {vigenciaDiferida && <span style={estilo}>Vigência diferida</span>}
     </>
+  )
+}
+
+// ── Comparação da redação anterior com a atual ───────────────────────────────
+// Dispositivo removido ou sem redação atual correspondente: mostra só o texto anterior, sem marcar nada.
+function ComparacaoRedacao({ alteracao, itens, theme }) {
+  const atual = alteracao.operacao === 'DELETE' ? null : redacaoAtual(alteracao, itens)
+  const trechos = useMemo(() => (atual == null ? null : compararRedacoes(alteracao.texto, atual)), [alteracao.texto, atual])
+  const base = { fontSize: 14, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }
+  if (!trechos || trechos.every(t => t.tipo === 'igual')) {
+    return <div style={{ ...base, color: theme.muted }}>{alteracao.texto}</div>
+  }
+  return (
+    <div style={{ ...base, color: theme.text }}>
+      {trechos.map((t, i) => {
+        if (t.tipo === 'removido') return <del key={i} style={{ color: theme.vinho, textDecorationColor: theme.vinho }}>{t.texto}</del>
+        if (t.tipo === 'incluido') return <ins key={i} style={{ textDecoration: 'none', background: theme.gold + '33', borderBottom: `1px solid ${theme.gold}` }}>{t.texto}</ins>
+        return <span key={i}>{t.texto}</span>
+      })}
+    </div>
   )
 }
 
@@ -239,9 +260,13 @@ function ArtigoModal({ grupo, onFechar, entradas, onAbrirEntrada, alteracoes, on
                       <div style={{ fontSize: 11, color: theme.muted, fontFamily: "'IBM Plex Mono', monospace", marginBottom: 2 }}>
                         {rotuloLinha(a)}{a.operacao === 'DELETE' ? ' (removido)' : ''}{a.lei_alteradora ? `, substituído pela ${a.lei_alteradora}` : ''}
                       </div>
-                      <div style={{ fontSize: 14, color: theme.muted, lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>{a.texto}</div>
+                      <ComparacaoRedacao alteracao={a} itens={grupo.itens} theme={theme} />
                     </div>
                   ))}
+                  <div style={{ fontSize: 11, color: theme.muted, fontFamily: "'Inter', sans-serif", display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                    <span><span style={{ textDecoration: 'line-through', color: theme.vinho }}>riscado</span>: saiu</span>
+                    <span><span style={{ background: theme.gold + '33', borderBottom: `1px solid ${theme.gold}` }}>destacado</span>: entrou</span>
+                  </div>
                 </div>
               )}
             </div>
