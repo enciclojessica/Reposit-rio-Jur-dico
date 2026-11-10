@@ -28,7 +28,8 @@ export default function PainelMetricas({ entradas }) {
     async function carregar() {
       const [membrosRes, anotacoesRes, favoritosRes, rascunhosRes, historicoRes, aberturasRes] = await Promise.all([
         supabase.from('membros').select('role, pago, criado_em'),
-        supabase.from('anotacoes').select('id', { count: 'exact', head: true }),
+        // Só o total: desde 10/11/2026 a admin não lê as anotações dos membros (MIGRATION_anotacoes_so_dono_20261110.sql).
+        supabase.rpc('admin_total_anotacoes'),
         supabase.from('favoritos').select('id', { count: 'exact', head: true }),
         supabase.from('pecas_rascunhos').select('id', { count: 'exact', head: true }),
         supabase.from('historico_leitura').select('user_id, entrada_id, visto_em'),
@@ -63,7 +64,7 @@ export default function PainelMetricas({ entradas }) {
         totalMembros: membros.length,
         porRole,
         pagantes,
-        totalAnotacoes: anotacoesRes.count || 0,
+        totalAnotacoes: Number(anotacoesRes.data) || 0,
         totalFavoritos: favoritosRes.count || 0,
         totalRascunhos: rascunhosRes.count || 0,
         ativos7, ativos30,
