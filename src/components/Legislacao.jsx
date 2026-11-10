@@ -487,6 +487,16 @@ export default function Legislacao({ preFiltro, onPreFiltroConsumido, entradas, 
     return mapa
   }, [entradas])
 
+  // Conta a abertura do artigo para o painel de métricas (legislacao_aberturas: só total por artigo e dia, sem quem
+  // abriu). Contador em segundo plano: falha não interrompe a leitura e não precisa de aviso.
+  const chaveAberta = artigoSelecionado?.chave
+  useEffect(() => {
+    if (!artigoSelecionado) return
+    supabase.rpc('registrar_abertura_artigo', {
+      p_codigo: artigoSelecionado.codigo, p_numero: artigoSelecionado.numero, p_titulo: artigoSelecionado.titulo || null,
+    }).then(() => {}, () => {})
+  }, [chaveAberta])
+
   useEffect(() => {
     if (!preFiltro) return
     setCodigoAtivo(preFiltro.codigo || 'todos')

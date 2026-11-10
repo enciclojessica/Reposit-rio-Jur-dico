@@ -3,6 +3,12 @@ import { useTheme } from '../theme'
 import { supabase } from '../supabase'
 
 import { AREAS_VALIDAS } from '../../lib/normalizarArea'
+import { artigosMaisAbertos, diaHaDias, entradasMaisAbertas } from '../utils/metricasUso'
+
+const ROTULO_CODIGO = {
+  cf: 'CF', adct: 'ADCT', cc: 'CC', cdc: 'CDC', cp: 'CP', cpc: 'CPC', cpp: 'CPP', ctb: 'CTB', clt: 'CLT', ctn: 'CTN',
+  lep: 'LEP', lei8906: 'Estatuto da Advocacia', cedoab: 'Código de Ética', lei9099: 'Lei 9.099', lei15040: 'Lei 15.040',
+}
 
 function StatBox({ label, valor, theme, cor }) {
   return (
@@ -20,12 +26,13 @@ export default function PainelMetricas({ entradas }) {
 
   useEffect(() => {
     async function carregar() {
-      const [membrosRes, anotacoesRes, favoritosRes, rascunhosRes, historicoRes] = await Promise.all([
+      const [membrosRes, anotacoesRes, favoritosRes, rascunhosRes, historicoRes, aberturasRes] = await Promise.all([
         supabase.from('membros').select('role, pago, criado_em'),
         supabase.from('anotacoes').select('id', { count: 'exact', head: true }),
         supabase.from('favoritos').select('id', { count: 'exact', head: true }),
         supabase.from('pecas_rascunhos').select('id', { count: 'exact', head: true }),
         supabase.from('historico_leitura').select('user_id, entrada_id, visto_em'),
+        supabase.from('legislacao_aberturas').select('codigo, numero, titulo, dia, aberturas').gte('dia', diaHaDias(30)).limit(5000),
       ])
 
       const membros = membrosRes.data || []
@@ -62,6 +69,9 @@ export default function PainelMetricas({ entradas }) {
         ativos7, ativos30,
         porDia,
         vistasSet,
+        historico,
+        artigosAbertos: artigosMaisAbertos(aberturasRes.data),
+        erroAberturas: aberturasRes.error ? 'Não foi possível ler as aberturas de artigos.' : '',
       })
       setLoading(false)
     }
@@ -82,6 +92,8 @@ export default function PainelMetricas({ entradas }) {
     .map(area => ({ area, count: porArea[area] || 0 }))
     .sort((a, b) => b.count - a.count)
   const maxArea = Math.max(1, ...distribuicaoAreas.map(a => a.count))
+
+  const maisAbertas = entradasMaisAbertas(dados.historico, entradas)
 
   // Nunca abertas: entradas cuja id não aparece em nenhuma linha de
   // historico_leitura. Mais antigas primeiro (quanto mais tempo sem
@@ -168,6 +180,51 @@ export default function PainelMetricas({ entradas }) {
             </div>
             <div style={{ width: 26, textAlign: 'right', flexShrink: 0, fontSize: 12, color: count === 0 ? theme.muted : theme.gold, fontFamily: theme.fontTitle }}>
               {count}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 4 }}>
+          Entradas mais abertas, últimos 30 dias
+        </div>
+        <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 12 }}>
+          Quantos membros diferentes abriram cada entrada (o histórico guarda a última leitura de cada membro, não cada abertura).
+        </div>
+        {maisAbertas.length === 0 ? (
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Nenhuma leitura nos últimos 30 dias.</div>
+        ) : maisAbertas.map(({ entrada, membros }) => (
+          <div key={entrada.id} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>{entrada.tema}</div>
+              <div style={{ fontSize: 11, color: theme.muted, fontFamily: theme.fontSerif }}>{entrada.area}, {entrada.tipo}</div>
+            </div>
+            <div style={{ fontSize: 13, color: theme.gold, fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>
+              {membros} {membros === 1 ? 'membro' : 'membros'}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 13, color: theme.text, fontFamily: theme.fontTitle, fontWeight: 600, marginBottom: 4 }}>
+          Artigos mais abertos, últimos 30 dias
+        </div>
+        <div style={{ fontSize: 11, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif, marginBottom: 12 }}>
+          Aberturas do artigo na tela de legislação, por membros aprovados. Conta desde 10/11/2026 e não guarda quem abriu.
+        </div>
+        {dados.erroAberturas ? (
+          <div role="alert" style={{ fontSize: 12, color: theme.error, fontFamily: theme.fontSerif }}>{dados.erroAberturas}</div>
+        ) : dados.artigosAbertos.length === 0 ? (
+          <div style={{ fontSize: 12, color: theme.muted, fontStyle: 'italic', fontFamily: theme.fontSerif }}>Nenhum artigo aberto ainda.</div>
+        ) : dados.artigosAbertos.map(a => (
+          <div key={`${a.codigo}|${a.numero}|${a.titulo}`} style={{ padding: '6px 0', borderTop: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ fontSize: 13, color: theme.text, fontFamily: "'Inter', sans-serif" }}>
+              {ROTULO_CODIGO[a.codigo] || a.codigo.toUpperCase()}, {a.titulo || `Art. ${a.numero}`}
+            </div>
+            <div style={{ fontSize: 13, color: theme.gold, fontFamily: "'IBM Plex Mono', monospace", whiteSpace: 'nowrap' }}>
+              {a.aberturas} {a.aberturas === 1 ? 'abertura' : 'aberturas'}
             </div>
           </div>
         ))}
